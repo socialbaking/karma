@@ -2,6 +2,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
+import ProductHeader from "@/components/product/header";
 
 type Product = {
   id: number;
@@ -47,13 +48,7 @@ const Products = () => {
       <Header />
 
       <main className="flex w-full flex-1 flex-col items-center justify-center px-20 text-center">
-        <h1 className="text-6xl font-bold">
-          Welcome to{' '}
-          <span className="text-green-600">
-            CannaSPY
-          </span>
-        </h1>
-
+        <ProductHeader />
         <p className="mt-3 text-2xl">
           Your experiences. Your data. Your insights.
         </p>

@@ -2,8 +2,9 @@ import axios from "axios";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import Footer from "@/components/footer";
-import Header from "@/components/header";
+import ProductHeader from "@/components/product/header";
 import Product  from "types/product.d";
+import Header from "@/components/header";
 
 // get a single product based on the id from slug
 const Product = () => {
@@ -14,12 +15,16 @@ const Product = () => {
   const { asPath, pathname } = useRouter();
   console.log("✅ asPath", asPath);
   console.log("✅ pathname", pathname);
+  const getIdFromSlug = asPath.split("/")[2];
+  console.log("🚗 ggggetIdFromSlug", getIdFromSlug);
 
   useEffect(() => {
+    if (!Number(getIdFromSlug)) return;
     const fetchData = async () => {
       setLoading(true);
       setError(false);
-      const api_link = `http://localhost:1337/api/products/${asPath.split("/")[2]}`;
+
+      const api_link = `http://localhost:1337/api/products/${getIdFromSlug}`;
       console.log("❌ api_link", api_link);
       try {
         const { data } = await axios.get(api_link);
@@ -32,7 +37,7 @@ const Product = () => {
       setLoading(false);
     };
     fetchData();
-  } , []);
+  } , [getIdFromSlug]);
 
   if (loading) {
     return <p>Loading...</p>;
@@ -47,13 +52,7 @@ const Product = () => {
       <Header />
 
       <main className="flex w-full flex-1 flex-col items-center justify-center px-20 text-center">
-        <h1 className="text-6xl font-bold">
-          Welcome to{' '}
-          <span className="text-green-600">
-            CannaSPY
-          </span>
-        </h1>
-
+        <ProductHeader />
         <p className="mt-3 text-2xl">
           Your experiences. Your data. Your insights.
         </p>
@@ -62,14 +61,9 @@ const Product = () => {
           {product?.attributes?.name}
         </ul>
       </main>
+      <Footer />
     </div>
   );
 }
 
 export default Product;
-
-// export default Products;
-// import React from 'react';
-// import { useParams } from 'react-router-dom';
-// import { useQuery } from '@apollo/react-hooks';
-// import { gql } from 'apollo-boost';
