@@ -1,12 +1,11 @@
 function Header() {
   return (
     <div>
-      <h1 className="text-6xl font-bold">
+      <h3 className="text-2xl font-bold">
         <span className="text-green-600">
-          CannaSPY
+          Products
         </span>
-        {' '} Products
-      </h1>
+      </h3>
     </div>
   )
 }
