@@ -49,9 +49,6 @@ const Products = () => {
 
       <main className="flex w-full flex-1 flex-col items-center justify-center px-20 text-center">
         <ProductHeader />
-        <p className="mt-3 text-2xl">
-          Your experiences. Your data. Your insights.
-        </p>
 
         <ul className="mt-10">
           {products?.map((product) => (
