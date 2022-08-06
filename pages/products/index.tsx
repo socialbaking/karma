@@ -1,10 +1,17 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import Header from "../components/header";
-import Footer from "../components/footer";
+import Header from "@/components/header";
+import Footer from "@/components/footer";
+
+type Product = {
+  id: number;
+  attributes: {
+    name: string;
+  };
+};
 
 const Products = () => {
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
 
@@ -52,9 +59,9 @@ const Products = () => {
         </p>
 
         <ul className="mt-10">
-          {products.map((product) => (
-            <li key={product.attributes.id}>
-              <a href={`/products/${product.attributes.id}`}>{product.attributes.name}</a>
+          {products?.map((product) => (
+            <li key={product?.id}>
+              <a href={`/products/${product?.id}`}>{product?.attributes?.name}</a>
             </li>
           ))}
         </ul>
