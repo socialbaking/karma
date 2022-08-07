@@ -3,11 +3,22 @@ import React, { useEffect, useState } from "react";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import ProductHeader from "@/components/product/header";
+import { CalendarIcon, LocationMarkerIcon, UsersIcon } from '@heroicons/react/solid'
 
 type Product = {
   id: number;
   attributes: {
     name: string;
+    createdAt: string;
+    updatedAt: string;
+    category: {
+      data: {
+        id: number;
+        attributes: {
+          name: string;
+        };
+      };
+    }
   };
 };
 
@@ -22,7 +33,7 @@ const Products = () => {
       setError(false);
       try {
         const { data } = await axios.get(
-          "http://localhost:1337/api/products"
+          "http://localhost:1337/api/products?populate=category"
         );
         const result = data.data;
         console.log("result", result);
@@ -44,24 +55,53 @@ const Products = () => {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center py-2">
+    <div className="h-screen flex flex-col">
       <Header />
-
-      <main className="flex w-full flex-1 flex-col items-center justify-center px-20 text-center">
-        <ProductHeader />
-
-        <ul className="mt-10">
-          {products?.map((product) => (
-            <li key={product?.id}>
-              <a href={`/products/${product?.id}`}>{product?.attributes?.name}</a>
+      <main className="flex w-full flex-1 flex-col px-20 p-8">
+        <div className="bg-white shadow overflow-hidden sm:rounded-md">
+        <ul role="list" className="divide-y divide-gray-200">
+          {products.map((product) => (
+            <li key={product.id}>
+              <a href="#" className="block hover:bg-gray-50">
+                <div className="px-4 py-4 sm:px-6">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-medium text-indigo-600 truncate">{product?.attributes?.name}</p>
+                    <div className="ml-2 flex-shrink-0 flex">
+                      <p className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                        Type
+                      </p>
+                    </div>
+                  </div>
+                  <div className="mt-2 sm:flex sm:justify-between">
+                    <div className="sm:flex">
+                      <p className="flex items-center text-sm text-gray-500">
+                        <UsersIcon className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" aria-hidden="true" />
+                        {product?.attributes?.category?.data?.attributes?.name}
+                      </p>
+                      <p className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0 sm:ml-6">
+                        <LocationMarkerIcon className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" aria-hidden="true" />
+                        Location
+                      </p>
+                    </div>
+                    <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
+                    <CalendarIcon className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" aria-hidden="true" />
+                    <p>
+                      Added on <time dateTime={product?.attributes?.createdAt}>{
+                        new Intl.DateTimeFormat('en-NZ', { year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(product?.attributes?.createdAt))
+                      }</time>
+                    </p>
+                  </div>
+                  </div>
+                </div>
+              </a>
             </li>
           ))}
         </ul>
+        </div>
       </main>
-
       <Footer />
     </div>
-  );
+  )
 };
 
 export default Products;
