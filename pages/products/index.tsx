@@ -1,14 +1,16 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import ProductHeader from "@/components/product/header";
-import { CalendarIcon, LocationMarkerIcon, UsersIcon } from '@heroicons/react/solid'
+import { CalendarIcon, CalculatorIcon, VariableIcon, UsersIcon, GlobeIcon } from '@heroicons/react/solid'
 
 type Product = {
   id: number;
   attributes: {
     name: string;
+    THC: number;
+    CBD: number;
     createdAt: string;
     updatedAt: string;
     category: {
@@ -54,6 +56,14 @@ const Products = () => {
     return <p>Error!</p>;
   }
 
+  const INGREDIENTS = ["CBD", "THC", "CBG"] as const;
+  const attributes = products.map(product => product.attributes);
+  const ingredients = useMemo(() => {
+    if (!attributes) return [];
+    return [...INGREDIENTS].filter(key => attributes[key]).sort((a, b) => attributes[a] < attributes[b] ? -1 : 1)
+  }, [attributes]
+
+
   return (
     <div className="h-screen flex flex-col">
       <Header />
@@ -67,21 +77,28 @@ const Products = () => {
                   <div className="flex items-center justify-between">
                     <p className="text-sm font-medium text-indigo-600 truncate">{product?.attributes?.name}</p>
                     <div className="ml-2 flex-shrink-0 flex">
-                      <p className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                        Type
+                    {ingredients.map(key => (
+                    <p key={key} className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${product?.attributes?.[key] > product?.attributes?.[key] ? "bg-green-400" : "bg-green-100"} bg-green-100 text-green-800`}>
+                      {key}: {product?.attributes?.[key]}%
                       </p>
+                      ))}
                     </div>
                   </div>
                   <div className="mt-2 sm:flex sm:justify-between">
                     <div className="sm:flex">
                       <p className="flex items-center text-sm text-gray-500">
-                        <UsersIcon className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" aria-hidden="true" />
+                        <GlobeIcon className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" aria-hidden="true" />
                         {product?.attributes?.category?.data?.attributes?.name}
                       </p>
-                      <p className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0 sm:ml-6">
-                        <LocationMarkerIcon className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" aria-hidden="true" />
-                        Location
+                      {/* <p className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0 sm:ml-6">
+                        <CalculatorIcon className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" aria-hidden="true" />
+                        <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" fill="none" viewBox="0 0 18 18" height="20" width="20"><path fill-rule="evenodd" clip-rule="evenodd" d="M15.523 9.648L9.648 3.773 3.773 9.648l5.875 5.875 5.875-5.875zM9.648.944L.945 9.648l8.703 8.704 8.704-8.704L9.648.944z" fill="text-gray-400"></path></svg>
+                        {product?.attributes?.THC}%
                       </p>
+                      <p className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0 sm:ml-6">
+                        <VariableIcon className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" aria-hidden="true" />
+                        {product?.attributes?.CBD}%
+                      </p> */}
                     </div>
                     <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
                     <CalendarIcon className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" aria-hidden="true" />
