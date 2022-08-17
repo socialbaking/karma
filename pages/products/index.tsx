@@ -9,8 +9,8 @@ type Product = {
   id: number;
   attributes: {
     name: string;
-    THC: number;
-    CBD: number;
+    THC: string;
+    CBD: string;
     createdAt: string;
     updatedAt: string;
     category: {
@@ -56,12 +56,15 @@ const Products = () => {
     return <p>Error!</p>;
   }
 
-  const INGREDIENTS = ["CBD", "THC", "CBG"] as const;
+  const INGREDIENTS = ["CBD", "THC", "CBG"];
+  console.log("ingredients", INGREDIENTS);
   const attributes = products.map(product => product.attributes);
-  const ingredients = useMemo(() => {
-    if (!attributes) return [];
-    return [...INGREDIENTS].filter(key => attributes[key]).sort((a, b) => attributes[a] < attributes[b] ? -1 : 1)
-  }, [attributes]
+  console.log("attributes", attributes);
+  // const ingredients = useMemo(() => {
+  //   if (!attributes) return [];
+  //   return [...INGREDIENTS].filter(key => attributes[key]).sort((a, b) => attributes[a] < attributes[b] ? -1 : 1)
+  // }, [attributes]);
+  // console.log("ingredients", ingredients);
 
 
   return (
@@ -77,11 +80,17 @@ const Products = () => {
                   <div className="flex items-center justify-between">
                     <p className="text-sm font-medium text-indigo-600 truncate">{product?.attributes?.name}</p>
                     <div className="ml-2 flex-shrink-0 flex">
-                    {ingredients.map(key => (
+                    {/* {ingredients.map(key => (
                     <p key={key} className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${product?.attributes?.[key] > product?.attributes?.[key] ? "bg-green-400" : "bg-green-100"} bg-green-100 text-green-800`}>
                       {key}: {product?.attributes?.[key]}%
                       </p>
-                      ))}
+                      ))} */}
+                      <p className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${product?.attributes?.THC > product?.attributes?.CBD ? "bg-green-400" : "bg-green-100"} text-green-800`}>
+                        THC: {product?.attributes?.THC}%
+                      </p>
+                      <p className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${product?.attributes?.THC < product?.attributes?.CBD ? "bg-green-400" : "bg-green-100"} text-green-800`}>
+                        CBD: {product?.attributes?.CBD}%
+                      </p>
                     </div>
                   </div>
                   <div className="mt-2 sm:flex sm:justify-between">
