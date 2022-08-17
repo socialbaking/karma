@@ -1,4 +1,5 @@
 import React from "react";
+import dynamic from 'next/dynamic'
 
 const Logo = ({
   primary = "",
@@ -47,4 +48,4 @@ const Logo = ({
   );
 };
 
-export { Logo };
+export default dynamic(()=> Promise.resolve(Logo), {ssr: false});
