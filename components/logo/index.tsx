@@ -1,25 +1,50 @@
-import { Logo } from "./Logo";
+import React from "react";
 
-function App() {
+const Logo = ({
+  primary = "",
+  secondary = "",
+  size = "1rem",
+  fontProps = {},
+  iconOnly = false
+}) => {
+  const logoStyle = {
+    width: `calc(${size} + 20px)`,
+    height: `calc(${size} + 20px)`
+  };
+  const primaryStyle = {
+    fontWeight: "normal",
+    fontFamily: "PT Sans",
+    fontSize: size,
+    paddingLeft: "10px",
+    ...fontProps
+  };
+  const secondaryStyle = {
+    fontWeight: "bold",
+    fontFamily: "PT Sans",
+    fontSize: size,
+    ...fontProps
+  };
+  const containerStyle = {
+    display: "flex" as const,
+    flexDirection: 'row' as const,
+    alignContent: "center",
+    alignItems: "flex-end"
+  };
   return (
-    <div className="App">
-      <h2>test</h2>
-      <Logo primary="pharma" secondary="karma" />
-      <Logo primary="pharma" secondary="karma" size="2rem" />
-      <Logo primary="canna" secondary="spy" size="2rem" />
-
-      <Logo
-        primary="pharma"
-        secondary="karma"
-        size="2rem"
-        fontProps={{
-          color: "#ff00ff"
-        }}
+    <div style={containerStyle}>
+      <img
+        alt={`${primary}-${secondary}`}
+        src="/SVG/default.svg"
+        style={logoStyle}
       />
-      <Logo iconOnly />
-      <Logo iconOnly size="2rem" />
+      {!iconOnly && (
+        <>
+          <span style={primaryStyle}>{primary}</span>
+          <span style={secondaryStyle}>{secondary}</span>
+        </>
+      )}
     </div>
   );
-}
+};
 
-export default App;
+export { Logo };
