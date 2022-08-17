@@ -23,6 +23,6 @@
     "jsx": "preserve",
     "incremental": true
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "pages/api/products.js", "pages/api/products.js", "pages/api/products.js", "components/logo/index.jsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "pages/api/products.js", "pages/api/products.js", "pages/api/products.js"],
   "exclude": ["node_modules"]
 }
