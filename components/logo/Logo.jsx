@@ -34,13 +34,13 @@ const Logo = ({
   };
   return (
     <div style={containerStyle}>
-      {/* <img
+      <img
         alt={`${primary}-${secondary}`}
-        src={DefaultLogo}
+        src="/SVG/default.svg"
         style={logoStyle}
-      /> */}
+      />
             {/* <Image className={logoStyle} src={DefaultLogo} width={50} height={50} alt="CannaSPY Logo" /> */}
-      <Image className="justify-self-center" src={DefaultLogo} width={50} height={50} alt="CannaSPY Logo" />
+      {/* <Image className="justify-self-center" src={DefaultLogo} style={logoStyle} alt="CannaSPY Logo" /> */}
       {!iconOnly && (
         <>
           <span style={primaryStyle}>{primary}</span>
