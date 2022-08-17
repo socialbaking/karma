@@ -1,6 +1,7 @@
 import Head from 'next/head'
-import Image from 'next/image'
-import logo from "@/public/logo.png"
+// import Image from 'next/image'
+// import logo from "@/public/logo.png"
+import Logo from '@/components/logo'
 
 const navigation = [
   { name: 'Home', href: '/' },
@@ -23,7 +24,8 @@ function Header() {
             <div className="flex items-center">
               <a href="#">
                 <span className="sr-only">CannaSPY</span>
-                <Image className="h-10 w-auto" src={logo} width={50} height={50} alt="CannaSPY Logo" />
+                {/* <Image className="h-10 w-auto" src={logo} width={50} height={50} alt="CannaSPY Logo" /> */}
+                <Logo iconOnly />
               </a>
               <div className="hidden ml-10 space-x-8 lg:block">
                 {navigation?.map((link) => (
