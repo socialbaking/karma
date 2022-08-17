@@ -1,6 +1,6 @@
 // import Image from 'next/image'
 // import logo from "../public/logo.png"
-import { Logo } from '@/components/logo'
+import Logo from '@/components/logo'
 
 function Footer() {
   return (
