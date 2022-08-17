@@ -4,6 +4,7 @@ import Image from 'next/image'
 import Header from '@/components/header'
 import Footer from '@/components/footer'
 import Features from '@/components/features'
+import Logo from '@/components/logo'
 
 const Home: NextPage = () => {
   return (
@@ -11,6 +12,7 @@ const Home: NextPage = () => {
       <Header />
       <main className="flex w-full flex-1 flex-col items-center px-20">
         <Features />
+        <Logo />
         {/* <article className="prose lg:prose-xl">
           <h1>Garlic bread with cheese: What the science tells us</h1>
           <p>
