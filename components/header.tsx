@@ -13,8 +13,8 @@ function Header() {
   return (
     <div>
       <Head>
-          <title>CannaSPY</title>
-          <meta property="og:title" content="CannaSPY" key="title" />
+          <title>pharmakarma</title>
+          <meta property="og:title" content="pharmakarma" key="title" />
           <link rel="icon" href="/logo.png" />
       </Head>
       <header className="relative bg-white">
@@ -23,8 +23,7 @@ function Header() {
           <div className="w-full py-6 flex items-center justify-between border-b border-green-500 lg:border-none">
             <div className="flex items-center">
               <a href="#">
-                <span className="sr-only">CannaSPY</span>
-                {/* <Image className="h-10 w-auto" src={logo} width={50} height={50} alt="CannaSPY Logo" /> */}
+                <span className="sr-only">pharmakarma</span>
                 <Logo iconOnly />
               </a>
               <div className="hidden ml-10 space-x-8 lg:block">
