@@ -70,11 +70,11 @@ function ListItem({ id, attributes }) {
             </div>
             <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
             <CalendarIcon className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" aria-hidden="true" />
-            {/* <p>
+            <p>
               Added on <time dateTime={attributes?.createdAt}>{
                 new Intl.DateTimeFormat('en-NZ', { year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(attributes?.createdAt))
               }</time>
-            </p> */}
+            </p>
           </div>
           </div>
         </div>
