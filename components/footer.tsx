@@ -7,12 +7,8 @@ function Footer() {
     <footer className="bg-gray-800" aria-labelledby="footer-heading">
       <div className="container px-5 py-8 mx-auto flex items-center sm:flex-row flex-col">
         <p className="flex title-font font-medium items-center md:justify-start justify-center text-green-600">
-          {/* <Image className="justify-self-center" src={logo} width={50} height={50} alt="CannaSPY Logo" /> */}
           <Logo primary="pharma" secondary="karma" />
         </p>
-        {/* <p className="text-sm text-gray-500 sm:ml-4 sm:pl-4 sm:border-l-2 sm:border-gray-200 sm:py-2 sm:mt-0 mt-4">© 2022 CannaSPY —
-          <a href="https://twitter.com/CannaSPY" className="text-gray-600 ml-1" rel="noopener noreferrer" target="_blank">@CannaSPY</a>
-        </p> */}
         <span className="inline-flex sm:ml-auto sm:mt-0 mt-4 justify-center sm:justify-start">
           <a className="ml-3 text-gray-500">
             <svg fill="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" className="w-5 h-5" viewBox="0 0 24 24">
