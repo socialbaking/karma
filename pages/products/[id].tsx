@@ -3,12 +3,12 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import Footer from "@/components/footer";
 import ProductHeader from "@/components/product/header";
-import Product  from "types/product.d";
+import ProductType  from "types/product.d";
 import Header from "@/components/header";
 
 // get a single product based on the id from slug
 const Product = () => {
-  const [product, setProduct] = useState<Product>();
+  const [product, setProduct] = useState<ProductType>();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
 
