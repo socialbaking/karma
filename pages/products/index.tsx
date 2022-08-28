@@ -46,7 +46,7 @@ const Products = () => {
         <div className="bg-white shadow overflow-hidden sm:rounded-md">
         <ul role="list" className="divide-y divide-gray-200">
         {products.map((x) => (
-          <ListItem id={x.id} attributes={x.attributes} />
+          <ListItem key={x.id} id={x.id} attributes={x.attributes} />
         ))}
         </ul>
         </div>
