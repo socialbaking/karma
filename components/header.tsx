@@ -7,7 +7,7 @@ const navigation = [
   { name: 'Home', href: '/' },
   { name: 'Products', href: '/products' },
   { name: 'About', href: '/about' },
-  { name: 'Contact', href: '/contact' },
+  // { name: 'Contact', href: '/contact' },
 ];
 
 function Header() {
@@ -45,7 +45,7 @@ function Header() {
                 ))}
               </div>
             </div>
-            <div className="ml-10 space-x-4">
+            {/* <div className="ml-10 space-x-4">
               <a
                 href="#"
                 className="inline-block bg-green-700 py-2 px-4 border border-transparent rounded-md text-base font-medium text-white hover:bg-opacity-75"
@@ -58,7 +58,7 @@ function Header() {
               >
                 Sign up
               </a>
-            </div>
+            </div> */}
           </div>
         </nav>
       </header>
