@@ -13,9 +13,11 @@ function ListItem({ id, attributes }: ProductType) {
 	// }, [attributes]);
 	// console.log("ingredients xyz", ingredients);
 
+	const productUrl = `/products/${id}`;
+
 	return (
 		<li key={id}>
-			<a href="#" className="block hover:bg-gray-50">
+			<a href={productUrl} className="block hover:bg-gray-50">
 				<div className="px-4 py-4 sm:px-6">
 					<div className="flex items-center justify-between">
 						<p className="text-sm font-medium text-indigo-600 truncate">
