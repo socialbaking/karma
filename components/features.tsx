@@ -2,27 +2,27 @@ import { AnnotationIcon, GlobeAltIcon, LightningBoltIcon, ScaleIcon } from '@her
 
 const data = [
   {
-    name: 'Competitive prices.',
+    name: 'Community Built.',
     description:
-      'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Maiores impedit perferendis suscipit eaque, iste dolor cupiditate blanditiis ratione.',
+      'A community built website for medicinal cannabis education is an amazinng way to provides access to reliable, evidence-based information and empowers individuals to make informed decisions about their health. It also connects people interested in medicinal cannabis and improves health outcomes through safe and effective use.',
     icon: GlobeAltIcon,
   },
   {
     name: 'Complete transparency.',
     description:
-      'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Maiores impedit perferendis suscipit eaque, iste dolor cupiditate blanditiis ratione.',
+      'We are a community built website and we want to hear from you. We are committed to providing the most up-to-date information on the latest research and developments in the field of medicinal cannabis.',
     icon: ScaleIcon,
   },
   {
     name: 'Real reviews. Real People.',
     description:
-      'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Maiores impedit perferendis suscipit eaque, iste dolor cupiditate blanditiis ratione.',
+      'Eveyrone gets a voice. We believe that everyone should have a voice and that everyone should be able to share their experiences. We are a community built website and we want to hear from you.',
     icon: LightningBoltIcon,
   },
   {
-    name: 'Health Tracker.',
+    name: 'Market Tracker.',
     description:
-      'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Maiores impedit perferendis suscipit eaque, iste dolor cupiditate blanditiis ratione.',
+      'Our Market analysis tracks medicinal cannabis product prices helps individuals save money by providing up-to-date information for informed purchasing decisions.',
     icon: AnnotationIcon,
   },
 ]
