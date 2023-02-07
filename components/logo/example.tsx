@@ -1,4 +1,4 @@
-import { Logo } from "./index";
+import Logo from "@/components/logo";
 
 function App() {
   return (
