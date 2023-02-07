@@ -19,9 +19,9 @@ const Home: NextPage = () => {
 
     router.push('/');
 
-    nameRef.current.value = '';
-    emailRef.current.value = '';
-    messageRef.current.value = '';
+    // nameRef.current.value = '';
+    // emailRef.current.value = '';
+    // messageRef.current.value = '';
   };
   return (
     <div className="h-screen flex flex-col">
