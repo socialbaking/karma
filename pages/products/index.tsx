@@ -12,14 +12,15 @@ const Products = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
 
-  const API_URL = "http://localhost:1337/api/products?populate=category";
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+  const API = `${API_URL}/products?populate=category`;
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       setError(false);
       try {
-        const { data } = await axios.get(API_URL);
+        const { data } = await axios.get(API);
         const result = data.data;
         console.log("result", result);
         setProducts(result);

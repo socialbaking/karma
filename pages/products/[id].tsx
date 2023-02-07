@@ -26,10 +26,10 @@ const Product = () => {
 			setLoading(true);
 			setError(false);
 
-			const api_link = `http://localhost:1337/api/products/${getIdFromSlug}`;
-			console.log("❌ api_link", api_link);
+			const API_URL = process.env.NEXT_PUBLIC_API_URL;
+			const getProduct = `${API_URL}/products/${getIdFromSlug}`;
 			try {
-				const { data } = await axios.get(api_link);
+				const { data } = await axios.get(getProduct);
 				const result = data.data;
 				console.log("result", result);
 				setProduct(result);
