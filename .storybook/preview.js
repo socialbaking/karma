@@ -1,16 +1,23 @@
-import { addDecorator } from '@storybook/react';
-import { initialize, mswDecorator } from 'msw-storybook-addon';
+// import '../src/styles/globals.css';
+import '../styles/globals.css';
+import * as NextImage from 'next/image';
 
-initialize();
+const OriginalNextImage = NextImage.default;
 
-export const decorators = [mswDecorator];
+Object.defineProperty(NextImage, 'default', {
+  configurable: true,
+  value: (props) => <OriginalNextImage {...props} unoptimized />,
+});
 
 export const parameters = {
-  actions: { argTypesRegex: "^on[A-Z].*" },
+  actions: { argTypesRegex: '^on[A-Z].*' },
   controls: {
     matchers: {
       color: /(background|color)$/i,
       date: /Date$/,
     },
   },
-}
+  previewTabs: {
+    'storybook/docs/panel': { index: -1 },
+  },
+};
