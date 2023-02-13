@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-import React, { useMemo } from "react";
+import React from "react";
 import ProductType from "types/product.d";
 import { CalendarIcon, GlobeIcon } from "@heroicons/react/solid";
 

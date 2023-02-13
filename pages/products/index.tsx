@@ -1,11 +1,9 @@
 import axios from "axios";
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState } from "react";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import ProductType  from "types/product.d";
-import ProductHeader from "@/components/product/header";
 import ListItem from "@/components/product/listItem";
-import { CalendarIcon, CalculatorIcon, VariableIcon, UsersIcon, GlobeIcon } from '@heroicons/react/solid';
 
 const Products = () => {
   const [products, setProducts] = useState<ProductType[]>([]);

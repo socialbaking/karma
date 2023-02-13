@@ -1,7 +1,7 @@
 import type { NextPage } from 'next';
 import Header from '@/components/header';
 import { useRef } from 'react';
-import axios from 'axios';
+// import axios from 'axios';
 import { useRouter } from 'next/router';
 const Home: NextPage = () => {
   const nameRef = useRef<HTMLInputElement>(null);
@@ -11,11 +11,12 @@ const Home: NextPage = () => {
   const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault();
 
-    const res = await axios.post('/api/contact', {
-      name: nameRef.current?.value,
-      email: emailRef.current?.value,
-      message: messageRef.current?.value,
-    });
+    // TODO: Actually complete this
+    // const res = await axios.post('/api/contact', {
+    //   name: nameRef.current?.value,
+    //   email: emailRef.current?.value,
+    //   message: messageRef.current?.value,
+    // });
 
     router.push('/');
 

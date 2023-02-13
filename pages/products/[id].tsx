@@ -2,7 +2,6 @@ import axios from "axios";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import Footer from "@/components/footer";
-import ProductHeader from "@/components/product/header";
 import ProductType  from "types/product.d";
 import Header from "@/components/header";
 import ProductFeature from "@/components/product/feature";
@@ -13,7 +12,7 @@ const Product = () => {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState(false);
 
-	const { asPath, pathname, query } = useRouter();
+	const { query } = useRouter();
 	// console.log("✅ asPath", asPath);
 	// console.log("✅ pathname", pathname);
 	// const getIdFromSlug = asPath.split("/")[2];
