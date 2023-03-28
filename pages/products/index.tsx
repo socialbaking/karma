@@ -32,7 +32,7 @@ const Products = () => {
   }, []);
 
   if (loading) {
-    return <p>Loading...</p>;
+    return <></>;
   }
 
   if (error) {
