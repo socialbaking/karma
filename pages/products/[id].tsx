@@ -2,6 +2,7 @@ import axios from "axios";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import Footer from "@/components/footer";
+import Error from "@/components/error";
 import ProductType  from "types/product.d";
 import Header from "@/components/header";
 import ProductFeature from "@/components/product/feature";
@@ -44,9 +45,9 @@ const Product = () => {
 		return <p>Loading...</p>;
 	}
 
-	if (error) {
-		return <p>Error!</p>;
-	}
+  if (error) {
+    return <Error message="Something went wrong." />;
+  }
 
 	return (
 		<div className="h-screen flex flex-col">

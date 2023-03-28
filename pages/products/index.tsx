@@ -2,6 +2,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
+import Error from "@/components/error";
 import ProductType  from "types/product.d";
 import ListItem from "@/components/product/listItem";
 
@@ -35,7 +36,7 @@ const Products = () => {
   }
 
   if (error) {
-    return <p>Error!</p>;
+    return <Error message="Something went wrong." />;
   }
 
   return (
