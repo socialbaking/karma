@@ -92,6 +92,53 @@ The program requires at a minimum:
 - Request: `GET /system-logs`
 - Response: `[ {"timestamp": "2022-05-01T10:30:00Z", "message": "Unique code generated", "code": "ABC123" }, {"timestamp": "2022-05-01T11:00:00Z", "message": "Unique code redeemed", "code": "ABC123", "partner_id": "1234" }]`
 
+### API SDK Example
+
+```typescript
+interface UniqueCode {
+  unique_code: string;
+  value: number;
+}
+
+interface Partner {
+  partner_id: string;
+  partner_name: string;
+  location: string;
+}
+
+interface UniqueCodeDetails extends UniqueCode {
+  partner_id: string;
+}
+
+interface CodeValidity {
+  valid: boolean;
+}
+
+interface SystemLog {
+  timestamp: string;
+  message: string;
+  code?: string;
+  partner_id?: string;
+}
+
+interface PaymentTransfer {
+  unique_code: string;
+  amount: number;
+}
+
+interface VouchSDK {
+  generateUniqueCode(): Promise<UniqueCode>;
+  verifyUniqueCode(uniqueCode: string, partnerId: string): Promise<CodeValidity>;
+  getUniqueCodeDetails(uniqueCode: string): Promise<UniqueCodeDetails>;
+  addPartner(partner: Partner): Promise<{ success: boolean }>;
+  assignUniqueCode(uniqueCode: string, partnerId: string): Promise<{ success: boolean }>;
+  getUniqueCodeData(uniqueCode: string): Promise<UniqueCodeDetails>;
+  processPayment(paymentTransfer: PaymentTransfer): Promise<{ success: boolean }>;
+  acceptUniqueCode(uniqueCode: string): Promise<{ success: boolean }>;
+  getSystemLogs(): Promise<SystemLog[]>;
+}
+```
+
 ## Vouch System Architecture
 
 The Vouch system will use a serverless architecture based on AWS Lambda and Node.js. This approach allows for flexibility and scalability while minimizing operational costs. The system will interact with other services such as Xero and WordPress through their respective APIs.
