@@ -126,15 +126,19 @@ interface PaymentTransfer {
     amount: number;
 }
 
+interface APIStatus {
+    success: boolean
+}
+
 interface VouchSDK {
     generateUniqueCode(): Promise<UniqueCode>;
     verifyUniqueCode(uniqueCode: string, partnerId: string): Promise<CodeValidity>;
     getUniqueCodeDetails(uniqueCode: string): Promise<UniqueCodeDetails>;
-    addPartner(partner: Partner): Promise<{ success: boolean }>;
-    assignUniqueCode(uniqueCode: string, partnerId: string): Promise<{ success: boolean }>;
+    addPartner(partner: Partner): Promise<APIStatus>;
+    assignUniqueCode(uniqueCode: string, partnerId: string): Promise<APIStatus>;
     getUniqueCodeData(uniqueCode: string): Promise<UniqueCodeDetails>;
-    processPayment(paymentTransfer: PaymentTransfer): Promise<{ success: boolean }>;
-    acceptUniqueCode(uniqueCode: string): Promise<{ success: boolean }>;
+    processPayment(paymentTransfer: PaymentTransfer): Promise<APIStatus>;
+    acceptUniqueCode(uniqueCode: string): Promise<APIStatus>;
     getSystemLogs(): Promise<SystemLog[]>;
 }
 ```
