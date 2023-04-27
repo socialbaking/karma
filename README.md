@@ -48,7 +48,7 @@ The program requires at a minimum:
 #### Verify Code Validity
 
 - Request: `POST /verify-unique-code`
-- Request Body: `{ "unique_code": "ABC123", "clinic_id": "1234" }`
+- Request Body: `{ "unique_code": "ABC123", "partner_id": "1234" }`
 - Response: `{ "valid": true }`
 
 #### Retrieve Code Public Details
@@ -66,7 +66,7 @@ The program requires at a minimum:
 #### Assign Unique Code / Redeem Unique Code
 
 - Request: `POST /assign-unique-code`
-- Request Body: `{ "unique_code": "ABC123", "clinic_id": "1234" }`
+- Request Body: `{ "unique_code": "ABC123", "partner_id": "1234" }`
 - Response: `{ "success": true }`
 
 #### Retrieve Code Data / Processing information
