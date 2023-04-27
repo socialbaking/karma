@@ -12,6 +12,13 @@ Our vouch system makes it easy for you to access medical cannabis treatments fro
 - The program will be launched in New Zealand and will only be valid for use within New Zealand.
 - The program will be tested and refined to ensure that it is user-friendly and effective for both patients and companies.
 - The program will be marketed to patients, clinics, and trusted partners to promote its use and growth.
+- The program will retain code information until it has been fully redeemed and indicated as expirible. 
+- The program will only provide code data when the specific code is provided. 
+- The program will rate limit requests and take bad actors into account.
+- The program will only provide information about more than one code, or processing information about a code to redeeming registred clinics and redeeming trusted partners. 
+- The program will make use of techniques to detect on a best effort basis patient information within user provided content and prevent this data from being processed.
+- The program is not intended to be used to store patient information.
+- The program is not intended to be used to process patient information.
 
 ## Technical Goal 
 
