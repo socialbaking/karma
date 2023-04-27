@@ -91,3 +91,39 @@ Response: `{ "success": true }`
 
 Request: `GET /system-logs`
 Response: `[ {"timestamp": "2022-05-01T10:30:00Z", "message": "Unique code generated", "code": "ABC123" }, {"timestamp": "2022-05-01T11:00:00Z", "message": "Unique code redeemed", "code": "ABC123", "partner_id": "1234" }]`
+
+## Vouch System Architecture
+
+The Vouch system will use a serverless architecture based on AWS Lambda and Node.js. This approach allows for flexibility and scalability while minimizing operational costs. The system will interact with other services such as Xero and WordPress through their respective APIs.
+
+### Frontend
+
+The frontend will be built using React, a popular and efficient JavaScript library for building user interfaces. It will provide a responsive and user-friendly interface for patients, clinics, and trusted partners. The frontend will communicate with the backend through the provided API endpoints.
+
+### Backend
+
+The backend will be implemented using Node.js and AWS Lambda. Each API endpoint will have its own Lambda function to ensure optimal performance and scalability. The backend will interact with a database, such as AWS DynamoDB, to store and manage data related to unique codes, clinics, and trusted partners.
+
+### Database
+
+AWS DynamoDB will be used as the primary database for the Vouch system. This NoSQL database service provides fast and predictable performance, as well as scalability and security. The database will store data related to unique codes, clinics, and trusted partners.
+
+### API Gateway
+
+AWS API Gateway will be used to expose the API endpoints and manage access to the backend services. API Gateway will provide features such as rate limiting, authentication, and monitoring to ensure the security and reliability of the Vouch system.
+
+### WordPress Plugin
+
+The WordPress plugin will be developed using PHP, the primary language for WordPress plugin development. The plugin will provide an interface for WordPress-based e-commerce sites to easily integrate the Vouch unique code system. The plugin will communicate with the backend API to accept and verify unique codes for medical cannabis treatments.
+
+### Third-party Integrations
+
+The Vouch system will integrate with the Xero API for payment processing. This integration will enable the automatic transfer of funds between clinics and trusted partners when unique codes are redeemed. The Vouch system will also interact with the WordPress plugin and other e-commerce platforms to accept unique codes and track their usage.
+
+### Monitoring and Logging
+
+AWS CloudWatch will be used to monitor the performance and health of the Vouch system. CloudWatch provides insights into the usage, errors, and performance of the Lambda functions and other AWS resources. Additionally, logs from the API and other components will be stored and analyzed using CloudWatch Logs.
+
+### Security
+
+To ensure data security and regulatory compliance, the Vouch system will use a combination of AWS security features and best practices. AWS Identity and Access Management (IAM) will be used to manage access to AWS resources, and data stored in DynamoDB will be encrypted at rest. API Gateway will be configured with appropriate authentication and rate limiting to protect the system from abuse. Patient data privacy will be ensured by using techniques to detect and prevent the processing of personal information.
