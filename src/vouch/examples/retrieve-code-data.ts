@@ -9,6 +9,8 @@ export const response = {
     uniqueCode: "ABC123",
     value: 50,
     partnerId: "1234",
-    partnerName: "ABC Clinic",
-    location: "Auckland"
+    partnerName: "ABF Clinic",
+    location: "Auckland",
+    remote: true,
+    onsite: true
 };
