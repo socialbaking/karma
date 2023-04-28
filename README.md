@@ -14,6 +14,38 @@ Our vouch system makes it easy for you to access medical cannabis treatments fro
 
 [//]: # (badges)
 
+### Diagram 
+
+```mermaid
+sequenceDiagram
+  autonumber
+  participant Patient as Patient
+  participant GivingPartner as Giving Partner
+  participant AcceptingPartner as Accepting Partner
+  participant VouchAPI as Vouch API
+
+  Note over Patient, GivingPartner: Patient needs medical cannabis treatment
+
+  GivingPartner ->> VouchAPI: POST /generate-unique-code
+  VouchAPI -->> GivingPartner: { "uniqueCode": "ABC123", "value": 50.00 }
+  GivingPartner ->> Patient: Give unique code "ABC123" with value $50
+
+  Note over Patient, AcceptingPartner: Patient visits Accepting Partner for treatment
+
+  Patient ->> AcceptingPartner: Provide unique code "ABC123"
+  AcceptingPartner ->> VouchAPI: POST /verify-unique-code
+  VouchAPI -->> AcceptingPartner: { "valid": true }
+  AcceptingPartner ->> VouchAPI: POST /accept-unique-code
+  VouchAPI -->> AcceptingPartner: { "success": true }
+  AcceptingPartner ->> Patient: Treatment provided, code "ABC123" accepted
+
+  Note over AcceptingPartner, VouchAPI: Process payment transfer
+
+  AcceptingPartner ->> VouchAPI: POST /process-payment
+  VouchAPI -->> AcceptingPartner: { "success": true }
+```
+
+
 ## Focus
 
 - The program will provide a unique code to patients that can be redeemed with registered clinics and trusted partners for medical cannabis treatments.
