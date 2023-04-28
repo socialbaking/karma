@@ -39,9 +39,9 @@ function getRequestContextKeyValueStoreWithName<T>(name: string): KeyValueStore<
 }
 
 export interface KeyValueStore<T> {
-    get(key: string): Promise<T>
+    get(key: string): Promise<T | undefined>
     set(key: string, value: T): Promise<T>
-    values(): Promise<T>
+    values(): Promise<T[]>
 }
 
 function createKeyValueStore<T>(storage: GenericStorageFn): KeyValueStore<T> {

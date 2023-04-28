@@ -1,7 +1,7 @@
 import {FastifyInstance} from "fastify";
 import {FromSchema} from "json-schema-to-ts";
 import {ok} from "../../is";
-import {acceptUniqueCode} from "../data";
+import {verifyUniqueCode} from "../data";
 
 export async function verifyCodeValidityRoutes(fastify: FastifyInstance) {
     const body = {
@@ -38,7 +38,7 @@ export async function verifyCodeValidityRoutes(fastify: FastifyInstance) {
             } = request.body;
 
             response.send({
-                success: await acceptUniqueCode({
+                success: await verifyUniqueCode({
                     uniqueCode,
                     partnerId: "1234"
                 })

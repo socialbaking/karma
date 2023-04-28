@@ -13,6 +13,8 @@
 // };
 
 
+import {updateUniqueCodeState} from "./unique-code";
+
 export interface AssignUniqueCodeInput {
     uniqueCode: string
     partnerId: string
@@ -20,7 +22,10 @@ export interface AssignUniqueCodeInput {
 }
 
 export async function assignUniqueCode({ uniqueCode, partnerId, value }: AssignUniqueCodeInput): Promise<boolean> {
-
-
+    await updateUniqueCodeState({
+        uniqueCode,
+        partnerId,
+        type: "assigned"
+    });
     return true;
 }
