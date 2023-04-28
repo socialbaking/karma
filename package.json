@@ -36,11 +36,15 @@
   "author": "Fabian Cook <hello@fabiancook.dev>",
   "license": "MIT",
   "dependencies": {
+    "@fastify/cors": "^8.2.1",
+    "@fastify/swagger": "^8.3.1",
+    "@fastify/swagger-ui": "^1.8.0",
     "@virtualstate/focus": "^1.4.10-alpha.4",
     "@virtualstate/listen": "^1.0.0-alpha.14",
     "@virtualstate/promise": "^1.2.1",
     "abort-controller": "^3.0.0",
     "fastify": "^4.17.0",
+    "fastify-blipp": "^4.0.0",
     "uuid": "^8.3.2",
     "whatwg-url": "^9.1.0"
   },

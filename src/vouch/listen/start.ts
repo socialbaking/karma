@@ -1,23 +1,26 @@
 import { listen } from "@virtualstate/listen";
 import fastify from "fastify";
 import {routes} from "./routes";
-
-function getPort() {
-    const env = process.env.PORT;
-    if (env && /^\d+$/.test(env)) {
-        return +env;
-    }
-    return 0; // random;
-}
+import {setupSwagger} from "./swagger";
+import blippPlugin from "fastify-blipp";
+import corsPlugin from "@fastify/cors";
+import {getPort} from "./config";
 
 export async function start() {
     const app = fastify({
         logger: true
     })
 
+    app.register(blippPlugin);
+    app.register(corsPlugin);
+
+    await setupSwagger(app);
+
     app.register(routes);
 
     const port = getPort();
 
     await app.listen({ port });
+
+    app.blipp();
 }
