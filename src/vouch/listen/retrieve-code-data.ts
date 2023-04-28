@@ -69,7 +69,6 @@ export async function retrieveCodeDataRoutes(fastify: FastifyInstance) {
                 const { uniqueCode } = request.query;
 
                 const data = await retrieveCodeData({
-                    partnerId: "1234",
                     uniqueCode
                 })
 

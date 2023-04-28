@@ -7,6 +7,7 @@ import {retrieveSystemLogsRoutes} from "./retrive-system-logs";
 import {retrieveCodeDataRoutes} from "./retrieve-code-data";
 import {retrieveCodeDetailsRoutes} from "./retrieve-code-public-details";
 import {FastifyInstance} from "fastify";
+import {processPaymentRoutes} from "./process-payment-transfer";
 
 export async function routes(fastify: FastifyInstance) {
 
@@ -19,6 +20,7 @@ export async function routes(fastify: FastifyInstance) {
         fastify.register(retrieveSystemLogsRoutes);
         fastify.register(retrieveCodeDataRoutes);
         fastify.register(retrieveCodeDetailsRoutes);
+        fastify.register(processPaymentRoutes);
     }
 
     fastify.register(apiRoutes, {

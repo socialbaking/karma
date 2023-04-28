@@ -24,7 +24,7 @@ function getRequestContextKeyValueStoreWithName<T>(name: string): KeyValueStore<
 
     function create() {
         let store: Promise<KVS<StorageSchema>> = undefined;
-        const kv = createKeyValueStore(() => {
+        const kv = createKeyValueStore<T>(() => {
             if (store) {
                 return store;
             }
@@ -40,7 +40,7 @@ function getRequestContextKeyValueStoreWithName<T>(name: string): KeyValueStore<
 
 export interface KeyValueStore<T> {
     get(key: string): Promise<T | undefined>
-    set(key: string, value: T): Promise<T>
+    set(key: string, value: T): Promise<void>
     values(): Promise<T[]>
 }
 

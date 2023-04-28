@@ -10,6 +10,8 @@ export interface UniqueCode {
     uniqueCode: string;
     value: number;
     partnerId: string;
+    createdAt: string;
+    createdBy: string;
     acceptedAt?: string;
     acceptedBy?: string; // partnerId
 }

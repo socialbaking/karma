@@ -1,3 +1,6 @@
+import {getUniqueCodeStore} from "./unique-code";
+import {getPartnerStore} from "./partner";
+
 export interface RetrieveCodePublicDetailsInput {
     uniqueCode: string
 }
@@ -9,14 +12,17 @@ export interface RetrieveCodePublicDetailsOutput {
     partnerName: string;
 }
 
-export async function retrieveCodePublicDetails({ uniqueCode }: RetrieveCodePublicDetailsInput): Promise<RetrieveCodePublicDetailsOutput> {
-
-
+export async function retrieveCodePublicDetails({ uniqueCode }: RetrieveCodePublicDetailsInput): Promise<RetrieveCodePublicDetailsOutput | undefined> {
+    const store = getUniqueCodeStore();
+    const document = await store.get(uniqueCode);
+    if (!document) return undefined;
+    const partnerStore = getPartnerStore();
+    const partner = await partnerStore.get(document.partnerId)
+    if (!partner) return undefined;
     return {
         uniqueCode,
-        partnerId: "1234",
-        partnerName: "ABF Clinic",
-        value: 50
+        value: document.value,
+        partnerId: document.partnerId,
+        partnerName: partner.partnerName,
     }
-
 }

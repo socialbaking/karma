@@ -37,12 +37,12 @@ export async function generateUniqueCodeRoutes(fastify: FastifyInstance) {
                 value
             } = request.body;
 
-            response.send({
-                success: await generateUniqueCode({
+            response.send(
+                await generateUniqueCode({
                     partnerId: "1234",
                     value
                 })
-            });
+            );
         }
     );
 

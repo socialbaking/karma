@@ -1,23 +1,8 @@
-// export const url = "/unique-code-data";
-// export const query = {
-//     uniqueCode: "ABC123"
-// }
-// export const options = {
-//     method: "POST"
-// };
-// export const response = {
-//     uniqueCode: "ABC123",
-//     value: 50,
-//     partnerId: "1234",
-//     partnerName: "ABF Clinic",
-//     location: "Auckland",
-//     remote: true,
-//     onsite: true
-// };
+import {getUniqueCodeStore} from "./unique-code";
+import {getPartnerStore} from "./partner";
 
 export interface RetrieveCodeDataInput {
     uniqueCode: string
-    partnerId: string
 }
 
 export interface RetrieveCodeDataOutput {
@@ -30,17 +15,16 @@ export interface RetrieveCodeDataOutput {
     onsite?: boolean;
 }
 
-export async function retrieveCodeData({ uniqueCode, partnerId }: RetrieveCodeDataInput): Promise<RetrieveCodeDataOutput> {
-
-
+export async function retrieveCodeData({ uniqueCode }: RetrieveCodeDataInput): Promise<RetrieveCodeDataOutput> {
+    const store = getUniqueCodeStore();
+    const document = await store.get(uniqueCode);
+    if (!document) return undefined;
+    const partnerStore = getPartnerStore();
+    const partner = await partnerStore.get(document.partnerId)
+    if (!partner) return undefined;
     return {
+        ...partner,
         uniqueCode,
-        partnerId,
-        partnerName: "ABF Clinic",
-        value: 50,
-        location: "Auckland",
-        onsite: true,
-        remote: true
+        value: document.value,
     }
-
 }
