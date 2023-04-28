@@ -13,16 +13,12 @@ export async function start() {
         logger: true
     })
 
-    const storage = await kvsEnvStorage({
-        name: "vouch",
-        version: 1
-    });
 
     app.register(fastifyRequestContext, {
         hook: 'preValidation',
-        defaultStoreValues: () => ({
-            kvStore: storage
-        })
+        defaultStoreValues: {
+
+        }
     });
 
     app.register(blippPlugin);
