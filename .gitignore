@@ -10,3 +10,4 @@ coverage
 /playwright/.cache/
 workerd-tests
 workerd-tests.capnp
+.cache
