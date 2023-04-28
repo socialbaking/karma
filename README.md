@@ -45,6 +45,41 @@ sequenceDiagram
   VouchAPI -->> AcceptingPartner: { "success": true }
 ```
 
+```mermaid
+graph LR
+
+A(Patient) --> B(Request unique code)
+B --> C(Giving Partner generates unique code)
+C --> D(Vouch API: POST /generate-unique-code)
+D --> E(Giving Partner provides unique code to Patient)
+
+A --> F(Check unique code balance)
+F --> G(Vouch API: GET /unique-code-details)
+G --> H(Patient receives unique code details)
+
+A --> I(Visit Accepting Partner for treatment)
+I --> J(Accepting Partner verifies unique code)
+J --> K(Vouch API: POST /verify-unique-code)
+K --> L(Accepting Partner accepts unique code)
+L --> M(Vouch API: POST /accept-unique-code)
+M --> N(Patient receives treatment)
+
+I --> O(Accepting Partner processes payment)
+O --> P(Vouch API: POST /process-payment)
+P --> Q(Payment is processed)
+
+subgraph Vouch System Components
+  D --> G
+  G --> K
+  K --> M
+  M --> P
+end
+
+subgraph WordPress Plugin
+  B
+  I
+end
+```
 
 ## Focus
 
