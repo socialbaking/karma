@@ -1,0 +1,107 @@
+{
+  "name": "@socialbaking/vouch",
+  "version": "1.0.0-alpha.1",
+  "main": "./esnext/index.js",
+  "module": "./esnext/index.js",
+  "types": "./esnext/index.d.ts",
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./esnext/index.d.ts"
+      ],
+      "tests": [
+        "./esnext/tests/index.d.ts"
+      ],
+      "routes": [
+        "./esnext/routes/index.d.ts"
+      ]
+    }
+  },
+  "type": "module",
+  "sideEffects": false,
+  "keywords": [],
+  "exports": {
+    ".": "./esnext/index.js",
+    "./tests": "./esnext/tests/index.js",
+    "./routes": "./esnext/routes/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/socialbaking/vouch.git"
+  },
+  "bugs": {
+    "url": "https://github.com/socialbaking/vouch/issues"
+  },
+  "homepage": "https://github.com/socialbaking/vouch#readme",
+  "author": "Fabian Cook <hello@fabiancook.dev>",
+  "license": "MIT",
+  "dependencies": {
+    "@virtualstate/focus": "^1.4.10-alpha.4",
+    "@virtualstate/listen": "^1.0.0-alpha.14",
+    "@virtualstate/promise": "^1.2.1",
+    "abort-controller": "^3.0.0",
+    "uuid": "^8.3.2",
+    "whatwg-url": "^9.1.0"
+  },
+  "devDependencies": {
+    "@opennetwork/http-representation": "^3.0.0",
+    "@opennetwork/http-representation-node": "^3.0.0",
+    "@playwright/test": "^1.26.0",
+    "@types/chance": "^1.1.3",
+    "@types/jest": "^27.0.1",
+    "@types/mkdirp": "^1.0.2",
+    "@types/node": "^18.16.2",
+    "@types/rimraf": "^3.0.2",
+    "@types/uuid": "^8.3.3",
+    "@types/whatwg-url": "^8.2.1",
+    "@virtualstate/dom": "^2.46.0",
+    "@virtualstate/examples": "^2.46.0",
+    "@virtualstate/fringe": "^2.46.1",
+    "@virtualstate/hooks": "^2.46.0",
+    "@virtualstate/hooks-extended": "^2.46.0",
+    "@virtualstate/impack": "^1.0.0-alpha.8",
+    "@virtualstate/kdl": "^1.0.1-alpha.29",
+    "@virtualstate/memo": "^1.8.0",
+    "@virtualstate/navigation": "^1.0.1-alpha.159",
+    "@virtualstate/union": "^2.46.0",
+    "@virtualstate/x": "^2.46.0",
+    "c8": "^7.10.0",
+    "chance": "^1.1.8",
+    "change-case": "^4.1.2",
+    "cheerio": "^1.0.0-rc.10",
+    "dom-lite": "^20.2.0",
+    "dotenv": "^16.0.0",
+    "filehound": "^1.17.4",
+    "jest": "^27.1.0",
+    "mkdirp": "^1.0.4",
+    "preact": "^10.7.3",
+    "react": "^18.1.0",
+    "rimraf": "^3.0.2",
+    "source-map-support": "^0.5.21",
+    "ts-jest": "^27.0.5",
+    "ts-node": "^10.2.1",
+    "typescript": "^5.0.4",
+    "urlpattern-polyfill": "^1.0.0-rc2",
+    "v8-to-istanbul": "^8.1.0"
+  },
+  "scripts": {
+    "test:all": "yarn test:node && yarn test:deno && yarn test:bun",
+    "build": "rm -rf esnext && tsc",
+    "postbuild": "mkdir -p coverage && node scripts/post-build.js",
+    "generate": "yarn build && node esnext/generate.js",
+    "prepublishOnly": "npm run build",
+    "test": "yarn build && yarn test:all",
+    "test:remote": "yarn test:deno:remote",
+    "test:node": "export $(cat .env | xargs) && node --enable-source-maps esnext/tests/index.js",
+    "test:node:remote": "export $(cat .env | xargs) && node --experimental-network-imports --enable-source-maps -e '(async () => { return await import(\"https://cdn.skypack.dev/@virtualstate/focus/tests\");})();\n'",
+    "test:deno": "export $(cat .env | xargs) && deno run --allow-write --allow-env --allow-read --allow-net --import-map=import-map-deno.json esnext/tests/index.js",
+    "test:deno:remote": "export $(cat .env | xargs) && deno run --allow-write --allow-env --allow-read --allow-net --import-map=import-map-deno.json https://cdn.skypack.dev/@virtualstate/focus/tests",
+    "test:bun": "export $(cat .env | xargs) && bun esnext/tests/index.js",
+    "test:deno:r": "export $(cat .env | xargs) && deno run -r --allow-write --allow-env --allow-read --allow-net --import-map=import-map-deno.json esnext/tests/index.js",
+    "test:node:inspect": "yarn build && export $(cat .env | xargs) && node --enable-source-maps --inspect-brk esnext/tests/index.js",
+    "test:deno:inspect": "yarn build && export $(cat .env | xargs) && deno run --allow-write --allow-env --allow-read --allow-net --import-map=import-map-deno.json --inspect-brk esnext/tests/index.js",
+    "coverage": "export $(cat .env | xargs) && c8 node esnext/tests/index.js && yarn postbuild",
+    "test:workerd:compile": "workerd compile workerd-tests.capnp > workerd-tests",
+    "test:workerd": "yarn test:workerd:compile && ./workerd-tests --experimental"
+  }
+}

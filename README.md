@@ -2,6 +2,18 @@
 
 Our vouch system makes it easy for you to access medical cannabis treatments from registered clinics and trusted partners in New Zealand. With a simple and secure process, you can receive the care you need and support the growth of the medical cannabis industry.
 
+[//]: # (badges)
+
+### Support
+
+ ![Node.js supported](https://img.shields.io/badge/node-%3E%3D18.7.0-blue) ![Deno supported](https://img.shields.io/badge/deno-%3E%3D1.17.0-blue) ![Bun supported](https://img.shields.io/badge/bun-%3E%3D0.1.11-blue) 
+
+### Test Coverage
+
+ ![100%25 lines covered](https://img.shields.io/badge/lines-100%25-brightgreen) ![100%25 statements covered](https://img.shields.io/badge/statements-100%25-brightgreen) ![100%25 functions covered](https://img.shields.io/badge/functions-100%25-brightgreen) ![100%25 branches covered](https://img.shields.io/badge/branches-100%25-brightgreen)
+
+[//]: # (badges)
+
 ## Focus
 
 - The program will provide a unique code to patients that can be redeemed with registered clinics and trusted partners for medical cannabis treatments.
