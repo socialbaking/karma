@@ -1,3 +1,5 @@
+import {FastifySchema} from "fastify";
+
 export const url = "/accept-unique-code";
 export const body = {
     uniqueCode: "ABC123"

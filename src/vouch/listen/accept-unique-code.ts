@@ -1,12 +1,51 @@
-import { route } from "@virtualstate/listen/routes";
-import { acceptUniqueCode as example } from "../examples";
-import {FetchEvent} from "@virtualstate/listen";
 import {FastifyInstance} from "fastify";
+import {acceptUniqueCode} from "../data";
+import {FromSchema} from "json-schema-to-ts";
+import {ok} from "../../is";
 
-export async function acceptUniqueCode(fastify: FastifyInstance) {
-    fastify.post("/accept-unique-code", (request, response) => {
-        response.send(example.response);
-    })
+export async function acceptUniqueCodeRoutes(fastify: FastifyInstance) {
+
+    const body = {
+        type: "object",
+        properties: {
+            uniqueCode: {
+                type: "string"
+            }
+        },
+        required: [
+            "uniqueCode"
+        ]
+    } as const;
+    type BodySchema = FromSchema<typeof body>
+    function assert(body: unknown): asserts body is BodySchema {
+        ok(body);
+    }
+
+    fastify.post(
+        "/accept-unique-code",
+        {
+          schema: {
+              description: "Accept a unique code",
+              tags: ["partner"],
+              summary: "",
+              body
+          }
+        },
+        async (request, response) => {
+            assert(request.body);
+
+            const {
+                uniqueCode
+            } = request.body;
+
+            response.send({
+                success: await acceptUniqueCode({
+                    uniqueCode,
+                    partnerId: "1234"
+                })
+            });
+        }
+    )
 
 }
 

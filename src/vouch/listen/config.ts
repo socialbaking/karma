@@ -1,4 +1,3 @@
-import {Server} from "node:http";
 import {ok} from "../../is";
 
 export function getPort() {
@@ -6,7 +5,7 @@ export function getPort() {
     if (env && /^\d+$/.test(env)) {
         return +env;
     }
-    return 0; // random;
+    return 3000;
 }
 
 export function getHostname() {

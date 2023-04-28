@@ -1,25 +1,24 @@
-import {FetchEvent} from "@virtualstate/listen";
-import {acceptUniqueCode} from "./accept-unique-code";
-import {assignUniqueCode} from "./assign-unique-code";
-import {addPartner} from "./add-partner";
-import {verifyCodeValidity} from "./verify-code-validity";
-import {generateUniqueCode} from "./generate-unique-code";
-import {retrieveSystemLogs} from "./retrive-system-logs";
-import {retrieveCodeData} from "./retrieve-code-data";
-import {retrieveCodeDetails} from "./retrieve-code-public-details";
+import {acceptUniqueCodeRoutes} from "./accept-unique-code";
+import {assignUniqueCodeRoutes} from "./assign-unique-code";
+import {addPartnerRoutes} from "./add-partner";
+import {verifyCodeValidityRoutes} from "./verify-code-validity";
+import {generateUniqueCodeRoutes} from "./generate-unique-code";
+import {retrieveSystemLogsRoutes} from "./retrive-system-logs";
+import {retrieveCodeDataRoutes} from "./retrieve-code-data";
+import {retrieveCodeDetailsRoutes} from "./retrieve-code-public-details";
 import {FastifyInstance} from "fastify";
 
 export async function routes(fastify: FastifyInstance) {
 
     async function apiRoutes(fastify: FastifyInstance) {
-        fastify.register(acceptUniqueCode);
-        fastify.register(assignUniqueCode);
-        fastify.register(addPartner);
-        fastify.register(verifyCodeValidity);
-        fastify.register(generateUniqueCode);
-        fastify.register(retrieveSystemLogs);
-        fastify.register(retrieveCodeData);
-        fastify.register(retrieveCodeDetails);
+        fastify.register(acceptUniqueCodeRoutes);
+        fastify.register(assignUniqueCodeRoutes);
+        fastify.register(addPartnerRoutes);
+        fastify.register(verifyCodeValidityRoutes);
+        fastify.register(generateUniqueCodeRoutes);
+        fastify.register(retrieveSystemLogsRoutes);
+        fastify.register(retrieveCodeDataRoutes);
+        fastify.register(retrieveCodeDetailsRoutes);
     }
 
     fastify.register(apiRoutes, {

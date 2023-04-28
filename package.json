@@ -49,6 +49,7 @@
     "fastify": "^4.17.0",
     "fastify-blipp": "^4.0.0",
     "human-readable-ids": "^1.0.4",
+    "json-schema-to-ts": "^2.8.0",
     "uuid": "^8.3.2",
     "whatwg-url": "^9.1.0"
   },
@@ -111,6 +112,7 @@
     "test:deno:inspect": "yarn build && export $(cat .env | xargs) && deno run --allow-write --allow-env --allow-read --allow-net --import-map=import-map-deno.json --inspect-brk esnext/tests/index.js",
     "coverage": "export $(cat .env | xargs) && c8 node esnext/tests/index.js && yarn postbuild",
     "test:workerd:compile": "workerd compile workerd-tests.capnp > workerd-tests",
-    "test:workerd": "yarn test:workerd:compile && ./workerd-tests --experimental"
+    "test:workerd": "yarn test:workerd:compile && ./workerd-tests --experimental",
+    "start": "yarn build && node esnext/vouch/listen/main.js"
   }
 }

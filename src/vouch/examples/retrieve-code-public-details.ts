@@ -8,5 +8,6 @@ export const options = {
 export const response = {
     uniqueCode: "ABC123",
     value: 50,
-    partnerId: "1234"
+    partnerId: "1234",
+    partnerName: "ABF Clinic"
 };
