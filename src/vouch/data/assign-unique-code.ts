@@ -25,7 +25,8 @@ export async function assignUniqueCode({ uniqueCode, partnerId, value }: AssignU
     await updateUniqueCodeState({
         uniqueCode,
         partnerId,
-        type: "assigned"
+        type: "assigned",
+        value
     });
     return true;
 }

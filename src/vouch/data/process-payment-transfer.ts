@@ -22,7 +22,8 @@ export async function processPayment({ uniqueCode, partnerId }: ProcessPaymentIn
     await updateUniqueCodeState({
         uniqueCode,
         partnerId,
-        type: "processed"
+        type: "processed",
+        value: 0
     });
     return true;
 

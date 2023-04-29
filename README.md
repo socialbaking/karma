@@ -167,13 +167,13 @@ The program requires at a minimum:
 #### Process Payment Transfer related to a unique code
 
 - Request: `POST /process-payment`
-- Request Body: `{ "uniqueCode": "ABC123", "amount": 50.00 }`
+- Request Body: `{ "uniqueCode": "ABC123" }`
 - Response: `{ "success": true }`
 
 #### Accept Unique Code / Record code usage
 
 - Request: `POST /accept-unique-code`
-- Request Body: `{ "uniqueCode": "ABC123" }`
+- Request Body: `{ "uniqueCode": "ABC123", "value": 25.00 }`
 - Response: `{ "success": true }`
 
 #### Retrieve System Logs
@@ -181,7 +181,35 @@ The program requires at a minimum:
 - Request: `GET /system-logs`
 - Response: `[ {"timestamp": "2022-05-01T10:30:00Z", "message": "Unique code generated", "code": "ABC123" }, {"timestamp": "2022-05-01T11:00:00Z", "message": "Unique code redeemed", "code": "ABC123", "partnerId": "1234" }]`
 
+## Example TypeScript SDK
 
+```typescript
+interface Partner {
+  partnerId: string;
+  partnerName: string;
+  location: string;
+}
+
+interface UniqueCode {
+  uniqueCode: string;
+  value: number;
+  partnerId: string;
+  partnerName: string;
+  location: string;
+}
+
+interface VouchClient {
+  generateUniqueCode(value: number): Promise<string>;
+  verifyUniqueCode(uniqueCode: string): Promise<boolean>;
+  addPartner(partnerName: string, location: string, remote?: boolean, onsite?: boolean): Promise<string>;
+  listPartners(): Promise<Partner[]>;
+  assignUniqueCode(uniqueCode: string, value: number): Promise<void>;
+  getUniqueCode(uniqueCode: string): Promise<UniqueCode>;
+  listUniqueCodes(): Promise<UniqueCode[]>;
+  processPayment(uniqueCode: string): Promise<void>;
+  acceptUniqueCode(uniqueCode: string, value: number): Promise<void>;
+}
+```
 
 ## Vouch System Architecture
 

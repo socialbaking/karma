@@ -13,11 +13,15 @@ export async function acceptUniqueCodeRoutes(fastify: FastifyInstance) {
             },
             partnerId: {
                 type: "string"
+            },
+            value: {
+                type: "number"
             }
         },
         required: [
             "uniqueCode",
-            "partnerId"
+            "partnerId",
+            "value"
         ]
     } as const;
     type BodySchema = FromSchema<typeof body>
@@ -40,13 +44,15 @@ export async function acceptUniqueCodeRoutes(fastify: FastifyInstance) {
 
             const {
                 uniqueCode,
-                partnerId
+                partnerId,
+                value
             } = request.body;
 
             response.send({
                 success: await acceptUniqueCode({
                     uniqueCode,
-                    partnerId
+                    partnerId,
+                    value
                 })
             });
         }
