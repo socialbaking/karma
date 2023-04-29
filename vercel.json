@@ -1,13 +1,18 @@
 {
+  "buildCommand": "yarn build",
+  "installCommand": "yarn install",
+  "outputDirectory": ".",
+  "framework": null,
   "rewrites": [
     {
       "source": "/(.*)",
-      "destination": "/esnext/vouch/listen/serverless.js"
+      "destination": "/api/index.js"
     }
   ],
-  "build": {
-    "env": {
-      "NODEJS_AWS_HANDLER_NAME": "handler"
+  "functions": {
+    "api/index.js": {
+      "memory": 1024,
+      "maxDuration": 10
     }
   }
 }
