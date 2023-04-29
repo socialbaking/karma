@@ -5,7 +5,6 @@ import {RetrieveCodeDataOutput} from "./retrieve-code-data";
 export async function retrieveCodes(): Promise<RetrieveCodeDataOutput[]> {
     const store = getUniqueCodeStore();
     const documents = await store.values();
-    console.log(documents)
     if (!documents.length) return [];
     const partnerStore = getPartnerStore();
     const partnerIds = [...new Set(documents.map(document => document.partnerId))];

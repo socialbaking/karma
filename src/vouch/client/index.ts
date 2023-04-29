@@ -1,4 +1,4 @@
-import { VouchClient, UniqueCode, Partner } from "./interface";
+import {VouchClient, UniqueCode, Partner, SystemLog, PublicUniqueCode} from "./interface";
 import {ok} from "../../is";
 
 export * from "./interface"
@@ -90,9 +90,8 @@ export class Client implements VouchClient {
         return partnerId;
     }
 
-    async assignUniqueCode(uniqueCode: string, value: number): Promise<void> {
+    async assignUniqueCode(uniqueCode: string, value: number, partnerId: string): Promise<void> {
         const {
-            partnerId,
             baseUrl,
             headers,
             prefix
@@ -256,6 +255,53 @@ export class Client implements VouchClient {
         ok(response.ok, "verifyUniqueCode response not ok");
         const { success } = await response.json();
         return success;
+    }
+
+    async listSystemLogs(): Promise<SystemLog[]> {
+        const {
+            baseUrl,
+            headers,
+            prefix,
+            partnerId
+        } = this;
+        const url = new URL(
+            `${prefix}/system-logs`,
+            baseUrl
+        );
+        if (partnerId) {
+            url.searchParams.set("partnerId", partnerId);
+        }
+        const response = await fetch(
+            url,
+            {
+                method: "GET",
+                headers
+            }
+        );
+        ok(response.ok, "listSystemLogs response not ok");
+        return response.json();
+    }
+
+    async getPublicUniqueCode(uniqueCode: string): Promise<PublicUniqueCode> {
+        const {
+            baseUrl,
+            headers,
+            prefix
+        } = this;
+        const url = new URL(
+            `${prefix}/unique-code-details`,
+            baseUrl
+        );
+        url.searchParams.set("uniqueCode", uniqueCode);
+        const response = await fetch(
+            url,
+            {
+                method: "GET",
+                headers
+            }
+        );
+        ok(response.ok, "getPublicUniqueCode response not ok");
+        return response.json();
     }
 
 }

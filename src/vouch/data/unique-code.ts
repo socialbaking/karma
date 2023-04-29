@@ -53,7 +53,8 @@ export async function updateUniqueCodeState({
         partnerId,
         message: `Unique code ${type} (Value: ${value})`,
         uniqueCode,
-        value
+        value,
+        action: type
     });
     const currentValue = document[`${type}Value`] ?? 0
     await store.set(uniqueCode, {

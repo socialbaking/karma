@@ -1,7 +1,19 @@
-import {FastifyInstance} from "fastify";
+import {FastifyInstance, FastifyRequest} from "fastify";
 import {retrieveSystemLogs} from "../data";
+import {FromSchema} from "json-schema-to-ts";
 
 export async function retrieveSystemLogsRoutes(fastify: FastifyInstance) {
+
+    const querystring = {
+        type: "object",
+        properties: {
+            partnerId: {
+                type: "string"
+            }
+        },
+        required: [
+        ]
+    } as const;
 
     const response = {
         200: {
@@ -38,23 +50,28 @@ export async function retrieveSystemLogsRoutes(fastify: FastifyInstance) {
         }
     };
 
+    const schema = {
+        description: "Retrieve system logs",
+        tags: ["partner"],
+        summary: "",
+        response,
+        querystring
+    }
+
     fastify.get(
         "/system-logs",
         {
-            schema: {
-                description: "Retrieve system logs",
-                tags: ["partner"],
-                summary: "",
-                response
+            schema,
+            async handler(request: FastifyRequest<{ Querystring: FromSchema<typeof querystring> }>, response) {
+                const { partnerId } = request.query;
+                const data = await retrieveSystemLogs({
+                    partnerId
+                })
+
+                response.send(data);
             }
         },
-        async (request, response) => {
-            const data = await retrieveSystemLogs({
 
-            })
-
-            response.send(data);
-        }
     );
 }
 

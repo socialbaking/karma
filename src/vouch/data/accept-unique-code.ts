@@ -1,4 +1,4 @@
-import {updateUniqueCodeState} from "./unique-code";
+import {getUniqueCode, updateUniqueCodeState} from "./unique-code";
 
 export interface AcceptUniqueCodeInput {
     uniqueCode: string;
@@ -7,6 +7,12 @@ export interface AcceptUniqueCodeInput {
 }
 
 export async function acceptUniqueCode({ uniqueCode, partnerId, value }: AcceptUniqueCodeInput): Promise<boolean> {
+    const document = await getUniqueCode(uniqueCode);
+    const remainingValue = document.value - (document.acceptedValue ?? 0);
+
+    if (!remainingValue) return false;
+    if (remainingValue < value) return false;
+
     await updateUniqueCodeState({
         uniqueCode,
         partnerId,

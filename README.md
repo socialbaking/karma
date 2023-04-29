@@ -10,7 +10,7 @@ Our vouch system makes it easy for you to access medical cannabis treatments fro
 
 ### Test Coverage
 
- ![82.58%25 lines covered](https://img.shields.io/badge/lines-82.58%25-brightgreen) ![82.58%25 statements covered](https://img.shields.io/badge/statements-82.58%25-brightgreen) ![64.38%25 functions covered](https://img.shields.io/badge/functions-64.38%25-yellow) ![91.93%25 branches covered](https://img.shields.io/badge/branches-91.93%25-brightgreen)
+ ![99.49%25 lines covered](https://img.shields.io/badge/lines-99.49%25-brightgreen) ![99.49%25 statements covered](https://img.shields.io/badge/statements-99.49%25-brightgreen) ![94.73%25 functions covered](https://img.shields.io/badge/functions-94.73%25-brightgreen) ![88.98%25 branches covered](https://img.shields.io/badge/branches-88.98%25-brightgreen)
 
 [//]: # (badges)
 
@@ -198,16 +198,21 @@ interface UniqueCode {
   location: string;
 }
 
+export interface SystemLog extends Record<string, unknown> {
+  message: string;
+}
+
 interface VouchClient {
   generateUniqueCode(value: number): Promise<string>;
   verifyUniqueCode(uniqueCode: string): Promise<boolean>;
   addPartner(partnerName: string, location: string, remote?: boolean, onsite?: boolean): Promise<string>;
   listPartners(): Promise<Partner[]>;
-  assignUniqueCode(uniqueCode: string, value: number): Promise<void>;
+  assignUniqueCode(uniqueCode: string, value: number, partnerId: string): Promise<void>;
   getUniqueCode(uniqueCode: string): Promise<UniqueCode>;
   listUniqueCodes(): Promise<UniqueCode[]>;
   processPayment(uniqueCode: string): Promise<void>;
   acceptUniqueCode(uniqueCode: string, value: number): Promise<void>;
+  listSystemLogs(): Promise<SystemLog[]>;
 }
 ```
 
