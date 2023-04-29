@@ -6,21 +6,21 @@ import {getHostname} from "./config";
 export async function setupSwagger(fastify: FastifyInstance) {
     const url = getHostname()
 
-    const { host } = new URL(url);
+    const { host, protocol } = new URL(url);
 
     await fastify.register(basePlugin, {
         swagger: {
             info: {
-                title: 'Test swagger',
-                description: 'Testing the Fastify swagger API',
+                title: 'Vouch API',
+                description: '',
                 version: '0.1.0'
             },
             externalDocs: {
-                url: 'https://swagger.io',
+                url: 'https://documentation.vouch.patient.nz',
                 description: 'Find more info here'
             },
             host,
-            schemes: ['http'],
+            schemes: [protocol.replace(":", "")],
             consumes: ['application/json'],
             produces: ['application/json'],
             tags: [
