@@ -4,5 +4,10 @@
       "source": "/(.*)",
       "destination": "/esnext/vouch/listen/serverless.js"
     }
-  ]
+  ],
+  "build": {
+    "env": {
+      "NODEJS_AWS_HANDLER_NAME": "handler"
+    }
+  }
 }
