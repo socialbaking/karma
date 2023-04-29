@@ -62,6 +62,7 @@
     "@virtualstate/listen": "^1.0.0-alpha.14",
     "@virtualstate/promise": "^1.2.1",
     "abort-controller": "^3.0.0",
+    "dotenv": "^16.0.3",
     "fastify": "^4.17.0",
     "fastify-blipp": "^4.0.0",
     "human-readable-ids": "^1.0.4",
