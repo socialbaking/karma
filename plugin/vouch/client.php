@@ -31,7 +31,7 @@ interface VouchClient
 
 interface ClientOptions
 {
-    public function __construct(string | \URL $url, ?string $accessToken = null, ?string $partnerId = null, ?int $version = null, ?string $prefix = null);
+    public function __construct(string $url, ?string $accessToken = null, ?string $partnerId = null, ?int $version = null, ?string $prefix = null);
 
     public function acceptUniqueCode(string $uniqueCode, int $value): bool;
 
@@ -63,7 +63,7 @@ class Headers
 
 final class Client implements VouchClient
 {
-    private string|\URL $baseUrl;
+    private string $baseUrl;
     private Headers $headers;
     private ?string $partnerId;
     private int $version;
