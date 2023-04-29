@@ -9,10 +9,14 @@ export async function processPaymentRoutes(fastify: FastifyInstance) {
         properties: {
             uniqueCode: {
                 type: "string"
+            },
+            partnerId: {
+                type: "string"
             }
         },
         required: [
-            "uniqueCode"
+            "uniqueCode",
+            "partnerId"
         ]
     } as const;
     type BodySchema = FromSchema<typeof body>
@@ -34,12 +38,13 @@ export async function processPaymentRoutes(fastify: FastifyInstance) {
             assert(request.body);
 
             const {
-                uniqueCode
+                uniqueCode,
+                partnerId
             } = request.body;
 
             response.send({
                 success: await processPayment({
-                    partnerId: "1234",
+                    partnerId,
                     uniqueCode
                 })
             });

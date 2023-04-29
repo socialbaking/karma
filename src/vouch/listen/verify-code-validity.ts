@@ -9,10 +9,14 @@ export async function verifyCodeValidityRoutes(fastify: FastifyInstance) {
         properties: {
             uniqueCode: {
                 type: "string"
+            },
+            partnerId: {
+                type: "string"
             }
         },
         required: [
-            "uniqueCode"
+            "uniqueCode",
+            "partnerId"
         ]
     } as const;
     type BodySchema = FromSchema<typeof body>
@@ -34,13 +38,14 @@ export async function verifyCodeValidityRoutes(fastify: FastifyInstance) {
             assert(request.body);
 
             const {
-                uniqueCode
+                uniqueCode,
+                partnerId
             } = request.body;
 
             response.send({
                 success: await verifyUniqueCode({
                     uniqueCode,
-                    partnerId: "1234"
+                    partnerId
                 })
             });
         }

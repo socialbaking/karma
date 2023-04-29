@@ -43,6 +43,7 @@ export async function retrieveCodeDataRoutes(fastify: FastifyInstance) {
                     type: "boolean"
                 }
             },
+            additionalProperties: true,
             required: [
                 "uniqueCode",
                 "partnerId",

@@ -3,7 +3,7 @@ export const query = {
     uniqueCode: "ABC123"
 }
 export const options = {
-    method: "POST"
+    method: "GET"
 };
 export const response = {
     uniqueCode: "ABC123",

@@ -62,6 +62,11 @@ export async function retrieveCodeDetailsRoutes(fastify: FastifyInstance) {
                     uniqueCode
                 })
 
+                console.log({
+                    uniqueCode,
+                    data
+                })
+
                 if (!data) {
                     response.status(404);
                 }

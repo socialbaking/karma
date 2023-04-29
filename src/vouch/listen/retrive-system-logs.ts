@@ -10,6 +10,9 @@ export async function retrieveSystemLogsRoutes(fastify: FastifyInstance) {
             items: {
                 type: "object",
                 properties: {
+                    systemLogId: {
+                        type: "string"
+                    },
                     message: {
                         type: "string"
                     },
@@ -29,7 +32,8 @@ export async function retrieveSystemLogsRoutes(fastify: FastifyInstance) {
                 required: [
                     "message",
                     "timestamp"
-                ]
+                ],
+                additionalProperties: true,
             }
         }
     };
@@ -46,7 +50,7 @@ export async function retrieveSystemLogsRoutes(fastify: FastifyInstance) {
         },
         async (request, response) => {
             const data = await retrieveSystemLogs({
-                partnerId: "1234"
+
             })
 
             response.send(data);

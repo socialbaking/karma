@@ -7,3 +7,4 @@ export * from "./retrieve-code-data";
 export * from "./retrieve-code-public-details";
 export * from "./retrive-system-logs";
 export * from "./verify-code-validity";
+export * from "./retrieve-codes";
