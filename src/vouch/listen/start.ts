@@ -25,13 +25,13 @@ export async function create() {
 
     await setupSwagger(app);
 
+    app.register(routes);
+
     return app;
 }
 
 export async function start() {
     const app = await create();
-
-    app.register(routes);
 
     const port = getPort();
 
