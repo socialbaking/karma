@@ -68,12 +68,12 @@
     "human-readable-ids": "^1.0.4",
     "json-schema-to-ts": "^2.8.0",
     "redis": "^4.6.6",
-    "redis-memory-server": "^0.6.0",
     "tmp": "^0.2.1",
     "uuid": "^8.3.2",
     "whatwg-url": "^9.1.0"
   },
   "devDependencies": {
+    "redis-memory-server": "^0.6.0",
     "@opennetwork/http-representation": "^3.0.0",
     "@opennetwork/http-representation-node": "^3.0.0",
     "@playwright/test": "^1.26.0",
