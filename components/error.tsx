@@ -2,13 +2,17 @@ import Header from "@/components/header";
 import Footer from "@/components/footer";
 import { XCircleIcon } from "@heroicons/react/solid";
 
-const Error = ({
-  message = ""
-}) => {
+interface Props {
+	message?: string;
+}
+
+const Error = ({ message = "" }: Props) => {
+	if (!message) return null;
+
 	return (
-		<div className="h-screen flex flex-col">
+		<>
 			<Header />
-			<main className="flex w-full flex-1 flex-col px-80 p-8">
+			<main className="flex w-full flex-1 flex-col p-8">
 				<div className="rounded-md bg-red-50 p-4">
 					<div className="flex">
 						<div className="flex-shrink-0">
@@ -29,9 +33,9 @@ const Error = ({
 					</div>
 				</div>
 			</main>
-      <Footer />
-		</div>
+			<Footer />
+		</>
 	);
-}
+};
 
 export default Error;
