@@ -1,71 +1,56 @@
-import axios from "axios";
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
-import Footer from "@/components/footer";
-import Error from "@/components/error";
-import ProductType  from "types/product.d";
-import Header from "@/components/header";
-import ProductFeature from "@/components/product/feature";
+import axios from 'axios';
+import { useRouter } from 'next/router';
+import React, { Suspense } from 'react';
+import { QueryClient, useQuery, QueryClientProvider } from '@tanstack/react-query';
+import Footer from '@/components/footer';
+import Error from '@/components/error';
+import ProductType from 'types/product.d';
+import Header from '@/components/header';
+import ProductFeature from '@/components/product/feature';
 
-// get a single product based on the id from slug
+const queryClient = new QueryClient();
+
+const useProduct = (productId: string | string[] | undefined) => {
+  return useQuery(['product', productId], async () => {
+    if (!Number(productId)) return;
+    const API_URL = process.env.NEXT_PUBLIC_API_URL;
+    const getProduct = `${API_URL}/products/${productId}`;
+    const { data } = await axios.get(getProduct);
+    return data.data;
+  }, {
+    cacheTime: 1000 * 60 * 5, // Cache the data for 5 minutes
+    staleTime: 1000 * 60, // Mark data as stale after 1 minute
+  });
+};
+
 const Product = () => {
-	const [product, setProduct] = useState<ProductType>();
-	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState(false);
+  const { query } = useRouter();
+  const productId = query.id;
+  const { data: product, isLoading, isError } = useProduct(productId);
 
-	const { query } = useRouter();
-	// console.log("✅ asPath", asPath);
-	// console.log("✅ pathname", pathname);
-	// const getIdFromSlug = asPath.split("/")[2];
-	const getIdFromSlug = query.id
-	// console.log("🚗 ggggetIdFromSlug", getIdFromSlug);
-
-	useEffect(() => {
-		if (!Number(getIdFromSlug)) return;
-		const fetchData = async () => {
-			setLoading(true);
-			setError(false);
-
-			const API_URL = process.env.NEXT_PUBLIC_API_URL;
-			const getProduct = `${API_URL}/products/${getIdFromSlug}`;
-			try {
-				const { data } = await axios.get(getProduct);
-				const result = data.data;
-				console.log("result", result);
-				setProduct(result);
-			} catch (error) {
-				setError(true);
-			}
-			setLoading(false);
-		};
-		fetchData();
-	}, [getIdFromSlug]);
-
-	if (loading) {
-		return <></>;
-	}
-
-  if (error) {
-    return <Error message="Something went wrong." />;
-  }
-
-	return (
-		<div className="h-screen flex flex-col">
-			<Header />
-			<main className="flex w-full flex-1 flex-col px-20 p-8">
-				{/* <div className="bg-white shadow overflow-hidden sm:rounded-md">
-					<div className="mt-10">
-						<p className="text-2xl">{product?.attributes?.name}</p>
-						<p>{product?.attributes?.description}</p>
-					</div>
-				</div> */}
-				{!!product&&(
-        <ProductFeature product={product} />
-				)}
-			</main>
-			<Footer />
-		</div>
-	);
+	if (isError) {
+    return <Error message={!isLoading && product && "Something went wrong."} />;
 }
 
-export default Product;
+  return (
+    <div className='h-screen flex flex-col'>
+      <Header />
+      <main className='flex w-full flex-1 flex-col px-20 p-8'>
+        <Suspense fallback={<div>Loading...</div>}>
+          {!isLoading && product && <ProductFeature product={product} />}
+        </Suspense>
+      </main>
+      <Footer />
+    </div>
+  );
+};
+
+const ProductPage = () => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <Product />
+    </QueryClientProvider>
+  );
+};
+
+export default ProductPage;
