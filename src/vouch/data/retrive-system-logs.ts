@@ -1,4 +1,3 @@
-import { retrieveSystemLogs as example } from "../examples";
 import {getSystemLogStore} from "./system-log";
 
 export interface RetrieveSystemLogsInput {

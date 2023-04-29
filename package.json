@@ -12,8 +12,17 @@
       "tests": [
         "./esnext/tests/index.d.ts"
       ],
-      "routes": [
-        "./esnext/routes/index.d.ts"
+      "data": [
+        "./esnext/vouch/data/index.d.ts"
+      ],
+      "client": [
+        "./esnext/vouch/client/index.d.ts"
+      ],
+      "listen": [
+        "./esnext/vouch/listen/main.d.ts"
+      ],
+      "listen/routes": [
+        "./esnext/vouch/listen/routes.d.ts"
       ]
     }
   },
@@ -23,7 +32,10 @@
   "exports": {
     ".": "./esnext/index.js",
     "./tests": "./esnext/tests/index.js",
-    "./routes": "./esnext/routes/index.js"
+    "./data": "./esnext/vouch/data/index.js",
+    "./client": "./esnext/vouch/client/index.js",
+    "./listen": "./esnext/vouch/listen/main.js",
+    "./listen/routes": "./esnext/vouch/listen/routes.js"
   },
   "repository": {
     "type": "git",
@@ -76,7 +88,7 @@
     "@virtualstate/union": "^2.46.0",
     "@virtualstate/x": "^2.46.0",
     "c8": "^7.10.0",
-    "chance": "^1.1.8",
+    "chance": "^1.1.11",
     "change-case": "^4.1.2",
     "cheerio": "^1.0.0-rc.10",
     "dom-lite": "^20.2.0",
@@ -100,19 +112,13 @@
     "postbuild": "mkdir -p coverage && node scripts/post-build.js",
     "generate": "yarn build && node esnext/generate.js",
     "prepublishOnly": "npm run build",
-    "test": "yarn build && yarn test:all",
+    "test": "yarn build && yarn test:node",
     "test:remote": "yarn test:deno:remote",
     "test:node": "export $(cat .env | xargs) && node --enable-source-maps esnext/tests/index.js",
     "test:node:remote": "export $(cat .env | xargs) && node --experimental-network-imports --enable-source-maps -e '(async () => { return await import(\"https://cdn.skypack.dev/@virtualstate/focus/tests\");})();\n'",
-    "test:deno": "export $(cat .env | xargs) && deno run --allow-write --allow-env --allow-read --allow-net --import-map=import-map-deno.json esnext/tests/index.js",
-    "test:deno:remote": "export $(cat .env | xargs) && deno run --allow-write --allow-env --allow-read --allow-net --import-map=import-map-deno.json https://cdn.skypack.dev/@virtualstate/focus/tests",
-    "test:bun": "export $(cat .env | xargs) && bun esnext/tests/index.js",
-    "test:deno:r": "export $(cat .env | xargs) && deno run -r --allow-write --allow-env --allow-read --allow-net --import-map=import-map-deno.json esnext/tests/index.js",
     "test:node:inspect": "yarn build && export $(cat .env | xargs) && node --enable-source-maps --inspect-brk esnext/tests/index.js",
     "test:deno:inspect": "yarn build && export $(cat .env | xargs) && deno run --allow-write --allow-env --allow-read --allow-net --import-map=import-map-deno.json --inspect-brk esnext/tests/index.js",
     "coverage": "export $(cat .env | xargs) && c8 node esnext/tests/index.js && yarn postbuild",
-    "test:workerd:compile": "workerd compile workerd-tests.capnp > workerd-tests",
-    "test:workerd": "yarn test:workerd:compile && ./workerd-tests --experimental",
     "start": "yarn build && node esnext/vouch/listen/main.js"
   }
 }

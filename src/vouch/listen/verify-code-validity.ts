@@ -12,6 +12,9 @@ export async function verifyCodeValidityRoutes(fastify: FastifyInstance) {
             },
             partnerId: {
                 type: "string"
+            },
+            value: {
+                type: "number"
             }
         },
         required: [
@@ -39,13 +42,15 @@ export async function verifyCodeValidityRoutes(fastify: FastifyInstance) {
 
             const {
                 uniqueCode,
-                partnerId
+                partnerId,
+                value
             } = request.body;
 
             response.send({
                 success: await verifyUniqueCode({
                     uniqueCode,
-                    partnerId
+                    partnerId,
+                    value
                 })
             });
         }

@@ -11,8 +11,7 @@ import {kvsEnvStorage} from "@kvs/env";
 export async function start() {
     const app = fastify({
         logger: true
-    })
-
+    });
 
     app.register(fastifyRequestContext, {
         hook: 'preValidation',
@@ -33,4 +32,8 @@ export async function start() {
     await app.listen({ port });
 
     app.blipp();
+
+    return () => {
+        return app.close();
+    }
 }

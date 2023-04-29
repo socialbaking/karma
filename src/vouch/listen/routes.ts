@@ -28,6 +28,6 @@ export async function routes(fastify: FastifyInstance) {
     }
 
     fastify.register(apiRoutes, {
-        prefix: "/api"
+        prefix: "/api/version/1"
     });
 }

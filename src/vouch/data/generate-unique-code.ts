@@ -1,16 +1,3 @@
-// export const url = "/generate-unique-code";
-// export const body = {
-//     partnerId: "1234",
-//     value: 50
-// }
-// export const options = {
-//     method: "POST",
-//     body
-// };
-// export const response = {
-//     uniqueCode: "ABC123",
-//     value: 50
-// };
 import id from "human-readable-ids";
 import {getUniqueCodeStore, UniqueCode} from "./unique-code";
 import {log} from "./system-log";

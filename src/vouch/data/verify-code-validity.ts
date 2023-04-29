@@ -9,6 +9,10 @@ export interface VerifyUniqueCodeInput {
 export async function verifyUniqueCode({ uniqueCode, partnerId, value }: VerifyUniqueCodeInput): Promise<boolean> {
     const document = await getUniqueCode(uniqueCode);
     if (!document) return false;
+    if (value && document.value < value) {
+        return false;
+    }
+
     await updateUniqueCodeState({
         uniqueCode,
         partnerId,

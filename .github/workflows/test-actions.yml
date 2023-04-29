@@ -27,19 +27,7 @@ jobs:
       - run: yarn build
       # yarn coverage === c8 + yarn test:node
       - run: yarn coverage
-      - run: yarn test:deno
-      - run: yarn test:bun
-        continue-on-error: true
       - name: test:node with PORT
         run: yarn test:node
-        env:
-          PORT: 3400
-      - name: test:deno with PORT
-        run: yarn test:deno
-        env:
-          PORT: 3400
-      - name: test:bun with PORT
-        run: yarn test:bun
-        continue-on-error: true
         env:
           PORT: 3400

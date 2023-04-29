@@ -4,35 +4,48 @@ import {ok} from "../../is";
 export * from "./interface"
 
 export interface ClientOptions {
-    partnerId: string;
-    apiKey: string;
-    baseUrl: string
+    partnerId?: string;
+    accessToken?: string;
+    version?: number;
+    prefix?: string;
+    url: string | URL;
 }
 
 export class Client implements VouchClient {
 
-    private readonly baseUrl: string;
+    private readonly baseUrl: string | URL;
     private readonly headers: Headers;
     private readonly partnerId: string;
+    private readonly version: number;
+    private readonly prefix: string;
 
-    constructor({ baseUrl, apiKey, partnerId }: ClientOptions) {
-        this.baseUrl = baseUrl;
+    constructor({ url, accessToken, partnerId, version, prefix }: ClientOptions) {
+        this.baseUrl = url;
+        version = version ?? 1;
+        this.version = version;
+        this.partnerId = partnerId;
+        this.prefix = prefix ?? `/api/version/${version}`;
         const headers = this.headers = new Headers();
         headers.set("Content-Type", "application/json");
         headers.set("Accept", "application/json");
-        headers.set("Authorization", `Bearer ${apiKey}`);
-        headers.set("X-Partner-ID", partnerId);
+        if (accessToken) {
+            headers.set("Authorization", `Bearer ${accessToken}`);
+        }
+        if (partnerId) {
+            headers.set("X-Partner-ID", partnerId);
+        }
     }
 
     async acceptUniqueCode(uniqueCode: string, value: number) {
         const {
             partnerId,
             baseUrl,
-            headers
+            headers,
+            prefix
         } = this;
         const response = await fetch(
             new URL(
-                "/accept-unique-code",
+                `${prefix}/accept-unique-code`,
                 baseUrl
             ),
             {
@@ -45,7 +58,7 @@ export class Client implements VouchClient {
                 headers
             }
         );
-        ok(response.ok);
+        ok(response.ok, "acceptUniqueCode response not ok");
         const { success } = await response.json();
         return success;
     }
@@ -53,11 +66,12 @@ export class Client implements VouchClient {
     async addPartner(partnerName: string, location: string, remote?: boolean, onsite?: boolean): Promise<string> {
         const {
             baseUrl,
-            headers
+            headers,
+            prefix
         } = this;
         const response = await fetch(
             new URL(
-                "/add-partner",
+                `${prefix}/add-partner`,
                 baseUrl
             ),
             {
@@ -71,7 +85,7 @@ export class Client implements VouchClient {
                 headers
             }
         );
-        ok(response.ok);
+        ok(response.ok, "addPartner response not ok");
         const { partnerId } = await response.json();
         return partnerId;
     }
@@ -80,11 +94,12 @@ export class Client implements VouchClient {
         const {
             partnerId,
             baseUrl,
-            headers
+            headers,
+            prefix
         } = this;
         const response = await fetch(
             new URL(
-                "/assign-unique-code",
+                `${prefix}/assign-unique-code`,
                 baseUrl
             ),
             {
@@ -97,7 +112,7 @@ export class Client implements VouchClient {
                 headers
             }
         );
-        ok(response.ok);
+        ok(response.ok, "assignUniqueCode response not ok");
         const { success } = await response.json();
         return success;
     }
@@ -106,11 +121,12 @@ export class Client implements VouchClient {
         const {
             partnerId,
             baseUrl,
-            headers
+            headers,
+            prefix
         } = this;
         const response = await fetch(
             new URL(
-                "/generate-unique-code",
+                `${prefix}/generate-unique-code`,
                 baseUrl
             ),
             {
@@ -122,7 +138,7 @@ export class Client implements VouchClient {
                 headers
             }
         );
-        ok(response.ok);
+        ok(response.ok, "generateUniqueCode response not ok");
         const { uniqueCode } = await response.json();
         return uniqueCode;
     }
@@ -130,10 +146,11 @@ export class Client implements VouchClient {
     async getUniqueCode(uniqueCode: string): Promise<UniqueCode> {
         const {
             baseUrl,
-            headers
+            headers,
+            prefix
         } = this;
         const url = new URL(
-            "/unique-code-data",
+            `${prefix}/unique-code-data`,
             baseUrl
         );
         url.searchParams.set("uniqueCode", uniqueCode);
@@ -144,18 +161,19 @@ export class Client implements VouchClient {
                 headers
             }
         );
-        ok(response.ok);
+        ok(response.ok, "getUniqueCode response not ok");
         return response.json();
     }
 
     async listPartners(): Promise<Partner[]> {
         const {
             baseUrl,
-            headers
+            headers,
+            prefix
         } = this;
         const response = await fetch(
             new URL(
-                "/partners",
+                `${prefix}/partners`,
                 baseUrl
             ),
             {
@@ -163,18 +181,19 @@ export class Client implements VouchClient {
                 headers
             }
         );
-        ok(response.ok);
+        ok(response.ok, "listPartners response not ok");
         return response.json();
     }
 
     async listUniqueCodes(): Promise<UniqueCode[]> {
         const {
             baseUrl,
-            headers
+            headers,
+            prefix
         } = this;
         const response = await fetch(
             new URL(
-                "/unique-codes",
+                `${prefix}/unique-codes`,
                 baseUrl
             ),
             {
@@ -182,7 +201,7 @@ export class Client implements VouchClient {
                 headers
             }
         );
-        ok(response.ok);
+        ok(response.ok, "listUniqueCodes response not ok");
         return response.json();
     }
 
@@ -190,11 +209,12 @@ export class Client implements VouchClient {
         const {
             partnerId,
             baseUrl,
-            headers
+            headers,
+            prefix
         } = this;
         const response = await fetch(
             new URL(
-                "/process-payment",
+                `${prefix}/process-payment`,
                 baseUrl
             ),
             {
@@ -206,7 +226,7 @@ export class Client implements VouchClient {
                 headers
             }
         );
-        ok(response.ok);
+        ok(response.ok, "processPayment response not ok");
         const { success } = await response.json();
         return success;
     }
@@ -215,11 +235,12 @@ export class Client implements VouchClient {
         const {
             partnerId,
             baseUrl,
-            headers
+            headers,
+            prefix
         } = this;
         const response = await fetch(
             new URL(
-                "/verify-unique-code",
+                `${prefix}/verify-unique-code`,
                 baseUrl
             ),
             {
@@ -232,7 +253,7 @@ export class Client implements VouchClient {
                 headers
             }
         );
-        ok(response.ok);
+        ok(response.ok, "verifyUniqueCode response not ok");
         const { success } = await response.json();
         return success;
     }
