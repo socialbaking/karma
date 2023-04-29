@@ -5,13 +5,20 @@ import {setupSwagger} from "./swagger";
 import blippPlugin from "fastify-blipp";
 import corsPlugin from "@fastify/cors";
 import {getPort} from "./config";
-import { fastifyRequestContext } from "@fastify/request-context";
+import {fastifyRequestContext, requestContext} from "@fastify/request-context";
 import {kvsEnvStorage} from "@kvs/env";
 
 export async function create() {
     const app = fastify({
         logger: true
     });
+
+    app.addHook(
+        "preValidation",
+        async (request, response) => {
+            requestContext.set("hostname", request.hostname);
+        }
+    )
 
     app.register(fastifyRequestContext, {
         hook: 'preValidation',
