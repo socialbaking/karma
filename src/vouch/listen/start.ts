@@ -8,7 +8,7 @@ import {getPort} from "./config";
 import { fastifyRequestContext } from "@fastify/request-context";
 import {kvsEnvStorage} from "@kvs/env";
 
-export async function start() {
+export async function create() {
     const app = fastify({
         logger: true
     });
@@ -24,6 +24,12 @@ export async function start() {
     app.register(corsPlugin);
 
     await setupSwagger(app);
+
+    return app;
+}
+
+export async function start() {
+    const app = await create();
 
     app.register(routes);
 
