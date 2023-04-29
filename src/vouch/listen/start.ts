@@ -6,9 +6,23 @@ import blippPlugin from "fastify-blipp";
 import corsPlugin from "@fastify/cors";
 import {getPort} from "./config";
 import {fastifyRequestContext, requestContext} from "@fastify/request-context";
-import {kvsEnvStorage} from "@kvs/env";
+
+async function initRedisMemory() {
+    const { RedisMemoryServer } = await import("redis-memory-server")
+    const redisServer = new RedisMemoryServer();
+
+    const host = await redisServer.getHost();
+    const port = await redisServer.getPort();
+
+    process.env.REDIS_URL = `redis://${host}:${port}`;
+}
 
 export async function create() {
+
+    if (process.env.REDIS_MEMORY && !process.env.REDIS_URL) {
+        await initRedisMemory();
+    }
+
     const app = fastify({
         logger: true
     });
