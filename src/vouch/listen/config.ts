@@ -2,15 +2,13 @@ import {ok} from "../../is";
 import {requestContext} from "@fastify/request-context";
 
 export function getPort() {
-    const hostname = requestContext.get("hostname");
-
+    const hostname = getEnvironmentHostname();
     if (hostname) {
         const { port } = new URL(hostname);
         if (port) {
             return +port;
         }
     }
-
     const env = process.env.PORT;
     if (env && /^\d+$/.test(env)) {
         return +env;
@@ -18,15 +16,28 @@ export function getPort() {
     return 3000;
 }
 
-export function getHostname() {
+function getEnvironmentHostname() {
+    if (process.env.API_URL) {
+        return process.env.API_URL;
+    }
+
+    if (process.env.SERVER_EXTERNAL_URL_HOSTNAME) {
+        return process.env.SERVER_EXTERNAL_URL_HOSTNAME;
+    }
+
     const hostname = requestContext.get("hostname");
 
     if (hostname) {
         return hostname;
     }
 
-    if (process.env.SERVER_EXTERNAL_URL_HOSTNAME) {
-        return process.env.SERVER_EXTERNAL_URL_HOSTNAME;
+    return undefined;
+}
+
+export function getHostname() {
+    const hostname = getEnvironmentHostname();
+    if (hostname) {
+        return hostname;
     }
 
     const port = getPort();

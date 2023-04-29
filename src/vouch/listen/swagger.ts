@@ -4,7 +4,6 @@ import uiPlugin from "@fastify/swagger-ui";
 import {getHostname} from "./config";
 
 export async function setupSwagger(fastify: FastifyInstance) {
-
     const url = getHostname()
 
     const { host } = new URL(url);
