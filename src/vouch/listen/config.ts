@@ -18,7 +18,7 @@ export function getPort() {
 
 function getEnvironmentHostname() {
     if (process.env.VERCEL_URL) {
-        return process.env.VERCEL_URL
+        return `https://${process.env.VERCEL_URL}`
     }
 
     if (process.env.API_URL) {
