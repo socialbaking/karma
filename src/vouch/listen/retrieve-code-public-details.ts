@@ -52,7 +52,7 @@ export async function retrieveCodeDetailsRoutes(fastify: FastifyInstance) {
     }
 
     fastify.get(
-        "/retrieve-code-details",
+        "/unique-code-details",
         {
             schema,
             async handler(request: FastifyRequest<{ Querystring: FromSchema<typeof querystring> }>, response) {

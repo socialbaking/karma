@@ -8,3 +8,4 @@ export * from "./retrieve-code-public-details";
 export * from "./retrive-system-logs";
 export * from "./verify-code-validity";
 export * from "./retrieve-codes";
+export * from "./retrieve-partners";

@@ -139,8 +139,13 @@ The program requires at a minimum:
 #### Add Partner
 
 - Request: `POST /add-partner`
-- Request Body: `{ "partnerId": "1234", "partnerName": "ABC Clinic", "location": "Auckland" }`
-- Response: `{ "success": true }`
+- Request Body: `{ "partnerName": "ABC Clinic", "location": "Auckland" }`
+- Response: `{ "partnerId": "1234" }`
+- 
+#### List Partners
+
+- Request: `GET /partners`
+- Response: `[{ "partnerId": "1234", "partnerName": "ABC Clinic", "location": "Auckland" }]`
 
 #### Assign Unique Code / Redeem Unique Code
 
@@ -153,6 +158,11 @@ The program requires at a minimum:
 - Request: `GET /unique-code-data`
 - Request Parameters: `uniqueCode=ABC123`
 - Response: `{ "uniqueCode": "ABC123", "value": 50.00, "partnerId": "1234", "partnerName": "ABC Clinic", "location": "Auckland" }`
+
+#### List Code Data / Processing information
+
+- Request: `GET /unique-codes`
+- Response: `[{ "uniqueCode": "ABC123", "value": 50.00, "partnerId": "1234", "partnerName": "ABC Clinic", "location": "Auckland" }]`
 
 #### Process Payment Transfer related to a unique code
 
@@ -171,56 +181,7 @@ The program requires at a minimum:
 - Request: `GET /system-logs`
 - Response: `[ {"timestamp": "2022-05-01T10:30:00Z", "message": "Unique code generated", "code": "ABC123" }, {"timestamp": "2022-05-01T11:00:00Z", "message": "Unique code redeemed", "code": "ABC123", "partnerId": "1234" }]`
 
-### API SDK Example
 
-```typescript
-interface UniqueCode {
-    uniqueCode: string;
-    value: number;
-}
-
-interface Partner {
-    partnerId: string;
-    partnerName: string;
-    location: string;
-}
-
-interface UniqueCodeDetails extends UniqueCode {
-    partnerId: string;
-}
-
-interface CodeValidity {
-    valid: boolean;
-}
-
-interface SystemLog {
-    timestamp: string;
-    message: string;
-    code?: string;
-    partnerId?: string;
-}
-
-interface PaymentTransfer {
-    uniqueCode: string;
-    amount: number;
-}
-
-interface APIStatus {
-    success: boolean
-}
-
-interface VouchSDK {
-    generateUniqueCode(): Promise<UniqueCode>;
-    verifyUniqueCode(uniqueCode: string, partnerId: string): Promise<CodeValidity>;
-    getUniqueCodeDetails(uniqueCode: string): Promise<UniqueCodeDetails>;
-    addPartner(partner: Partner): Promise<APIStatus>;
-    assignUniqueCode(uniqueCode: string, partnerId: string): Promise<APIStatus>;
-    getUniqueCodeData(uniqueCode: string): Promise<UniqueCodeDetails>;
-    processPayment(paymentTransfer: PaymentTransfer): Promise<APIStatus>;
-    acceptUniqueCode(uniqueCode: string): Promise<APIStatus>;
-    getSystemLogs(): Promise<SystemLog[]>;
-}
-```
 
 ## Vouch System Architecture
 
