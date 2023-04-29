@@ -39,6 +39,10 @@ yarn-error.log*
 
 .env
 !.env.example
+.env.local
 
-# storybook
-storybook-static
+# ignore next.js build output
+.next
+static
+server
+cache
