@@ -18,6 +18,15 @@ export async function addPartnerRoutes(fastify: FastifyInstance) {
             },
             onsite: {
                 type: "boolean"
+            },
+            clinic: {
+                type: "boolean"
+            },
+            pharmacy: {
+                type: "boolean"
+            },
+            partnerDescription: {
+                type: "string"
             }
         },
         required: [
@@ -50,6 +59,15 @@ export async function addPartnerRoutes(fastify: FastifyInstance) {
                 },
                 remote: {
                     type: "boolean"
+                },
+                clinic: {
+                    type: "boolean"
+                },
+                pharmacy: {
+                    type: "boolean"
+                },
+                partnerDescription: {
+                    type: "string"
                 }
             },
             required: [

@@ -24,6 +24,15 @@ export async function retrievePartnerRoutes(fastify: FastifyInstance) {
                     },
                     remote: {
                         type: "boolean"
+                    },
+                    clinic: {
+                        type: "boolean"
+                    },
+                    pharmacy: {
+                        type: "boolean"
+                    },
+                    partnerDescription: {
+                        type: "string"
                     }
                 },
                 required: [
