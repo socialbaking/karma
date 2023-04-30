@@ -2,19 +2,46 @@
 
 Our vouch system makes it easy for you to access medical cannabis treatments from registered clinics and trusted partners in New Zealand. With a simple and secure process, you can receive the care you need and support the growth of the medical cannabis industry.
 
-[//]: # (badges)
+## Focus
 
-### Support
+- The program will provide a unique code to patients that can be redeemed with registered clinics and trusted partners for medical cannabis treatments.
+- The unique code will have a fixed value that will be determined when the code is requested.
+- The program will provide a web portal for patients to check the balance and details of their unique code.
+- The program will provide a plugin for WordPress and other PHP or Node.js e-commerce sites to accept the unique code and make it easy for companies to participate.
+- The program will ensure that patient data is secure and compliant with relevant regulations.
+- The program will be launched in New Zealand and will only be valid for use within New Zealand.
+- The program will be tested and refined to ensure that it is user-friendly and effective for both patients and companies.
+- The program will be marketed to patients, clinics, and trusted partners to promote its use and growth.
+- The program will retain code information until it has been fully redeemed and indicated as expirible. 
+- The program will only provide code data when the specific code is provided. 
+- The program will rate limit requests and take bad actors into account.
+- The program will only provide information about more than one code, or processing information about a code to redeeming registred clinics and redeeming trusted partners. 
+- The program will make use of techniques to detect on a best effort basis patient information within user provided content and prevent this data from being processed.
+- The program is not intended to be used to store patient information.
+- The program is not intended to be used to process patient information.
 
- ![Node.js supported](https://img.shields.io/badge/node-%3E%3D18.7.0-blue) ![Deno supported](https://img.shields.io/badge/deno-%3E%3D1.17.0-blue) ![Bun supported](https://img.shields.io/badge/bun-%3E%3D0.1.11-blue) 
+## Technical Goal 
 
-### Test Coverage
+The program is designed to provide a unique code to patients that can be redeemed with registered clinics and trusted 
+partners for medical cannabis treatments. The system will consist of a user-friendly frontend and a secure backend developed with Node.js.
 
- ![95.06%25 lines covered](https://img.shields.io/badge/lines-95.06%25-brightgreen) ![95.06%25 statements covered](https://img.shields.io/badge/statements-95.06%25-brightgreen) ![92.59%25 functions covered](https://img.shields.io/badge/functions-92.59%25-brightgreen) ![83.84%25 branches covered](https://img.shields.io/badge/branches-83.84%25-brightgreen)
+The program will also provide a plugin for WordPress and other PHP or Node.js based e-commerce sites to accept the unique code and make it easy for companies to participate.
 
-[//]: # (badges)
+## API Surface
 
-### Diagram 
+The program requires at a minimum:
+
+- An API endpoint for generating unique codes with a fixed value for patients to use.
+- An API endpoint for verifying the validity of unique codes when redeemed by clinics and trusted partners.
+- An API endpoint for retrieving the details and balance of a unique code for patients to check.
+- An API endpoint for adding and removing registered clinics and trusted partners.
+- An API endpoint for adding and removing unique codes associated with specific clinics and trusted partners.
+- An API endpoint for retrieving data related to unique codes and their associated clinics and trusted partners.
+- An API endpoint for securely communicating with Xero for payment processing.
+- An API endpoint for securely communicating with the WordPress plugin and other e-commerce sites to accept the unique codes.
+- An API endpoint for logging and monitoring system activity and errors.
+
+### Diagram
 
 ```mermaid
 sequenceDiagram
@@ -81,44 +108,17 @@ subgraph WordPress Plugin
 end
 ```
 
-## Focus
+[//]: # (badges)
 
-- The program will provide a unique code to patients that can be redeemed with registered clinics and trusted partners for medical cannabis treatments.
-- The unique code will have a fixed value that will be determined when the code is requested.
-- The program will provide a web portal for patients to check the balance and details of their unique code.
-- The program will provide a plugin for WordPress and other PHP or Node.js e-commerce sites to accept the unique code and make it easy for companies to participate.
-- The program will ensure that patient data is secure and compliant with relevant regulations.
-- The program will be launched in New Zealand and will only be valid for use within New Zealand.
-- The program will be tested and refined to ensure that it is user-friendly and effective for both patients and companies.
-- The program will be marketed to patients, clinics, and trusted partners to promote its use and growth.
-- The program will retain code information until it has been fully redeemed and indicated as expirible. 
-- The program will only provide code data when the specific code is provided. 
-- The program will rate limit requests and take bad actors into account.
-- The program will only provide information about more than one code, or processing information about a code to redeeming registred clinics and redeeming trusted partners. 
-- The program will make use of techniques to detect on a best effort basis patient information within user provided content and prevent this data from being processed.
-- The program is not intended to be used to store patient information.
-- The program is not intended to be used to process patient information.
+### Support
 
-## Technical Goal 
+![Node.js supported](https://img.shields.io/badge/node-%3E%3D18.7.0-blue) ![Deno supported](https://img.shields.io/badge/deno-%3E%3D1.17.0-blue) ![Bun supported](https://img.shields.io/badge/bun-%3E%3D0.1.11-blue)
 
-The program is designed to provide a unique code to patients that can be redeemed with registered clinics and trusted 
-partners for medical cannabis treatments. The system will consist of a user-friendly frontend and a secure backend developed with Node.js.
+### Test Coverage
 
-The program will also provide a plugin for WordPress and other PHP or Node.js based e-commerce sites to accept the unique code and make it easy for companies to participate.
+![95.06%25 lines covered](https://img.shields.io/badge/lines-95.06%25-brightgreen) ![95.06%25 statements covered](https://img.shields.io/badge/statements-95.06%25-brightgreen) ![92.59%25 functions covered](https://img.shields.io/badge/functions-92.59%25-brightgreen) ![83.84%25 branches covered](https://img.shields.io/badge/branches-83.84%25-brightgreen)
 
-## API Surface
-
-The program requires at a minimum:
-
-- An API endpoint for generating unique codes with a fixed value for patients to use.
-- An API endpoint for verifying the validity of unique codes when redeemed by clinics and trusted partners.
-- An API endpoint for retrieving the details and balance of a unique code for patients to check.
-- An API endpoint for adding and removing registered clinics and trusted partners.
-- An API endpoint for adding and removing unique codes associated with specific clinics and trusted partners.
-- An API endpoint for retrieving data related to unique codes and their associated clinics and trusted partners.
-- An API endpoint for securely communicating with Xero for payment processing.
-- An API endpoint for securely communicating with the WordPress plugin and other e-commerce sites to accept the unique codes.
-- An API endpoint for logging and monitoring system activity and errors.
+[//]: # (badges)
 
 ### API Surface Examples
 
