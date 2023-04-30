@@ -2,6 +2,7 @@ import {FastifyInstance} from "fastify";
 import {FromSchema} from "json-schema-to-ts";
 import {ok} from "../../is";
 import {verifyUniqueCode} from "../data";
+import {validateAuthorizedForPartnerId} from "./authentication";
 
 export async function verifyCodeValidityRoutes(fastify: FastifyInstance) {
     const body = {
@@ -23,36 +24,41 @@ export async function verifyCodeValidityRoutes(fastify: FastifyInstance) {
         ]
     } as const;
     type BodySchema = FromSchema<typeof body>
-    function assert(body: unknown): asserts body is BodySchema {
-        ok(body);
+
+    const schema = {
+        description: "Verify a unique code",
+        tags: ["partner"],
+        summary: "",
+        body
+    };
+    type Schema = {
+        Body: BodySchema
     }
 
-    fastify.post(
+    fastify.post<Schema>(
         "/verify-unique-code",
         {
-            schema: {
-                description: "Verify a unique code",
-                tags: ["partner"],
-                summary: "",
-                body
-            }
-        },
-        async (request, response) => {
-            assert(request.body);
-
-            const {
-                uniqueCode,
-                partnerId,
-                value
-            } = request.body;
-
-            response.send({
-                success: await verifyUniqueCode({
+            schema,
+            preHandler: fastify.auth([
+               fastify.verifyBearerAuth
+            ]),
+            async handler(request, response) {
+                const {
                     uniqueCode,
                     partnerId,
                     value
-                })
-            });
+                } = request.body;
+
+                validateAuthorizedForPartnerId(partnerId);
+
+                response.send({
+                    success: await verifyUniqueCode({
+                        uniqueCode,
+                        partnerId,
+                        value
+                    })
+                });
+            }
         }
     )
 }

@@ -2,6 +2,7 @@ import {FastifyInstance} from "fastify";
 import {FromSchema} from "json-schema-to-ts";
 import {ok} from "../../is";
 import {processPayment} from "../data";
+import {validateAuthorizedForPartnerId} from "./authentication";
 
 export async function processPaymentRoutes(fastify: FastifyInstance) {
     const body = {
@@ -23,31 +24,38 @@ export async function processPaymentRoutes(fastify: FastifyInstance) {
     function assert(body: unknown): asserts body is BodySchema {
         ok(body);
     }
+    type Schema = {
+        Body: BodySchema
+    }
+    const schema = {
+        description: "Process a payment",
+        tags: ["partner"],
+        summary: "",
+        body
+    };
 
-    fastify.post(
+    fastify.post<Schema>(
         "/process-payment",
         {
-            schema: {
-                description: "Process a payment",
-                tags: ["partner"],
-                summary: "",
-                body
+            schema,
+            preHandler: fastify.auth([
+               fastify.verifyBearerAuth
+            ]),
+            async handler(request, response) {
+                const {
+                    uniqueCode,
+                    partnerId
+                } = request.body;
+
+                validateAuthorizedForPartnerId(partnerId);
+
+                response.send({
+                    success: await processPayment({
+                        partnerId,
+                        uniqueCode
+                    })
+                });
             }
-        },
-        async (request, response) => {
-            assert(request.body);
-
-            const {
-                uniqueCode,
-                partnerId
-            } = request.body;
-
-            response.send({
-                success: await processPayment({
-                    partnerId,
-                    uniqueCode
-                })
-            });
         }
     );
 }

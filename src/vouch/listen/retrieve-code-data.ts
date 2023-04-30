@@ -1,6 +1,7 @@
 import {FastifyInstance, FastifyRequest} from "fastify";
 import {FromSchema} from "json-schema-to-ts";
 import {retrieveCodeData} from "../data";
+import {validateAuthorizedForPartnerId} from "./authentication";
 
 export async function retrieveCodeDataRoutes(fastify: FastifyInstance) {
 
@@ -48,16 +49,25 @@ export async function retrieveCodeDataRoutes(fastify: FastifyInstance) {
         response
     };
 
-    fastify.get(
+    type Schema = {
+        Querystring: FromSchema<typeof querystring>;
+    };
+
+    fastify.get<Schema>(
         "/unique-code-data",
         {
             schema,
-            async handler(request: FastifyRequest<{ Querystring: FromSchema<typeof querystring> }>, response) {
+            preHandler: fastify.auth([
+               fastify.verifyBearerAuth
+            ]),
+            async handler(request, response) {
                 const { uniqueCode } = request.query;
 
                 const data = await retrieveCodeData({
                     uniqueCode
-                })
+                });
+
+                validateAuthorizedForPartnerId(data.partnerId);
 
                 if (!data) {
                     response.status(404);

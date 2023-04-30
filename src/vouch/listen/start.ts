@@ -9,6 +9,9 @@ import {fastifyRequestContext, requestContext} from "@fastify/request-context";
 import helmet from "@fastify/helmet";
 import { readFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
+import { bearerAuthentication } from "./bearer-authentication";
+import bearerAuthPlugin from "@fastify/bearer-auth";
+import authPlugin from "@fastify/auth";
 
 const { pathname } = new URL(import.meta.url);
 const directory = dirname(pathname)
@@ -67,6 +70,14 @@ export async function create() {
     app.register(corsPlugin);
 
     await setupSwagger(app);
+
+    app
+        .register(authPlugin)
+    app.register(bearerAuthPlugin, {
+        keys: new Set<string>(),
+        auth: bearerAuthentication,
+        addHook: false
+    });
 
     app.register(routes);
 

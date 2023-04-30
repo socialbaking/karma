@@ -2,6 +2,8 @@ import {FastifyInstance} from "fastify";
 import {acceptUniqueCode} from "../data";
 import {FromSchema} from "json-schema-to-ts";
 import {ok} from "../../is";
+import {allowAnonymous} from "./bearer-authentication";
+import {validateAuthorizedForPartnerId} from "./authentication";
 
 export async function acceptUniqueCodeRoutes(fastify: FastifyInstance) {
 
@@ -25,36 +27,40 @@ export async function acceptUniqueCodeRoutes(fastify: FastifyInstance) {
         ]
     } as const;
     type BodySchema = FromSchema<typeof body>
-    function assert(body: unknown): asserts body is BodySchema {
-        ok(body);
+    const schema = {
+        description: "Accept a unique code",
+        tags: ["partner"],
+        summary: "",
+        body
+    };
+    type Schema = {
+        Body: BodySchema
     }
 
-    fastify.post(
+    fastify.post<Schema>(
         "/accept-unique-code",
         {
-          schema: {
-              description: "Accept a unique code",
-              tags: ["partner"],
-              summary: "",
-              body
-          }
-        },
-        async (request, response) => {
-            assert(request.body);
-
-            const {
-                uniqueCode,
-                partnerId,
-                value
-            } = request.body;
-
-            response.send({
-                success: await acceptUniqueCode({
+            schema,
+            preHandler: fastify.auth([
+                fastify.verifyBearerAuth
+            ]),
+            async handler(request, response) {
+                const {
                     uniqueCode,
                     partnerId,
                     value
-                })
-            });
+                } = request.body;
+
+                validateAuthorizedForPartnerId(partnerId);
+
+                response.send({
+                    success: await acceptUniqueCode({
+                        uniqueCode,
+                        partnerId,
+                        value
+                    })
+                });
+            }
         }
     )
 

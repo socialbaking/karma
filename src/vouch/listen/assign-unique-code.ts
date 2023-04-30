@@ -2,6 +2,7 @@ import {FastifyInstance} from "fastify";
 import {FromSchema} from "json-schema-to-ts";
 import {ok} from "../../is";
 import {assignUniqueCode} from "../data";
+import {validateAuthorizedForPartnerId} from "./authentication";
 
 export async function assignUniqueCodeRoutes(fastify: FastifyInstance) {
     const body = {
@@ -27,33 +28,40 @@ export async function assignUniqueCodeRoutes(fastify: FastifyInstance) {
     function assert(body: unknown): asserts body is BodySchema {
         ok(body);
     }
+    type Schema = {
+        Body: BodySchema
+    }
+    const schema = {
+        description: "Assign a unique code",
+        tags: ["partner"],
+        summary: "",
+        body
+    };
 
-    fastify.post(
+    fastify.post<Schema>(
         "/assign-unique-code",
         {
-            schema: {
-                description: "Assign a unique code",
-                tags: ["partner"],
-                summary: "",
-                body
-            }
-        },
-        async (request, response) => {
-            assert(request.body);
-
-            const {
-                uniqueCode,
-                value,
-                partnerId
-            } = request.body;
-
-            response.send({
-                success: await assignUniqueCode({
+            schema,
+            preHandler: fastify.auth([
+               fastify.verifyBearerAuth
+            ]),
+            async handler(request, response) {
+                const {
                     uniqueCode,
-                    partnerId,
-                    value
-                })
-            });
+                    value,
+                    partnerId
+                } = request.body;
+
+                validateAuthorizedForPartnerId(partnerId);
+
+                response.send({
+                    success: await assignUniqueCode({
+                        uniqueCode,
+                        partnerId,
+                        value
+                    })
+                });
+            }
         }
     );
 }

@@ -2,6 +2,7 @@ import {FastifyInstance} from "fastify";
 import {FromSchema} from "json-schema-to-ts";
 import {ok} from "../../is";
 import {generateUniqueCode} from "../data";
+import {validateAuthorizedForPartnerId} from "./authentication";
 
 export async function generateUniqueCodeRoutes(fastify: FastifyInstance) {
     const body = {
@@ -19,34 +20,40 @@ export async function generateUniqueCodeRoutes(fastify: FastifyInstance) {
         ]
     } as const;
     type BodySchema = FromSchema<typeof body>
-    function assert(body: unknown): asserts body is BodySchema {
-        ok(body);
-    }
+    type Schema = {
+        Body: BodySchema
+    };
 
-    fastify.post(
+    const schema = {
+        description: "Generate a unique code",
+        tags: ["partner"],
+        summary: "",
+        body
+    };
+
+    fastify.post<Schema>(
         "/generate-unique-code",
         {
-            schema: {
-                description: "Generate a unique code",
-                tags: ["partner"],
-                summary: "",
-                body
+            schema,
+            preHandler: fastify.auth([
+               fastify.verifyBearerAuth
+            ]),
+            async handler(request, response) {
+
+                const {
+                    value,
+                    partnerId
+                } = request.body;
+
+                validateAuthorizedForPartnerId(partnerId);
+
+                response.send(
+                    await generateUniqueCode({
+                        partnerId,
+                        value
+                    })
+                );
             }
-        },
-        async (request, response) => {
-            assert(request.body);
-
-            const {
-                value,
-                partnerId
-            } = request.body;
-
-            response.send(
-                await generateUniqueCode({
-                    partnerId,
-                    value
-                })
-            );
         }
     );
 }

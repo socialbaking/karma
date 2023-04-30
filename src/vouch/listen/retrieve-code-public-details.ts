@@ -1,6 +1,7 @@
 import {FastifyInstance, FastifyRequest} from "fastify";
 import {retrieveCodePublicDetails} from "../data";
 import {FromSchema} from "json-schema-to-ts";
+import {allowAnonymous} from "./bearer-authentication";
 
 export async function retrieveCodeDetailsRoutes(fastify: FastifyInstance) {
 
@@ -47,11 +48,19 @@ export async function retrieveCodeDetailsRoutes(fastify: FastifyInstance) {
         response
     }
 
-    fastify.get(
+    type Schema = {
+        Querystring: FromSchema<typeof querystring>
+    }
+
+    fastify.get<Schema>(
         "/unique-code-details",
         {
             schema,
-            async handler(request: FastifyRequest<{ Querystring: FromSchema<typeof querystring> }>, response) {
+            preHandler: fastify.auth([
+               allowAnonymous,
+               fastify.verifyBearerAuth
+            ]),
+            async handler(request, response) {
                 const { uniqueCode } = request.query;
 
                 const data = await retrieveCodePublicDetails({

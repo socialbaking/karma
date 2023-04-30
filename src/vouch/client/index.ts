@@ -43,6 +43,7 @@ export class Client implements VouchClient {
             headers,
             prefix
         } = this;
+        console.log(headers)
         const response = await fetch(
             new URL(
                 `${prefix}/accept-unique-code`,

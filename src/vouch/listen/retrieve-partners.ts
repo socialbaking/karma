@@ -1,5 +1,6 @@
 import {FastifyInstance, FastifyRequest} from "fastify";
 import {retrievePartners} from "../data";
+import {allowAnonymous} from "./bearer-authentication";
 
 export async function retrievePartnerRoutes(fastify: FastifyInstance) {
 
@@ -55,6 +56,10 @@ export async function retrievePartnerRoutes(fastify: FastifyInstance) {
         "/partners",
         {
             schema,
+            preHandler: fastify.auth([
+               allowAnonymous,
+               fastify.verifyBearerAuth
+            ]),
             async handler(request: FastifyRequest, response) {
                 response.send(
                     await retrievePartners()

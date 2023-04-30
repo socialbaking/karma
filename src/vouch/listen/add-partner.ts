@@ -1,6 +1,7 @@
 import {FastifyInstance, FastifyRequest} from "fastify";
 import {FromSchema} from "json-schema-to-ts";
 import {addPartner} from "../data";
+import {allowAnonymous} from "./bearer-authentication";
 
 export async function addPartnerRoutes(fastify: FastifyInstance) {
 
@@ -89,29 +90,32 @@ export async function addPartnerRoutes(fastify: FastifyInstance) {
         response
     }
 
-    fastify.post(
+    fastify.post<Schema>(
         "/add-partner",
         {
-            schema
-        },
-        async (request: FastifyRequest<Schema>, response) => {
+            schema,
+            preHandler: fastify.auth([
+                allowAnonymous,
+                fastify.verifyBearerAuth
+            ]),
+            async handler(request, response)  {
+                const {
+                    partnerName,
+                    location,
+                    onsite,
+                    remote
+                } = request.body;
 
-            const {
-                partnerName,
-                location,
-                onsite,
-                remote
-            } = request.body;
+                const partner = await addPartner({
+                    partnerName,
+                    location,
+                    onsite,
+                    remote
+                });
 
-            const partner = await addPartner({
-                partnerName,
-                location,
-                onsite,
-                remote
-            });
-
-            response.status(201);
-            response.send(partner);
+                response.status(201);
+                response.send(partner);
+            }
         }
     )
 }

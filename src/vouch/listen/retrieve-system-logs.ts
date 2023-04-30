@@ -1,6 +1,8 @@
-import {FastifyInstance, FastifyRequest} from "fastify";
+import {FastifyInstance} from "fastify";
 import {retrieveSystemLogs} from "../data";
 import {FromSchema} from "json-schema-to-ts";
+import {allowAnonymous} from "./bearer-authentication";
+import {getMaybeAuthorizedForPartnerId} from "./authentication";
 
 export async function retrieveSystemLogsRoutes(fastify: FastifyInstance) {
 
@@ -58,14 +60,22 @@ export async function retrieveSystemLogsRoutes(fastify: FastifyInstance) {
         querystring
     }
 
-    fastify.get(
+    type Schema = {
+        Querystring: FromSchema<typeof querystring>
+    }
+
+    fastify.get<Schema>(
         "/system-logs",
         {
             schema,
-            async handler(request: FastifyRequest<{ Querystring: FromSchema<typeof querystring> }>, response) {
+            preHandler: fastify.auth([
+                allowAnonymous,
+                fastify.verifyBearerAuth
+            ]),
+            async handler(request, response) {
                 const { partnerId } = request.query;
                 const data = await retrieveSystemLogs({
-                    partnerId
+                    partnerId: partnerId ?? getMaybeAuthorizedForPartnerId()
                 })
 
                 response.send(data);
