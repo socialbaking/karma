@@ -4,6 +4,7 @@ import {FastifyAuthFunction} from "@fastify/auth";
 import {setAuthorizedForPartnerId} from "./authentication";
 import {ok} from "../../is";
 import {requestContext} from "@fastify/request-context";
+import {getPartner} from "../data/partner";
 
 const AUTHORIZED_ACCESS_TOKEN_KEY = "accessTokenKeyValue";
 
@@ -23,8 +24,15 @@ export async function bearerAuthentication(key: string, request: FastifyRequest)
     if (!token) return false;
     if (token.disabledAt) return false;
 
+
     if (token.partnerId) {
         setAuthorizedForPartnerId(token.partnerId);
+        const partner = await getPartner(token.partnerId);
+        request.requestContext.set("partner", partner);
+        if (process.env.VOUCH_REQUIRE_PARTNER_APPROVAL) {
+            if (!partner.approved) return false;
+        }
+
     }
 
     request.requestContext.set("accessTokenAuthentication", true);

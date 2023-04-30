@@ -1,5 +1,5 @@
 import {getUniqueCode, updateUniqueCodeState} from "./unique-code";
-import {getPartnerStore} from "./partner";
+import {getPartner, getPartnerStore} from "./partner";
 
 export interface VerifyUniqueCodeInput {
     uniqueCode: string
@@ -15,7 +15,7 @@ export async function verifyUniqueCode({ uniqueCode, partnerId, value }: VerifyU
     }
 
     if (process.env.VOUCH_REQUIRE_PARTNER_APPROVAL) {
-        const partner = await getPartnerStore().get(document.partnerId);
+        const partner = await getPartner(document.partnerId);
         if (!partner.approved) return false;
     }
 

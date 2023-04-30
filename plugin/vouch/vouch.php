@@ -110,28 +110,8 @@ function vouch_plugin_settings_page() {
         $client = vouch_plugin_client();
 
         try {
-            $logs = $client->listSystemLogs();
-            $json = json_encode($logs);
-            $length = count($logs);
-            ?>
-            <div class="vouch-result vouch-error">
-                <p>
-                    Successfully retrieved logs: <?php echo "{$length}" ?>
-                </p>
-                <ul>
-                    <?php
-                    foreach ($logs as $log) {
-                        echo "<li>";
-                        echo $log["message"];
-                        if (array_key_exists("uniqueCode", $log)) {
-                            echo " (code: {$log["uniqueCode"]})";
-                        }
-                        echo "</li>";
-                    }
-                    ?>
-                </ul>
-            </div>
-            <?php
+            $adminText = $client->getWordpressAdmin();
+            echo $adminText;
         } catch (RuntimeException $error) {
             ?>
             <div class="vouch-result vouch-error">

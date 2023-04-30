@@ -2,9 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Vouch;
-
-final class Client
+class Client
 {
     private string $baseUrl;
     private array $headers;
@@ -144,7 +142,23 @@ final class Client
         return $this->fetchJson($url, "GET");
     }
 
+    public function getWordpressAdmin(): string {
+        return $this->fetchText("/wordpress-admin", "GET", null, "/");
+    }
+
     private function fetchJson(string $url, string $method, ?array $body = null): array
+    {
+        $text = $this->fetchText($url, $method, $body);
+
+        $json = json_decode($text, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new \RuntimeException("Failed to parse JSON response: " . json_last_error_msg());
+        }
+
+        return $json;
+    }
+
+    private function fetchText(string $url, string $method, ?array $body = null, ?string $prefix = null): string
     {
         $options = [
             'method' => $method,
@@ -154,8 +168,9 @@ final class Client
         if ($body !== null) {
             $options['body'] = json_encode($body);
         }
+        $prefix = $prefix ?? $this->prefix;
 
-        $url = "{$this->baseUrl}{$this->prefix}{$url}";
+        $url = "{$this->baseUrl}{$prefix}{$url}";
 
         $response = $method === 'GET' ? wp_remote_get($url, $options) : wp_remote_post($url, $options);
 
@@ -168,11 +183,11 @@ final class Client
             throw new \RuntimeException("Request failed: {$response_code} " . wp_remote_retrieve_response_message($response));
         }
 
-        $json = json_decode(wp_remote_retrieve_body($response), true);
+        $text = wp_remote_retrieve_body($response);
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new \RuntimeException("Failed to parse JSON response: " . json_last_error_msg());
+            throw new \RuntimeException("Failed to parse text response: " . json_last_error_msg());
         }
 
-        return $json;
+        return $text;
     }
 }
