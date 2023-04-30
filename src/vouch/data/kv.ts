@@ -27,7 +27,6 @@ function getRequestContextKeyValueStoreWithName<T>(name: string): KeyValueStore<
         let store: Promise<KVS<StorageSchema>> = undefined;
         let kv;
         if (getRedisUrl()) {
-            console.log("client in use");
             kv = createRedisKeyValueStore<T>(name);
         } else {
             kv = createKeyValueStore<T>(() => {
@@ -51,21 +50,43 @@ export interface KeyValueStore<T> {
     values(): Promise<T[]>
 }
 
+const GLOBAL_CLIENTS = new Map();
+const GLOBAL_CLIENT_CONNECTION_PROMISE = new WeakMap();
+
 function getRedisUrl() {
     return process.env.REDIS_URL;
 }
 
 function createRedisKeyValueStore<T>(name: string): KeyValueStore<T> {
-    const url = getRedisUrl();
-    const client = createClient({
-        url
-    });
+    const client = getClient();
 
-    let connectPromise: Promise<void> | undefined = undefined;
+    function getClient() {
+        const url = getRedisUrl();
+        const existing = GLOBAL_CLIENTS.get(url);
+        if (existing) {
+            return existing;
+        }
+        const client = createClient({
+            url
+        });
+        GLOBAL_CLIENTS.set(url, client);
+        return client;
+    }
 
     async function connect() {
-        if (connectPromise) return connectPromise;
-        return connectPromise = client.connect();
+        if (client.isOpen) {
+            return client;
+        }
+        const existingPromise = GLOBAL_CLIENT_CONNECTION_PROMISE.get(client);
+        if (existingPromise) return existingPromise;
+        const promise = client.connect();
+        GLOBAL_CLIENT_CONNECTION_PROMISE.set(client, promise);
+        promise.finally(() => {
+            if (promise === GLOBAL_CLIENT_CONNECTION_PROMISE.get(client)) {
+                GLOBAL_CLIENT_CONNECTION_PROMISE.delete(client)
+            }
+        })
+        return promise;
     }
 
     function getPrefix() {
@@ -97,7 +118,7 @@ function createRedisKeyValueStore<T>(name: string): KeyValueStore<T> {
         await connect();
         const keys = await client.keys(`${getPrefix()}*`);
         return await Promise.all(
-            keys.map(key => internalGet(key))
+            keys.map((key: string) => internalGet(key))
         );
     }
 
