@@ -7,6 +7,11 @@ import corsPlugin from "@fastify/cors";
 import {getPort} from "./config";
 import {fastifyRequestContext, requestContext} from "@fastify/request-context";
 import helmet from "@fastify/helmet";
+import { readFile } from "node:fs/promises";
+import { dirname, join } from "node:path";
+
+const { pathname } = new URL(import.meta.url);
+const directory = dirname(pathname)
 
 async function initRedisMemory() {
     const { RedisMemoryServer } = await import("redis-memory-server")
@@ -28,10 +33,11 @@ export async function create() {
         logger: true
     });
 
+    const packageJSON = await readFile(join(directory, "../../../package.json"), "utf-8")
     const {
         name,
         version
-    } = await import("../../../package.json");
+    } = JSON.parse(packageJSON);
 
     app.register(helmet, { contentSecurityPolicy: false });
 
