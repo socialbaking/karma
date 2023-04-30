@@ -196,12 +196,16 @@ export interface Partner {
     onsite?: boolean;
     remote?: boolean;
 }
-export interface UniqueCode {
+export interface UniqueCode extends Record<string, unknown> {
     uniqueCode: string;
     value: number;
     partnerId: string;
 }
-export type PublicUniqueCode = UniqueCode;
+export interface PublicUniqueCode {
+    uniqueCode: string;
+    value: number;
+    partnerId: string;
+}
 export interface SystemLog extends Record<string, unknown> {
     message: string;
     uniqueCode?: string;
