@@ -151,7 +151,7 @@ const privateClient = new Client({
 });
 
 {
-    // In staging mode, an 
+    // In staging mode, addPartner can be used without being authenticated
     const { partnerId, accessToken } = await publicClient.addPartner({
         partnerName: "The Clinic",
         location: "Auckland, New Zealand"
