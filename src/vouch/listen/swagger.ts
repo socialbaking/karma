@@ -52,7 +52,7 @@ export async function setupSwagger(fastify: FastifyInstance) {
             onRequest: function (request, reply, next) { next() },
             preHandler: function (request, reply, next) { next() }
         },
-        staticCSP: true,
+        staticCSP: false,
         transformStaticCSP: (header) => header,
         transformSpecification: (swaggerObject, request, reply) => { return swaggerObject },
         transformSpecificationClone: true
