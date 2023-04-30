@@ -29,27 +29,13 @@ export async function retrieveCodeDataRoutes(fastify: FastifyInstance) {
                 },
                 value: {
                     type: "number"
-                },
-                partnerName: {
-                    type: "string"
-                },
-                location: {
-                    type: "string"
-                },
-                onsite: {
-                    type: "boolean"
-                },
-                remote: {
-                    type: "boolean"
                 }
             },
             additionalProperties: true,
             required: [
                 "uniqueCode",
                 "partnerId",
-                "value",
-                "partnerName",
-                "location"
+                "value"
             ]
         }
     }

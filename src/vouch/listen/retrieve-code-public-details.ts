@@ -29,16 +29,12 @@ export async function retrieveCodeDetailsRoutes(fastify: FastifyInstance) {
                 },
                 value: {
                     type: "number"
-                },
-                partnerName: {
-                    type: "string"
-                },
+                }
             },
             required: [
                 "uniqueCode",
                 "partnerId",
-                "value",
-                "partnerName"
+                "value"
             ]
         }
     }
