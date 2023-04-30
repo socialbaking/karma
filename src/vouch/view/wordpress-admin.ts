@@ -2,6 +2,7 @@ import {FastifyInstance} from "fastify";
 import {FromSchema} from "json-schema-to-ts";
 import {getPartner} from "../data/partner";
 import {getAccessToken, accessToken, getAuthorizedForPartnerId} from "./authentication";
+import {packageIdentifier} from "../package";
 
 export async function wordpressAdminRoutes(fastify: FastifyInstance) {
 
@@ -41,6 +42,7 @@ export async function wordpressAdminRoutes(fastify: FastifyInstance) {
                 response.send(`
                     <form action="https://vouch.patient.nz/code-data" method="get">
                         <p>Authenticated as partner: ${partnerName}</p>
+                        <p>Vouch API version: ${packageIdentifier}</p>
                         <input type="hidden" name="accessToken" value="${accessToken}" />
                         <input type="text" name="uniqueCode" placeholder="Unique Code" />
                         <button type="submit">Check Info</button>
