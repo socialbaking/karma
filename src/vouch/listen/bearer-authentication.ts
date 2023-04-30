@@ -1,12 +1,21 @@
 import {FastifyReply, FastifyRequest} from "fastify";
-import {getAccessToken} from "../data";
+import {getAccessToken as getAccessTokenDocument} from "../data";
 import {FastifyAuthFunction} from "@fastify/auth";
 import {setAuthorizedForPartnerId} from "./authentication";
 import {ok} from "../../is";
+import {requestContext} from "@fastify/request-context";
+
+const AUTHORIZED_ACCESS_TOKEN_KEY = "accessTokenKeyValue";
+
+export function getAccessToken() {
+    const accessToken = requestContext.get(AUTHORIZED_ACCESS_TOKEN_KEY);
+    ok(accessToken, "Expected access token to be supplied");
+    return accessToken;
+}
 
 export async function bearerAuthentication(key: string, request: FastifyRequest): Promise<boolean> {
     if (!key) return false;
-    const token = await getAccessToken(key);
+    const token = await getAccessTokenDocument(key);
     if (!token) return false;
     if (token.disabledAt) return false;
 
@@ -16,6 +25,7 @@ export async function bearerAuthentication(key: string, request: FastifyRequest)
 
     request.requestContext.set("accessTokenAuthentication", true);
     request.requestContext.set("accessToken", token);
+    request.requestContext.set(AUTHORIZED_ACCESS_TOKEN_KEY, token.accessToken);
 
     return true;
 }

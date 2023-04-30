@@ -21,3 +21,8 @@ export interface Partner extends PartnerData, Record<string, unknown> {
 export function getPartnerStore() {
     return getKeyValueStore<Partner>(PARTNER_STORE_NAME);
 }
+
+export function getPartner(partnerId: string) {
+    const store = getPartnerStore();
+    return store.get(partnerId);
+}
