@@ -1,4 +1,5 @@
 import {getUniqueCode, updateUniqueCodeState} from "./unique-code";
+import {verifyUniqueCode} from "./verify-code-validity";
 
 export interface AcceptUniqueCodeInput {
     uniqueCode: string;

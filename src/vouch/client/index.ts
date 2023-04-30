@@ -1,17 +1,9 @@
-import {VouchClient, UniqueCode, Partner, SystemLog, PublicUniqueCode, PartnerData} from "./interface";
+import {Client as ClientInterface, UniqueCode, Partner, SystemLog, PublicUniqueCode, PartnerData, ClientOptions} from "./interface";
 import {ok} from "../../is";
 
-export * from "./interface"
+export * from "./interface";
 
-export interface ClientOptions {
-    partnerId?: string;
-    accessToken?: string;
-    version?: number;
-    prefix?: string;
-    url?: string | URL;
-}
-
-export class Client implements VouchClient {
+export class Client implements ClientInterface {
 
     private readonly baseUrl: string | URL;
     private readonly headers: Headers;
@@ -34,6 +26,8 @@ export class Client implements VouchClient {
         if (partnerId) {
             headers.set("X-Partner-ID", partnerId);
         }
+
+        return this;
     }
 
     async acceptUniqueCode(uniqueCode: string, value: number) {

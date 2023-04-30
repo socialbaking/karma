@@ -138,13 +138,38 @@ npm i --save @socialbaking/vouch
 import { Client } from "@socialbaking/vouch";
 
 // Access to public information
-const publicClient = new Client();
+const publicClient = new Client({
+    // url: "https://vouch.patient.nz",
+    // version: 1,
+    // ...
+});
 
 // Access the API as an integrating partner
 const privateClient = new Client({
     partnerId: "079260c4-6a34-4fa0-9cd4-a47efaec25f4", // Created with the public client
     accessToken: "651036de....bcafc5dada6" // Provided to integrating partners
 });
+
+{
+    // In staging mode, an 
+    const { partnerId, accessToken } = await publicClient.addPartner({
+        partnerName: "The Clinic",
+        location: "Auckland, New Zealand"
+    });
+    
+    const client = new Client({
+        partnerId,
+        accessToken
+    });
+    
+    const uniqueCode = await client.generateUniqueCode(50);
+    
+    // Accept part of the code or whole code
+    if (await client.verifyUniqueCode(uniqueCode, 25)) {
+        await client.acceptUniqueCode(uniqueCode, 25);
+    }
+    
+}
 ```
 
 ### Client's TypeScript Interface
@@ -182,7 +207,14 @@ export interface Partner extends PartnerData {
     partnerId: string;
     accessToken?: string;
 }
-export interface VouchClient {
+export interface ClientOptions {
+    partnerId?: string;
+    accessToken?: string;
+    version?: number;
+    prefix?: string;
+    url?: string | URL;
+}
+export interface Client {
     generateUniqueCode(value: number): Promise<string>;
     verifyUniqueCode(uniqueCode: string, value?: number): Promise<boolean>;
     addPartner(partner: PartnerData): Promise<Partner>;

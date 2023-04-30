@@ -33,7 +33,15 @@ export interface Partner extends PartnerData {
     accessToken?: string;
 }
 
-export interface VouchClient {
+export interface ClientOptions {
+    partnerId?: string;
+    accessToken?: string;
+    version?: number;
+    prefix?: string;
+    url?: string | URL;
+}
+
+export interface Client {
     generateUniqueCode(value: number): Promise<string>;
     verifyUniqueCode(uniqueCode: string, value?: number): Promise<boolean>;
     addPartner(partner: PartnerData): Promise<Partner>;
