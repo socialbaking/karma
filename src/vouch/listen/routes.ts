@@ -10,6 +10,7 @@ import {FastifyInstance} from "fastify";
 import {processPaymentRoutes} from "./process-payment-transfer";
 import {retrieveCodesRoutes} from "./retrieve-codes";
 import {retrievePartnerRoutes} from "./retrieve-partners";
+import {viewRoutes} from "../view";
 
 export async function routes(fastify: FastifyInstance) {
 
@@ -30,4 +31,5 @@ export async function routes(fastify: FastifyInstance) {
     fastify.register(apiRoutes, {
         prefix: "/api/version/1"
     });
+    fastify.register(viewRoutes);
 }
