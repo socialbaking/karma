@@ -29,7 +29,12 @@ export async function verifyCodeValidityRoutes(fastify: FastifyInstance) {
         description: "Verify a unique code",
         tags: ["partner"],
         summary: "",
-        body
+        body,
+        security: [
+            {
+                apiKey: [] as string[]
+            }
+        ]
     };
     type Schema = {
         Body: BodySchema

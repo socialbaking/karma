@@ -31,7 +31,12 @@ export async function acceptUniqueCodeRoutes(fastify: FastifyInstance) {
         description: "Accept a unique code",
         tags: ["partner"],
         summary: "",
-        body
+        body,
+        security: [
+            {
+                apiKey: [] as string[]
+            }
+        ]
     };
     type Schema = {
         Body: BodySchema

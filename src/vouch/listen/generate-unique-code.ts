@@ -28,7 +28,12 @@ export async function generateUniqueCodeRoutes(fastify: FastifyInstance) {
         description: "Generate a unique code",
         tags: ["partner"],
         summary: "",
-        body
+        body,
+        security: [
+            {
+                apiKey: [] as string[]
+            }
+        ]
     };
 
     fastify.post<Schema>(

@@ -36,7 +36,12 @@ export async function retrieveCodesRoutes(fastify: FastifyInstance) {
         description: "Retrieve a list of private code data",
         tags: ["partner"],
         summary: "",
-        response
+        response,
+        security: [
+            {
+                apiKey: [] as string[]
+            }
+        ]
     };
 
     fastify.get(

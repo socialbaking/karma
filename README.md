@@ -10,7 +10,7 @@ Our vouch system makes it easy for you to access medical cannabis treatments fro
 
 ### Test Coverage
 
- ![95.13%25 lines covered](https://img.shields.io/badge/lines-95.13%25-brightgreen) ![95.13%25 statements covered](https://img.shields.io/badge/statements-95.13%25-brightgreen) ![90.72%25 functions covered](https://img.shields.io/badge/functions-90.72%25-brightgreen) ![85.92%25 branches covered](https://img.shields.io/badge/branches-85.92%25-brightgreen)
+ ![95.06%25 lines covered](https://img.shields.io/badge/lines-95.06%25-brightgreen) ![95.06%25 statements covered](https://img.shields.io/badge/statements-95.06%25-brightgreen) ![90.72%25 functions covered](https://img.shields.io/badge/functions-90.72%25-brightgreen) ![84.28%25 branches covered](https://img.shields.io/badge/branches-84.28%25-brightgreen)
 
 [//]: # (badges)
 

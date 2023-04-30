@@ -57,7 +57,12 @@ export async function retrieveSystemLogsRoutes(fastify: FastifyInstance) {
         tags: ["partner"],
         summary: "",
         response,
-        querystring
+        querystring,
+        security: [
+            {
+                apiKey: [] as string[]
+            }
+        ]
     }
 
     type Schema = {

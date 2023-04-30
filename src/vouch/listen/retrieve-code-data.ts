@@ -46,7 +46,12 @@ export async function retrieveCodeDataRoutes(fastify: FastifyInstance) {
         tags: ["partner"],
         summary: "",
         querystring,
-        response
+        response,
+        security: [
+            {
+                apiKey: [] as string[]
+            }
+        ]
     };
 
     type Schema = {

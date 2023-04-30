@@ -31,7 +31,12 @@ export async function processPaymentRoutes(fastify: FastifyInstance) {
         description: "Process a payment",
         tags: ["partner"],
         summary: "",
-        body
+        body,
+        security: [
+            {
+                apiKey: [] as string[]
+            }
+        ]
     };
 
     fastify.post<Schema>(

@@ -17,7 +17,9 @@ export async function addPartner({ partnerName, location, remote, onsite }: AddP
         partnerName,
         location,
         onsite,
-        remote
+        remote,
+        approved: false,
+        createdAt: new Date().toISOString()
     };
     await store.set(partnerId, partner)
     const { accessToken } = await createPartnerAccessToken(partnerId);

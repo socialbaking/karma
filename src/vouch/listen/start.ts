@@ -53,6 +53,15 @@ export async function create() {
     app.addHook(
         "preValidation",
         async (request, response) => {
+            if (request.headers.apikey && !request.headers.authorization) {
+                request.headers.authorization = `bearer ${request.headers.apikey}`
+            }
+        }
+    )
+
+    app.addHook(
+        "preValidation",
+        async (request, response) => {
             requestContext.set("hostname", request.hostname);
 
             response.header("X-Powered-By", `${name}@${version}`);
