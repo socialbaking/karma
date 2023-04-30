@@ -1,8 +1,13 @@
 import {FastifyInstance} from "fastify";
 import {FromSchema} from "json-schema-to-ts";
 import {retrieveCodeData} from "../data";
-import {accessToken, getMaybeAccessToken, validateAuthorizedForPartnerId} from "./authentication";
-import {getPartnerStore} from "../data/partner";
+import {
+    accessToken,
+    getAuthorizedForPartnerId,
+    getMaybeAccessToken,
+    validateAuthorizedForPartnerId
+} from "./authentication";
+import {getPartner, getPartnerStore} from "../data/partner";
 
 export async function codeDataRoutes(fastify: FastifyInstance) {
 
@@ -59,7 +64,14 @@ export async function codeDataRoutes(fastify: FastifyInstance) {
                     partnerId,
                     value
                 } = code;
-                validateAuthorizedForPartnerId(partnerId);
+                const {
+                    approved
+                } = await getPartner(getAuthorizedForPartnerId())
+                // TODO, partners should be able to check other partners
+                // if approved
+                if (process.env.VOUCH_REQUIRE_PARTNER_APPROVAL && !approved) {
+                    validateAuthorizedForPartnerId(partnerId);
+                }
                 const {
                     partnerName,
                     location,
