@@ -9,8 +9,9 @@ export interface PartnerData {
     onsite?: boolean;
 }
 
-export interface Partner extends PartnerData {
+export interface Partner extends PartnerData, Record<string, unknown> {
     partnerId: string;
+    accessToken?: string;
 }
 
 export function getPartnerStore() {

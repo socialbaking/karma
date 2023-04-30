@@ -152,13 +152,6 @@ const privateClient = new Client({
 [//]: # (typescript client)
 
 ```typescript
-export interface Partner {
-    partnerId: string;
-    partnerName: string;
-    location: string;
-    onsite?: boolean;
-    remote?: boolean;
-}
 export interface UniqueCode extends Record<string, unknown> {
     uniqueCode: string;
     value: number;
@@ -176,10 +169,23 @@ export interface SystemLog extends Record<string, unknown> {
     partnerId?: string;
     action?: string;
 }
+export interface PartnerData {
+    partnerName: string;
+    location: string;
+    onsite?: boolean;
+    remote?: boolean;
+    clinic?: boolean;
+    pharmacy?: boolean;
+    partnerDescription?: string;
+}
+export interface Partner extends PartnerData {
+    partnerId: string;
+    accessToken?: string;
+}
 export interface VouchClient {
     generateUniqueCode(value: number): Promise<string>;
     verifyUniqueCode(uniqueCode: string, value?: number): Promise<boolean>;
-    addPartner(partnerName: string, location: string, remote?: boolean, onsite?: boolean): Promise<string>;
+    addPartner(partner: PartnerData): Promise<Partner>;
     assignUniqueCode(uniqueCode: string, value: number, partnerId: string): Promise<void>;
     processPayment(uniqueCode: string): Promise<void>;
     acceptUniqueCode(uniqueCode: string, value: number): Promise<void>;

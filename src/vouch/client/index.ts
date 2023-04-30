@@ -1,4 +1,4 @@
-import {VouchClient, UniqueCode, Partner, SystemLog, PublicUniqueCode} from "./interface";
+import {VouchClient, UniqueCode, Partner, SystemLog, PublicUniqueCode, PartnerData} from "./interface";
 import {ok} from "../../is";
 
 export * from "./interface"
@@ -63,7 +63,7 @@ export class Client implements VouchClient {
         return success;
     }
 
-    async addPartner(partnerName: string, location: string, remote?: boolean, onsite?: boolean): Promise<string> {
+    async addPartner(partner: PartnerData): Promise<Partner> {
         const {
             baseUrl,
             headers,
@@ -76,18 +76,12 @@ export class Client implements VouchClient {
             ),
             {
                 method: "POST",
-                body: JSON.stringify({
-                    partnerName,
-                    location,
-                    remote,
-                    onsite
-                }),
+                body: JSON.stringify(partner),
                 headers
             }
         );
         ok(response.ok, "addPartner response not ok");
-        const { partnerId } = await response.json();
-        return partnerId;
+        return await response.json();
     }
 
     async assignUniqueCode(uniqueCode: string, value: number, partnerId: string): Promise<void> {

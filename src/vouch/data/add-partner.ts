@@ -1,5 +1,6 @@
-import {getPartnerStore} from "./partner";
+import {getPartnerStore, Partner} from "./partner";
 import {v4} from "uuid";
+import {createPartnerAccessToken} from "./access-token";
 
 export interface AddPartnerInput {
     partnerName: string;
@@ -8,15 +9,20 @@ export interface AddPartnerInput {
     onsite?: boolean;
 }
 
-export async function addPartner({ partnerName, location, remote, onsite }: AddPartnerInput): Promise<string> {
+export async function addPartner({ partnerName, location, remote, onsite }: AddPartnerInput): Promise<Partner> {
     const store = getPartnerStore();
     const partnerId = v4();
-    await store.set(partnerId, {
+    const partner: Partner = {
         partnerId,
         partnerName,
         location,
         onsite,
         remote
-    })
-    return partnerId;
+    };
+    await store.set(partnerId, partner)
+    const { accessToken } = await createPartnerAccessToken(partnerId);
+    return {
+        ...partner,
+        accessToken
+    };
 }

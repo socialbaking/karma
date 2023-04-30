@@ -12,11 +12,9 @@ async function testClient() {
     const close = await start();
 
     const url = getHostname();
-    const accessToken = v4();
 
     const publicClient = new Client({
-        url,
-        accessToken
+        url
     });
 
     ok(Array.isArray(await publicClient.listPartners()));
@@ -24,8 +22,16 @@ async function testClient() {
     const partnerName = chance.company();
     const location = chance.city();
 
-    const partnerId = await publicClient.addPartner(partnerName, location, true, true);
+    const { partnerId, accessToken } = await publicClient.addPartner({
+        partnerName,
+        location,
+        onsite: true,
+        remote: true,
+        pharmacy: true,
+        clinic: true
+    });
 
+    ok(accessToken);
     ok(Array.isArray(await publicClient.listSystemLogs()));
 
     {

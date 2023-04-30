@@ -68,6 +68,9 @@ export async function addPartnerRoutes(fastify: FastifyInstance) {
                 },
                 partnerDescription: {
                     type: "string"
+                },
+                accessToken: {
+                    type: "string"
                 }
             },
             required: [
@@ -100,27 +103,15 @@ export async function addPartnerRoutes(fastify: FastifyInstance) {
                 remote
             } = request.body;
 
-            const partnerId = await addPartner({
+            const partner = await addPartner({
                 partnerName,
                 location,
                 onsite,
                 remote
             });
 
-            if (!partnerId) {
-                response.status(500);
-                return response.send()
-            } else {
-                response.status(201);
-            }
-
-            response.send({
-                partnerId,
-                partnerName,
-                location,
-                onsite,
-                remote
-            });
+            response.status(201);
+            response.send(partner);
         }
     )
 }

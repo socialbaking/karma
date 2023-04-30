@@ -1,6 +1,6 @@
 {
   "name": "@socialbaking/vouch",
-  "version": "1.0.0-alpha.40",
+  "version": "1.0.0-alpha.41",
   "main": "./esnext/index.js",
   "module": "./esnext/index.js",
   "types": "./esnext/index.d.ts",
@@ -52,6 +52,8 @@
   "author": "Fabian Cook <hello@fabiancook.dev>",
   "license": "MIT",
   "dependencies": {
+    "@fastify/auth": "^4.2.0",
+    "@fastify/bearer-auth": "^9.0.0",
     "@fastify/cors": "^8.2.1",
     "@fastify/helmet": "^10.1.0",
     "@fastify/request-context": "^4.2.0",
