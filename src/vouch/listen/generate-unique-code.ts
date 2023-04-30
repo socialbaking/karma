@@ -2,7 +2,7 @@ import {FastifyInstance} from "fastify";
 import {FromSchema} from "json-schema-to-ts";
 import {ok} from "../../is";
 import {generateUniqueCode} from "../data";
-import {validateAuthorizedForPartnerId} from "./authentication";
+import {accessToken, validateAuthorizedForPartnerId} from "./authentication";
 
 export async function generateUniqueCodeRoutes(fastify: FastifyInstance) {
     const body = {
@@ -41,7 +41,8 @@ export async function generateUniqueCodeRoutes(fastify: FastifyInstance) {
         {
             schema,
             preHandler: fastify.auth([
-               fastify.verifyBearerAuth
+               fastify.verifyBearerAuth,
+                accessToken
             ]),
             async handler(request, response) {
 

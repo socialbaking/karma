@@ -4,6 +4,7 @@ import {codePublicDetailsRoutes} from "./code-public-details";
 import {partnerBalanceRoutes} from "./partner-balance";
 import {requestCodeDataRoutes} from "./request-code-data";
 import {packageIdentifier} from "../package";
+import {wordpressAdminRoutes} from "./wordpress-admin";
 
 export async function viewRoutes(fastify: FastifyInstance) {
 
@@ -11,6 +12,7 @@ export async function viewRoutes(fastify: FastifyInstance) {
     fastify.register(codePublicDetailsRoutes);
     fastify.register(partnerBalanceRoutes);
     fastify.register(requestCodeDataRoutes);
+    fastify.register(wordpressAdminRoutes);
 
     fastify.get("/", async (request, response) => {
 

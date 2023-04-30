@@ -90,6 +90,57 @@ async function testClient() {
             // 2x accept (failed accept does not log)
             // 1x process
             ok(relatedToCode.length === 7, `Expected 7 logs, got ${relatedToCode.length}`);
+
+
+
+            {
+                const url = new URL(
+                    `${client.prefix}/unique-code-data`,
+                    client.baseUrl
+                );
+                url.searchParams.set("uniqueCode", uniqueCode);
+
+                {
+                    const response = await fetch(
+                        url,
+                        {
+                            method: "GET"
+                        }
+                    );
+                    // Not authenticated yet
+                    ok(!response.ok);
+                    ok(response.status === 401);
+                }
+
+                {
+                    url.searchParams.set("accessToken", "some bad token");
+                    const response = await fetch(
+                        url,
+                        {
+                            method: "GET"
+                        }
+                    );
+                    // Not authenticated yet
+                    ok(!response.ok);
+                    ok(response.status === 401);
+                }
+
+                {
+                    url.searchParams.set("accessToken", accessToken);
+                    const response = await fetch(
+                        url,
+                        {
+                            method: "GET"
+                        }
+                    );
+                    ok(response.ok)
+                    const json = await response.json();
+                    ok(json);
+                    ok(json.uniqueCode === uniqueCode);
+                    ok(json.value);
+                }
+            }
+
         }
 
 

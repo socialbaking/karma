@@ -5,11 +5,11 @@ export * from "./interface";
 
 export class Client implements ClientInterface {
 
-    private readonly baseUrl: string | URL;
-    private readonly headers: Headers;
-    private readonly partnerId: string;
-    private readonly version: number;
-    private readonly prefix: string;
+    readonly baseUrl: string | URL;
+    readonly headers: Headers;
+    readonly partnerId: string;
+    readonly version: number;
+    readonly prefix: string;
 
     constructor({ url, accessToken, partnerId, version, prefix }: ClientOptions = {}) {
         this.baseUrl = url ?? "https://vouch.patient.nz";

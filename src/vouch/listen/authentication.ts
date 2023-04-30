@@ -1,6 +1,8 @@
 import {requestContext} from "@fastify/request-context";
 import {ok} from "../../is";
 
+export * from "./bearer-authentication";
+
 const AUTHORIZED_PARTNER_ID_KEY = "authorizedForPartnerIds";
 
 export function setAuthorizedForPartnerId(partnerId: string) {

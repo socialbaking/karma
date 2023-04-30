@@ -1,7 +1,7 @@
 import {FastifyInstance, FastifyRequest} from "fastify";
 import {FromSchema} from "json-schema-to-ts";
 import {retrieveCodeData, retrieveCodes} from "../data";
-import {allowAnonymous} from "./bearer-authentication";
+import {accessToken, allowAnonymous} from "./bearer-authentication";
 import {getAuthorizedForPartnerId} from "./authentication";
 
 export async function retrieveCodesRoutes(fastify: FastifyInstance) {
@@ -50,7 +50,8 @@ export async function retrieveCodesRoutes(fastify: FastifyInstance) {
             schema,
             preHandler: fastify.auth([
                allowAnonymous,
-               fastify.verifyBearerAuth
+               fastify.verifyBearerAuth,
+               accessToken
             ]),
             async handler(request: FastifyRequest, response) {
                 response.send(

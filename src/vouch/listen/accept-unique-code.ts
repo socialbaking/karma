@@ -2,7 +2,7 @@ import {FastifyInstance} from "fastify";
 import {acceptUniqueCode} from "../data";
 import {FromSchema} from "json-schema-to-ts";
 import {ok} from "../../is";
-import {allowAnonymous} from "./bearer-authentication";
+import {accessToken, allowAnonymous} from "./bearer-authentication";
 import {validateAuthorizedForPartnerId} from "./authentication";
 
 export async function acceptUniqueCodeRoutes(fastify: FastifyInstance) {
@@ -47,7 +47,8 @@ export async function acceptUniqueCodeRoutes(fastify: FastifyInstance) {
         {
             schema,
             preHandler: fastify.auth([
-                fastify.verifyBearerAuth
+                fastify.verifyBearerAuth,
+                accessToken
             ]),
             async handler(request, response) {
                 const {
