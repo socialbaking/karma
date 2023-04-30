@@ -69,6 +69,7 @@ function createRedisKeyValueStore<T>(name: string): KeyValueStore<T> {
         const client = createClient({
             url
         });
+        client.on("error", console.warn);
         GLOBAL_CLIENTS.set(url, client);
         return client;
     }

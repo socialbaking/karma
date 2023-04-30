@@ -13,7 +13,7 @@ import { dirname, join } from "node:path";
 const { pathname } = new URL(import.meta.url);
 const directory = dirname(pathname)
 
-async function initRedisMemory() {
+export async function initRedisMemory() {
     const { RedisMemoryServer } = await import("redis-memory-server")
     const redisServer = new RedisMemoryServer();
 
@@ -21,12 +21,18 @@ async function initRedisMemory() {
     const port = await redisServer.getPort();
 
     process.env.REDIS_URL = `redis://${host}:${port}`;
+
+    return async () => {
+        return redisServer.stop();
+    }
 }
 
 export async function create() {
 
+    const closeFns: (() => Promise<void>)[] = [];
+
     if (process.env.REDIS_MEMORY && !process.env.REDIS_URL) {
-        await initRedisMemory();
+        closeFns.push(await initRedisMemory());
     }
 
     const app = fastify({
@@ -64,11 +70,16 @@ export async function create() {
 
     app.register(routes);
 
-    return app;
+    return {
+        app,
+        closeFns
+    } as const;
 }
 
 export async function start() {
-    const app = await create();
+    const {
+        app, closeFns
+    } = await create();
 
     const port = getPort();
 
@@ -76,7 +87,10 @@ export async function start() {
 
     app.blipp();
 
-    return () => {
-        return app.close();
+    return async () => {
+        await app.close();
+        await Promise.all(
+            closeFns.map(async (fn) => fn())
+        );
     }
 }
