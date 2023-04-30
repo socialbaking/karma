@@ -17,6 +17,6 @@ jobs:
       - name: Repository Dispatch
         uses: peter-evans/repository-dispatch@v2
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PAT_VOUCH }}
           repository: ${{ matrix.repo }}
           event-type: repository_update_event
