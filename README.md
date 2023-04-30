@@ -120,69 +120,9 @@ subgraph WordPress Plugin
 end
 ```
 
-### API Surface Examples
+## API Documentation 
 
-#### Generate Unique Code
-
-- Request: `POST /generate-unique-code`
-- Response: `{ "uniqueCode": "ABC123", "value": 50.00 }`
-
-#### Verify Code Validity
-
-- Request: `POST /verify-unique-code`
-- Request Body: `{ "uniqueCode": "ABC123", "partnerId": "1234" }`
-- Response: `{ "valid": true }`
-
-#### Retrieve Code Public Details
-
-- Request: `GET /unique-code-details`
-- Request Parameters: `uniqueCode=ABC123`
-- Response: `{ "uniqueCode": "ABC123", "value": 50.00, "partnerId": "1234" }`
-
-#### Add Partner
-
-- Request: `POST /add-partner`
-- Request Body: `{ "partnerName": "ABC Clinic", "location": "Auckland" }`
-- Response: `{ "partnerId": "1234" }`
-- 
-#### List Partners
-
-- Request: `GET /partners`
-- Response: `[{ "partnerId": "1234", "partnerName": "ABC Clinic", "location": "Auckland" }]`
-
-#### Assign Unique Code / Redeem Unique Code
-
-- Request: `POST /assign-unique-code`
-- Request Body: `{ "uniqueCode": "ABC123", "partnerId": "1234" }`
-- Response: `{ "success": true }`
-
-#### Retrieve Code Data / Processing information
-
-- Request: `GET /unique-code-data`
-- Request Parameters: `uniqueCode=ABC123`
-- Response: `{ "uniqueCode": "ABC123", "value": 50.00, "partnerId": "1234", "partnerName": "ABC Clinic", "location": "Auckland" }`
-
-#### List Code Data / Processing information
-
-- Request: `GET /unique-codes`
-- Response: `[{ "uniqueCode": "ABC123", "value": 50.00, "partnerId": "1234", "partnerName": "ABC Clinic", "location": "Auckland" }]`
-
-#### Process Payment Transfer related to a unique code
-
-- Request: `POST /process-payment`
-- Request Body: `{ "uniqueCode": "ABC123" }`
-- Response: `{ "success": true }`
-
-#### Accept Unique Code / Record code usage
-
-- Request: `POST /accept-unique-code`
-- Request Body: `{ "uniqueCode": "ABC123", "value": 25.00 }`
-- Response: `{ "success": true }`
-
-#### Retrieve System Logs
-
-- Request: `GET /system-logs`
-- Response: `[ {"timestamp": "2022-05-01T10:30:00Z", "message": "Unique code generated", "code": "ABC123" }, {"timestamp": "2022-05-01T11:00:00Z", "message": "Unique code redeemed", "code": "ABC123", "partnerId": "1234" }]`
+See the vouch [API Documentation](https://vouch.patient.nz/api/documentation) for more information
 
 ## Example TypeScript SDK
 
