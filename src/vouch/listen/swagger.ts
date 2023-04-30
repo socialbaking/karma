@@ -2,6 +2,7 @@ import {FastifyInstance} from "fastify";
 import basePlugin from "@fastify/swagger";
 import uiPlugin from "@fastify/swagger-ui";
 import {getHostname} from "./config";
+import {version, homepage} from "../package";
 
 export async function setupSwagger(fastify: FastifyInstance) {
     const url = getHostname()
@@ -13,10 +14,10 @@ export async function setupSwagger(fastify: FastifyInstance) {
             info: {
                 title: 'Vouch API',
                 description: '',
-                version: '0.1.0'
+                version
             },
             externalDocs: {
-                url: 'https://documentation.vouch.patient.nz',
+                url: homepage,
                 description: 'Find more info here'
             },
             host,
