@@ -1,5 +1,6 @@
 import { promises as fs } from "fs";
 import { dirname, resolve } from "path";
+import {readFile} from "fs/promises";
 
 // await import("./correct-import-extensions.js");
 // await import("./workerd-tests.js");
@@ -123,22 +124,39 @@ if (!process.env.NO_COVERAGE_BADGE_UPDATE) {
     );
   }
 
-  const tag = "[//]: # (badges)";
+  await replaceBetween(
+      "README.md",
+      "badges",
+      badges.join(
+          " "
+      )
+  )
+  console.log("Wrote coverage badges!");
+}
 
-  const readMe = await fs.readFile("README.md", "utf8");
+async function replaceBetween(fileName, tagName, content) {
+  const tag = `[//]: # (${tagName})`;
+
+  const readMe = await fs.readFile(fileName, "utf8");
   const badgeStart = readMe.indexOf(tag);
   const badgeStartAfter = badgeStart + tag.length;
   if (badgeStart === -1) {
-    throw new Error(`Expected to find "${tag}" in README.md`);
+    throw new Error(`Expected to find "${tag}" in ${fileName}`);
   }
   const badgeEnd = badgeStartAfter + readMe.slice(badgeStartAfter).indexOf(tag);
   const badgeEndAfter = badgeEnd + tag.length;
-  const readMeBefore = readMe.slice(0, badgeStart);
-  const readMeAfter = readMe.slice(badgeEndAfter);
+  const fileBefore = readMe.slice(0, badgeStart);
+  const fileAfter = readMe.slice(badgeEndAfter);
 
-  const readMeNext = `${readMeBefore}${tag}\n\n${badges.join(
-    " "
-  )}\n\n${tag}${readMeAfter}`;
-  await fs.writeFile("README.md", readMeNext);
-  console.log("Wrote coverage badges!");
+  const fileNext = `${fileBefore}${tag}\n\n${content}\n\n${tag}${fileAfter}`;
+  await fs.writeFile(fileName, fileNext);
+}
+
+{
+
+  const interfaceContents = await readFile("esnext/vouch/client/interface.d.ts", "utf-8");
+
+  await replaceBetween("README.md", "typescript client", `\`\`\`typescript\n${interfaceContents.trim()}\n\`\`\``)
+
+
 }

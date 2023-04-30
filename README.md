@@ -6,11 +6,11 @@ Our vouch system makes it easy for you to access medical cannabis treatments fro
 
 ### Support
 
-![Node.js supported](https://img.shields.io/badge/node-%3E%3D18.7.0-blue)
+ ![Node.js supported](https://img.shields.io/badge/node-%3E%3D18.7.0-blue) 
 
 ### Test Coverage
 
-![94.82%25 lines covered](https://img.shields.io/badge/lines-94.82%25-brightgreen) ![94.82%25 statements covered](https://img.shields.io/badge/statements-94.82%25-brightgreen) ![92.68%25 functions covered](https://img.shields.io/badge/functions-92.68%25-brightgreen) ![86.88%25 branches covered](https://img.shields.io/badge/branches-86.88%25-brightgreen)
+ ![94.82%25 lines covered](https://img.shields.io/badge/lines-94.82%25-brightgreen) ![94.82%25 statements covered](https://img.shields.io/badge/statements-94.82%25-brightgreen) ![92.68%25 functions covered](https://img.shields.io/badge/functions-92.68%25-brightgreen) ![86.88%25 branches covered](https://img.shields.io/badge/branches-86.88%25-brightgreen)
 
 [//]: # (badges)
 
@@ -186,35 +186,42 @@ end
 
 ## Example TypeScript SDK
 
+[//]: # (typescript client)
+
 ```typescript
-interface Partner {
-  partnerId: string;
-  partnerName: string;
-  location: string;
+export interface Partner {
+    partnerId: string;
+    partnerName: string;
+    location: string;
+    onsite?: boolean;
+    remote?: boolean;
 }
-
-interface UniqueCode {
-  uniqueCode: string;
-  value: number;
-  partnerId: string;
-  partnerName: string;
-  location: string;
+export interface UniqueCode {
+    uniqueCode: string;
+    value: number;
+    partnerId: string;
 }
-
+export type PublicUniqueCode = UniqueCode;
 export interface SystemLog extends Record<string, unknown> {
-  message: string;
+    message: string;
+    uniqueCode?: string;
+    value?: number;
+    partnerId?: string;
+    action?: string;
 }
-
-interface VouchClient {
-  generateUniqueCode(value: number): Promise<string>;
-  verifyUniqueCode(uniqueCode: string): Promise<boolean>;
-  addPartner(partnerName: string, location: string, remote?: boolean, onsite?: boolean): Promise<string>;
-  listPartners(): Promise<Partner[]>;
-  assignUniqueCode(uniqueCode: string, value: number, partnerId: string): Promise<void>;
-  getUniqueCode(uniqueCode: string): Promise<UniqueCode>;
-  listUniqueCodes(): Promise<UniqueCode[]>;
-  processPayment(uniqueCode: string): Promise<void>;
-  acceptUniqueCode(uniqueCode: string, value: number): Promise<void>;
-  listSystemLogs(): Promise<SystemLog[]>;
+export interface VouchClient {
+    generateUniqueCode(value: number): Promise<string>;
+    verifyUniqueCode(uniqueCode: string, value?: number): Promise<boolean>;
+    addPartner(partnerName: string, location: string, remote?: boolean, onsite?: boolean): Promise<string>;
+    assignUniqueCode(uniqueCode: string, value: number, partnerId: string): Promise<void>;
+    processPayment(uniqueCode: string): Promise<void>;
+    acceptUniqueCode(uniqueCode: string, value: number): Promise<void>;
+    getUniqueCode(uniqueCode: string): Promise<UniqueCode>;
+    getPublicUniqueCode(uniqueCode: string): Promise<PublicUniqueCode>;
+    listUniqueCodes(): Promise<UniqueCode[]>;
+    listPartners(): Promise<Partner[]>;
+    listSystemLogs(): Promise<SystemLog[]>;
 }
 ```
+
+[//]: # (typescript client)
