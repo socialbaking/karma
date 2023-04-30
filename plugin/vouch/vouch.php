@@ -63,7 +63,7 @@ function vouch_plugin_settings_init() {
 
 function vouch_plugin_setting_access_token_callback() {
     $value = get_option('vouch_plugin_setting_access_token', '');
-    echo '<input type="text" name="vouch_plugin_setting_access_token" value="' . esc_attr($value) . '" />';
+    echo '<input type="password" name="vouch_plugin_setting_access_token" value="' . esc_attr($value) . '" />';
 }
 
 function vouch_plugin_setting_url_callback() {
