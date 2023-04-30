@@ -2,6 +2,18 @@
 
 Our vouch system makes it easy for you to access medical cannabis treatments from registered clinics and trusted partners in New Zealand. With a simple and secure process, you can receive the care you need and support the growth of the medical cannabis industry.
 
+[//]: # (badges)
+
+### Support
+
+![Node.js supported](https://img.shields.io/badge/node-%3E%3D18.7.0-blue)
+
+### Test Coverage
+
+![94.82%25 lines covered](https://img.shields.io/badge/lines-94.82%25-brightgreen) ![94.82%25 statements covered](https://img.shields.io/badge/statements-94.82%25-brightgreen) ![92.68%25 functions covered](https://img.shields.io/badge/functions-92.68%25-brightgreen) ![86.88%25 branches covered](https://img.shields.io/badge/branches-86.88%25-brightgreen)
+
+[//]: # (badges)
+
 ## Focus
 
 - The program will provide a unique code to patients that can be redeemed with registered clinics and trusted partners for medical cannabis treatments.
@@ -107,18 +119,6 @@ subgraph WordPress Plugin
   I
 end
 ```
-
-[//]: # (badges)
-
-### Support
-
- ![Node.js supported](https://img.shields.io/badge/node-%3E%3D18.7.0-blue) 
-
-### Test Coverage
-
- ![94.82%25 lines covered](https://img.shields.io/badge/lines-94.82%25-brightgreen) ![94.82%25 statements covered](https://img.shields.io/badge/statements-94.82%25-brightgreen) ![92.68%25 functions covered](https://img.shields.io/badge/functions-92.68%25-brightgreen) ![86.88%25 branches covered](https://img.shields.io/badge/branches-86.88%25-brightgreen)
-
-[//]: # (badges)
 
 ### API Surface Examples
 
