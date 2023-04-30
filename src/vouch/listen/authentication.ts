@@ -1,5 +1,6 @@
 import {requestContext} from "@fastify/request-context";
 import {ok} from "../../is";
+import {getPartner} from "./bearer-authentication";
 
 export * from "./bearer-authentication";
 
@@ -22,4 +23,11 @@ export function getAuthorizedForPartnerId(): string {
 export function validateAuthorizedForPartnerId(partnerId: string): asserts partnerId {
     const authorizedPartnerId = getAuthorizedForPartnerId();
     ok(authorizedPartnerId === partnerId, "Expected partner authorization to match");
+}
+
+export function ensurePartnerMatchIfUnapproved(partnerId: string): asserts partnerId {
+    const { approved } = getPartner();
+    if (process.env.VOUCH_REQUIRE_PARTNER_APPROVAL && !approved) {
+        validateAuthorizedForPartnerId(partnerId);
+    }
 }

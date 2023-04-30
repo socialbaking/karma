@@ -3,7 +3,7 @@ import {acceptUniqueCode} from "../data";
 import {FromSchema} from "json-schema-to-ts";
 import {ok} from "../../is";
 import {accessToken, allowAnonymous} from "./bearer-authentication";
-import {validateAuthorizedForPartnerId} from "./authentication";
+import {ensurePartnerMatchIfUnapproved, validateAuthorizedForPartnerId} from "./authentication";
 
 export async function acceptUniqueCodeRoutes(fastify: FastifyInstance) {
 
@@ -57,7 +57,7 @@ export async function acceptUniqueCodeRoutes(fastify: FastifyInstance) {
                     value
                 } = request.body;
 
-                validateAuthorizedForPartnerId(partnerId);
+                ensurePartnerMatchIfUnapproved(partnerId);
 
                 response.send({
                     success: await acceptUniqueCode({

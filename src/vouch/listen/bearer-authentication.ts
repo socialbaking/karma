@@ -4,9 +4,20 @@ import {FastifyAuthFunction} from "@fastify/auth";
 import {setAuthorizedForPartnerId} from "./authentication";
 import {ok} from "../../is";
 import {requestContext} from "@fastify/request-context";
-import {getPartner} from "../data/partner";
+import {getPartner as getPartnerDocument, Partner} from "../data/partner";
 
 const AUTHORIZED_ACCESS_TOKEN_KEY = "accessTokenKeyValue";
+const AUTHORIZED_PARTNER = "partner";
+
+export function getMaybePartner(): Partner | undefined {
+    return requestContext.get(AUTHORIZED_PARTNER)
+}
+
+export function getPartner(): Partner {
+    const partner = getMaybePartner();
+    ok(partner, "Expected authorized partner");
+    return partner;
+}
 
 export function getMaybeAccessToken() {
     return requestContext.get(AUTHORIZED_ACCESS_TOKEN_KEY);
@@ -27,8 +38,8 @@ export async function bearerAuthentication(key: string, request: FastifyRequest)
 
     if (token.partnerId) {
         setAuthorizedForPartnerId(token.partnerId);
-        const partner = await getPartner(token.partnerId);
-        request.requestContext.set("partner", partner);
+        const partner = await getPartnerDocument(token.partnerId);
+        request.requestContext.set(AUTHORIZED_PARTNER, partner);
         if (process.env.VOUCH_REQUIRE_PARTNER_APPROVAL) {
             if (!partner.approved) return false;
         }

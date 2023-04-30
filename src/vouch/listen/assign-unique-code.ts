@@ -2,7 +2,7 @@ import {FastifyInstance} from "fastify";
 import {FromSchema} from "json-schema-to-ts";
 import {ok} from "../../is";
 import {assignUniqueCode} from "../data";
-import {accessToken, validateAuthorizedForPartnerId} from "./authentication";
+import {accessToken, ensurePartnerMatchIfUnapproved, validateAuthorizedForPartnerId} from "./authentication";
 
 export async function assignUniqueCodeRoutes(fastify: FastifyInstance) {
     const body = {
@@ -58,7 +58,7 @@ export async function assignUniqueCodeRoutes(fastify: FastifyInstance) {
                     partnerId
                 } = request.body;
 
-                validateAuthorizedForPartnerId(partnerId);
+                ensurePartnerMatchIfUnapproved(partnerId);
 
                 response.send({
                     success: await assignUniqueCode({
