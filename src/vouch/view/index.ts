@@ -3,6 +3,7 @@ import {codeDataRoutes} from "./code-data";
 import {codePublicDetailsRoutes} from "./code-public-details";
 import {partnerBalanceRoutes} from "./partner-balance";
 import {requestCodeDataRoutes} from "./request-code-data";
+import {packageIdentifier} from "../package";
 
 export async function viewRoutes(fastify: FastifyInstance) {
 
@@ -15,7 +16,7 @@ export async function viewRoutes(fastify: FastifyInstance) {
 
         response.header("Content-Type", "text/html");
         response.send(`
-            <p>Welcome!</p>
+            <p>Welcome! You are running ${packageIdentifier}</p>
             <p>
                 <a href="/request-code-data">Check a code here</a>
             </p>
