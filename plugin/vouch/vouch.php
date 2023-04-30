@@ -77,51 +77,89 @@ function vouch_plugin_setting_version_callback() {
 }
 
 function vouch_plugin_setting_partner_id_callback() {
-$value = get_option('vouch_plugin_setting_partner_id', '');
-echo '<input type="text" name="vouch_plugin_setting_partner_id" value="' . esc_attr($value) . '" />';
+    $value = get_option('vouch_plugin_setting_partner_id', '');
+    echo '<input type="text" name="vouch_plugin_setting_partner_id" value="' . esc_attr($value) . '" />';
 }
 
 function vouch_plugin_init() {
-add_options_page(
-'Vouch API Settings',
-'Vouch API',
-'manage_options',
-'vouch_plugin',
-'vouch_plugin_settings_page'
-);
+    add_options_page(
+        'Vouch API Settings',
+        'Vouch API',
+        'manage_options',
+        'vouch_plugin',
+        'vouch_plugin_settings_page'
+    );
 }
 
 function vouch_plugin_settings_page() {
-?>
-<div class="wrap">
-<h1>Vouch API Settings</h1>
-<form method="post" action="options.php">
-<?php
-         settings_fields('vouch_plugin');
-         do_settings_sections('vouch_plugin');
-         submit_button();
-         ?>
-</form>
-</div>
-<?php
+    ?>
+    <div class="wrap">
+        <h1>Vouch API Settings</h1>
+        <form method="post" action="options.php">
+            <?php
+            settings_fields('vouch_plugin');
+            do_settings_sections('vouch_plugin');
+            submit_button();
+            ?>
+        </form>
+    </div>
+    <?php
+    $existingAccessToken = get_option('vouch_plugin_setting_access_token', '');
+
+    if ($existingAccessToken) {
+        $client = vouch_plugin_client();
+
+        try {
+            $logs = $client->listSystemLogs();
+            $json = json_encode($logs);
+            $length = count($logs);
+            ?>
+            <div class="vouch-result vouch-error">
+                <p>
+                    Successfully retrieved logs: <?php echo "{$length}" ?>
+                </p>
+                <ul>
+                    <?php
+                    foreach ($logs as $log) {
+                        echo "<li>";
+                        echo $log["message"];
+                        if (array_key_exists("uniqueCode", $log)) {
+                            echo " (code: {$log["uniqueCode"]})";
+                        }
+                        echo "</li>";
+                    }
+                    ?>
+                </ul>
+            </div>
+            <?php
+        } catch (RuntimeException $error) {
+            ?>
+            <div class="vouch-result vouch-error">
+                <p>
+                    <?php
+                    echo $error;
+                    ?>
+                </p>
+            </div>
+            <?php
+        }
+
+    }
+
 }
 
 add_action('admin_init', 'vouch_plugin_settings_init');
 add_action('admin_menu', 'vouch_plugin_init');
 
-function vouch_plugin_client() {
+function vouch_plugin_client(): Client {
     $accessToken = get_option('vouch_plugin_setting_access_token');
     $url = get_option('vouch_plugin_setting_url');
     $version = intval(get_option('vouch_plugin_setting_version'));
     $partnerId = get_option('vouch_plugin_setting_partner_id');
 
-    $options = [
-        'accessToken' => $accessToken,
-        'url' => $url,
-        'version' => $version,
-        'partnerId' => $partnerId,
-    ];
-    return new Client($options);
+//    echo "values: {$accessToken} {$url} {$version} {$partnerId}<br />";
+
+    return new Client($url, $accessToken, $partnerId, $version);
 }
 
 // Add Vouch Unique Code field to the coupon edit page
