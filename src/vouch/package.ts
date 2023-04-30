@@ -4,7 +4,7 @@ import {dirname, join} from "node:path";
 const { pathname } = new URL(import.meta.url);
 const directory = dirname(pathname);
 
-const packageJSON = await readFile(join(directory, "../../../package.json"), "utf-8")
+const packageJSON = await readFile(join(directory, "../../package.json"), "utf-8")
 const packageInfo = JSON.parse(packageJSON);
 
 export const name: string = packageInfo.name;
