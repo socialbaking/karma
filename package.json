@@ -53,6 +53,7 @@
   "license": "MIT",
   "dependencies": {
     "@fastify/cors": "^8.2.1",
+    "@fastify/helmet": "^10.1.0",
     "@fastify/request-context": "^4.2.0",
     "@fastify/swagger": "^8.3.1",
     "@fastify/swagger-ui": "^1.8.0",
@@ -65,6 +66,7 @@
     "dotenv": "^16.0.3",
     "fastify": "^4.17.0",
     "fastify-blipp": "^4.0.0",
+    "fastify-helmet": "^7.1.0",
     "human-readable-ids": "^1.0.4",
     "json-schema-to-ts": "^2.8.0",
     "redis": "^4.6.6",
@@ -73,7 +75,6 @@
     "whatwg-url": "^9.1.0"
   },
   "devDependencies": {
-    "redis-memory-server": "^0.6.0",
     "@opennetwork/http-representation": "^3.0.0",
     "@opennetwork/http-representation-node": "^3.0.0",
     "@playwright/test": "^1.26.0",
@@ -106,6 +107,7 @@
     "mkdirp": "^1.0.4",
     "preact": "^10.7.3",
     "react": "^18.1.0",
+    "redis-memory-server": "^0.6.0",
     "rimraf": "^3.0.2",
     "source-map-support": "^0.5.21",
     "ts-jest": "^27.0.5",

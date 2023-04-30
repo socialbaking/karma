@@ -6,6 +6,7 @@ import blippPlugin from "fastify-blipp";
 import corsPlugin from "@fastify/cors";
 import {getPort} from "./config";
 import {fastifyRequestContext, requestContext} from "@fastify/request-context";
+import helmet from "@fastify/helmet";
 
 async function initRedisMemory() {
     const { RedisMemoryServer } = await import("redis-memory-server")
@@ -26,6 +27,8 @@ export async function create() {
     const app = fastify({
         logger: true
     });
+
+    app.register(helmet, { contentSecurityPolicy: false });
 
     app.addHook(
         "preValidation",
