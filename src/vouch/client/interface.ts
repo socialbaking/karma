@@ -10,11 +10,9 @@ export interface UniqueCode {
     uniqueCode: string;
     value: number;
     partnerId: string;
-    partnerName: string;
-    location: string;
 }
 
-export type PublicUniqueCode = Pick<UniqueCode, "uniqueCode" | "value" | "partnerName">
+export type PublicUniqueCode = UniqueCode
 
 export interface SystemLog extends Record<string, unknown> {
     message: string;
