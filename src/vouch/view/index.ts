@@ -15,8 +15,13 @@ export async function viewRoutes(fastify: FastifyInstance) {
 
         response.header("Content-Type", "text/html");
         response.send(`
-            <p>Hello!</p>
-            <a href="/api/documentation">Checkout the documentation!</a>
+            <p>Welcome!</p>
+            <p>
+                <a href="/request-code-data">Check a code here</a>
+            </p>
+            <p>
+                <a href="/api/documentation">Checkout the documentation!</a>
+            </p>
         `);
     })
 }

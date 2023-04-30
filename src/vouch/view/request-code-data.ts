@@ -26,7 +26,13 @@ export async function requestCodeDataRoutes(fastify: FastifyInstance) {
         {
             schema,
             async handler(request, response) {
-
+                response.header("Content-Type", "text/html");
+                response.send(`
+                    <form action="/public-code-data" method="get">
+                        <input type="text" name="uniqueCode" placeholder="Unique Code" />
+                        <button type="submit">Check Info</button>
+                    </form>
+                `)
             }
         }
     );
