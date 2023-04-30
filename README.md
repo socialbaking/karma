@@ -112,11 +112,11 @@ end
 
 ### Support
 
-![Node.js supported](https://img.shields.io/badge/node-%3E%3D18.7.0-blue) ![Deno supported](https://img.shields.io/badge/deno-%3E%3D1.17.0-blue) ![Bun supported](https://img.shields.io/badge/bun-%3E%3D0.1.11-blue)
+ ![Node.js supported](https://img.shields.io/badge/node-%3E%3D18.7.0-blue) 
 
 ### Test Coverage
 
-![95.06%25 lines covered](https://img.shields.io/badge/lines-95.06%25-brightgreen) ![95.06%25 statements covered](https://img.shields.io/badge/statements-95.06%25-brightgreen) ![92.59%25 functions covered](https://img.shields.io/badge/functions-92.59%25-brightgreen) ![83.84%25 branches covered](https://img.shields.io/badge/branches-83.84%25-brightgreen)
+ ![94.82%25 lines covered](https://img.shields.io/badge/lines-94.82%25-brightgreen) ![94.82%25 statements covered](https://img.shields.io/badge/statements-94.82%25-brightgreen) ![92.68%25 functions covered](https://img.shields.io/badge/functions-92.68%25-brightgreen) ![86.88%25 branches covered](https://img.shields.io/badge/branches-86.88%25-brightgreen)
 
 [//]: # (badges)
 
