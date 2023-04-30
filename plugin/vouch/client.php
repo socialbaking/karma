@@ -4,93 +4,38 @@ declare(strict_types=1);
 
 namespace Vouch;
 
-interface VouchClient
-{
-    public function acceptUniqueCode(string $uniqueCode, int $value): bool;
-
-    public function addPartner(string $partnerName, string $location, ?bool $remote = null, ?bool $onsite = null): string;
-
-    public function assignUniqueCode(string $uniqueCode, int $value, string $partnerId): bool;
-
-    public function generateUniqueCode(int $value): string;
-
-    public function getUniqueCode(string $uniqueCode): UniqueCode;
-
-    public function listPartners(): array;
-
-    public function listUniqueCodes(): array;
-
-    public function processPayment(string $uniqueCode): bool;
-
-    public function verifyUniqueCode(string $uniqueCode, ?int $value = null): bool;
-
-    public function listSystemLogs(?string $partnerId = null): array;
-
-    public function getPublicUniqueCode(string $uniqueCode): PublicUniqueCode;
-}
-
-interface ClientOptions
-{
-    public function __construct(string $url, ?string $accessToken = null, ?string $partnerId = null, ?int $version = null, ?string $prefix = null);
-
-    public function acceptUniqueCode(string $uniqueCode, int $value): bool;
-
-    public function addPartner(string $partnerName, string $location, ?bool $remote = null, ?bool $onsite = null): string;
-
-    public function assignUniqueCode(string $uniqueCode, int $value, string $partnerId): bool;
-
-    public function generateUniqueCode(int $value): string;
-
-    public function getUniqueCode(string $uniqueCode): UniqueCode;
-
-    public function listPartners(): array;
-
-    public function listUniqueCodes(): array;
-
-    public function processPayment(string $uniqueCode): bool;
-
-    public function verifyUniqueCode(string $uniqueCode, ?int $value = null): bool;
-
-    public function listSystemLogs(?string $partnerId = null): array;
-
-    public function getPublicUniqueCode(string $uniqueCode): PublicUniqueCode;
-}
-
-class Headers
-{
-    public function set(string $name, string $value): void;
-}
-
-final class Client implements VouchClient
+final class Client
 {
     private string $baseUrl;
-    private Headers $headers;
+    private array $headers;
     private ?string $partnerId;
     private int $version;
     private string $prefix;
 
-    public function __construct(string|\URL $url, ?string $accessToken = null, ?string $partnerId = null, ?int $version = null, ?string $prefix = null)
+    public function __construct(string $url, ?string $accessToken = null, ?string $partnerId = null, ?int $version = null, ?string $prefix = null)
     {
         $this->baseUrl = $url;
         $this->version = $version ?? 1;
         $this->partnerId = $partnerId;
         $this->prefix = $prefix ?? "/api/version/{$this->version}";
 
-        $headers = $this->headers = new Headers();
-        $headers->set("Content-Type", "application/json");
-        $headers->set("Accept", "application/json");
+        $this->headers = [
+            "Content-Type" => "application/json",
+            "Accept" => "application/json",
+        ];
+
         if ($accessToken !== null) {
-            $headers->set("Authorization", "Bearer {$accessToken}");
+            $this->headers["Authorization"] = "Bearer {$accessToken}";
         }
         if ($partnerId !== null) {
-            $headers->set("X-Partner-ID", $partnerId);
+            $this->headers["X-Partner-ID"] = $partnerId;
         }
     }
 
     public function acceptUniqueCode(string $uniqueCode, int $value): bool
     {
         $response = $this->fetchJson(
-            "{$this->prefix}/accept-unique-code",
+            "/accept-unique-code",
             "POST",
             [
                 "uniqueCode" => $uniqueCode,
@@ -101,10 +46,10 @@ final class Client implements VouchClient
         return $response["success"];
     }
 
-    public function addPartner(string $partnerName, string $location, ?bool $remote = null, ?bool $onsite = null): string
+    public function addPartner(string $partnerName, string $location, ?bool $remote = null, ?bool $onsite = null): array
     {
         $response = $this->fetchJson(
-            "{$this->prefix}/add-partner",
+            "/add-partner",
             "POST",
             [
                 "partnerName" => $partnerName,
@@ -113,13 +58,13 @@ final class Client implements VouchClient
                 "onsite" => $onsite,
             ]
         );
-        return $response["partnerId"];
+        return $response;
     }
 
     public function assignUniqueCode(string $uniqueCode, int $value, string $partnerId): bool
     {
         $response = $this->fetchJson(
-            "{$this->prefix}/assign-unique-code",
+            "/assign-unique-code",
             "POST",
             [
                 "uniqueCode" => $uniqueCode,
@@ -133,7 +78,7 @@ final class Client implements VouchClient
     public function generateUniqueCode(int $value): string
     {
         $response = $this->fetchJson(
-            "{$this->prefix}/generate-unique-code",
+            "/generate-unique-code",
             "POST",
             [
                 "partnerId" => $this->partnerId,
@@ -143,30 +88,26 @@ final class Client implements VouchClient
         return $response["uniqueCode"];
     }
 
-    public function getUniqueCode(string $uniqueCode): UniqueCode
+    public function getUniqueCode(string $uniqueCode): array
     {
-        $url = new \URL("{$this->prefix}/unique-code-data", $this->baseUrl);
-        $url->searchParams->set("uniqueCode", $uniqueCode);
+        $url ="/unique-code-data?uniqueCode={$uniqueCode}";
 
-        $response = $this->fetchJson((string) $url, "GET");
-        return $response;
+        return $this->fetchJson($url, "GET");
     }
 
     public function listPartners(): array
     {
-        $response = $this->fetchJson("{$this->prefix}/partners", "GET");
-        return $response;
+        return $this->fetchJson("/partners", "GET");
     }
 
     public function listUniqueCodes(): array
     {
-        $response = $this->fetchJson("{$this->prefix}/unique-codes", "GET");
-        return $response;
+        return $this->fetchJson("/unique-codes", "GET");
     }
-public function processPayment(string $uniqueCode): bool
+    public function processPayment(string $uniqueCode): bool
     {
         $response = $this->fetchJson(
-            "{$this->prefix}/process-payment",
+            "/process-payment",
             "POST",
             [
                 "uniqueCode" => $uniqueCode,
@@ -179,7 +120,7 @@ public function processPayment(string $uniqueCode): bool
     public function verifyUniqueCode(string $uniqueCode, ?int $value = null): bool
     {
         $response = $this->fetchJson(
-            "{$this->prefix}/verify-unique-code",
+            "/verify-unique-code",
             "POST",
             [
                 "uniqueCode" => $uniqueCode,
@@ -192,37 +133,42 @@ public function processPayment(string $uniqueCode): bool
 
     public function listSystemLogs(?string $partnerId = null): array
     {
-        $url = new \URL("{$this->prefix}/system-logs", $this->baseUrl);
-        if ($partnerId !== null) {
-            $url->searchParams->set("partnerId", $partnerId);
-        }
-
-        $response = $this->fetchJson((string) $url, "GET");
-        return $response;
+        $url = "/system-logs?partnerId={$partnerId}";
+        return $this->fetchJson($url, "GET");
     }
 
-    public function getPublicUniqueCode(string $uniqueCode): PublicUniqueCode
+    public function getPublicUniqueCode(string $uniqueCode): array
     {
-        $url = new \URL("{$this->prefix}/unique-code-details", $this->baseUrl);
-        $url->searchParams->set("uniqueCode", $uniqueCode);
+        $url = "/unique-code-details?uniqueCode={$uniqueCode}";
 
-        $response = $this->fetchJson((string) $url, "GET");
-        return $response;
+        return $this->fetchJson($url, "GET");
     }
 
     private function fetchJson(string $url, string $method, ?array $body = null): array
     {
-        $options = ["method" => $method, "headers" => $this->headers];
+        $options = [
+            'method' => $method,
+            'headers' => $this->headers,
+            'timeout' => 30, // Set a timeout value
+        ];
         if ($body !== null) {
-            $options["body"] = json_encode($body);
+            $options['body'] = json_encode($body);
         }
 
-        $response = fetch(new \Request($url, $options));
-        if (!$response->ok) {
-            throw new \RuntimeException("Request failed: {$response->status} {$response->statusText}");
+        $url = "{$this->baseUrl}{$this->prefix}{$url}";
+
+        $response = $method === 'GET' ? wp_remote_get($url, $options) : wp_remote_post($url, $options);
+
+        if (is_wp_error($response)) {
+            throw new \RuntimeException("Request failed: " . $response->get_error_message());
         }
 
-        $json = json_decode($response->text, true);
+        $response_code = wp_remote_retrieve_response_code($response);
+        if ($response_code !== 200) {
+            throw new \RuntimeException("Request failed: {$response_code} " . wp_remote_retrieve_response_message($response));
+        }
+
+        $json = json_decode(wp_remote_retrieve_body($response), true);
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new \RuntimeException("Failed to parse JSON response: " . json_last_error_msg());
         }

@@ -59,14 +59,6 @@ function vouch_plugin_settings_init() {
     );
     register_setting('vouch_plugin', 'vouch_plugin_setting_partner_id');
 
-    add_settings_field(
-        'vouch_plugin_setting_xero_access_token',
-        'Xero Access Token',
-        'vouch_plugin_setting_xero_access_token_callback',
-        'vouch_plugin',
-        'vouch_plugin_settings_section'
-    );
-    register_setting('vouch_plugin', 'vouch_plugin_setting_xero_access_token');
 }
 
 function vouch_plugin_setting_access_token_callback() {
@@ -87,11 +79,6 @@ function vouch_plugin_setting_version_callback() {
 function vouch_plugin_setting_partner_id_callback() {
 $value = get_option('vouch_plugin_setting_partner_id', '');
 echo '<input type="text" name="vouch_plugin_setting_partner_id" value="' . esc_attr($value) . '" />';
-}
-
-function vouch_plugin_setting_xero_access_token_callback() {
-$value = get_option('vouch_plugin_setting_xero_access_token', '');
-echo '<input type="text" name="vouch_plugin_setting_xero_access_token" value="' . esc_attr($value) . '" />';
 }
 
 function vouch_plugin_init() {
@@ -127,14 +114,12 @@ function vouch_plugin_client() {
     $url = get_option('vouch_plugin_setting_url');
     $version = intval(get_option('vouch_plugin_setting_version'));
     $partnerId = get_option('vouch_plugin_setting_partner_id');
-    $xeroAccessToken = get_option('vouch_plugin_setting_xero_access_token');
 
     $options = [
         'accessToken' => $accessToken,
         'url' => $url,
         'version' => $version,
         'partnerId' => $partnerId,
-        'xeroAccessToken' => $xeroAccessToken,
     ];
     return new Client($options);
 }
