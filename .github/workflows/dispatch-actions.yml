@@ -19,6 +19,6 @@ jobs:
       - name: Dispatch to workflows
         run: |
           curl -H "Accept: application/vnd.github.everest-preview+json" \
-          -H "Authorization: token ${{ secrets.DISPATCH_TOKEN }}" \
+          -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
           --request POST \
           --data '{"event_type": "repository_update_event", "client_payload": { }}' https://api.github.com/repos/${{ matrix.repo }}/dispatches
