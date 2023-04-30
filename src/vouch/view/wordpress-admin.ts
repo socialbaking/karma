@@ -44,8 +44,10 @@ export async function wordpressAdminRoutes(fastify: FastifyInstance) {
                         <p>Authenticated as partner: ${partnerName}</p>
                         <p>Vouch API version: ${packageIdentifier}</p>
                         <input type="hidden" name="accessToken" value="${accessToken}" />
-                        <input type="text" name="uniqueCode" placeholder="Unique Code" />
-                        <button type="submit">Check Info</button>
+                        <p>
+                            <input type="text" name="uniqueCode" placeholder="Unique Code" /> 
+                        </p>
+                        <button type="submit" class="button button-primary">Check Info</button>
                     </form>
                 `)
             }
