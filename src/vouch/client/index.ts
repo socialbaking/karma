@@ -8,7 +8,7 @@ export interface ClientOptions {
     accessToken?: string;
     version?: number;
     prefix?: string;
-    url: string | URL;
+    url?: string | URL;
 }
 
 export class Client implements VouchClient {
@@ -19,8 +19,8 @@ export class Client implements VouchClient {
     private readonly version: number;
     private readonly prefix: string;
 
-    constructor({ url, accessToken, partnerId, version, prefix }: ClientOptions) {
-        this.baseUrl = url;
+    constructor({ url, accessToken, partnerId, version, prefix }: ClientOptions = {}) {
+        this.baseUrl = url ?? "https://vouch.patient.nz";
         version = version ?? 1;
         this.version = version;
         this.partnerId = partnerId;

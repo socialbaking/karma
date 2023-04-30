@@ -124,7 +124,30 @@ end
 
 See the vouch [API Documentation](https://vouch.patient.nz/api/documentation) for more information
 
-## Example TypeScript SDK
+## JavaScript / TypeScript Client
+
+The Vouch API is accessible using the [@socialbaking/vouch](https://www.npmjs.com/package/@socialbaking/vouch) npm package
+
+### Usage
+
+```bash
+npm i --save @socialbaking/vouch
+```
+
+```typescript
+import { Client } from "@socialbaking/vouch";
+
+// Access to public information
+const publicClient = new Client();
+
+// Access the API as an integrating partner
+const privateClient = new Client({
+    partnerId: "079260c4-6a34-4fa0-9cd4-a47efaec25f4", // Created with the public client
+    accessToken: "651036de....bcafc5dada6" // Provided to integrating partners
+});
+```
+
+### Client's TypeScript Interface
 
 [//]: # (typescript client)
 
