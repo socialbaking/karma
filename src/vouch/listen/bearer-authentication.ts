@@ -7,8 +7,12 @@ import {requestContext} from "@fastify/request-context";
 
 const AUTHORIZED_ACCESS_TOKEN_KEY = "accessTokenKeyValue";
 
+export function getMaybeAccessToken() {
+    return requestContext.get(AUTHORIZED_ACCESS_TOKEN_KEY);
+}
+
 export function getAccessToken() {
-    const accessToken = requestContext.get(AUTHORIZED_ACCESS_TOKEN_KEY);
+    const accessToken = getMaybeAccessToken();
     ok(accessToken, "Expected access token to be supplied");
     return accessToken;
 }

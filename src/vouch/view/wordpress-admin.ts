@@ -1,8 +1,7 @@
 import {FastifyInstance} from "fastify";
 import {FromSchema} from "json-schema-to-ts";
-import {getAuthorizedForPartnerId} from "../listen/authentication";
-import {getPartner, getPartnerStore} from "../data/partner";
-import {getAccessToken} from "./authentication";
+import {getPartner} from "../data/partner";
+import {getAccessToken, accessToken, getAuthorizedForPartnerId} from "./authentication";
 
 export async function wordpressAdminRoutes(fastify: FastifyInstance) {
 
@@ -29,7 +28,8 @@ export async function wordpressAdminRoutes(fastify: FastifyInstance) {
         {
             schema,
             preHandler: fastify.auth([
-               fastify.verifyBearerAuth
+               fastify.verifyBearerAuth,
+               accessToken
             ]),
             async handler(request, response) {
                 const partnerId = getAuthorizedForPartnerId();
@@ -39,7 +39,7 @@ export async function wordpressAdminRoutes(fastify: FastifyInstance) {
                 const accessToken = await getAccessToken();
                 response.header("Content-Type", "text/html");
                 response.send(`
-                    <form action="https://vouch.patient.nz/public-code-data" method="get">
+                    <form action="https://vouch.patient.nz/code-data" method="get">
                         <p>Authenticated as partner: ${partnerName}</p>
                         <input type="hidden" name="accessToken" value="${accessToken}" />
                         <input type="text" name="uniqueCode" placeholder="Unique Code" />

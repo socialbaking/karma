@@ -1,7 +1,7 @@
 import {FastifyInstance} from "fastify";
 import {FromSchema} from "json-schema-to-ts";
 import {retrieveCodeData} from "../data";
-import {validateAuthorizedForPartnerId} from "./authentication";
+import {accessToken, getMaybeAccessToken, validateAuthorizedForPartnerId} from "./authentication";
 import {getPartnerStore} from "../data/partner";
 
 export async function codeDataRoutes(fastify: FastifyInstance) {
@@ -32,6 +32,10 @@ export async function codeDataRoutes(fastify: FastifyInstance) {
         "/code-data",
         {
             schema,
+            preHandler: fastify.auth([
+                fastify.verifyBearerAuth,
+                accessToken
+            ]),
             async handler(request, response) {
                 const {
                     uniqueCode
@@ -44,6 +48,10 @@ export async function codeDataRoutes(fastify: FastifyInstance) {
                     const params = new URLSearchParams();
                     params.set("notFound", "true");
                     params.set("uniqueCode", uniqueCode);
+                    const accessToken = getMaybeAccessToken();
+                    if (accessToken) {
+                        params.set("accessToken", accessToken);
+                    }
                     response.header("Location", `/request-code-data?${params.toString()}`);
                     return response.send("Could not find the code");
                 }
