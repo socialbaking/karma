@@ -28,12 +28,19 @@ export async function create() {
         logger: true
     });
 
+    const {
+        name,
+        version
+    } = await import("../../../package.json");
+
     app.register(helmet, { contentSecurityPolicy: false });
 
     app.addHook(
         "preValidation",
         async (request, response) => {
             requestContext.set("hostname", request.hostname);
+
+            response.header("X-Powered-By", `${name}@${version}`);
         }
     )
 
