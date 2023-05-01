@@ -169,8 +169,12 @@ class Client
             $options['body'] = json_encode($body);
         }
         $prefix = $prefix ?? $this->prefix;
+        $pathname = "{$prefix}{$url}";
+        $pathname = preg_replace("/^\/\//", "/", $pathname);
+        $baseUrl = $this->baseUrl;
+        $baseUrl = preg_replace("/\/$/", "", $baseUrl);
 
-        $url = "{$this->baseUrl}{$prefix}{$url}";
+        $url = "{$baseUrl}{$pathname}";
 
         $response = $method === 'GET' ? wp_remote_get($url, $options) : wp_remote_post($url, $options);
 

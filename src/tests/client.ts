@@ -1,5 +1,5 @@
 import { start } from "../vouch/listen";
-import {getHostname} from "../vouch/listen/config";
+import {getOrigin} from "../vouch/listen/config";
 import {Client} from "../vouch";
 import {Chance} from "chance"
 import {v4} from "uuid";
@@ -11,7 +11,7 @@ async function testClient() {
 
     const close = await start();
 
-    const url = getHostname();
+    const url = getOrigin();
 
     const publicClient = new Client({
         url

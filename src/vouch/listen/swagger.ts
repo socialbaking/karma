@@ -1,11 +1,11 @@
 import {FastifyInstance} from "fastify";
 import basePlugin from "@fastify/swagger";
 import uiPlugin from "@fastify/swagger-ui";
-import {getHostname} from "./config";
+import {getOrigin} from "./config";
 import {version, homepage} from "../package";
 
 export async function setupSwagger(fastify: FastifyInstance) {
-    const url = getHostname()
+    const url = getOrigin()
 
     const { host, protocol } = new URL(url);
 

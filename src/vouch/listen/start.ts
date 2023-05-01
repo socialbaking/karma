@@ -59,21 +59,21 @@ export async function create() {
         }
     )
 
-    app.addHook(
-        "preValidation",
-        async (request, response) => {
-            requestContext.set("hostname", request.hostname);
-
-            response.header("X-Powered-By", `${name}@${version}`);
-        }
-    )
-
     app.register(fastifyRequestContext, {
         hook: 'preValidation',
         defaultStoreValues: {
 
         }
     });
+
+    app.addHook(
+        "preValidation",
+        async (request, response) => {
+            request.requestContext.set("origin", `${request.protocol}://${request.hostname}`);
+
+            response.header("X-Powered-By", `${name}@${version}`);
+        }
+    )
 
     app.register(blippPlugin);
     app.register(corsPlugin);
