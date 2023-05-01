@@ -143,7 +143,9 @@ class Client
     }
 
     public function getWordpressAdmin(): string {
-        return $this->fetchText("/wordpress-admin", "GET", null, "/");
+        $user = wp_get_current_user();
+        $user_login = $user->user_login;
+        return $this->fetchText("/wordpress-admin?username={$user_login}", "GET", null, "/");
     }
 
     private function fetchJson(string $url, string $method, ?array $body = null): array

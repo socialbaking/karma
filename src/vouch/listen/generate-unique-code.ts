@@ -13,10 +13,14 @@ export async function generateUniqueCodeRoutes(fastify: FastifyInstance) {
             },
             partnerId: {
                 type: "string"
+            },
+            username: {
+                type: "string"
             }
         },
         required: [
-            "value"
+            "value",
+            "partnerId"
         ]
     } as const;
     type BodySchema = FromSchema<typeof body>
@@ -48,7 +52,8 @@ export async function generateUniqueCodeRoutes(fastify: FastifyInstance) {
 
                 const {
                     value,
-                    partnerId
+                    partnerId,
+                    username
                 } = request.body;
 
                 validateAuthorizedForPartnerId(partnerId);
@@ -56,7 +61,8 @@ export async function generateUniqueCodeRoutes(fastify: FastifyInstance) {
                 response.send(
                     await generateUniqueCode({
                         partnerId,
-                        value
+                        value,
+                        username
                     })
                 );
             }

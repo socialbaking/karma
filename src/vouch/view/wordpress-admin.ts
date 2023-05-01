@@ -10,6 +10,9 @@ export async function wordpressAdminRoutes(fastify: FastifyInstance) {
     const querystring = {
         type: "object",
         properties: {
+            username: {
+                type: "string"
+            }
         },
         required: [
         ]
@@ -34,6 +37,9 @@ export async function wordpressAdminRoutes(fastify: FastifyInstance) {
                accessToken
             ]),
             async handler(request, response) {
+                const {
+                    username
+                } = request.query;
                 const partnerId = getAuthorizedForPartnerId();
                 const {
                     partnerName
@@ -76,6 +82,7 @@ export async function wordpressAdminRoutes(fastify: FastifyInstance) {
                                             },
                                             body: JSON.stringify({
                                               partnerId: "${partnerId}",
+                                              username: "${username}",
                                               value: value
                                             }),
                                             credentials: "omit"

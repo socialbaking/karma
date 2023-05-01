@@ -9,13 +9,14 @@ function generateActualCode() {
 export interface GenerateUniqueCodeInput {
     partnerId: string
     value: number
+    username?: string;
 }
 
 export interface GenerateUniqueCodeOutput extends GenerateUniqueCodeInput {
     uniqueCode: string
 }
 
-export async function generateUniqueCode({ partnerId, value }: GenerateUniqueCodeInput): Promise<GenerateUniqueCodeOutput> {
+export async function generateUniqueCode({ partnerId, value, username }: GenerateUniqueCodeInput): Promise<GenerateUniqueCodeOutput> {
     const uniqueCode = generateActualCode();
     const store = getUniqueCodeStore();
     const document: UniqueCode = {
@@ -23,7 +24,8 @@ export async function generateUniqueCode({ partnerId, value }: GenerateUniqueCod
         value,
         uniqueCode,
         createdAt: new Date().toISOString(),
-        createdBy: partnerId
+        createdBy: partnerId,
+        createdByUsername: username
     };
     await store.set(uniqueCode, document);
     await log({

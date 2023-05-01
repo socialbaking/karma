@@ -7,6 +7,7 @@ export interface UniqueCode {
     partnerId: string;
     createdAt: string;
     createdBy: string;
+    createdByUsername?: string;
     acceptedAt?: string;
     acceptedBy?: string; // partnerId
     acceptedValue?: number;
