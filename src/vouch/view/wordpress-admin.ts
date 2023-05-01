@@ -45,7 +45,7 @@ export async function wordpressAdminRoutes(fastify: FastifyInstance) {
                     <p>Authenticated as partner: ${partnerName}</p>
                     <p>Vouch API version: ${packageIdentifier}</p>
                     <form id="request-code-form">
-                        <p>Request a new code</p>
+                        <h4>Request a new code</h4>
                         <p>
                             <input type="number" name="value" placeholder="Dollar Value" /> 
                         </p>
@@ -91,8 +91,9 @@ export async function wordpressAdminRoutes(fastify: FastifyInstance) {
                             })
                         </script>
                     </form>
+                    <hr />
                     <form id="get-code-form">
-                        <p>Get code details</p>
+                        <h4>Get code details</h4>
                         <p>
                             <input type="text" name="uniqueCode" placeholder="Unique Code" /> 
                         </p>
