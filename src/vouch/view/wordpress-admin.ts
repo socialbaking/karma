@@ -46,7 +46,6 @@ export async function wordpressAdminRoutes(fastify: FastifyInstance) {
                     <p>Vouch API version: ${packageIdentifier}</p>
                     <form id="request-code-form">
                         <p>Request a new code</p>
-                        <input type="hidden" name="accessToken" value="${accessToken}" />
                         <p>
                             <input type="number" name="value" placeholder="Dollar Value" /> 
                         </p>
@@ -92,12 +91,48 @@ export async function wordpressAdminRoutes(fastify: FastifyInstance) {
                             })
                         </script>
                     </form>
-                    <form action="${url}/code-data" method="get">
-                        <input type="hidden" name="accessToken" value="${accessToken}" />
+                    <form id="get-code-form">
+                        <p>Get code details</p>
                         <p>
                             <input type="text" name="uniqueCode" placeholder="Unique Code" /> 
                         </p>
-                        <button type="submit" class="button button-primary">Check Info</button>
+                        <button type="button" class="button button-primary" id="get-code">Get Code Info</button>
+                        <span id="get-code-result"></span>
+                        <script type="application/javascript">
+                            const getCodeButton = document.getElementById("get-code");
+                            const getCodeResult = document.getElementById("get-code-result");
+                            getCodeButton.addEventListener("click", (event) => {
+                                event.preventDefault();
+                                getCodeButton.disabled = true;
+                                
+                                void run().finally(() => {
+                                    getCodeButton.disabled = false;
+                                });
+                                
+                                async function run() {
+                                    getCodeResult.innerHTML = "";
+                                    const url = new URL("/api/version/1/unique-code-data", "${url}");
+                                    const input = document.querySelector("#get-code-form [name='uniqueCode']")
+                                    if (!input.value) return;
+                                    url.searchParams.set("uniqueCode", input.value);
+                                    const response = await fetch(
+                                        url.toString(),
+                                        {
+                                            method: "GET",
+                                            headers: {
+                                                Authorization: "bearer ${accessToken}"
+                                            },
+                                            credentials: "omit"
+                                        }
+                                    );
+                                    if (!response.ok) {
+                                        return alert("Could not get code");
+                                    }
+                                    const { uniqueCode, value, acceptedValue } = await response.json();
+                                    getCodeResult.innerHTML = "<p class='code-result'>Unique Code: " + uniqueCode + ", value: $" + value + ", accepted value: $" + (acceptedValue || 0) + "</p>";
+                                }
+                            })
+                        </script>
                     </form>
                 `)
             }
