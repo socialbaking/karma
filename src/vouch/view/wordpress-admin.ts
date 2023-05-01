@@ -63,7 +63,7 @@ export async function wordpressAdminRoutes(fastify: FastifyInstance) {
                                 });
                                 
                                 async function run() {
-                                    const url = new URL("/version/1/generate-unique-code", "${url}");
+                                    const url = new URL("/api/version/1/generate-unique-code", "${url}");
                                     const valueInput = document.querySelector("#request-code-form [name='value']")
                                     const value = valueInput.value;
                                     if (!value) return;
