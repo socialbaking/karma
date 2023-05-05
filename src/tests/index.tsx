@@ -1,6 +1,15 @@
 /* c8 ignore start */
+import {shutdown} from "../tracing";
+import {tracer} from "../trace";
+
 try {
-  await import("./client");
+  await tracer.startActiveSpan("tests", async (span) => {
+    await tracer.startActiveSpan("client-tests", async (span) => {
+      await import("./client");
+      span.end()
+    });
+    span.end();
+  })
   console.log("Tests successful");
 } catch (error) {
   console.error(error);
@@ -9,5 +18,7 @@ try {
   }
   throw error;
 }
+
+await shutdown();
 
 export default 1;

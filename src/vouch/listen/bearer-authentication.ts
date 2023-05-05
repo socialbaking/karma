@@ -19,11 +19,11 @@ export function getPartner(): Partner {
     return partner;
 }
 
-export function getMaybeAccessToken() {
+export function getMaybeAccessToken(): string | undefined {
     return requestContext.get(AUTHORIZED_ACCESS_TOKEN_KEY);
 }
 
-export function getAccessToken() {
+export function getAccessToken(): string {
     const accessToken = getMaybeAccessToken();
     ok(accessToken, "Expected access token to be supplied");
     return accessToken;

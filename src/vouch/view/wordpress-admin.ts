@@ -44,7 +44,7 @@ export async function wordpressAdminRoutes(fastify: FastifyInstance) {
                 const {
                     partnerName
                 } = await getPartner(partnerId);
-                const accessToken = await getAccessToken();
+                const accessToken = getAccessToken();
                 const url = getOrigin();
                 response.header("Content-Type", "text/html");
                 response.send(`
