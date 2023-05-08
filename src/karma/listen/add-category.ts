@@ -8,7 +8,7 @@ export async function addCategoryRoutes(fastify: FastifyInstance) {
     const body = {
         type: "object",
         properties: {
-            CategoryName: {
+            categoryName: {
                 type: "string"
             },
             location: {
@@ -26,7 +26,7 @@ export async function addCategoryRoutes(fastify: FastifyInstance) {
             pharmacy: {
                 type: "boolean"
             },
-            CategoryDescription: {
+            categoryDescription: {
                 type: "string"
             }
         },
@@ -67,7 +67,7 @@ export async function addCategoryRoutes(fastify: FastifyInstance) {
                 pharmacy: {
                     type: "boolean"
                 },
-                CategoryDescription: {
+                categoryDescription: {
                     type: "string"
                 },
                 accessToken: {
@@ -101,17 +101,23 @@ export async function addCategoryRoutes(fastify: FastifyInstance) {
             ]),
             async handler(request, response)  {
                 const {
-                    CategoryName,
+                    categoryName,
                     location,
                     onsite,
-                    remote
+                    remote,
+                    clinic,
+                    pharmacy,
+                    categoryDescription
                 } = request.body;
 
                 const Category = await addCategory({
-                    CategoryName,
+                    categoryName,
                     location,
+                    remote,
                     onsite,
-                    remote
+                    clinic,
+                    pharmacy,
+                    categoryDescription,
                 });
 
                 response.status(201);

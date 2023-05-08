@@ -9,6 +9,12 @@ export async function addCategory({  categoryName }: CategoryData): Promise<Cate
     const category: Category = {
         categoryId,
         categoryName,
+        location: "",
+        remote: true,
+        onsite: false,
+        clinic: true,
+        pharmacy: false,
+        categoryDescription: "",
         createdAt: new Date().toISOString()
     };
     await store.set(categoryId, category);
