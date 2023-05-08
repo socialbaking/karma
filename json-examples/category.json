@@ -1,0 +1,43 @@
+{
+	"version": 2,
+	"data": {
+		"api::category.category": {
+			"1": {
+				"id": 1,
+				"name": "Dispensary",
+				"createdAt": "2022-07-27T06:57:52.404Z",
+				"updatedAt": "2022-08-13T02:28:29.688Z",
+				"publishedAt": "2022-07-27T22:26:27.845Z",
+				"createdBy": null,
+				"updatedBy": null
+			},
+			"2": {
+				"id": 2,
+				"name": "Equipment",
+				"createdAt": "2022-08-02T04:34:31.789Z",
+				"updatedAt": "2022-08-13T01:56:56.417Z",
+				"publishedAt": null,
+				"createdBy": null,
+				"updatedBy": null
+			},
+			"3": {
+				"id": 3,
+				"name": "Flower",
+				"createdAt": "2022-08-02T04:44:22.071Z",
+				"updatedAt": "2022-08-02T04:44:25.380Z",
+				"publishedAt": "2022-08-02T04:44:25.379Z",
+				"createdBy": null,
+				"updatedBy": null
+			},
+			"4": {
+				"id": 4,
+				"name": "Oils",
+				"createdAt": "2022-08-13T01:40:08.364Z",
+				"updatedAt": "2022-08-13T01:40:10.166Z",
+				"publishedAt": "2022-08-13T01:40:10.165Z",
+				"createdBy": null,
+				"updatedBy": null
+			}
+		}
+	}
+}
