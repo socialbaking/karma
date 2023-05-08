@@ -1,4 +1,11 @@
-import {Client as ClientInterface, UniqueCode, Partner, SystemLog, PublicUniqueCode, PartnerData, ClientOptions} from "./interface";
+import {
+    Client as ClientInterface,
+    Partner,
+    SystemLog,
+    PartnerData,
+    ClientOptions,
+    CategoryData, Category
+} from "./interface";
 import {ok} from "../../is";
 
 export * from "./interface";
@@ -48,6 +55,28 @@ export class Client implements ClientInterface {
             }
         );
         ok(response.ok, "addPartner response not ok");
+        return await response.json();
+    }
+
+
+    async addCategory(category: CategoryData): Promise<Category> {
+        const {
+            baseUrl,
+            headers,
+            prefix
+        } = this;
+        const response = await fetch(
+            new URL(
+                `${prefix}/categories`,
+                baseUrl
+            ),
+            {
+                method: "POST",
+                body: JSON.stringify(category),
+                headers
+            }
+        );
+        ok(response.ok, "addCategory response not ok");
         return await response.json();
     }
 

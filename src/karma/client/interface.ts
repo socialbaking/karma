@@ -1,15 +1,3 @@
-export interface UniqueCode extends Record<string, unknown> {
-    uniqueCode: string;
-    value: number;
-    partnerId: string;
-}
-
-export interface PublicUniqueCode {
-    uniqueCode: string;
-    value: number;
-    partnerId: string;
-}
-
 export interface SystemLog extends Record<string, unknown> {
     message: string;
     uniqueCode?: string;
@@ -33,6 +21,14 @@ export interface Partner extends PartnerData {
     accessToken?: string;
 }
 
+export interface CategoryData {
+    categoryName: string;
+}
+
+export interface Category extends CategoryData {
+    categoryId: string;
+}
+
 export interface ClientOptions {
     partnerId?: string;
     accessToken?: string;
@@ -43,6 +39,7 @@ export interface ClientOptions {
 
 export interface Client {
     addPartner(partner: PartnerData): Promise<Partner>;
+    addCategory(category: CategoryData): Promise<Category>;
     listPartners(): Promise<Partner[]>;
     listSystemLogs(): Promise<SystemLog[]>;
 }

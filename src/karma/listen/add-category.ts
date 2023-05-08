@@ -56,7 +56,7 @@ export async function addCategoryRoutes(fastify: FastifyInstance) {
     }
 
     fastify.post<Schema>(
-        "/category",
+        "/categories",
         {
             schema,
             preHandler: fastify.auth([

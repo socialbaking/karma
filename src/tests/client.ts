@@ -2,7 +2,6 @@ import { start } from "../karma/listen";
 import {getOrigin} from "../karma/listen/config";
 import {Client} from "../karma";
 import {Chance} from "chance"
-import {v4} from "uuid";
 import {ok} from "../is";
 
 const chance = new Chance();
@@ -54,7 +53,20 @@ async function testClient() {
 
             ok(Array.isArray(logs));
 
-            // TODO: Add tests here
+
+            const categoryName = chance.animal();
+            const category = await client.addCategory({
+                categoryName
+            })
+            console.log(category);
+            ok(category);
+            const { categoryId } = category;
+
+
+            // TODO: Add category lists tests here, make sure its in the list
+            // const categories = await client.listCategories():
+            // const foundCategory = categories.find(value => value.categoryId === categoryId);
+            // ok(foundCategory);
 
         }
 

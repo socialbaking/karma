@@ -2,7 +2,7 @@ import {FastifyInstance, FastifyRequest} from "fastify";
 import {listPartners} from "../data";
 import {accessToken, allowAnonymous} from "./bearer-authentication";
 
-export async function retrievePartnerRoutes(fastify: FastifyInstance) {
+export async function listPartnerRoutes(fastify: FastifyInstance) {
 
     const response = {
         200: {

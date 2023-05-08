@@ -1,7 +1,7 @@
 import {addPartnerRoutes} from "./add-partner";
-import {retrieveSystemLogsRoutes} from "./retrieve-system-logs";
+import {listSystemLogsRoutes} from "./list-system-logs";
 import {FastifyInstance} from "fastify";
-import {retrievePartnerRoutes} from "./retrieve-partners";
+import {listPartnerRoutes} from "./list-partners";
 import {viewRoutes} from "../view";
 import {addCategoryRoutes} from "./add-category";
 
@@ -10,8 +10,8 @@ export async function routes(fastify: FastifyInstance) {
     async function apiRoutes(fastify: FastifyInstance) {
         fastify.register(addPartnerRoutes);
         fastify.register(addCategoryRoutes);
-        fastify.register(retrieveSystemLogsRoutes);
-        fastify.register(retrievePartnerRoutes);
+        fastify.register(listSystemLogsRoutes);
+        fastify.register(listPartnerRoutes);
 
         // TODO: Register routes here
     }

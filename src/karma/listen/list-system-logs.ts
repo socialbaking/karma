@@ -4,7 +4,7 @@ import {FromSchema} from "json-schema-to-ts";
 import {accessToken, allowAnonymous} from "./bearer-authentication";
 import {getMaybeAuthorizedForPartnerId} from "./authentication";
 
-export async function retrieveSystemLogsRoutes(fastify: FastifyInstance) {
+export async function listSystemLogsRoutes(fastify: FastifyInstance) {
 
     const querystring = {
         type: "object",
