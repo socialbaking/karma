@@ -30,34 +30,6 @@ export class Client implements ClientInterface {
         return this;
     }
 
-    async acceptUniqueCode(uniqueCode: string, value: number) {
-        const {
-            partnerId,
-            baseUrl,
-            headers,
-            prefix
-        } = this;
-        console.log(headers)
-        const response = await fetch(
-            new URL(
-                `${prefix}/accept-unique-code`,
-                baseUrl
-            ),
-            {
-                method: "POST",
-                body: JSON.stringify({
-                    uniqueCode,
-                    partnerId,
-                    value
-                }),
-                headers
-            }
-        );
-        ok(response.ok, "acceptUniqueCode response not ok");
-        const { success } = await response.json();
-        return success;
-    }
-
     async addPartner(partner: PartnerData): Promise<Partner> {
         const {
             baseUrl,
@@ -79,80 +51,6 @@ export class Client implements ClientInterface {
         return await response.json();
     }
 
-    async assignUniqueCode(uniqueCode: string, value: number, partnerId: string): Promise<void> {
-        const {
-            baseUrl,
-            headers,
-            prefix
-        } = this;
-        const response = await fetch(
-            new URL(
-                `${prefix}/assign-unique-code`,
-                baseUrl
-            ),
-            {
-                method: "POST",
-                body: JSON.stringify({
-                    uniqueCode,
-                    partnerId,
-                    value
-                }),
-                headers
-            }
-        );
-        ok(response.ok, "assignUniqueCode response not ok");
-        const { success } = await response.json();
-        return success;
-    }
-
-    async generateUniqueCode(value: number): Promise<string> {
-        const {
-            partnerId,
-            baseUrl,
-            headers,
-            prefix
-        } = this;
-        const response = await fetch(
-            new URL(
-                `${prefix}/generate-unique-code`,
-                baseUrl
-            ),
-            {
-                method: "POST",
-                body: JSON.stringify({
-                    partnerId,
-                    value
-                }),
-                headers
-            }
-        );
-        ok(response.ok, "generateUniqueCode response not ok");
-        const { uniqueCode } = await response.json();
-        return uniqueCode;
-    }
-
-    async getUniqueCode(uniqueCode: string): Promise<UniqueCode> {
-        const {
-            baseUrl,
-            headers,
-            prefix
-        } = this;
-        const url = new URL(
-            `${prefix}/unique-code-data`,
-            baseUrl
-        );
-        url.searchParams.set("uniqueCode", uniqueCode);
-        const response = await fetch(
-            url,
-            {
-                method: "GET",
-                headers
-            }
-        );
-        ok(response.ok, "getUniqueCode response not ok");
-        return response.json();
-    }
-
     async listPartners(): Promise<Partner[]> {
         const {
             baseUrl,
@@ -171,79 +69,6 @@ export class Client implements ClientInterface {
         );
         ok(response.ok, "listPartners response not ok");
         return response.json();
-    }
-
-    async listUniqueCodes(): Promise<UniqueCode[]> {
-        const {
-            baseUrl,
-            headers,
-            prefix
-        } = this;
-        const response = await fetch(
-            new URL(
-                `${prefix}/unique-codes`,
-                baseUrl
-            ),
-            {
-                method: "GET",
-                headers
-            }
-        );
-        ok(response.ok, "listUniqueCodes response not ok");
-        return response.json();
-    }
-
-    async processPayment(uniqueCode: string): Promise<void> {
-        const {
-            partnerId,
-            baseUrl,
-            headers,
-            prefix
-        } = this;
-        const response = await fetch(
-            new URL(
-                `${prefix}/process-payment`,
-                baseUrl
-            ),
-            {
-                method: "POST",
-                body: JSON.stringify({
-                    uniqueCode,
-                    partnerId
-                }),
-                headers
-            }
-        );
-        ok(response.ok, "processPayment response not ok");
-        const { success } = await response.json();
-        return success;
-    }
-
-    async verifyUniqueCode(uniqueCode: string, value?: number): Promise<boolean> {
-        const {
-            partnerId,
-            baseUrl,
-            headers,
-            prefix
-        } = this;
-        const response = await fetch(
-            new URL(
-                `${prefix}/verify-unique-code`,
-                baseUrl
-            ),
-            {
-                method: "POST",
-                body: JSON.stringify({
-                    uniqueCode,
-                    partnerId,
-                    value
-                }),
-                headers
-            }
-        );
-        ok(response.ok, "verifyUniqueCode response not ok");
-        const { success } = await response.json();
-        return success;
     }
 
     async listSystemLogs(): Promise<SystemLog[]> {
@@ -268,28 +93,6 @@ export class Client implements ClientInterface {
             }
         );
         ok(response.ok, "listSystemLogs response not ok");
-        return response.json();
-    }
-
-    async getPublicUniqueCode(uniqueCode: string): Promise<PublicUniqueCode> {
-        const {
-            baseUrl,
-            headers,
-            prefix
-        } = this;
-        const url = new URL(
-            `${prefix}/unique-code-details`,
-            baseUrl
-        );
-        url.searchParams.set("uniqueCode", uniqueCode);
-        const response = await fetch(
-            url,
-            {
-                method: "GET",
-                headers
-            }
-        );
-        ok(response.ok, "getPublicUniqueCode response not ok");
         return response.json();
     }
 

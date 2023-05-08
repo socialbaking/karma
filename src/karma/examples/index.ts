@@ -1,9 +1,4 @@
-export * as acceptUniqueCode from "./accept-unique-code";
 export * as addPartner from "./add-partner";
-export * as assignUniqueCode from "./assign-unique-code";
-export * as generateUniqueCode from "./generate-unique-code";
-export * as processPayment from "./process-payment-transfer";
-export * as retrieveCodeData from "./retrieve-code-data";
-export * as retrieveCodeDetails from "./retrieve-code-public-details";
 export * as retrieveSystemLogs from "./retrive-system-logs";
-export * as verifyCodeValidity from "./verify-code-validity";
+
+// TODO: Export examples here

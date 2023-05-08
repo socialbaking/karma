@@ -1,12 +1,6 @@
-export * from "./accept-unique-code";
 export * from "./add-partner";
-export * from "./assign-unique-code";
-export * from "./generate-unique-code";
-export * from "./process-payment-transfer";
-export * from "./retrieve-code-data";
-export * from "./retrieve-code-public-details";
 export * from "./retrive-system-logs";
-export * from "./verify-code-validity";
-export * from "./retrieve-codes";
 export * from "./retrieve-partners";
 export * from "./access-token";
+
+// TODO: Export data functions here

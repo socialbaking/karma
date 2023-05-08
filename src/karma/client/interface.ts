@@ -42,15 +42,7 @@ export interface ClientOptions {
 }
 
 export interface Client {
-    generateUniqueCode(value: number): Promise<string>;
-    verifyUniqueCode(uniqueCode: string, value?: number): Promise<boolean>;
     addPartner(partner: PartnerData): Promise<Partner>;
-    assignUniqueCode(uniqueCode: string, value: number, partnerId: string): Promise<void>;
-    processPayment(uniqueCode: string): Promise<void>;
-    acceptUniqueCode(uniqueCode: string, value: number): Promise<void>;
-    getUniqueCode(uniqueCode: string): Promise<UniqueCode>;
-    getPublicUniqueCode(uniqueCode: string): Promise<PublicUniqueCode>;
-    listUniqueCodes(): Promise<UniqueCode[]>;
     listPartners(): Promise<Partner[]>;
     listSystemLogs(): Promise<SystemLog[]>;
 }
