@@ -1,5 +1,5 @@
 import {FastifyInstance, FastifyRequest} from "fastify";
-import {retrievePartners} from "../data";
+import {listPartners} from "../data";
 import {accessToken, allowAnonymous} from "./bearer-authentication";
 
 export async function retrievePartnerRoutes(fastify: FastifyInstance) {
@@ -68,7 +68,7 @@ export async function retrievePartnerRoutes(fastify: FastifyInstance) {
             ]),
             async handler(request: FastifyRequest, response) {
                 response.send(
-                    await retrievePartners()
+                    await listPartners()
                 );
             }
         }

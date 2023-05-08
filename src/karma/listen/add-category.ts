@@ -8,31 +8,15 @@ export async function addCategoryRoutes(fastify: FastifyInstance) {
     const body = {
         type: "object",
         properties: {
-            CategoryName: {
+            categoryName: {
                 type: "string"
             },
-            location: {
-                type: "string"
-            },
-            remote: {
-                type: "boolean"
-            },
-            onsite: {
-                type: "boolean"
-            },
-            clinic: {
-                type: "boolean"
-            },
-            pharmacy: {
-                type: "boolean"
-            },
-            CategoryDescription: {
+            categoryDescription: {
                 type: "string"
             }
         },
         required: [
-            "CategoryName",
-            "location"
+            "categoryName"
         ]
     } as const;
     type BodySchema = FromSchema<typeof body>
@@ -46,38 +30,19 @@ export async function addCategoryRoutes(fastify: FastifyInstance) {
             description: "A new Category",
             type: "object",
             properties: {
-                CategoryId: {
+                categoryId: {
                     type: "string"
                 },
-                CategoryName: {
+                categoryName: {
                     type: "string"
                 },
-                location: {
+                categoryDescription: {
                     type: "string"
                 },
-                onsite: {
-                    type: "boolean"
-                },
-                remote: {
-                    type: "boolean"
-                },
-                clinic: {
-                    type: "boolean"
-                },
-                pharmacy: {
-                    type: "boolean"
-                },
-                CategoryDescription: {
-                    type: "string"
-                },
-                accessToken: {
-                    type: "string"
-                }
             },
             required: [
-                "CategoryId",
-                "CategoryName",
-                "location"
+                "categoryId",
+                "categoryName"
             ]
         }
     }
@@ -95,23 +60,16 @@ export async function addCategoryRoutes(fastify: FastifyInstance) {
         {
             schema,
             preHandler: fastify.auth([
-                allowAnonymous,
                 fastify.verifyBearerAuth,
                 accessToken
             ]),
             async handler(request, response)  {
                 const {
-                    CategoryName,
-                    location,
-                    onsite,
-                    remote
+                    categoryName
                 } = request.body;
 
                 const Category = await addCategory({
-                    CategoryName,
-                    location,
-                    onsite,
-                    remote
+                    categoryName
                 });
 
                 response.status(201);

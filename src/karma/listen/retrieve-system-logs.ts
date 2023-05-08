@@ -1,5 +1,5 @@
 import {FastifyInstance} from "fastify";
-import {retrieveSystemLogs} from "../data";
+import {listSystemLogs} from "../data";
 import {FromSchema} from "json-schema-to-ts";
 import {accessToken, allowAnonymous} from "./bearer-authentication";
 import {getMaybeAuthorizedForPartnerId} from "./authentication";
@@ -80,7 +80,7 @@ export async function retrieveSystemLogsRoutes(fastify: FastifyInstance) {
             ]),
             async handler(request, response) {
                 const { partnerId } = request.query;
-                const data = await retrieveSystemLogs({
+                const data = await listSystemLogs({
                     partnerId: partnerId ?? getMaybeAuthorizedForPartnerId()
                 })
 

@@ -1,10 +1,10 @@
-import type {RetrieveSystemLogOutput} from "../data";
+import type {SystemLogData} from "../data";
 
 export const url = "/system-logs";
 export const options = {
     method: "GET"
 };
-export const response: RetrieveSystemLogOutput[] = [
+export const response: SystemLogData[] = [
     {
         timestamp: "2022-05-01T10:30:00Z",
         message: "Unique code generated",

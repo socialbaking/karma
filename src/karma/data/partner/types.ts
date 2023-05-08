@@ -1,6 +1,3 @@
-import {getKeyValueStore} from "./kv";
-
-const PARTNER_STORE_NAME = "partner" as const;
 
 export interface PartnerData {
     partnerName: string;
@@ -16,13 +13,4 @@ export interface Partner extends PartnerData, Record<string, unknown> {
     createdAt: string;
     approvedAt?: string;
     approvedByUserId?: string;
-}
-
-export function getPartnerStore() {
-    return getKeyValueStore<Partner>(PARTNER_STORE_NAME);
-}
-
-export function getPartner(partnerId: string) {
-    const store = getPartnerStore();
-    return store.get(partnerId);
 }

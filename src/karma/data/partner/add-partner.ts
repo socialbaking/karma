@@ -1,12 +1,10 @@
-import {getPartnerStore, Partner} from "./partner";
 import {v4} from "uuid";
-import {createPartnerAccessToken} from "./access-token";
+import {createPartnerAccessToken} from "../access-token";
+import {Partner, PartnerData} from "./types";
+import {getPartnerStore} from "./store";
 
-export interface AddPartnerInput {
-    partnerName: string;
-    location: string;
-    remote?: boolean;
-    onsite?: boolean;
+export interface AddPartnerInput extends PartnerData {
+
 }
 
 export async function addPartner({ partnerName, location, remote, onsite }: AddPartnerInput): Promise<Partner> {
