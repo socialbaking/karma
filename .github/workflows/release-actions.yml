@@ -27,7 +27,6 @@ jobs:
       - run: yarn build
       # yarn coverage === c8 + yarn test
       - run: yarn coverage
-      - run: rm -rf patches # Remove any patches to allow for other packages to decide this
       - name: Package Registry Publish - npm
         run: |
           git config user.name "${{ github.actor }}"
