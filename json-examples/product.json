@@ -1,0 +1,279 @@
+{
+	"version": 2,
+	"data": {
+		"api::category.category": {
+			"3": {
+				"id": 3,
+				"name": "Flower",
+				"createdAt": "2022-08-02T04:44:22.071Z",
+				"updatedAt": "2022-08-02T04:44:25.380Z",
+				"publishedAt": "2022-08-02T04:44:25.379Z",
+				"createdBy": 1,
+				"updatedBy": 1
+			}
+		},
+		"api::cost.cost": {
+			"1": {
+				"id": 1,
+				"name": "Shishkaberry",
+				"price": 499,
+				"createdAt": "2022-07-27T23:14:25.501Z",
+				"updatedAt": "2022-08-13T03:05:48.206Z",
+				"publishedAt": "2022-07-27T23:14:46.363Z",
+				"size": 35,
+				"sizeType": "grams",
+				"products": [
+					1
+				],
+				"dispensary": 1,
+				"createdBy": null,
+				"updatedBy": null
+			},
+			"3": {
+				"id": 3,
+				"name": "Shishkaberry",
+				"price": 555,
+				"createdAt": "2022-08-13T02:20:41.556Z",
+				"updatedAt": "2022-08-13T02:20:55.931Z",
+				"publishedAt": "2022-08-13T02:20:55.928Z",
+				"size": 35,
+				"sizeType": "grams",
+				"products": [
+					1
+				],
+				"dispensary": 2,
+				"createdBy": null,
+				"updatedBy": null
+			},
+			"4": {
+				"id": 4,
+				"name": "Shishkaberry",
+				"price": 455,
+				"createdAt": "2022-08-13T02:21:31.821Z",
+				"updatedAt": "2022-08-13T02:21:33.606Z",
+				"publishedAt": "2022-08-13T02:21:33.605Z",
+				"size": 35,
+				"sizeType": "grams",
+				"products": [
+					1
+				],
+				"dispensary": 3,
+				"createdBy": null,
+				"updatedBy": null
+			},
+			"5": {
+				"id": 5,
+				"name": "Shishkaberry",
+				"price": 450,
+				"createdAt": "2022-08-13T02:21:50.236Z",
+				"updatedAt": "2022-08-13T02:21:50.931Z",
+				"publishedAt": "2022-08-13T02:21:50.929Z",
+				"size": 35,
+				"sizeType": "grams",
+				"products": [
+					1
+				],
+				"dispensary": 4,
+				"createdBy": null,
+				"updatedBy": null
+			},
+			"6": {
+				"id": 6,
+				"name": "Shishkaberry",
+				"price": 455,
+				"createdAt": "2022-08-13T02:25:57.532Z",
+				"updatedAt": "2022-08-13T02:25:58.218Z",
+				"publishedAt": "2022-08-13T02:25:58.213Z",
+				"size": 35,
+				"sizeType": "grams",
+				"products": [
+					1
+				],
+				"dispensary": 6,
+				"createdBy": null,
+				"updatedBy": null
+			},
+			"7": {
+				"id": 7,
+				"name": "Shishkaberry",
+				"price": 459,
+				"createdAt": "2022-08-13T02:26:11.700Z",
+				"updatedAt": "2022-08-13T02:26:12.316Z",
+				"publishedAt": "2022-08-13T02:26:12.314Z",
+				"size": 35,
+				"sizeType": "grams",
+				"products": [
+					1
+				],
+				"dispensary": 7,
+				"createdBy": null,
+				"updatedBy": null
+			},
+			"8": {
+				"id": 8,
+				"name": "ANTG Mariposa",
+				"price": 275,
+				"createdAt": "2022-08-13T03:37:45.083Z",
+				"updatedAt": "2022-08-13T03:37:50.464Z",
+				"publishedAt": "2022-08-13T03:37:45.876Z",
+				"size": 10,
+				"sizeType": "grams",
+				"products": [
+					3
+				],
+				"dispensary": 1,
+				"createdBy": null,
+				"updatedBy": null
+			},
+			"9": {
+				"id": 9,
+				"name": "ANTG Mariposa",
+				"price": 200,
+				"createdAt": "2022-08-13T03:39:54.042Z",
+				"updatedAt": "2022-08-13T03:40:40.534Z",
+				"publishedAt": "2022-08-13T03:40:40.529Z",
+				"size": 10,
+				"sizeType": "grams",
+				"products": [
+					3
+				],
+				"dispensary": 3,
+				"createdBy": null,
+				"updatedBy": null
+			},
+			"10": {
+				"id": 10,
+				"name": "ANTG Mariposa",
+				"price": 170,
+				"createdAt": "2022-08-13T03:41:14.036Z",
+				"updatedAt": "2022-08-13T03:41:19.170Z",
+				"publishedAt": "2022-08-13T03:41:19.167Z",
+				"size": 10,
+				"sizeType": "grams",
+				"products": [
+					3
+				],
+				"dispensary": 4,
+				"createdBy": null,
+				"updatedBy": null
+			}
+		},
+		"api::product.product": {
+			"1": {
+				"id": 1,
+				"name": "Medium THC Wholeflower Shishkaberry",
+				"description": "Shishkaberry, or “Kish,” is an indica-dominant hybrid that came about from crossing DJ Short Blueberry with an unknown Afghani strain. This plant will mature in 8 to 9 weeks and should yield a fairly high amount of flowers. Shiskaberry’s buds have a fruit and berry aroma and will be painted with shades of purple. Its initial head buzz is happy and good for finishing things up or being social, but will slip into a lazy high over time.",
+				"createdAt": "2022-07-27T23:10:13.474Z",
+				"updatedAt": "2022-08-13T03:34:56.777Z",
+				"publishedAt": "2022-07-27T23:14:39.148Z",
+				"THC": "15.25",
+				"CBD": "0.5",
+				"strain": "shishkaberry",
+				"costs": [
+					3,
+					4,
+					5,
+					6,
+					7,
+					1
+				],
+				"category": 3,
+				"createdBy": null,
+				"updatedBy": null
+			},
+			"3": {
+				"id": 3,
+				"name": "ANTG Mariposa",
+				"description": "The ANTG Mariposa Flower is a Sativa dominant OG Kush hybrid medicinal cannabis flower that is Australian grown and made. Each gram of dried flower contains 135mg THC and <1mg CBD. This product meets the NZMQS (New Zealand Minimum Quality Standards) as assessed by the Medicinal Cannabis Agency for oral consumption as a tea.",
+				"createdAt": "2022-08-13T03:36:37.917Z",
+				"updatedAt": "2022-08-13T03:41:27.080Z",
+				"publishedAt": "2022-08-13T03:41:27.079Z",
+				"THC": "13.5",
+				"CBD": "1.0",
+				"strain": "og-kush",
+				"costs": [
+					8,
+					9,
+					10
+				],
+				"category": 3,
+				"createdBy": null,
+				"updatedBy": null
+			}
+		},
+		"api::dispensary.dispensary": {
+			"1": {
+				"id": 1,
+				"name": "Cannabis Clinic",
+				"details": "Whether you are suffering from a mild or severe health condition, medicinal cannabis and CBD oil may be a great natural treatment option. Our dedicated and experienced team will provide you with ongoing support and will answer any questions you have. We are passionate about the role of cannabinoids and plant-based medicine in modern healthcare. All our friendly and trained medical professionals know, and believe in, medicinal cannabis.",
+				"website": "https://cannabisclinic.co.nz/",
+				"createdAt": "2022-08-02T05:05:18.044Z",
+				"updatedAt": "2022-08-02T05:05:19.287Z",
+				"publishedAt": "2022-08-02T05:05:19.285Z",
+				"products": null,
+				"createdBy": null,
+				"updatedBy": null
+			},
+			"2": {
+				"id": 2,
+				"name": "Green Doctors Medicinal Cannabis Clinic",
+				"details": "Looking to buy CBD & THC in New Zealand? Green Doctors in Auckland is the country's first & largest specialist medicinal cannabis clinic.",
+				"website": "https://greendoctors.co.nz/",
+				"createdAt": "2022-08-13T02:00:01.438Z",
+				"updatedAt": "2022-08-13T02:27:05.730Z",
+				"publishedAt": "2022-08-13T02:00:02.249Z",
+				"products": null,
+				"createdBy": null,
+				"updatedBy": null
+			},
+			"3": {
+				"id": 3,
+				"name": "Wellworks Pharmacy",
+				"details": "Wellworks Pharmacy is a pharmacy and wellness bar serving Wellington City and Lower Hutt. We are dedicated to empowering the health of our community by adopting a fresh new approach to healthcare.\n\nWe take the hassle out of maintaining your health – we can pack and deliver your prescription medication to your door, manage your repeats and offer a full range of clinical services. We’re independently owned and believe pharmacies should serve the well-being of their local communities – versus big corporations. We want to make it as easy as possible for our customers to get healthy, and stay healthy.",
+				"website": "https://www.wellworks.co.nz/",
+				"createdAt": "2022-08-13T02:01:04.184Z",
+				"updatedAt": "2022-08-13T02:27:40.417Z",
+				"publishedAt": "2022-08-13T02:01:05.047Z",
+				"products": null,
+				"createdBy": null,
+				"updatedBy": null
+			},
+			"4": {
+				"id": 4,
+				"name": "Nga Hua Pharmacy",
+				"details": "### A conventional Pharmacy with an unconventional approach to health\n\nHere at Nga Hua pharmacy, we strive to help you and your whanau’s health thrive. Most people associate a pharmacy as a place just to get prescription medicines to survive. Not here. Our aim is to give personalised health advice so that you and your whanau can thrive, not just survive. Our advice is different. We challenge conventional thinking and health advice.\n\nWe welcome everybody, from tangata whenua to families from all other ethnicities and backgrounds.\n\nSo come on in and experience the difference in the quality of advice you will receive. Pop in to get your prescription filled, or book in a korero with James the pharmacist to discuss how we can help improve your health and wellbeing.",
+				"website": "https://www.ngahuapharmacy.co.nz/",
+				"createdAt": "2022-08-13T02:06:13.756Z",
+				"updatedAt": "2022-08-13T02:27:14.179Z",
+				"publishedAt": "2022-08-13T02:06:14.657Z",
+				"products": null,
+				"createdBy": null,
+				"updatedBy": null
+			},
+			"6": {
+				"id": 6,
+				"name": "Unichem Pharmacy",
+				"details": "Unichem is your local health professional. With a network of more than 250 pharmacies throughout New Zealand, you’ll always find professional care + advice for all your health, wellness and beauty needs.\n\nIn addition to stocking a wide range of quality natural health products, over the counter medications and beauty essentials, your local Unichem Pharmacist has the expertise to offer a range of health services. Come in and talk to us about Coeliac disease testing, blood pressure checks, a number of vaccinations, bowel health screening, medicine management, warfarin monitoring and more.\n\nYour Unichem Pharmacist is always available to discuss health conditions and medicines, provide advice on products and help you get the most from your medicines. ",
+				"website": "https://www.unichem.co.nz/index.html",
+				"createdAt": "2022-08-13T02:23:22.780Z",
+				"updatedAt": "2022-08-13T02:27:33.901Z",
+				"publishedAt": "2022-08-13T02:23:23.408Z",
+				"products": null,
+				"createdBy": null,
+				"updatedBy": null
+			},
+			"7": {
+				"id": 7,
+				"name": "Chemist Warehouse",
+				"details": "Chemist Warehouse Group is an Australian company operating a chain of retail pharmacies both locally and internationally. The company is Australia's largest pharmacy franchise retailer with over 350 stores, and employs over 8,000 staff. The company brands itself as offering discounted prices for pharmaceutical goods.",
+				"website": "https://www.chemistwarehouse.co.nz/",
+				"createdAt": "2022-08-13T02:24:53.935Z",
+				"updatedAt": "2022-08-13T02:26:49.317Z",
+				"publishedAt": "2022-08-13T02:24:55.594Z",
+				"products": null,
+				"createdBy": null,
+				"updatedBy": null
+			}
+		}
+	}
+}
