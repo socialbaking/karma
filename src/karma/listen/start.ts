@@ -42,13 +42,15 @@ export async function create() {
         logger: true
     });
 
+    const register: (...args: unknown[]) => void = app.register.bind(fastify);
+
     const packageJSON = await readFile(join(directory, "../../../package.json"), "utf-8")
     const {
         name,
         version
     } = JSON.parse(packageJSON);
 
-    app.register(helmet, { contentSecurityPolicy: false });
+    register(helmet, { contentSecurityPolicy: false });
 
     app.addHook(
         "preValidation",
@@ -59,7 +61,7 @@ export async function create() {
         }
     )
 
-    app.register(fastifyRequestContext, {
+    register(fastifyRequestContext, {
         hook: 'preValidation',
         defaultStoreValues: {
 
@@ -75,20 +77,19 @@ export async function create() {
         }
     )
 
-    app.register(blippPlugin);
-    app.register(corsPlugin);
+    register(blippPlugin);
+    register(corsPlugin);
 
     await setupSwagger(app);
 
-    app
-        .register(authPlugin)
-    app.register(bearerAuthPlugin, {
+    register(authPlugin)
+    register(bearerAuthPlugin, {
         keys: new Set<string>(),
         auth: bearerAuthentication,
         addHook: false
     });
 
-    app.register(routes);
+    register(routes);
 
     return {
         app,
