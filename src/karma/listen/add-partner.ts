@@ -91,7 +91,7 @@ export async function addPartnerRoutes(fastify: FastifyInstance) {
     }
 
     fastify.post<Schema>(
-        "/add-partner",
+        "/partners",
         {
             schema,
             preHandler: fastify.auth([

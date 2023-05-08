@@ -38,7 +38,7 @@ export class Client implements ClientInterface {
         } = this;
         const response = await fetch(
             new URL(
-                `${prefix}/add-partner`,
+                `${prefix}/partners`,
                 baseUrl
             ),
             {
