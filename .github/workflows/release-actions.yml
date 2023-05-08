@@ -24,14 +24,9 @@ jobs:
           registry-url: "https://registry.npmjs.org"
       - run: |
           yarn install
-          bun install
       - run: yarn build
       # yarn coverage === c8 + yarn test
       - run: yarn coverage
-      - name: test:node with PORT
-        run: yarn test:node
-        env:
-          PORT: 3400
       - name: Package Registry Publish - npm
         run: |
           git config user.name "${{ github.actor }}"

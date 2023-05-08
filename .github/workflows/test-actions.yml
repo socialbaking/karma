@@ -17,13 +17,8 @@ jobs:
         with:
           node-version: "18.x"
           registry-url: "https://registry.npmjs.org"
-      - uses: denoland/setup-deno@v1
-        with:
-          deno-version: "v1.x"
-      - uses: antongolub/action-setup-bun@v1
       - run: |
           yarn install
-          bun install
       - run: yarn build
       # yarn coverage === c8 + yarn test:node
       - run: yarn coverage
