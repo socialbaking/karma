@@ -22,10 +22,6 @@ jobs:
         with:
           node-version: "18.x"
           registry-url: "https://registry.npmjs.org"
-      - uses: denoland/setup-deno@v1
-        with:
-          deno-version: "v1.x"
-      - uses: antongolub/action-setup-bun@v1
       - run: |
           yarn install
           bun install
@@ -51,14 +47,14 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.YARN_TOKEN }}
       - uses: actions/setup-node@v2
         with:
-          node-version: "16.x"
+          node-version: "18.x"
           registry-url: "https://npm.pkg.github.com"
       - name: Package Registry Publish - GitHub
         run: |
           git config user.name "${{ github.actor }}"
           git config user.email "${{ github.actor}}@users.noreply.github.com"
           npm set "registry=https://npm.pkg.github.com/"
-          npm set "@virtualstate:registry=https://npm.pkg.github.com/virtualstate"
+          npm set "@socialbaking:registry=https://npm.pkg.github.com/socialbaking"
           npm set "//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}"
           npm publish --access=public
         env:

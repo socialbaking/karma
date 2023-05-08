@@ -77,6 +77,8 @@
     "fastify-helmet": "^7.1.0",
     "human-readable-ids": "^1.0.4",
     "json-schema-to-ts": "^2.8.0",
+    "patch-package": "^7.0.0",
+    "postinstall-postinstall": "^2.1.0",
     "redis": "^4.6.6",
     "tmp": "^0.2.1",
     "uuid": "^8.3.2",
@@ -125,6 +127,7 @@
     "v8-to-istanbul": "^8.1.0"
   },
   "scripts": {
+    "postinstall": "patch-package",
     "test:all": "yarn test:node && yarn test:deno && yarn test:bun",
     "build": "rm -rf esnext && tsc",
     "postbuild": "mkdir -p coverage && node scripts/post-build.js",
