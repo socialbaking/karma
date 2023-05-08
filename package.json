@@ -13,19 +13,19 @@
         "./esnext/tests/index.d.ts"
       ],
       "data": [
-        "./esnext/vouch/data/index.d.ts"
+        "./esnext/karma/data/index.d.ts"
       ],
       "client": [
-        "./esnext/vouch/client/index.d.ts"
+        "./esnext/karma/client/index.d.ts"
       ],
       "listen": [
-        "./esnext/vouch/listen/main.d.ts"
+        "./esnext/karma/listen/main.d.ts"
       ],
       "listen/routes": [
-        "./esnext/vouch/listen/routes.d.ts"
+        "./esnext/karma/listen/routes.d.ts"
       ],
       "vercel/serverless": [
-        "./esnext/vouch/listen/serverless.d.ts"
+        "./esnext/karma/listen/serverless.d.ts"
       ]
     }
   },
@@ -35,20 +35,20 @@
   "exports": {
     ".": "./esnext/index.js",
     "./tests": "./esnext/tests/index.js",
-    "./data": "./esnext/vouch/data/index.js",
-    "./client": "./esnext/vouch/client/index.js",
-    "./listen": "./esnext/vouch/listen/main.js",
-    "./listen/routes": "./esnext/vouch/listen/routes.js",
-    "./vercel/serverless": "./esnext/vouch/listen/serverless.js"
+    "./data": "./esnext/karma/data/index.js",
+    "./client": "./esnext/karma/client/index.js",
+    "./listen": "./esnext/karma/listen/main.js",
+    "./listen/routes": "./esnext/karma/listen/routes.js",
+    "./vercel/serverless": "./esnext/karma/listen/serverless.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/socialbaking/vouch.git"
+    "url": "git+https://github.com/socialbaking/karma.git"
   },
   "bugs": {
-    "url": "https://github.com/socialbaking/vouch/issues"
+    "url": "https://github.com/socialbaking/karma/issues"
   },
-  "homepage": "https://github.com/socialbaking/vouch#readme",
+  "homepage": "https://github.com/socialbaking/karma#readme",
   "author": "Fabian Cook <hello@fabiancook.dev>",
   "license": "MIT",
   "dependencies": {
@@ -134,9 +134,9 @@
     "generate": "yarn build && node esnext/generate.js",
     "prepublishOnly": "npm run build",
     "test": "yarn build && yarn test:node",
-    "test:node": "export $(cat .env | xargs) && OTEL_SERVICE_NAME=vouch-tests node --enable-source-maps esnext/tests/index.js",
+    "test:node": "export $(cat .env | xargs) && OTEL_SERVICE_NAME=karma-tests node --enable-source-maps esnext/tests/index.js",
     "test:node:inspect": "yarn build && export $(cat .env | xargs) && node --enable-source-maps --inspect-brk esnext/tests/index.js",
     "coverage": "export $(cat .env | xargs) && c8 node esnext/tests/index.js && yarn postbuild",
-    "start": "yarn build && node esnext/vouch/listen/main.js"
+    "start": "yarn build && node esnext/karma/listen/main.js"
   }
 }
