@@ -12,7 +12,7 @@ export async function setupSwagger(fastify: FastifyInstance) {
     await fastify.register(basePlugin, {
         swagger: {
             info: {
-                title: 'Vouch API',
+                title: 'Karma API',
                 description: '',
                 version
             },

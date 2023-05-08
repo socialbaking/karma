@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        repo: ['socialbaking/vouch-api']
+        repo: ['socialbaking/pharmakarma-api']
     timeout-minutes: 5
     steps:
       - name: Repository Dispatch

@@ -49,7 +49,7 @@ export async function wordpressAdminRoutes(fastify: FastifyInstance) {
                 response.header("Content-Type", "text/html");
                 response.send(`
                     <p>Authenticated as partner: ${partnerName}</p>
-                    <p>Vouch API version: ${packageIdentifier}</p>
+                    <p>Karma API version: ${packageIdentifier}</p>
                     <form id="request-code-form">
                         <h4>Request a new code</h4>
                         <p>

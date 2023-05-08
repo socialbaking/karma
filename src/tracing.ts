@@ -5,7 +5,7 @@ config();
 import { HoneycombSDK } from "@honeycombio/opentelemetry-node"
 import { getNodeAutoInstrumentations } from "@opentelemetry/auto-instrumentations-node";
 import { FastifyInstrumentation } from "@opentelemetry/instrumentation-fastify";
-import {getOrigin} from "./vouch/listen/config";
+import {getOrigin} from "./karma/listen/config";
 
 const FILTER_HTTP_WORDS = [
     "accessToken",

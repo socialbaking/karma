@@ -14,24 +14,24 @@ await pack({
   }
 });
 
-await fs.rmdir("esnext-workerd").catch(() => {});
-await fs.cp("esnext", "esnext-workerd", {
-  recursive: true
-})
-
-const capnp = await pack({
-  argv: ["--silent"],
-  paths: {
-    directory: "esnext-workerd",
-    importMap: "import-map-workerd.json",
-    capnpTemplate: "workerd-tests.template.capnp",
-    entrypoint: "esnext-workerd/tests/workerd/server-export.js"
-  }
-});
-
-if (capnp) {
-  await fs.writeFile("workerd-tests.capnp", capnp, "utf-8");
-}
+// await fs.rmdir("esnext-workerd").catch(() => {});
+// await fs.cp("esnext", "esnext-workerd", {
+//   recursive: true
+// })
+// //
+// const capnp = await pack({
+//   argv: ["--silent"],
+//   paths: {
+//     directory: "esnext-workerd",
+//     importMap: "import-map-workerd.json",
+//     capnpTemplate: "workerd-tests.template.capnp",
+//     entrypoint: "esnext-workerd/tests/workerd/server-export.js"
+//   }
+// });
+//
+// if (capnp) {
+//   await fs.writeFile("workerd-tests.capnp", capnp, "utf-8");
+// }
 
 {
 
@@ -141,7 +141,8 @@ async function replaceBetween(fileName, tagName, content) {
   const badgeStart = readMe.indexOf(tag);
   const badgeStartAfter = badgeStart + tag.length;
   if (badgeStart === -1) {
-    throw new Error(`Expected to find "${tag}" in ${fileName}`);
+    console.warn(`Expected to find "${tag}" in ${fileName}`);
+    return;
   }
   const badgeEnd = badgeStartAfter + readMe.slice(badgeStartAfter).indexOf(tag);
   const badgeEndAfter = badgeEnd + tag.length;
@@ -154,7 +155,7 @@ async function replaceBetween(fileName, tagName, content) {
 
 {
 
-  const interfaceContents = await readFile("esnext/vouch/client/interface.d.ts", "utf-8");
+  const interfaceContents = await readFile("esnext/karma/client/interface.d.ts", "utf-8");
 
   await replaceBetween("README.md", "typescript client", `\`\`\`typescript\n${interfaceContents.trim()}\n\`\`\``)
 

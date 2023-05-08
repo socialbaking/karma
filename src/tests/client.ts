@@ -1,6 +1,6 @@
-import { start } from "../vouch/listen";
-import {getOrigin} from "../vouch/listen/config";
-import {Client} from "../vouch";
+import { start } from "../karma/listen";
+import {getOrigin} from "../karma/listen/config";
+import {Client} from "../karma";
 import {Chance} from "chance"
 import {v4} from "uuid";
 import {ok} from "../is";

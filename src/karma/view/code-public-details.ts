@@ -1,15 +1,10 @@
 import {FastifyInstance} from "fastify";
 import {FromSchema} from "json-schema-to-ts";
-import {retrieveCodeData} from "../data";
-import {
-    accessToken, ensurePartnerMatchIfUnapproved,
-    getAuthorizedForPartnerId,
-    getMaybeAccessToken,
-    validateAuthorizedForPartnerId
-} from "./authentication";
-import {getPartner, getPartnerStore} from "../data/partner";
+import {retrieveCodeData, retrieveCodePublicDetails} from "../data";
+import {validateAuthorizedForPartnerId} from "./authentication";
+import {getPartnerStore} from "../data/partner";
 
-export async function codeDataRoutes(fastify: FastifyInstance) {
+export async function codePublicDetailsRoutes(fastify: FastifyInstance) {
 
     const querystring = {
         type: "object",
@@ -23,7 +18,7 @@ export async function codeDataRoutes(fastify: FastifyInstance) {
         ]
     } as const;
     const schema = {
-        description: "Retrieve private code data",
+        description: "Retrieve public code data",
         tags: ["patient"],
         summary: "",
         querystring
@@ -34,18 +29,14 @@ export async function codeDataRoutes(fastify: FastifyInstance) {
     }
 
     fastify.get<Schema>(
-        "/code-data",
+        "/public-code-data",
         {
             schema,
-            preHandler: fastify.auth([
-                fastify.verifyBearerAuth,
-                accessToken
-            ]),
             async handler(request, response) {
                 const {
                     uniqueCode
                 } = request.query;
-                const code = await retrieveCodeData({
+                const code = await retrieveCodePublicDetails({
                     uniqueCode,
                 });
                 if (!code) {
@@ -53,10 +44,6 @@ export async function codeDataRoutes(fastify: FastifyInstance) {
                     const params = new URLSearchParams();
                     params.set("notFound", "true");
                     params.set("uniqueCode", uniqueCode);
-                    const accessToken = getMaybeAccessToken();
-                    if (accessToken) {
-                        params.set("accessToken", accessToken);
-                    }
                     response.header("Location", `/request-code-data?${params.toString()}`);
                     return response.send("Could not find the code");
                 }
@@ -64,12 +51,11 @@ export async function codeDataRoutes(fastify: FastifyInstance) {
                     partnerId,
                     value
                 } = code;
-                ensurePartnerMatchIfUnapproved(partnerId);
                 const {
                     partnerName,
                     location,
                     partnerDescription
-                } = await getPartner(partnerId)
+                } = await getPartnerStore().get(partnerId)
 
                 response.header("Content-Type", "text/html");
                 response.send(
@@ -80,19 +66,18 @@ export async function codeDataRoutes(fastify: FastifyInstance) {
                             flex-direction: column;
                         }
                     </style>
-                    <section class="unique-code-details unique-code-details-private" data-unique-code="${uniqueCode}" data-value="${value}">
+                    <section class="unique-code-details" data-unique-code="${uniqueCode}" data-value="${value}">
                         <div class="unique-code-label">${uniqueCode}</div>
                         <div class="unique-code-value">${value}</div>
                         <div class="unique-code-partner">
-                            <div class="vouch-header">Given by:</div>
-                            <div class="vouch-partner-name">${partnerName}</div>
-                            ${partnerDescription ? `<div class="vouch-partner-name">${partnerDescription}</div>` : ""}
-                            <div class="vouch-partner-location">${location}</div>
+                            <div class="karma-header">Given by:</div>
+                            <div class="karma-partner-name">${partnerName}</div>
+                            ${partnerDescription ? `<div class="karma-partner-name">${partnerDescription}</div>` : ""}
+                            <div class="karma-partner-location">${location}</div>
                         </div>
                     </section>
                     `
                 )
-
             }
         }
     );

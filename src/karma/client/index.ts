@@ -12,7 +12,7 @@ export class Client implements ClientInterface {
     readonly prefix: string;
 
     constructor({ url, accessToken, partnerId, version, prefix }: ClientOptions = {}) {
-        this.baseUrl = url ?? "https://vouch.patient.nz";
+        this.baseUrl = url ?? "https://karma.patient.nz";
         version = version ?? 1;
         this.version = version;
         this.partnerId = partnerId;
