@@ -91,6 +91,20 @@ async function testClient() {
         }
 
 
+
+    }
+
+    {
+
+        const response = await fetch(
+            new URL(
+                "/api/background",
+                publicClient.baseUrl
+            )
+        );
+        ok(response.ok);
+        await response.blob();
+
     }
 
     await close();

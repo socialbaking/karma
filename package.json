@@ -77,9 +77,11 @@
     "fastify-helmet": "^7.1.0",
     "human-readable-ids": "^1.0.4",
     "json-schema-to-ts": "^2.8.0",
+    "p-limit": "^4.0.0",
     "patch-package": "^7.0.0",
     "postinstall-postinstall": "^2.1.0",
     "redis": "^4.6.6",
+    "redis-lock": "^1.0.0",
     "tmp": "^0.2.1",
     "uuid": "^8.3.2",
     "whatwg-url": "^9.1.0"

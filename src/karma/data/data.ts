@@ -5,3 +5,4 @@ export * from "./category";
 export * from "./report";
 export * from "./product";
 export * from "./background";
+export * from "./lock";
