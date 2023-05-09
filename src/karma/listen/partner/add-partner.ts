@@ -1,6 +1,6 @@
 import {FastifyInstance} from "fastify";
-import {addPartner, PartnerData, partnerSchema} from "../data";
-import {authenticate} from "./bearer-authentication";
+import {addPartner, PartnerData, partnerSchema} from "../../data";
+import {authenticate} from "../authentication";
 
 export async function addPartnerRoutes(fastify: FastifyInstance) {
 
@@ -24,7 +24,7 @@ export async function addPartnerRoutes(fastify: FastifyInstance) {
     }
 
     fastify.post<Schema>(
-        "/partners",
+        "/",
         {
             schema,
             preHandler: authenticate(fastify, {

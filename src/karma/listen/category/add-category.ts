@@ -1,7 +1,6 @@
-import {FastifyInstance, FastifyRequest} from "fastify";
-import {FromSchema} from "json-schema-to-ts";
-import {addCategory, CategoryData, categorySchema} from "../data";
-import {accessToken, allowAnonymous, authenticate} from "./bearer-authentication";
+import {FastifyInstance} from "fastify";
+import {addCategory, CategoryData, categorySchema} from "../../data";
+import {authenticate} from "../authentication";
 
 export async function addCategoryRoutes(fastify: FastifyInstance) {
 
@@ -26,7 +25,7 @@ export async function addCategoryRoutes(fastify: FastifyInstance) {
     }
 
     fastify.post<Schema>(
-        "/categories",
+        "/",
         {
             schema,
             preHandler: authenticate(fastify),

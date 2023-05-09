@@ -8,7 +8,7 @@ import {fastifyRequestContext} from "@fastify/request-context";
 import helmet from "@fastify/helmet";
 import { readFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
-import { bearerAuthentication } from "./bearer-authentication";
+import { bearerAuthentication } from "./authentication";
 import bearerAuthPlugin from "@fastify/bearer-auth";
 import authPlugin from "@fastify/auth";
 import {seed} from "../data";

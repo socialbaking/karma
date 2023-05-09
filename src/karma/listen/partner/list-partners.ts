@@ -1,7 +1,6 @@
 import {FastifyInstance, FastifyRequest} from "fastify";
-import {listPartners, partnerSchema} from "../data";
-import {authenticate} from "./bearer-authentication";
-import {getMaybeAuthorizedForPartnerId} from "./authentication";
+import {listPartners, partnerSchema} from "../../data";
+import {authenticate, getMaybeAuthorizedForPartnerId} from "../authentication";
 
 export async function listPartnerRoutes(fastify: FastifyInstance) {
 
@@ -25,7 +24,7 @@ export async function listPartnerRoutes(fastify: FastifyInstance) {
     };
 
     fastify.get(
-        "/partners",
+        "/",
         {
             schema,
             preHandler: authenticate(fastify, {

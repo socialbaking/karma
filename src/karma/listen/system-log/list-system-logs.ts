@@ -1,8 +1,7 @@
 import {FastifyInstance} from "fastify";
-import {listSystemLogs, systemLogSchema} from "../data";
+import {listSystemLogs, systemLogSchema} from "../../data";
 import {FromSchema} from "json-schema-to-ts";
-import {authenticate} from "./bearer-authentication";
-import {getMaybeAuthorizedForPartnerId} from "./authentication";
+import {authenticate, getMaybeAuthorizedForPartnerId} from "../authentication";
 
 export async function listSystemLogsRoutes(fastify: FastifyInstance) {
 
@@ -46,7 +45,7 @@ export async function listSystemLogsRoutes(fastify: FastifyInstance) {
     }
 
     fastify.get<Schema>(
-        "/system-logs",
+        "/",
         {
             schema,
             preHandler: authenticate(fastify, {
