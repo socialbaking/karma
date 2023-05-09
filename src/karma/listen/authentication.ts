@@ -16,6 +16,17 @@ export function getMaybeAuthorizedForPartnerId() {
     return requestContext.get(AUTHORIZED_PARTNER_ID_KEY);
 }
 
+export function isAnonymous() {
+    return !isAuthorized();
+}
+
+export function isAuthorized() {
+    // Later add more here if more authentication methods or types are available
+    return !!(
+        getMaybeAuthorizedForPartnerId()
+    )
+}
+
 export function getAuthorizedForPartnerId(): string {
     const partnerId = getMaybeAuthorizedForPartnerId();
     ok(partnerId, "Expected partner authorization")

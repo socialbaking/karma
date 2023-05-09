@@ -6,6 +6,7 @@ import {productRoutes} from "./product";
 import {partnerRoutes} from "./partner";
 import {metricRoutes} from "./metrics";
 import {categoryRoutes} from "./category";
+import {reportRoutes} from "./report";
 
 export async function routes(fastify: FastifyInstance) {
 
@@ -15,6 +16,7 @@ export async function routes(fastify: FastifyInstance) {
         fastify.register(partnerRoutes);
         fastify.register(metricRoutes);
         fastify.register(categoryRoutes);
+        fastify.register(reportRoutes);
     }
 
     fastify.register(apiRoutes, {

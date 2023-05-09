@@ -5,17 +5,6 @@ import {authenticate, getMaybeAuthorizedForPartnerId} from "../authentication";
 
 export async function listSystemLogsRoutes(fastify: FastifyInstance) {
 
-    const querystring = {
-        type: "object",
-        properties: {
-            partnerId: {
-                type: "string"
-            }
-        },
-        required: [
-        ]
-    } as const;
-
     const response = {
         200: {
             description: "System logs",
@@ -28,11 +17,10 @@ export async function listSystemLogsRoutes(fastify: FastifyInstance) {
     };
 
     const schema = {
-        description: "Retrieve system logs",
+        description: "List of system logs",
         tags: ["partner"],
         summary: "",
         response,
-        querystring,
         security: [
             {
                 apiKey: [] as string[]
@@ -40,21 +28,14 @@ export async function listSystemLogsRoutes(fastify: FastifyInstance) {
         ]
     }
 
-    type Schema = {
-        Querystring: FromSchema<typeof querystring>
-    }
-
-    fastify.get<Schema>(
+    fastify.get(
         "/",
         {
             schema,
-            preHandler: authenticate(fastify, {
-                anonymous: true
-            }),
+            preHandler: authenticate(fastify),
             async handler(request, response) {
-                const { partnerId } = request.query;
                 const data = await listSystemLogs({
-                    partnerId: partnerId ?? getMaybeAuthorizedForPartnerId()
+                    partnerId: getMaybeAuthorizedForPartnerId()
                 })
 
                 response.send(data);

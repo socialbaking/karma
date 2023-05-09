@@ -1,19 +1,19 @@
 import {FastifyInstance, FastifyRequest} from "fastify";
-import {listPartners, partnerSchema} from "../../data";
-import {authenticate, getMaybeAuthorizedForPartnerId} from "../authentication";
+import {listCategories, categorySchema} from "../../data";
+import {authenticate} from "../authentication";
 
-export async function listPartnerRoutes(fastify: FastifyInstance) {
+export async function listCategoryRoutes(fastify: FastifyInstance) {
 
     const response = {
         200: {
             type: "array",
-            items: partnerSchema.partner
+            items: categorySchema.category
         }
     }
 
     const schema = {
-        description: "List of partners",
-        tags: ["partner"],
+        description: "List of categories",
+        tags: ["category"],
         summary: "",
         response,
         security: [
@@ -29,11 +29,8 @@ export async function listPartnerRoutes(fastify: FastifyInstance) {
             schema,
             preHandler: authenticate(fastify),
             async handler(request: FastifyRequest, response) {
-                const authorizedPartnerId = getMaybeAuthorizedForPartnerId();
                 response.send(
-                    await listPartners({
-                        authorizedPartnerId
-                    })
+                    await listCategories()
                 );
             }
         }
