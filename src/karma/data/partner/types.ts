@@ -1,5 +1,5 @@
 
-export interface PartnerData {
+export interface PartnerData extends Record<string, unknown> {
     partnerName: string;
     location: string;
     remote?: boolean;
@@ -7,7 +7,7 @@ export interface PartnerData {
     approved?: boolean;
 }
 
-export interface Partner extends PartnerData, Record<string, unknown> {
+export interface Partner extends PartnerData {
     partnerId: string;
     accessToken?: string;
     createdAt: string;

@@ -12,6 +12,7 @@ import { dirname, join } from "node:path";
 import { bearerAuthentication } from "./bearer-authentication";
 import bearerAuthPlugin from "@fastify/bearer-auth";
 import authPlugin from "@fastify/auth";
+import {seed} from "../seed";
 
 const { pathname } = new URL(import.meta.url);
 const directory = dirname(pathname)
@@ -98,9 +99,13 @@ export async function create() {
 }
 
 export async function start() {
+
     const {
         app, closeFns
     } = await create();
+
+    // Before we start, we should seed
+    await seed();
 
     const port = getPort();
 

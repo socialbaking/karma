@@ -1,5 +1,5 @@
 
-export interface AccessTokenData {
+export interface AccessTokenData extends Record<string, unknown> {
     partnerId?: string;
 }
 

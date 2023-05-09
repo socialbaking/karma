@@ -29,7 +29,7 @@ function getRequestContextKeyValueStoreWithName<T>(name: string): KeyValueStore<
         if (getRedisUrl()) {
             kv = createRedisKeyValueStore<T>(name);
         } else {
-            kv = createKeyValueStore<T>(() => {
+            kv = createKeyValueStore<T>(name, () => {
                 if (store) {
                     return store;
                 }
@@ -45,6 +45,7 @@ function getRequestContextKeyValueStoreWithName<T>(name: string): KeyValueStore<
 }
 
 export interface KeyValueStore<T> {
+    name: string;
     get(key: string): Promise<T | undefined>
     set(key: string, value: T): Promise<void>
     values(): Promise<T[]>
@@ -124,13 +125,14 @@ function createRedisKeyValueStore<T>(name: string): KeyValueStore<T> {
     }
 
     return {
+        name,
         get,
         set,
         values
     }
 }
 
-function createKeyValueStore<T>(storage: GenericStorageFn): KeyValueStore<T> {
+function createKeyValueStore<T>(name: string, storage: GenericStorageFn): KeyValueStore<T> {
     async function get(key: string): Promise<T | undefined> {
         const store = await storage();
         return store.get(key);
@@ -151,6 +153,7 @@ function createKeyValueStore<T>(storage: GenericStorageFn): KeyValueStore<T> {
     }
 
     return {
+        name,
         get,
         set,
         values
