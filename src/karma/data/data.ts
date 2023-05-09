@@ -4,3 +4,4 @@ export * from "./access-token";
 export * from "./category";
 export * from "./report";
 export * from "./product";
+export * from "./background";
