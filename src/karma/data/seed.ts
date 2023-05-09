@@ -46,10 +46,10 @@ async function seedCategories() {
             return;
         }
         const category: Category = {
+            createdAt,
             ...existing,
             ...data,
             categoryId,
-            createdAt,
             updatedAt
         };
         await categoryStore.set(categoryId, category);
@@ -70,7 +70,8 @@ const partners: Partner[] = [
         delivery: true,
         website: "https://cannabisclinic.co.nz/",
         approvedAt,
-        approved: true
+        approved: true,
+        countryCode: "NZL"
     },
     {
         partnerName: "CannaPlus+",
@@ -79,14 +80,16 @@ const partners: Partner[] = [
         delivery: true,
         website: "https://cannaplus.co.nz/",
         approvedAt,
-        approved: true
+        approved: true,
+        countryCode: "NZL"
     },
     {
         partnerName: "The Pain Clinic",
         clinic: true,
         pharmacy: true,
         approvedAt,
-        approved: true
+        approved: true,
+        countryCode: "NZL"
     },
     {
         partnerName: "Green Doctors",
@@ -95,28 +98,32 @@ const partners: Partner[] = [
         delivery: true,
         website: "https://greendoctors.co.nz/",
         approvedAt,
-        approved: true
+        approved: true,
+        countryCode: "NZL"
     },
     {
         partnerName: "Dr Gulbransen GP",
         clinic: true,
         website: "https://www.cannabiscare.nz/",
         approvedAt,
-        approved: true
+        approved: true,
+        countryCode: "NZL"
     },
     {
         partnerName: "Koru Medical Clinic",
         clinic: true,
         website: "https://korumedical.co.nz/",
         approvedAt,
-        approved: true
+        approved: true,
+        countryCode: "NZL"
     },
     {
         partnerName: "RestoreMe",
         clinic: true,
         website: "https://www.restoremeclinic.co.nz/",
         approvedAt,
-        approved: true
+        approved: true,
+        countryCode: "NZL"
     },
     {
         partnerName: "Wellworks Pharmacy Taranaki Street",
@@ -124,7 +131,8 @@ const partners: Partner[] = [
         delivery: true,
         website: "https://www.wellworks.co.nz/",
         approvedAt,
-        approved: true
+        approved: true,
+        countryCode: "NZL"
     },
     {
         partnerName: "Nga Hua Pharmacy",
@@ -132,54 +140,63 @@ const partners: Partner[] = [
         delivery: true,
         website: "https://www.ngahuapharmacy.co.nz/",
         approvedAt,
-        approved: true
+        approved: true,
+        countryCode: "NZL"
     },
     {
         partnerName: "Medleaf Therapeutics",
         website: "https://medleaf.co.nz/",
         approvedAt,
-        approved: true
+        approved: true,
+        countryCode: "NZL"
     },
     {
         partnerName: "NUBU Pharmaceuticals",
         website: "https://www.nubupharma.com/",
         approvedAt,
-        approved: true
+        approved: true,
+        countryCode: "NZL"
     },
     {
         partnerName: "MedReleaf NZ",
         approvedAt,
-        approved: true
+        approved: true,
+        countryCode: "NZL"
     },
     {
         partnerName: "CDC Pharmaceuticals",
         website: "https://www.cdc.co.nz/",
         approvedAt,
-        approved: true
+        approved: true,
+        countryCode: "NZL"
     },
     {
         partnerName: "Helius Therapeutics",
         website: "https://www.helius.co.nz/",
         approvedAt,
-        approved: true
+        approved: true,
+        countryCode: "NZL"
     },
     {
         partnerName: "Cannasouth Bioscience",
         website: "https://www.cannasouth.co.nz/",
         approvedAt,
-        approved: true
+        approved: true,
+        countryCode: "NZL"
     },
     {
         partnerName: "RUA Bioscience",
         website: "https://www.ruabio.com/",
         approvedAt,
-        approved: true
+        approved: true,
+        countryCode: "NZL"
     },
     {
         partnerName: "Emerge Health New Zealand",
         website: "https://emergeaotearoa.org.nz/",
         approvedAt,
-        approved: true
+        approved: true,
+        countryCode: "NZL"
     }
 ]
     .map((data): Partner => ({
@@ -213,8 +230,10 @@ export async function seedPartners() {
             return;
         }
         const partner: Partner = {
+            createdAt,
             ...existing,
             ...data,
+            updatedAt
         };
         await partnerStore.set(partnerId, partner);
     }
@@ -244,7 +263,7 @@ async function seedProducts() {
         "Cannasouth Bioscience",
         "RUA Bioscience",
         "Emerge Health New Zealand"
-    ].map(getPartnerId);
+    ].map(getPartner);
 
     console.log({
         medleaf,
@@ -260,234 +279,397 @@ async function seedProducts() {
     const licenceApprovedAt = createdAt;
     const availableAt = createdAt;
 
+    ok(helius.countryCode, "Expected countryCode to be set");
+
     const products: ProductData[] = [
         {
             productName: "Helius CBD25 Full Spectrum",
-            licencedPartnerId: helius,
+            licenceCountryCode: helius.countryCode,
+            licencedPartnerId: helius.partnerId,
             licenceApprovedBeforeGivenDate: true,
             licenceApprovedAt,
             availableBeforeGivenDate: true,
             availableAt,
+            sizes: [{ size: "30", unit: "ml" }],
+            activeIngredientDescriptions: [
+                "Total CBD (CBD+CBDA) 25 mg/mL"
+            ],
         },
         {
             productName: "Helius CBD100 Full Spectrum",
-            licencedPartnerId: helius,
+            licenceCountryCode: helius.countryCode,
+            licencedPartnerId: helius.partnerId,
             licenceApprovedBeforeGivenDate: true,
             licenceApprovedAt,
             availableBeforeGivenDate: true,
             availableAt,
+            sizes: [{ size: "30", unit: "ml" }],
+            activeIngredientDescriptions: [
+                "Total CBD (CBD+CBDA) 100 mg/mL"
+            ],
         },
         {
             productName: "RUA CBD100",
-            licencedPartnerId: rua,
+            licenceCountryCode: rua.countryCode,
+            licencedPartnerId: rua.partnerId,
             licenceApprovedBeforeGivenDate: true,
             licenceApprovedAt,
             availableBeforeGivenDate: true,
             availableAt,
+            sizes: [{ size: "30", unit: "ml" }],
+            activeIngredientDescriptions: [
+                "Total CBD (CBD+CBDA) 100 mg/mL"
+            ],
         },
         {
             productName: "Tilray P Oral Solution CBD 100",
-            licencedPartnerId: cdc,
+            licenceCountryCode: cdc.countryCode,
+            licencedPartnerId: cdc.partnerId,
             licenceApprovedBeforeGivenDate: true,
             licenceApprovedAt,
             availableBeforeGivenDate: true,
             availableAt,
+            sizes: [{ size: "20", unit: "ml" }, { size: "40", unit: "ml" }],
+            activeIngredientDescriptions: [
+                "Total CBD (CBD+CBDA) 106.4 mg/g (100 mg/mL)"
+            ],
         },
         {
             productName: "Tilray P Oral Solution CBD 25",
-            licencedPartnerId: cdc,
+            licenceCountryCode: cdc.countryCode,
+            licencedPartnerId: cdc.partnerId,
             licenceApprovedBeforeGivenDate: true,
             licenceApprovedAt,
             availableBeforeGivenDate: true,
             availableAt,
+            sizes: [{ size: "40", unit: "ml" }],
+            activeIngredientDescriptions: [
+                "Total CBD (CBD+CBDA) 26.6 mg/g (25 mg/mL)"
+            ],
         },
         {
             productName: "SubDrops™ CBD100",
-            licencedPartnerId: helius,
+            licenceCountryCode: helius.countryCode,
+            licencedPartnerId: helius.partnerId,
             licenceApprovedBeforeGivenDate: true,
             licenceApprovedAt,
             availableBeforeGivenDate: true,
             availableAt,
+            sizes: [{ size: "30", unit: "ml" }],
+            activeIngredientDescriptions: [
+                "Total CBD (CBD+CBDA) 100 mg/mL"
+            ],
         },
         {
             productName: "SubDrops™ CBD25",
-            licencedPartnerId: helius,
+            licenceCountryCode: helius.countryCode,
+            licencedPartnerId: helius.partnerId,
             licenceApprovedBeforeGivenDate: true,
             licenceApprovedAt,
             availableBeforeGivenDate: true,
             availableAt,
+            sizes: [{ size: "30", unit: "ml" }],
+            activeIngredientDescriptions: [
+                "Total CBD (CBD+CBDA) 25 mg/mL"
+            ],
         },
         {
             productName: "evalaCann THC ≤1 mg: CBD 20 mg",
-            licencedPartnerId: cannasouth,
+            licenceCountryCode: cannasouth.countryCode,
+            licencedPartnerId: cannasouth.partnerId,
             licenceApprovedBeforeGivenDate: true,
             licenceApprovedAt,
             availableBeforeGivenDate: true,
             availableAt,
+            sizes: [{ size: "30", unit: "ml" }],
+            activeIngredientDescriptions: [
+                "Total THC (THC+THCA) ≤1 mg",
+                "Total CBD (CBD+CBDA) 20 mg"
+            ],
         },
         {
             productName: "evalaCann THC 10 mg: CBD 15 mg",
-            licencedPartnerId: cannasouth,
+            licenceCountryCode: cannasouth.countryCode,
+            licencedPartnerId: cannasouth.partnerId,
             licenceApprovedBeforeGivenDate: true,
             licenceApprovedAt,
             availableBeforeGivenDate: true,
             availableAt,
+            sizes: [{ size: "30", unit: "ml" }],
+            activeIngredientDescriptions: [
+                "Total THC (THC+THCA) 10 mg",
+                "Total CBD (CBD+CBDA) 15 mg"
+            ],
         },
         {
             productName: "evalaCann THC 10 mg: CBD  ≤1 mg",
-            licencedPartnerId: cannasouth,
+            licenceCountryCode: cannasouth.countryCode,
+            licencedPartnerId: cannasouth.partnerId,
             licenceApprovedBeforeGivenDate: true,
             licenceApprovedAt,
             // This product is not yet available
-            availableAt: undefined
+            availableAt: undefined,
+            sizes: [{ size: "30", unit: "ml" }],
+            activeIngredientDescriptions: [
+                "Total THC (THC+THCA) 10 mg",
+                "Total CBD (CBD+CBDA) ≤1 mg"
+            ],
         },
         {
             productName: "Helius THC25 Full Spectrum",
-            licencedPartnerId: helius,
+            licenceCountryCode: helius.countryCode,
+            licencedPartnerId: helius.partnerId,
             licenceApprovedBeforeGivenDate: true,
             licenceApprovedAt,
             availableBeforeGivenDate: true,
             availableAt,
+            sizes: [{ size: "30", unit: "ml" }],
+            activeIngredientDescriptions: [
+                "Total THC (THC+THCA) 25 mg/mL",
+                "Total CBD (CBD+CBDA) ≤2 mg/mL"
+            ],
         },
         {
             productName: "Helius THC10:CBD10 Full Spectrum",
-            licencedPartnerId: helius,
+            licenceCountryCode: helius.countryCode,
+            licencedPartnerId: helius.partnerId,
             licenceApprovedBeforeGivenDate: true,
             licenceApprovedAt,
             availableBeforeGivenDate: true,
             availableAt,
+            sizes: [{ size: "30", unit: "ml" }],
+            activeIngredientDescriptions: [
+                "Total THC (THC+THCA) 10 mg/mL",
+                "Total CBD (CBD+CBDA) 10 mg/mL"
+            ],
         },
         {
             productName: "Tilray FS oral Solution THC 25",
-            licencedPartnerId: cdc,
+            licenceCountryCode: cdc.countryCode,
+            licencedPartnerId: cdc.partnerId,
             licenceApprovedBeforeGivenDate: true,
             licenceApprovedAt,
             availableBeforeGivenDate: true,
             availableAt,
+            sizes: [{ size: "40", unit: "ml" }],
+            activeIngredientDescriptions: [
+                "Total THC (THC+THCA) 26.44 mg / g (25 mg/ mL)"
+            ],
         },
         {
             productName: "Tilray FS Oral Solution THC 10 CBD 10",
-            licencedPartnerId: cdc,
+            licenceCountryCode: cdc.countryCode,
+            licencedPartnerId: cdc.partnerId,
             licenceApprovedBeforeGivenDate: true,
             licenceApprovedAt,
             availableBeforeGivenDate: true,
             availableAt,
+            sizes: [{ size: "40", unit: "ml" }],
+            activeIngredientDescriptions: [
+                "Total THC (THC+THCA) 10.5 mg/g (10 mg/mL)",
+                "Total CBD  (CBD+CBDA) 10.5 mg/g (10 mg/mL)"
+            ],
         },
         {
             productName: "KIKUYA Dune",
-            licencedPartnerId: nubu,
+            licenceCountryCode: nubu.countryCode,
+            licencedPartnerId: nubu.partnerId,
             licenceApprovedBeforeGivenDate: true,
             licenceApprovedAt,
             availableBeforeGivenDate: true,
             availableAt,
+            sizes: [{ size: "10", unit: "g" }],
+            activeIngredientDescriptions: [
+                "Total THC (THC+THCA) 190 mg/g (19% w/w)",
+                "Total CBD (CBD+CBDA) ≤10 mg/g (≤1%w/w)"
+            ],
         },
         {
             productName: "KIKUYA Arroyo",
-            licencedPartnerId: nubu,
+            licenceCountryCode: nubu.countryCode,
+            licencedPartnerId: nubu.partnerId,
             licenceApprovedBeforeGivenDate: true,
             licenceApprovedAt,
             availableBeforeGivenDate: true,
             availableAt,
+            sizes: [{ size: "10", unit: "g" }],
+            activeIngredientDescriptions: [
+                "Total THC (THC+THCA) 200 mg/g (20% w/w)",
+                "Total CBD (CBD+CBDA) ≤10 mg/g (≤1% w/w)"
+            ],
         },
         {
             productName: "Medleaf Medium THC Afghan Haze",
-            licencedPartnerId: medleaf,
+            licenceCountryCode: medleaf.countryCode,
+            licencedPartnerId: medleaf.partnerId,
             licenceApprovedBeforeGivenDate: true,
             licenceApprovedAt,
             availableBeforeGivenDate: true,
             availableAt,
+            sizes: [{ size: "10", unit: "g" }],
+            activeIngredientDescriptions: [
+                "Total THC (THC+THCA) 18 % w/w",
+                "Total CBD (CBD+CBDA) <1% w/w"
+            ],
         },
         {
             productName: "Tilray Whole Flower Dried Cannabis THC 22",
-            licencedPartnerId: cdc,
+            licenceCountryCode: cdc.countryCode,
+            licencedPartnerId: cdc.partnerId,
             licenceApprovedBeforeGivenDate: true,
             licenceApprovedAt,
             availableBeforeGivenDate: true,
             availableAt,
+            sizes: [{ size: "15", unit: "g" }],
+            activeIngredientDescriptions: [
+                "Total THC (THC+THCA) 22 % w/w",
+                "Total CBD (CBD+CBDA) ≤1% w/w"
+            ],
         },
         {
             productName: "Equiposa",
-            licencedPartnerId: medReleaf,
+            licenceCountryCode: medReleaf.countryCode,
+            licencedPartnerId: medReleaf.partnerId,
             licenceApprovedBeforeGivenDate: true,
             licenceApprovedAt,
             // This product is not yet available
-            availableAt: undefined
+            availableAt: undefined,
+            sizes: [{ size: "15", unit: "g" }],
+            activeIngredientDescriptions: [
+                "Total THC (THC+THCA) 9.0 % w/w",
+                "Total CBD (CBD+CBDA) 8.3 % w/w"
+            ],
         },
         {
             productName: "Luminarium",
-            licencedPartnerId: medReleaf,
+            licenceCountryCode: medReleaf.countryCode,
+            licencedPartnerId: medReleaf.partnerId,
             licenceApprovedBeforeGivenDate: true,
             licenceApprovedAt,
             // This product is not yet available
-            availableAt: undefined
+            availableAt: undefined,
+            sizes: [{ size: "15", unit: "g" }],
+            activeIngredientDescriptions: [
+                "Total THC (THC+THCA) 22.5 % w/w",
+                "Total CBD (CBD+CBDA) ≤1.0 % w/w"
+            ],
         },
         {
             productName: "Sedaprem",
-            licencedPartnerId: medReleaf,
+            licenceCountryCode: medReleaf.countryCode,
+            licencedPartnerId: medReleaf.partnerId,
             licenceApprovedBeforeGivenDate: true,
             licenceApprovedAt,
             // This product is not yet available
-            availableAt: undefined
+            availableAt: undefined,
+            sizes: [{ size: "15", unit: "g" }],
+            activeIngredientDescriptions: [
+                "Total THC (THC+THCA) 21.3 % w/w",
+                "Total CBD (CBD+CBDA) ≤1.0 % w/w"
+            ],
         },
         {
             productName: "ANTG Eve",
-            licencedPartnerId: nubu,
+            licenceCountryCode: nubu.countryCode,
+            licencedPartnerId: nubu.partnerId,
             licenceApprovedBeforeGivenDate: true,
             licenceApprovedAt,
             availableBeforeGivenDate: true,
             availableAt,
+            sizes: [{ size: "10", unit: "g" }],
+            activeIngredientDescriptions: [
+                "Total THC (THC+THCA) 10 mg/g (˂ 1% w/w)",
+                "Total CBD (CBD+CBDA) 125 mg/g (12.5% w/w)"
+            ],
         },
         {
             productName: "ANTG Mariposa",
-            licencedPartnerId: nubu,
+            licenceCountryCode: nubu.countryCode,
+            licencedPartnerId: nubu.partnerId,
             licenceApprovedBeforeGivenDate: true,
             licenceApprovedAt,
             availableBeforeGivenDate: true,
             availableAt,
+            sizes: [{ size: "10", unit: "g" }],
+            activeIngredientDescriptions: [
+                "Total THC (THC+THCA) 135 mg/g (13.5% w/w)",
+                "Total CBD (CBD+CBDA) <10 mg/g (<1% w/w)"
+            ],
         },
         {
             productName: "ANTG Rocky",
-            licencedPartnerId: nubu,
+            licenceCountryCode: nubu.countryCode,
+            licencedPartnerId: nubu.partnerId,
             licenceApprovedBeforeGivenDate: true,
             licenceApprovedAt,
             availableBeforeGivenDate: true,
             availableAt,
+            sizes: [{ size: "10", unit: "g" }],
+            activeIngredientDescriptions: [
+                "Total THC (THC+THCA) 250 mg/g (25% w/w)",
+                "Total CBD (CBD+CBDA) <10 mg/g (<1% w/w)"
+            ],
         },
         {
             productName: "ANTG Solace",
-            licencedPartnerId: nubu,
+            licenceCountryCode: nubu.countryCode,
+            licencedPartnerId: nubu.partnerId,
             licenceApprovedBeforeGivenDate: true,
             licenceApprovedAt,
             availableBeforeGivenDate: true,
             availableAt,
+            sizes: [{ size: "10", unit: "g" }],
+            activeIngredientDescriptions: [
+                "Total THC (THC+THCA): 200 mg/g (20% w/w)",
+                "Total CBD (CBD+CBDA): <10 mg/g (<1% w/w)"
+            ],
         },
         {
             productName: "Medleaf Medium THC Shishkaberry",
-            licencedPartnerId: medleaf,
+            licenceCountryCode: medleaf.countryCode,
+            licencedPartnerId: medleaf.partnerId,
             licenceApprovedBeforeGivenDate: true,
             licenceApprovedAt,
             availableBeforeGivenDate: true,
             availableAt,
+            sizes: [{ size: "35", unit: "g" }],
+            activeIngredientDescriptions: [
+                "Total THC (THC+THCA): 152.5 mg/g (15.25% w/w)",
+                "Total CBD (CBD+CBDA): <5 mg/g (<0.5% w/w)"
+            ],
         },
         {
             productName: "Medleaf High THC Zour Apple",
-            licencedPartnerId: medleaf,
+            licenceCountryCode: medleaf.countryCode,
+            licencedPartnerId: medleaf.partnerId,
             licenceApprovedBeforeGivenDate: true,
             licenceApprovedAt,
             availableBeforeGivenDate: true,
             availableAt,
+            sizes: [{ size: "30", unit: "g" }],
+            activeIngredientDescriptions: [
+                "Total THC (THC+THCA) 21% w/w",
+                "Total CBD (CBD+CBDA) <1%w/w"
+            ],
         },
         {
             productName: "Medleaf High THC GG#4",
-            licencedPartnerId: medleaf,
+            licenceCountryCode: medleaf.countryCode,
+            licencedPartnerId: medleaf.partnerId,
             licenceApprovedBeforeGivenDate: true,
             licenceApprovedAt,
             // This product is not yet available
-            availableAt: undefined
+            availableAt: undefined,
+            sizes: [{ size: "30", unit: "g" }],
+            activeIngredientDescriptions: [
+                "Total THC (THC+THCA) 24% w/w",
+                "Total CBD (CBD+CBDA) <1%w/w"
+            ],
         },
         {
             productName: "Sativex oral spray",
-            licencedPartnerId: emerge,
+            licenceCountryCode: emerge.countryCode,
+            licencedPartnerId: emerge.partnerId,
             // This product is generally available
             availableAt: undefined
         }

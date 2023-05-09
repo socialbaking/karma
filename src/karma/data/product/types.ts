@@ -1,3 +1,8 @@
+export interface ProductSizeData extends Record<string, unknown> {
+    size: string;
+    unit: string;
+}
+
 export interface ProductData extends Record<string, unknown> {
     productName: string;
     licencedPartnerId?: string;
@@ -5,11 +10,16 @@ export interface ProductData extends Record<string, unknown> {
     licenceApprovedBeforeGivenDate?: boolean;
     licenceApprovedAt?: string;
     licenceExpiredAt?: string;
+    // ISO 3166-1 alpha-3 country code
+    licenceCountryCode?: string;
     // Flag for products we don't have the exact availability date for
     availableBeforeGivenDate?: boolean;
     availableAt?: string;
     // For products that we will no longer have available
     availableUntil?: string;
+    sizes?: ProductSizeData[];
+    // Direct text about the active ingredients, not specific values
+    activeIngredientDescriptions?: string[];
 }
 
 export interface Product extends ProductData {

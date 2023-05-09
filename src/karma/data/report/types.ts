@@ -1,3 +1,5 @@
+import {ProductSizeData} from "../product";
+
 export interface ReportData extends Record<string, unknown> {
     note?: string;
     parentReportId?: string;
@@ -12,9 +14,11 @@ export interface ReportData extends Record<string, unknown> {
     productPurchasePartnerId?: string;
     productPurchasePartnerName?: string; // Actual partnerName, not free text
     productPurchasePartnerText?: string; // User free text of the partnerName
+    productSize?: ProductSizeData;
     productDelivered?: boolean;
     createdByUserId?: string;
     anonymous?: boolean;
+    countryCode?: string; // "NZL"
 }
 
 export interface Report extends ReportData {

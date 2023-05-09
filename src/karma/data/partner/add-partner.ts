@@ -7,17 +7,18 @@ export interface AddPartnerInput extends PartnerData {
 
 }
 
-export async function addPartner({ partnerName, location, remote, onsite }: AddPartnerInput): Promise<Partner> {
+export async function addPartner(data: AddPartnerInput): Promise<Partner> {
     const store = getPartnerStore();
     const partnerId = v4();
+    const createdAt = new Date().toISOString();
     const partner: Partner = {
+        ...data,
         partnerId,
-        partnerName,
-        location,
-        onsite,
-        remote,
         approved: false,
-        createdAt: new Date().toISOString()
+        approvedAt: undefined,
+        approvedByUserId: undefined,
+        createdAt,
+        updatedAt: createdAt
     };
     await store.set(partnerId, partner)
     const { accessToken } = await createPartnerAccessToken(partnerId);
