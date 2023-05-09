@@ -31,7 +31,6 @@ async function testClient() {
     });
 
     ok(accessToken);
-    ok(Array.isArray(await publicClient.listSystemLogs()));
 
     {
         const client = new Client({
@@ -41,6 +40,8 @@ async function testClient() {
         });
 
         console.log(client);
+
+        ok(Array.isArray(await client.listSystemLogs()));
 
         const partners = await client.listPartners();
         const partner = partners.find(partner => partner.partnerId === partnerId);

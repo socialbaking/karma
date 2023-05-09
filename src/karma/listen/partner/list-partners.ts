@@ -27,7 +27,9 @@ export async function listPartnerRoutes(fastify: FastifyInstance) {
         "/",
         {
             schema,
-            preHandler: authenticate(fastify),
+            preHandler: authenticate(fastify, {
+                anonymous: true
+            }),
             async handler(request: FastifyRequest, response) {
                 const authorizedPartnerId = getMaybeAuthorizedForPartnerId();
                 response.send(
