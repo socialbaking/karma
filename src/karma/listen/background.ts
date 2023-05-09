@@ -3,9 +3,7 @@ import {background} from "../background";
 
 export async function backgroundRoutes(fastify: FastifyInstance) {
 
-    fastify.route({
-        url: "/background",
-        method: ["GET", "POST"],
+    fastify.get("/background", {
         async handler(request, response) {
 
             await background({
