@@ -298,7 +298,7 @@ async function seedProducts() {
             licenceApprovedAt,
             availableBeforeGivenDate: true,
             availableAt,
-            sizes: [{ size: "30", unit: "ml" }],
+            sizes: [{ value: "30", unit: "mL" }],
             activeIngredientDescriptions: [
                 "Total CBD (CBD+CBDA) 25 mg/mL"
             ],
@@ -311,7 +311,7 @@ async function seedProducts() {
             licenceApprovedAt,
             availableBeforeGivenDate: true,
             availableAt,
-            sizes: [{ size: "30", unit: "ml" }],
+            sizes: [{ value: "30", unit: "mL" }],
             activeIngredientDescriptions: [
                 "Total CBD (CBD+CBDA) 100 mg/mL"
             ],
@@ -324,7 +324,7 @@ async function seedProducts() {
             licenceApprovedAt,
             availableBeforeGivenDate: true,
             availableAt,
-            sizes: [{ size: "30", unit: "ml" }],
+            sizes: [{ value: "30", unit: "mL" }],
             activeIngredientDescriptions: [
                 "Total CBD (CBD+CBDA) 100 mg/mL"
             ],
@@ -337,7 +337,7 @@ async function seedProducts() {
             licenceApprovedAt,
             availableBeforeGivenDate: true,
             availableAt,
-            sizes: [{ size: "20", unit: "ml" }, { size: "40", unit: "ml" }],
+            sizes: [{ value: "20", unit: "mL" }, { value: "40", unit: "mL" }],
             activeIngredientDescriptions: [
                 "Total CBD (CBD+CBDA) 106.4 mg/g (100 mg/mL)"
             ],
@@ -350,7 +350,7 @@ async function seedProducts() {
             licenceApprovedAt,
             availableBeforeGivenDate: true,
             availableAt,
-            sizes: [{ size: "40", unit: "ml" }],
+            sizes: [{ value: "40", unit: "mL" }],
             activeIngredientDescriptions: [
                 "Total CBD (CBD+CBDA) 26.6 mg/g (25 mg/mL)"
             ],
@@ -363,7 +363,7 @@ async function seedProducts() {
             licenceApprovedAt,
             availableBeforeGivenDate: true,
             availableAt,
-            sizes: [{ size: "30", unit: "ml" }],
+            sizes: [{ value: "30", unit: "mL" }],
             activeIngredientDescriptions: [
                 "Total CBD (CBD+CBDA) 100 mg/mL"
             ],
@@ -376,7 +376,7 @@ async function seedProducts() {
             licenceApprovedAt,
             availableBeforeGivenDate: true,
             availableAt,
-            sizes: [{ size: "30", unit: "ml" }],
+            sizes: [{ value: "30", unit: "mL" }],
             activeIngredientDescriptions: [
                 "Total CBD (CBD+CBDA) 25 mg/mL"
             ],
@@ -389,7 +389,7 @@ async function seedProducts() {
             licenceApprovedAt,
             availableBeforeGivenDate: true,
             availableAt,
-            sizes: [{ size: "30", unit: "ml" }],
+            sizes: [{ value: "30", unit: "mL" }],
             activeIngredientDescriptions: [
                 "Total THC (THC+THCA) ≤1 mg",
                 "Total CBD (CBD+CBDA) 20 mg"
@@ -403,7 +403,7 @@ async function seedProducts() {
             licenceApprovedAt,
             availableBeforeGivenDate: true,
             availableAt,
-            sizes: [{ size: "30", unit: "ml" }],
+            sizes: [{ value: "30", unit: "mL" }],
             activeIngredientDescriptions: [
                 "Total THC (THC+THCA) 10 mg",
                 "Total CBD (CBD+CBDA) 15 mg"
@@ -417,7 +417,7 @@ async function seedProducts() {
             licenceApprovedAt,
             // This product is not yet available
             availableAt: undefined,
-            sizes: [{ size: "30", unit: "ml" }],
+            sizes: [{ value: "30", unit: "mL" }],
             activeIngredientDescriptions: [
                 "Total THC (THC+THCA) 10 mg",
                 "Total CBD (CBD+CBDA) ≤1 mg"
@@ -431,7 +431,7 @@ async function seedProducts() {
             licenceApprovedAt,
             availableBeforeGivenDate: true,
             availableAt,
-            sizes: [{ size: "30", unit: "ml" }],
+            sizes: [{ value: "30", unit: "mL" }],
             activeIngredientDescriptions: [
                 "Total THC (THC+THCA) 25 mg/mL",
                 "Total CBD (CBD+CBDA) ≤2 mg/mL"
@@ -445,7 +445,7 @@ async function seedProducts() {
             licenceApprovedAt,
             availableBeforeGivenDate: true,
             availableAt,
-            sizes: [{ size: "30", unit: "ml" }],
+            sizes: [{ value: "30", unit: "mL" }],
             activeIngredientDescriptions: [
                 "Total THC (THC+THCA) 10 mg/mL",
                 "Total CBD (CBD+CBDA) 10 mg/mL"
@@ -459,7 +459,7 @@ async function seedProducts() {
             licenceApprovedAt,
             availableBeforeGivenDate: true,
             availableAt,
-            sizes: [{ size: "40", unit: "ml" }],
+            sizes: [{ value: "40", unit: "mL" }],
             activeIngredientDescriptions: [
                 "Total THC (THC+THCA) 26.44 mg / g (25 mg/ mL)"
             ],
@@ -472,7 +472,7 @@ async function seedProducts() {
             licenceApprovedAt,
             availableBeforeGivenDate: true,
             availableAt,
-            sizes: [{ size: "40", unit: "ml" }],
+            sizes: [{ value: "40", unit: "mL" }],
             activeIngredientDescriptions: [
                 "Total THC (THC+THCA) 10.5 mg/g (10 mg/mL)",
                 "Total CBD  (CBD+CBDA) 10.5 mg/g (10 mg/mL)"
@@ -486,7 +486,7 @@ async function seedProducts() {
             licenceApprovedAt,
             availableBeforeGivenDate: true,
             availableAt,
-            sizes: [{ size: "10", unit: "g" }],
+            sizes: [{ value: "10", unit: "g" }],
             activeIngredientDescriptions: [
                 "Total THC (THC+THCA) 190 mg/g (19% w/w)",
                 "Total CBD (CBD+CBDA) ≤10 mg/g (≤1%w/w)"
@@ -500,7 +500,7 @@ async function seedProducts() {
             licenceApprovedAt,
             availableBeforeGivenDate: true,
             availableAt,
-            sizes: [{ size: "10", unit: "g" }],
+            sizes: [{ value: "10", unit: "g" }],
             activeIngredientDescriptions: [
                 "Total THC (THC+THCA) 200 mg/g (20% w/w)",
                 "Total CBD (CBD+CBDA) ≤10 mg/g (≤1% w/w)"
@@ -514,7 +514,7 @@ async function seedProducts() {
             licenceApprovedAt,
             availableBeforeGivenDate: true,
             availableAt,
-            sizes: [{ size: "10", unit: "g" }],
+            sizes: [{ value: "10", unit: "g" }],
             activeIngredientDescriptions: [
                 "Total THC (THC+THCA) 18 % w/w",
                 "Total CBD (CBD+CBDA) <1% w/w"
@@ -528,7 +528,7 @@ async function seedProducts() {
             licenceApprovedAt,
             availableBeforeGivenDate: true,
             availableAt,
-            sizes: [{ size: "15", unit: "g" }],
+            sizes: [{ value: "15", unit: "g" }],
             activeIngredientDescriptions: [
                 "Total THC (THC+THCA) 22 % w/w",
                 "Total CBD (CBD+CBDA) ≤1% w/w"
@@ -542,7 +542,7 @@ async function seedProducts() {
             licenceApprovedAt,
             // This product is not yet available
             availableAt: undefined,
-            sizes: [{ size: "15", unit: "g" }],
+            sizes: [{ value: "15", unit: "g" }],
             activeIngredientDescriptions: [
                 "Total THC (THC+THCA) 9.0 % w/w",
                 "Total CBD (CBD+CBDA) 8.3 % w/w"
@@ -556,7 +556,7 @@ async function seedProducts() {
             licenceApprovedAt,
             // This product is not yet available
             availableAt: undefined,
-            sizes: [{ size: "15", unit: "g" }],
+            sizes: [{ value: "15", unit: "g" }],
             activeIngredientDescriptions: [
                 "Total THC (THC+THCA) 22.5 % w/w",
                 "Total CBD (CBD+CBDA) ≤1.0 % w/w"
@@ -570,7 +570,7 @@ async function seedProducts() {
             licenceApprovedAt,
             // This product is not yet available
             availableAt: undefined,
-            sizes: [{ size: "15", unit: "g" }],
+            sizes: [{ value: "15", unit: "g" }],
             activeIngredientDescriptions: [
                 "Total THC (THC+THCA) 21.3 % w/w",
                 "Total CBD (CBD+CBDA) ≤1.0 % w/w"
@@ -584,7 +584,7 @@ async function seedProducts() {
             licenceApprovedAt,
             availableBeforeGivenDate: true,
             availableAt,
-            sizes: [{ size: "10", unit: "g" }],
+            sizes: [{ value: "10", unit: "g" }],
             activeIngredientDescriptions: [
                 "Total THC (THC+THCA) 10 mg/g (˂ 1% w/w)",
                 "Total CBD (CBD+CBDA) 125 mg/g (12.5% w/w)"
@@ -598,7 +598,7 @@ async function seedProducts() {
             licenceApprovedAt,
             availableBeforeGivenDate: true,
             availableAt,
-            sizes: [{ size: "10", unit: "g" }],
+            sizes: [{ value: "10", unit: "g" }],
             activeIngredientDescriptions: [
                 "Total THC (THC+THCA) 135 mg/g (13.5% w/w)",
                 "Total CBD (CBD+CBDA) <10 mg/g (<1% w/w)"
@@ -612,7 +612,7 @@ async function seedProducts() {
             licenceApprovedAt,
             availableBeforeGivenDate: true,
             availableAt,
-            sizes: [{ size: "10", unit: "g" }],
+            sizes: [{ value: "10", unit: "g" }],
             activeIngredientDescriptions: [
                 "Total THC (THC+THCA) 250 mg/g (25% w/w)",
                 "Total CBD (CBD+CBDA) <10 mg/g (<1% w/w)"
@@ -626,7 +626,7 @@ async function seedProducts() {
             licenceApprovedAt,
             availableBeforeGivenDate: true,
             availableAt,
-            sizes: [{ size: "10", unit: "g" }],
+            sizes: [{ value: "10", unit: "g" }],
             activeIngredientDescriptions: [
                 "Total THC (THC+THCA): 200 mg/g (20% w/w)",
                 "Total CBD (CBD+CBDA): <10 mg/g (<1% w/w)"
@@ -640,7 +640,7 @@ async function seedProducts() {
             licenceApprovedAt,
             availableBeforeGivenDate: true,
             availableAt,
-            sizes: [{ size: "35", unit: "g" }],
+            sizes: [{ value: "35", unit: "g" }],
             activeIngredientDescriptions: [
                 "Total THC (THC+THCA): 152.5 mg/g (15.25% w/w)",
                 "Total CBD (CBD+CBDA): <5 mg/g (<0.5% w/w)"
@@ -654,7 +654,7 @@ async function seedProducts() {
             licenceApprovedAt,
             availableBeforeGivenDate: true,
             availableAt,
-            sizes: [{ size: "30", unit: "g" }],
+            sizes: [{ value: "30", unit: "g" }],
             activeIngredientDescriptions: [
                 "Total THC (THC+THCA) 21% w/w",
                 "Total CBD (CBD+CBDA) <1%w/w"
@@ -668,7 +668,7 @@ async function seedProducts() {
             licenceApprovedAt,
             // This product is not yet available
             availableAt: undefined,
-            sizes: [{ size: "30", unit: "g" }],
+            sizes: [{ value: "30", unit: "g" }],
             activeIngredientDescriptions: [
                 "Total THC (THC+THCA) 24% w/w",
                 "Total CBD (CBD+CBDA) <1%w/w"

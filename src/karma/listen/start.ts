@@ -105,7 +105,9 @@ export async function start() {
     } = await create();
 
     // Before we start, we should seed
-    await seed();
+    if (process.env.ENABLE_SEED) {
+        await seed();
+    }
 
     const port = getPort();
 

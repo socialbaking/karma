@@ -1,7 +1,7 @@
 
 
 export interface ProductSizeData extends Record<string, unknown> {
-    size: string;
+    value: string;
     unit: string;
 }
 
@@ -29,6 +29,10 @@ export interface ActiveIngredient {
     type: string;
     unit: string;
     value: string;
+    prefix?: string;
+    calculated?: boolean;
+    calculatedUnit?: string;
+    size?: ProductSizeData;
 }
 
 export interface Product extends ProductData {
