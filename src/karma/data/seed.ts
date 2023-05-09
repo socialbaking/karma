@@ -257,122 +257,239 @@ async function seedProducts() {
         emerge
     })
 
+    const licenceApprovedAt = createdAt;
+    const availableAt = createdAt;
+
     const products: ProductData[] = [
         {
             productName: "Helius CBD25 Full Spectrum",
-            licencedPartnerId: helius
+            licencedPartnerId: helius,
+            licenceApprovedBeforeGivenDate: true,
+            licenceApprovedAt,
+            availableBeforeGivenDate: true,
+            availableAt,
         },
         {
             productName: "Helius CBD100 Full Spectrum",
-            licencedPartnerId: helius
+            licencedPartnerId: helius,
+            licenceApprovedBeforeGivenDate: true,
+            licenceApprovedAt,
+            availableBeforeGivenDate: true,
+            availableAt,
         },
         {
             productName: "RUA CBD100",
-            licencedPartnerId: rua
+            licencedPartnerId: rua,
+            licenceApprovedBeforeGivenDate: true,
+            licenceApprovedAt,
+            availableBeforeGivenDate: true,
+            availableAt,
         },
         {
             productName: "Tilray P Oral Solution CBD 100",
-            licencedPartnerId: cdc
+            licencedPartnerId: cdc,
+            licenceApprovedBeforeGivenDate: true,
+            licenceApprovedAt,
+            availableBeforeGivenDate: true,
+            availableAt,
         },
         {
             productName: "Tilray P Oral Solution CBD 25",
-            licencedPartnerId: cdc
+            licencedPartnerId: cdc,
+            licenceApprovedBeforeGivenDate: true,
+            licenceApprovedAt,
+            availableBeforeGivenDate: true,
+            availableAt,
         },
         {
             productName: "SubDrops™ CBD100",
-            licencedPartnerId: helius
+            licencedPartnerId: helius,
+            licenceApprovedBeforeGivenDate: true,
+            licenceApprovedAt,
+            availableBeforeGivenDate: true,
+            availableAt,
         },
         {
             productName: "SubDrops™ CBD25",
-            licencedPartnerId: helius
+            licencedPartnerId: helius,
+            licenceApprovedBeforeGivenDate: true,
+            licenceApprovedAt,
+            availableBeforeGivenDate: true,
+            availableAt,
         },
         {
             productName: "evalaCann THC ≤1 mg: CBD 20 mg",
-            licencedPartnerId: cannasouth
+            licencedPartnerId: cannasouth,
+            licenceApprovedBeforeGivenDate: true,
+            licenceApprovedAt,
+            availableBeforeGivenDate: true,
+            availableAt,
         },
         {
             productName: "evalaCann THC 10 mg: CBD 15 mg",
-            licencedPartnerId: cannasouth
+            licencedPartnerId: cannasouth,
+            licenceApprovedBeforeGivenDate: true,
+            licenceApprovedAt,
+            availableBeforeGivenDate: true,
+            availableAt,
         },
         {
             productName: "evalaCann THC 10 mg: CBD  ≤1 mg",
-            licencedPartnerId: cannasouth
+            licencedPartnerId: cannasouth,
+            licenceApprovedBeforeGivenDate: true,
+            licenceApprovedAt,
+            // This product is not yet available
+            availableAt: undefined
         },
         {
             productName: "Helius THC25 Full Spectrum",
-            licencedPartnerId: helius
+            licencedPartnerId: helius,
+            licenceApprovedBeforeGivenDate: true,
+            licenceApprovedAt,
+            availableBeforeGivenDate: true,
+            availableAt,
         },
         {
             productName: "Helius THC10:CBD10 Full Spectrum",
-            licencedPartnerId: helius
+            licencedPartnerId: helius,
+            licenceApprovedBeforeGivenDate: true,
+            licenceApprovedAt,
+            availableBeforeGivenDate: true,
+            availableAt,
         },
         {
             productName: "Tilray FS oral Solution THC 25",
-            licencedPartnerId: cdc
+            licencedPartnerId: cdc,
+            licenceApprovedBeforeGivenDate: true,
+            licenceApprovedAt,
+            availableBeforeGivenDate: true,
+            availableAt,
         },
         {
             productName: "Tilray FS Oral Solution THC 10 CBD 10",
-            licencedPartnerId: cdc
+            licencedPartnerId: cdc,
+            licenceApprovedBeforeGivenDate: true,
+            licenceApprovedAt,
+            availableBeforeGivenDate: true,
+            availableAt,
         },
         {
             productName: "KIKUYA Dune",
-            licencedPartnerId: nubu
+            licencedPartnerId: nubu,
+            licenceApprovedBeforeGivenDate: true,
+            licenceApprovedAt,
+            availableBeforeGivenDate: true,
+            availableAt,
         },
         {
             productName: "KIKUYA Arroyo",
-            licencedPartnerId: nubu
+            licencedPartnerId: nubu,
+            licenceApprovedBeforeGivenDate: true,
+            licenceApprovedAt,
+            availableBeforeGivenDate: true,
+            availableAt,
         },
         {
             productName: "Medleaf Medium THC Afghan Haze",
-            licencedPartnerId: medleaf
+            licencedPartnerId: medleaf,
+            licenceApprovedBeforeGivenDate: true,
+            licenceApprovedAt,
+            availableBeforeGivenDate: true,
+            availableAt,
         },
         {
             productName: "Tilray Whole Flower Dried Cannabis THC 22",
-            licencedPartnerId: cdc
+            licencedPartnerId: cdc,
+            licenceApprovedBeforeGivenDate: true,
+            licenceApprovedAt,
+            availableBeforeGivenDate: true,
+            availableAt,
         },
         {
             productName: "Equiposa",
-            licencedPartnerId: medReleaf
+            licencedPartnerId: medReleaf,
+            licenceApprovedBeforeGivenDate: true,
+            licenceApprovedAt,
+            // This product is not yet available
+            availableAt: undefined
         },
         {
             productName: "Luminarium",
-            licencedPartnerId: medReleaf
+            licencedPartnerId: medReleaf,
+            licenceApprovedBeforeGivenDate: true,
+            licenceApprovedAt,
+            // This product is not yet available
+            availableAt: undefined
         },
         {
             productName: "Sedaprem",
-            licencedPartnerId: medReleaf
+            licencedPartnerId: medReleaf,
+            licenceApprovedBeforeGivenDate: true,
+            licenceApprovedAt,
+            // This product is not yet available
+            availableAt: undefined
         },
         {
             productName: "ANTG Eve",
-            licencedPartnerId: nubu
+            licencedPartnerId: nubu,
+            licenceApprovedBeforeGivenDate: true,
+            licenceApprovedAt,
+            availableBeforeGivenDate: true,
+            availableAt,
         },
         {
             productName: "ANTG Mariposa",
-            licencedPartnerId: nubu
+            licencedPartnerId: nubu,
+            licenceApprovedBeforeGivenDate: true,
+            licenceApprovedAt,
+            availableBeforeGivenDate: true,
+            availableAt,
         },
         {
             productName: "ANTG Rocky",
-            licencedPartnerId: nubu
+            licencedPartnerId: nubu,
+            licenceApprovedBeforeGivenDate: true,
+            licenceApprovedAt,
+            availableBeforeGivenDate: true,
+            availableAt,
         },
         {
             productName: "ANTG Solace",
-            licencedPartnerId: nubu
+            licencedPartnerId: nubu,
+            licenceApprovedBeforeGivenDate: true,
+            licenceApprovedAt,
+            availableBeforeGivenDate: true,
+            availableAt,
         },
         {
             productName: "Medleaf Medium THC Shishkaberry",
-            licencedPartnerId: medleaf
+            licencedPartnerId: medleaf,
+            licenceApprovedBeforeGivenDate: true,
+            licenceApprovedAt,
+            availableBeforeGivenDate: true,
+            availableAt,
         },
         {
             productName: "Medleaf High THC Zour Apple",
-            licencedPartnerId: medleaf
+            licencedPartnerId: medleaf,
+            licenceApprovedBeforeGivenDate: true,
+            licenceApprovedAt,
+            availableBeforeGivenDate: true,
+            availableAt,
         },
         {
             productName: "Medleaf High THC GG#4",
-            licencedPartnerId: medleaf
+            licencedPartnerId: medleaf,
+            licenceApprovedBeforeGivenDate: true,
+            licenceApprovedAt,
+            // This product is not yet available
+            availableAt: undefined
         },
         {
             productName: "Sativex oral spray",
-            licencedPartnerId: emerge
+            licencedPartnerId: emerge,
+            // This product is generally available
+            availableAt: undefined
         }
     ];
 
@@ -385,14 +502,15 @@ async function seedProducts() {
         if (existing && !isChange(data, existing)) {
             return;
         }
-        const category: Product = {
+        const product: Product = {
             ...existing,
             ...data,
             productId,
             createdAt,
             updatedAt
         };
-        await productStore.set(productId, category);
+        console.log(product);
+        await productStore.set(productId, product);
     }
 
     await Promise.all(
