@@ -109,7 +109,8 @@ export async function setProduct(data: ProductData & Pick<Product, "productId"> 
                         calculated: true,
                         calculatedUnit: unit,
                         value: toHumanNumberString(numeric * numericSize),
-                        size
+                        size,
+                        prefix
                     });
                 }
 

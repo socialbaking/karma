@@ -698,7 +698,7 @@ async function seedProducts() {
             productId,
             createdAt,
         })
-        console.log(product);
+        console.log(product.productName, product.activeIngredients);
     }
 
     await Promise.all(
