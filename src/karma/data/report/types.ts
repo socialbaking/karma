@@ -19,6 +19,9 @@ export interface ReportData extends Record<string, unknown> {
     createdByUserId?: string;
     anonymous?: boolean;
     countryCode?: string; // "NZL"
+    orderedAt?: string;
+    sentAt?: string;
+    receivedAt?: string;
 }
 
 export interface Report extends ReportData {
