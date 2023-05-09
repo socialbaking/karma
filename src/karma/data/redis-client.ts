@@ -92,10 +92,33 @@ export function createRedisKeyValueStore<T>(name: string): KeyValueStore<T> {
         );
     }
 
+    async function *asyncIterable(): AsyncIterable<T> {
+        await connect();
+        const keys = await client.keys(`${getPrefix()}*`);
+        for (const key of keys) {
+            yield await internalGet(key);
+        }
+    }
+
+    async function deleteFn(key: string): Promise<void> {
+        await connect();
+        await client.del(key);
+    }
+
+    async function has(key: string): Promise<boolean> {
+        await connect();
+        return client.exists(key);
+    }
+
     return {
         name,
         get,
         set,
-        values
+        values,
+        delete: deleteFn,
+        has,
+        [Symbol.asyncIterator]() {
+            return asyncIterable()[Symbol.asyncIterator]()
+        }
     }
 }

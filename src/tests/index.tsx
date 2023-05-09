@@ -8,6 +8,10 @@ try {
       await import("./client");
       span.end()
     });
+    await tracer.startActiveSpan("data-tests", async (span) => {
+      await import("./data");
+      span.end()
+    });
     span.end();
   })
   console.log("Tests successful");

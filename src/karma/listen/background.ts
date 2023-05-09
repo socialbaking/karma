@@ -7,10 +7,7 @@ export async function backgroundRoutes(fastify: FastifyInstance) {
         async handler(request, response) {
 
             await background({
-                method: request.method,
-                query: request.query,
-                headers: request.headers,
-                body: request.body
+                query: request.query
             });
 
             response.status(200);

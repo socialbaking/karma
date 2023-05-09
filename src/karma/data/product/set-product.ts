@@ -67,6 +67,7 @@ export async function setProduct(data: ProductData & Pick<Product, "productId"> 
                     ingredients.push({
                         size,
                         type,
+                        calculated: true,
                         unit: size.unit,
                         value: toHumanNumberString(percentage * numericSize),
                         prefix,
@@ -129,17 +130,22 @@ export async function setProduct(data: ProductData & Pick<Product, "productId"> 
             };
         }
 
-        function isNumberString(value: string): value is `${number}` {
-            return /^\d+(?:\.\d+)?$/.test(value);
-        }
-
-        function toHumanNumberString(value: number) {
-            const string = value.toString();
-            const split = string.split(".");
-            if (split.length === 1) return string;
-            if (split[1].length <= 2) return string;
-            const rounded = Math.round(value * 100) / 100;
-            return rounded.toString();
-        }
     }
+}
+
+
+export function isNumberString(value: string): value is `${number}` {
+    return (
+        typeof value === "string" &&
+        /^-?\d+(?:\.\d+)?$/.test(value)
+    );
+}
+
+export function toHumanNumberString(value: number) {
+    const string = value.toString();
+    const split = string.split(".");
+    if (split.length === 1) return string;
+    if (split[1].length <= 2) return string;
+    const rounded = Math.round(value * 10000) / 10000;
+    return rounded.toString();
 }

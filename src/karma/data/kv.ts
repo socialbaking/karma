@@ -65,10 +65,32 @@ function createKeyValueStore<T>(name: string, storage: GenericStorageFn): KeyVal
         return values;
     }
 
+    async function *asyncIterable(): AsyncIterable<T> {
+        const store = await storage();
+        for await (const [,value] of store) {
+            yield value;
+        }
+    }
+
+    async function deleteFn(key: string): Promise<void> {
+        const store = await storage();
+        await store.delete(key);
+    }
+
+    async function has(key: string): Promise<boolean> {
+        const store = await storage();
+        return store.has(key);
+    }
+
     return {
         name,
         get,
         set,
-        values
+        values,
+        delete: deleteFn,
+        has,
+        [Symbol.asyncIterator]() {
+            return asyncIterable()[Symbol.asyncIterator]()
+        }
     }
 }
