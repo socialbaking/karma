@@ -1,7 +1,8 @@
 export interface ReportData extends Record<string, unknown> {
     message?: string;
     productId?: string;
-    productText?: string;
+    productName?: string; // Actual productName, not free text
+    productText?: string; // User free text of the product
     productPurchase?: boolean;
     productPurchaseTotalCost?: string; // "900.00", capture the user input raw
     productPurchaseItems?: number; // 2

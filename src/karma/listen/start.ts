@@ -12,7 +12,7 @@ import { dirname, join } from "node:path";
 import { bearerAuthentication } from "./bearer-authentication";
 import bearerAuthPlugin from "@fastify/bearer-auth";
 import authPlugin from "@fastify/auth";
-import {seed} from "../seed";
+import {seed} from "../data";
 
 const { pathname } = new URL(import.meta.url);
 const directory = dirname(pathname)

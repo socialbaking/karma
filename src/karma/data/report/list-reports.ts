@@ -7,6 +7,6 @@ export interface ListReportsInput {
 
 export async function listReports({ authorizedUserId }: ListReportsInput = {}): Promise<Report[]> {
     const store = getReportStore();
-    const partners = await store.values();
-    return partners.filter(partner => partner.createdByUserId === authorizedUserId);
+    const reports = await store.values();
+    return reports.filter(partner => partner.createdByUserId === authorizedUserId);
 }
