@@ -1,6 +1,6 @@
 import {FastifyInstance} from "fastify";
 import {addReport, ReportData, reportSchema} from "../../data";
-import {authenticate, getMaybeAuthorizedForPartnerId, isAnonymous} from "../authentication";
+import {authenticate, isAnonymous} from "../authentication";
 
 export async function addReportRoutes(fastify: FastifyInstance) {
 
@@ -35,7 +35,6 @@ export async function addReportRoutes(fastify: FastifyInstance) {
                     ...request.body,
                     anonymous: isAnonymous()
                 });
-                response.header("X-Report-Id", report.reportId);
                 response.status(201);
                 response.send(report);
             }
