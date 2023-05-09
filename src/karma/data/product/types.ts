@@ -42,11 +42,3 @@ export interface Product extends ProductData {
     updatedAt: string;
     activeIngredients?: ProductActiveIngredient[];
 }
-
-export interface ProductWithActiveIngredients extends Product {
-    activeIngredients: ProductActiveIngredient[];
-}
-
-export function isProductWithActiveIngredients(product: Product): product is ProductWithActiveIngredients {
-    return !!product.activeIngredients;
-}

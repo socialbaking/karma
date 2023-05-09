@@ -1,4 +1,4 @@
-import {isNumberString, ProductSizeData} from "../product";
+import {ProductSizeData} from "../product";
 
 export interface ReportData extends Record<string, unknown> {
     countryCode: string; // "NZL"
@@ -28,33 +28,6 @@ export interface Report extends ReportData {
     reportId: string;
     createdAt: string;
     updatedAt: string;
-}
-
-export interface ProductReport extends Report {
-    // These are the expected field for a completed product report
-    productPurchase: true
-    productPurchaseTotalCost: `${number}`;
-    productPurchaseItems: `${number}`;
-    productPurchaseItemCost: `${number}`;
-    productPurchaseDeliveryCost: `${number}`;
-    productPurchaseFeeCost?: `${number}`;
-}
-
-export function isProductReport(report: Report): report is ProductReport {
-    return !!(
-        report.productPurchase &&
-        isNumberString(report.productPurchaseTotalCost) &&
-        isNumberString(report.productPurchaseItemCost) &&
-        isNumberString(report.productPurchaseItems) &&
-        isNumberString(report.productPurchaseDeliveryCost) &&
-        (
-            (
-                !report.productPurchaseFeeCost &&
-                typeof report.productPurchaseFeeCost !== "string"
-            ) ||
-            isNumberString(report.productPurchaseFeeCost)
-        )
-    )
 }
 
 export interface ReportReference extends Record<string, unknown> {

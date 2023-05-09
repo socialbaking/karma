@@ -28,18 +28,3 @@ export interface CategoryData {
 export interface Category extends CategoryData {
     categoryId: string;
 }
-
-export interface ClientOptions {
-    partnerId?: string;
-    accessToken?: string;
-    version?: number;
-    prefix?: string;
-    url?: string | URL;
-}
-
-export interface Client {
-    addPartner(partner: PartnerData): Promise<Partner>;
-    addCategory(category: CategoryData): Promise<Category>;
-    listPartners(): Promise<Partner[]>;
-    listSystemLogs(): Promise<SystemLog[]>;
-}

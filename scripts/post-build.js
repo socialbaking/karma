@@ -1,6 +1,7 @@
 import { promises as fs } from "fs";
 import { dirname, resolve } from "path";
 import {readFile} from "fs/promises";
+import {replaceBetween} from "./replace-between.js";
 
 // await import("./correct-import-extensions.js");
 // await import("./workerd-tests.js");
@@ -134,30 +135,4 @@ if (!process.env.NO_COVERAGE_BADGE_UPDATE) {
   console.log("Wrote coverage badges!");
 }
 
-async function replaceBetween(fileName, tagName, content) {
-  const tag = `[//]: # (${tagName})`;
 
-  const readMe = await fs.readFile(fileName, "utf8");
-  const badgeStart = readMe.indexOf(tag);
-  const badgeStartAfter = badgeStart + tag.length;
-  if (badgeStart === -1) {
-    console.warn(`Expected to find "${tag}" in ${fileName}`);
-    return;
-  }
-  const badgeEnd = badgeStartAfter + readMe.slice(badgeStartAfter).indexOf(tag);
-  const badgeEndAfter = badgeEnd + tag.length;
-  const fileBefore = readMe.slice(0, badgeStart);
-  const fileAfter = readMe.slice(badgeEndAfter);
-
-  const fileNext = `${fileBefore}${tag}\n\n${content}\n\n${tag}${fileAfter}`;
-  await fs.writeFile(fileName, fileNext);
-}
-
-{
-
-  const interfaceContents = await readFile("esnext/karma/client/interface.d.ts", "utf-8");
-
-  await replaceBetween("README.md", "typescript client", `\`\`\`typescript\n${interfaceContents.trim()}\n\`\`\``)
-
-
-}
