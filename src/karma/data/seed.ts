@@ -10,6 +10,7 @@ import {
 } from "./data";
 import {v5} from "uuid";
 import {ok} from "../../is";
+import {setProduct} from "./product/set-product";
 
 const firstSeedingDate = new Date(1683589864494).toISOString();
 const createdAt = firstSeedingDate;
@@ -18,27 +19,34 @@ const updatedAt = new Date().toISOString()
 // Stable uuid namespace
 const namespace = "536165e4-aa2a-4d17-ad7e-751251497a11";
 
+const categories: Category[] = [
+    {
+        categoryName: "Flower"
+    },
+    {
+        categoryName: "Oil"
+    },
+    {
+        categoryName: "Equipment"
+    },
+    {
+        categoryName: "Product"
+    },
+    {
+        categoryName: "Fee"
+    }
+]
+    .map((data: CategoryData): Category => ({
+        ...data,
+        categoryId: v5(data.categoryName, namespace),
+        createdAt,
+        updatedAt
+    }));
+
 async function seedCategories() {
     const categoryStore = getCategoryStore();
-    const categories: CategoryData[] = [
-        {
-            categoryName: "Flower"
-        },
-        {
-            categoryName: "Oil"
-        },
-        {
-            categoryName: "Equipment"
-        },
-        {
-            categoryName: "Product"
-        },
-        {
-            categoryName: "Fee"
-        }
-    ];
 
-    async function putCategory(data: CategoryData) {
+    async function putCategory(data: Category) {
         const { categoryName } = data;
         const categoryId = v5(categoryName, namespace);
         const existing = await categoryStore.get(categoryId);
@@ -684,15 +692,13 @@ async function seedProducts() {
         if (existing && !isChange(data, existing)) {
             return;
         }
-        const product: Product = {
+        const product = await setProduct({
             ...existing,
             ...data,
             productId,
             createdAt,
-            updatedAt
-        };
+        })
         console.log(product);
-        await productStore.set(productId, product);
     }
 
     await Promise.all(
@@ -707,6 +713,10 @@ export async function seed() {
     await seedProducts();
 }
 
+const IGNORE_KEYS: string[] = ["updatedAt", "createdAt"];
+
 function isChange(left: Record<string, unknown>, right: Record<string, unknown>) {
-    return !Object.entries(left).every(([key, value]) => right[key] === value);
+    return !Object.entries(left)
+        .filter((pair) => !IGNORE_KEYS.includes(pair[0]))
+        .every(([key, value]) => right[key] === value);
 }

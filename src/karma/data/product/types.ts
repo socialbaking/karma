@@ -1,3 +1,5 @@
+
+
 export interface ProductSizeData extends Record<string, unknown> {
     size: string;
     unit: string;
@@ -20,10 +22,26 @@ export interface ProductData extends Record<string, unknown> {
     sizes?: ProductSizeData[];
     // Direct text about the active ingredients, not specific values
     activeIngredientDescriptions?: string[];
+    categoryId?: string;
+}
+
+export interface ActiveIngredient {
+    type: string;
+    unit: string;
+    value: string;
 }
 
 export interface Product extends ProductData {
     productId: string;
     createdAt: string;
     updatedAt: string;
+    activeIngredients?: ActiveIngredient[];
+}
+
+export interface ProductWithActiveIngredients extends Product {
+    activeIngredients: ActiveIngredient[];
+}
+
+export function isProductWithActiveIngredients(product: Product): product is ProductWithActiveIngredients {
+    return !!product.activeIngredients;
 }
