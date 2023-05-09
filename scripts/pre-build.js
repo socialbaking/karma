@@ -3,10 +3,12 @@ import { join } from "node:path";
 import { replaceBetween } from "./replace-between.js";
 
 const PATH = "./src/karma/data"
-const CLIENT_INTERFACE_PATH = "./src/karma/client/interface.readonly.ts"
+const CLIENT_INTERFACE_GENERATED_PATH = "./src/karma/client/interface.readonly.ts"
+const CLIENT_INTERFACE_PATH = "./src/karma/client/client.interface.ts"
 const IGNORE_TYPES = [
     "access-token",
-    "background"
+    "background",
+    "metrics"
 ];
 
 const paths = await readdir(PATH)
@@ -41,16 +43,21 @@ const types = (
     .map(value => value.trim())
     .join("\n\n")
 
-console.log(types);
+// console.log(types);
 
-const interfaceContents = [types].join("\n\n");
 
 await writeFile(
-    CLIENT_INTERFACE_PATH,
-    interfaceContents,
+    CLIENT_INTERFACE_GENERATED_PATH,
+    types,
     "utf-8"
 );
 
-// const interfaceContents = await readFile("esnext/karma/client/interface.d.ts", "utf-8");
+let client = await readFile(CLIENT_INTERFACE_PATH, "utf-8");
 
-await replaceBetween("README.md", "typescript client", `\`\`\`typescript\n${interfaceContents.trim()}\n\`\`\``)
+client = client
+    .replace(/^\/\/.+/mg, "")
+    .replace(/^import\s*.+/mg, "")
+
+const interfaceContents = [client, types].map(value => value.trim()).join("\n\n");
+
+await replaceBetween("README.md", "typescript client", `\`\`\`typescript\n${interfaceContents}\n\`\`\``)

@@ -18,6 +18,21 @@
 [//]: # (typescript client)
 
 ```typescript
+export interface ClientOptions {
+    partnerId?: string;
+    accessToken?: string;
+    version?: number;
+    prefix?: string;
+    url?: string | URL;
+}
+
+export interface Client {
+    addPartner(partner: PartnerData): Promise<Partner>;
+    addCategory(category: CategoryData): Promise<Category>;
+    listPartners(): Promise<Partner[]>;
+    listSystemLogs(): Promise<SystemLog[]>;
+}
+
 export interface CategoryData extends Record<string, unknown> {
     categoryName: string;
     countryCode?: string;
@@ -25,46 +40,6 @@ export interface CategoryData extends Record<string, unknown> {
 
 export interface Category extends CategoryData {
     categoryId: string;
-    createdAt: string;
-    updatedAt: string;
-}
-
-export interface ActiveIngredientMetrics {
-    type: string;
-    unit: string;
-    value: string;
-    // If the calculation of cost takes into account the
-    // proportion of this vs total active ingredients
-    proportional?: boolean;
-}
-
-export interface ReportMetricsData extends Record<string, unknown> {
-    activeIngredients: ActiveIngredientMetrics[]
-}
-
-export interface ReportMetrics extends ReportMetricsData {
-    reportId: string;
-    createdAt: string;
-    updatedAt: string;
-    countryCode: string;
-}
-
-export interface DailyMetricsData extends Record<string, unknown> {
-    timestamp: string;
-    countryCode: string;
-}
-
-export interface DailyMetrics extends DailyMetricsData {
-    createdAt: string;
-    updatedAt: string;
-}
-
-export interface MonthlyMetricsData extends Record<string, unknown> {
-    timestamp: string;
-    countryCode: string;
-}
-
-export interface MonthlyMetrics {
     createdAt: string;
     updatedAt: string;
 }
@@ -162,11 +137,6 @@ export interface Report extends ReportData {
     reportId: string;
     createdAt: string;
     updatedAt: string;
-}
-
-export interface ReportReference extends Record<string, unknown> {
-    reportId: string;
-    createdAt: string;
 }
 
 export interface SystemLogData extends Record<string, unknown> {

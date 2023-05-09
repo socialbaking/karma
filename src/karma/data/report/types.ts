@@ -29,8 +29,3 @@ export interface Report extends ReportData {
     createdAt: string;
     updatedAt: string;
 }
-
-export interface ReportReference extends Record<string, unknown> {
-    reportId: string;
-    createdAt: string;
-}
