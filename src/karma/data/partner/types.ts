@@ -1,10 +1,14 @@
 
 export interface PartnerData extends Record<string, unknown> {
     partnerName: string;
-    location: string;
+    location?: string;
     remote?: boolean;
     onsite?: boolean;
     approved?: boolean;
+    pharmacy?: boolean;
+    delivery?: boolean;
+    clinic?: boolean;
+    website?: string;
 }
 
 export interface Partner extends PartnerData {

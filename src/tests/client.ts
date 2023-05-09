@@ -46,6 +46,26 @@ async function testClient() {
         const partner = partners.find(partner => partner.partnerId === partnerId);
         ok(partner);
 
+        // There should be seeded partners available
+        ok(partners.length > 1);
+        const clinics = partners.filter(partner => partner.clinic);
+        const pharmacies = partners.filter(partner => partner.pharmacy);
+        const onlyPharmacies = partners.filter(partner => partner.pharmacy && !partner.clinic);
+        const otherPartners = partners.filter(partner => !(partner.clinic || partner.pharmacy));
+
+        console.log({
+            clinics,
+            pharmacies,
+            onlyPharmacies,
+            otherPartners
+        })
+
+        ok(clinics.length);
+        ok(pharmacies.length);
+        ok(onlyPharmacies.length);
+        ok(otherPartners.length);
+
+
 
         {
 

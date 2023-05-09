@@ -1,6 +1,7 @@
 import {FastifyInstance, FastifyRequest} from "fastify";
 import {listPartners} from "../data";
 import {accessToken, allowAnonymous} from "./bearer-authentication";
+import {getMaybeAuthorizedForPartnerId} from "./authentication";
 
 export async function listPartnerRoutes(fastify: FastifyInstance) {
 
@@ -38,8 +39,7 @@ export async function listPartnerRoutes(fastify: FastifyInstance) {
                 },
                 required: [
                     "partnerId",
-                    "partnerName",
-                    "location"
+                    "partnerName"
                 ]
             }
         }
@@ -67,8 +67,11 @@ export async function listPartnerRoutes(fastify: FastifyInstance) {
                accessToken
             ]),
             async handler(request: FastifyRequest, response) {
+                const authorizedPartnerId = getMaybeAuthorizedForPartnerId();
                 response.send(
-                    await listPartners()
+                    await listPartners({
+                        authorizedPartnerId
+                    })
                 );
             }
         }

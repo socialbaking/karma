@@ -31,8 +31,7 @@ export async function addPartnerRoutes(fastify: FastifyInstance) {
             }
         },
         required: [
-            "partnerName",
-            "location"
+            "partnerName"
         ]
     } as const;
     type BodySchema = FromSchema<typeof body>
@@ -76,8 +75,7 @@ export async function addPartnerRoutes(fastify: FastifyInstance) {
             },
             required: [
                 "partnerId",
-                "partnerName",
-                "location"
+                "partnerName"
             ]
         }
     }
