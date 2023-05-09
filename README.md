@@ -1,6 +1,17 @@
 # Pharmakarma - Node & JavaScript implementation
 
 
+[//]: # (badges)
+
+### Support
+
+ ![Node.js supported](https://img.shields.io/badge/node-%3E%3D18.7.0-blue) 
+
+### Test Coverage
+
+ ![90.89%25 lines covered](https://img.shields.io/badge/lines-90.89%25-brightgreen) ![90.89%25 statements covered](https://img.shields.io/badge/statements-90.89%25-brightgreen) ![73%25 functions covered](https://img.shields.io/badge/functions-73%25-yellow) ![83.33%25 branches covered](https://img.shields.io/badge/branches-83.33%25-brightgreen)
+
+[//]: # (badges)
 
 ### Client's TypeScript Interface
 
