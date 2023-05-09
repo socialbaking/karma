@@ -5,7 +5,6 @@ export interface PartnerData extends Record<string, unknown> {
     location?: string;
     remote?: boolean;
     onsite?: boolean;
-    approved?: boolean;
     pharmacy?: boolean;
     delivery?: boolean;
     clinic?: boolean;
@@ -17,6 +16,7 @@ export interface Partner extends PartnerData {
     accessToken?: string;
     createdAt: string;
     updatedAt: string;
+    approved?: boolean;
     approvedAt?: string;
     approvedByUserId?: string;
 }

@@ -1,6 +1,6 @@
 import {FastifyInstance, FastifyRequest} from "fastify";
-import {listPartners} from "../data";
-import {accessToken, allowAnonymous} from "./bearer-authentication";
+import {listPartners, partnerSchema} from "../data";
+import {authenticate} from "./bearer-authentication";
 import {getMaybeAuthorizedForPartnerId} from "./authentication";
 
 export async function listPartnerRoutes(fastify: FastifyInstance) {
@@ -8,40 +8,7 @@ export async function listPartnerRoutes(fastify: FastifyInstance) {
     const response = {
         200: {
             type: "array",
-            items: {
-                description: "A partner",
-                type: "object",
-                properties: {
-                    partnerId: {
-                        type: "string"
-                    },
-                    partnerName: {
-                        type: "string"
-                    },
-                    location: {
-                        type: "string"
-                    },
-                    onsite: {
-                        type: "boolean"
-                    },
-                    remote: {
-                        type: "boolean"
-                    },
-                    clinic: {
-                        type: "boolean"
-                    },
-                    pharmacy: {
-                        type: "boolean"
-                    },
-                    partnerDescription: {
-                        type: "string"
-                    }
-                },
-                required: [
-                    "partnerId",
-                    "partnerName"
-                ]
-            }
+            items: partnerSchema.partner
         }
     }
 
@@ -61,11 +28,9 @@ export async function listPartnerRoutes(fastify: FastifyInstance) {
         "/partners",
         {
             schema,
-            preHandler: fastify.auth([
-               allowAnonymous,
-               fastify.verifyBearerAuth,
-               accessToken
-            ]),
+            preHandler: authenticate(fastify, {
+                anonymous: true
+            }),
             async handler(request: FastifyRequest, response) {
                 const authorizedPartnerId = getMaybeAuthorizedForPartnerId();
                 response.send(

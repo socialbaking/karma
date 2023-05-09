@@ -1,82 +1,17 @@
-import {FastifyInstance, FastifyRequest} from "fastify";
-import {FromSchema} from "json-schema-to-ts";
-import {addPartner} from "../data";
-import {accessToken, allowAnonymous} from "./bearer-authentication";
+import {FastifyInstance} from "fastify";
+import {addPartner, PartnerData, partnerSchema} from "../data";
+import {authenticate} from "./bearer-authentication";
 
 export async function addPartnerRoutes(fastify: FastifyInstance) {
 
-    const body = {
-        type: "object",
-        properties: {
-            partnerName: {
-                type: "string"
-            },
-            location: {
-                type: "string"
-            },
-            remote: {
-                type: "boolean"
-            },
-            onsite: {
-                type: "boolean"
-            },
-            clinic: {
-                type: "boolean"
-            },
-            pharmacy: {
-                type: "boolean"
-            },
-            partnerDescription: {
-                type: "string"
-            }
-        },
-        required: [
-            "partnerName"
-        ]
-    } as const;
-    type BodySchema = FromSchema<typeof body>
-
     type Schema = {
-        Body: BodySchema
+        Body: PartnerData
     }
 
     const response = {
         201: {
             description: "A new partner",
-            type: "object",
-            properties: {
-                partnerId: {
-                    type: "string"
-                },
-                partnerName: {
-                    type: "string"
-                },
-                location: {
-                    type: "string"
-                },
-                onsite: {
-                    type: "boolean"
-                },
-                remote: {
-                    type: "boolean"
-                },
-                clinic: {
-                    type: "boolean"
-                },
-                pharmacy: {
-                    type: "boolean"
-                },
-                partnerDescription: {
-                    type: "string"
-                },
-                accessToken: {
-                    type: "string"
-                }
-            },
-            required: [
-                "partnerId",
-                "partnerName"
-            ]
+            ...partnerSchema.partner
         }
     }
 
@@ -84,7 +19,7 @@ export async function addPartnerRoutes(fastify: FastifyInstance) {
         description: "Add a new partner",
         tags: ["partner"],
         summary: "",
-        body,
+        body: partnerSchema.partnerData,
         response
     }
 
@@ -92,25 +27,11 @@ export async function addPartnerRoutes(fastify: FastifyInstance) {
         "/partners",
         {
             schema,
-            preHandler: fastify.auth([
-                allowAnonymous,
-                fastify.verifyBearerAuth,
-                accessToken
-            ]),
+            preHandler: authenticate(fastify, {
+                anonymous: true
+            }),
             async handler(request, response)  {
-                const {
-                    partnerName,
-                    location,
-                    onsite,
-                    remote
-                } = request.body;
-
-                const partner = await addPartner({
-                    partnerName,
-                    location,
-                    onsite,
-                    remote
-                });
+                const partner = await addPartner(request.body);
 
                 response.status(201);
                 response.send(partner);

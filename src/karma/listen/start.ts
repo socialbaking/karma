@@ -1,11 +1,10 @@
-import { listen } from "@virtualstate/listen";
 import fastify from "fastify";
 import {routes} from "./routes";
 import {setupSwagger} from "./swagger";
 import blippPlugin from "fastify-blipp";
 import corsPlugin from "@fastify/cors";
 import {getPort} from "./config";
-import {fastifyRequestContext, requestContext} from "@fastify/request-context";
+import {fastifyRequestContext} from "@fastify/request-context";
 import helmet from "@fastify/helmet";
 import { readFile } from "node:fs/promises";
 import { dirname, join } from "node:path";

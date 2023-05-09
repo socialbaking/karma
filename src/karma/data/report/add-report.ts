@@ -10,10 +10,12 @@ export async function addReport(data: AddReportInput): Promise<Report> {
     const store = getReportStore();
     const queue = getReportQueueStore();
     const reportId = v4();
+    const createdAt = new Date().toISOString();
     const report: Report = {
         ...data,
         reportId,
-        createdAt: new Date().toISOString()
+        createdAt,
+        updatedAt: createdAt
     };
     await store.set(reportId, report);
     const reference: ReportReference = {

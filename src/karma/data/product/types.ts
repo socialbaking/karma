@@ -7,6 +7,7 @@ export interface ProductSizeData extends Record<string, unknown> {
 
 export interface ProductData extends Record<string, unknown> {
     productName: string;
+    countryCode?: string;
     licencedPartnerId?: string;
     // Flag for products we don't have the exact licence date for
     licenceApprovedBeforeGivenDate?: boolean;
@@ -25,7 +26,7 @@ export interface ProductData extends Record<string, unknown> {
     categoryId?: string;
 }
 
-export interface ActiveIngredient {
+export interface ProductActiveIngredient {
     type: string;
     unit: string;
     value: string;
@@ -39,11 +40,11 @@ export interface Product extends ProductData {
     productId: string;
     createdAt: string;
     updatedAt: string;
-    activeIngredients?: ActiveIngredient[];
+    activeIngredients?: ProductActiveIngredient[];
 }
 
 export interface ProductWithActiveIngredients extends Product {
-    activeIngredients: ActiveIngredient[];
+    activeIngredients: ProductActiveIngredient[];
 }
 
 export function isProductWithActiveIngredients(product: Product): product is ProductWithActiveIngredients {

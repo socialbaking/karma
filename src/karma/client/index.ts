@@ -14,7 +14,7 @@ export class Client implements ClientInterface {
 
     readonly baseUrl: string | URL;
     readonly headers: Headers;
-    readonly partnerId: string;
+    readonly partnerId: string | undefined;
     readonly version: number;
     readonly prefix: string;
 

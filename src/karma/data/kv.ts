@@ -25,7 +25,7 @@ function getRequestContextKeyValueStoreWithName<T>(name: string): KeyValueStore<
     }
 
     function create() {
-        let store: Promise<KVS<StorageSchema>> = undefined;
+        let store: Promise<KVS<StorageSchema>>;
         let kv;
         if (isRedis()) {
             kv = createRedisKeyValueStore<T>(name);

@@ -1,4 +1,4 @@
-import {FastifyReply, FastifyRequest} from "fastify";
+import {FastifyInstance, FastifyReply, FastifyRequest} from "fastify";
 import {getAccessToken as getAccessTokenDocument} from "../data";
 import {FastifyAuthFunction} from "@fastify/auth";
 import {setAuthorizedForPartnerId} from "./authentication";
@@ -39,6 +39,7 @@ export async function bearerAuthentication(key: string, request: FastifyRequest)
     if (token.partnerId) {
         setAuthorizedForPartnerId(token.partnerId);
         const partner = await getPartnerDocument(token.partnerId);
+        ok(partner, "Expected partner to be available");
         request.requestContext.set(AUTHORIZED_PARTNER, partner);
         if (process.env.VOUCH_REQUIRE_PARTNER_APPROVAL) {
             if (!partner.approved) return false;
@@ -71,3 +72,37 @@ export const accessToken: FastifyAuthFunction = async (request, response) => {
     }
 }
 
+export function getFastifyVerifyBearerAuth(fastify: FastifyInstance): FastifyAuthFunction {
+    const verifyBearerAuth = fastify.verifyBearerAuth;
+    ok(verifyBearerAuth, "Expected verifyBearerAuth, please setup @fastify/bearer-auth");
+    return verifyBearerAuth;
+}
+
+export interface FastifyAuthOptions {
+    relation?: "and" | "or",
+    run?: "all"
+}
+
+
+export function getFastifyAuth(fastify: FastifyInstance) {
+    const auth = fastify.auth;
+    ok(auth, "Expected auth, please setup @fastify/auth");
+    return auth;
+}
+
+export interface AuthInput extends FastifyAuthOptions {
+    anonymous?: boolean;
+}
+
+export function authenticate(fastify: FastifyInstance, options?: AuthInput) {
+    const methods: FastifyAuthFunction[] = [
+        accessToken,
+        getFastifyVerifyBearerAuth(fastify)
+    ];
+
+    if (options?.anonymous) {
+        methods.unshift(allowAnonymous);
+    }
+
+    return getFastifyAuth(fastify)(methods, options);
+}

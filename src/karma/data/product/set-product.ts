@@ -1,5 +1,6 @@
-import {ActiveIngredient, Product, ProductData} from "./types";
+import {ProductActiveIngredient, Product, ProductData} from "./types";
 import {getProductStore} from "./store";
+import {ok} from "../../../is";
 
 export async function setProduct(data: ProductData & Pick<Product, "productId"> & Partial<Product>): Promise<Product> {
     const store = await getProductStore();
@@ -13,17 +14,17 @@ export async function setProduct(data: ProductData & Pick<Product, "productId"> 
     await store.set(data.productId, document);
     return document;
 
-    function getActiveIngredients(): ActiveIngredient[] {
+    function getActiveIngredients(): ProductActiveIngredient[] {
         const descriptions: string[] = data.activeIngredientDescriptions ?? []
         return descriptions.flatMap(getActiveIngredientsFromString);
     }
 
-    function getActiveIngredientsFromString(string: string): ActiveIngredient[] {
+    function getActiveIngredientsFromString(string: string): ProductActiveIngredient[] {
 
         const percentageRegex = /([≤<]?\s*\d+(?:\.\d+)?\s*%)/;
         const unitRegex = /([≤<]?\s*\d+(?:\.\d+)?\s*[a-z]+(?:\/[a-z]+)?)/i;
 
-        const ingredients: ActiveIngredient[] = [];
+        const ingredients: ProductActiveIngredient[] = [];
 
         const percentageMatch = string.match(percentageRegex);
         const unitMatch = string.match(unitRegex);
@@ -78,7 +79,9 @@ export async function setProduct(data: ProductData & Pick<Product, "productId"> 
         }
 
         if (unitMatch) {
-            const [,unit] = unitMatch[1].match(/([a-z]+(?:\/[a-z]+)?)/i);
+            const unitSubMatch = unitMatch[1].match(/([a-z]+(?:\/[a-z]+)?)/i);
+            ok(unitSubMatch, "Expected unit to match regex");
+            const [,unit] = unitSubMatch;
             const withoutUnit = unitMatch[1].replace(unit, "").trim();
             const { value, prefix } = splitPrefix(withoutUnit);
 
@@ -134,7 +137,7 @@ export async function setProduct(data: ProductData & Pick<Product, "productId"> 
 }
 
 
-export function isNumberString(value: string): value is `${number}` {
+export function isNumberString(value?: unknown): value is `${number}` {
     return (
         typeof value === "string" &&
         /^-?\d+(?:\.\d+)?$/.test(value)

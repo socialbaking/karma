@@ -1,7 +1,7 @@
 import {FastifyInstance} from "fastify";
-import {listSystemLogs} from "../data";
+import {listSystemLogs, systemLogSchema} from "../data";
 import {FromSchema} from "json-schema-to-ts";
-import {accessToken, allowAnonymous} from "./bearer-authentication";
+import {authenticate} from "./bearer-authentication";
 import {getMaybeAuthorizedForPartnerId} from "./authentication";
 
 export async function listSystemLogsRoutes(fastify: FastifyInstance) {
@@ -22,31 +22,7 @@ export async function listSystemLogsRoutes(fastify: FastifyInstance) {
             description: "System logs",
             type: "array",
             items: {
-                type: "object",
-                properties: {
-                    systemLogId: {
-                        type: "string"
-                    },
-                    message: {
-                        type: "string"
-                    },
-                    partnerId: {
-                        type: "string"
-                    },
-                    value: {
-                        type: "number"
-                    },
-                    timestamp: {
-                        type: "string"
-                    },
-                    uniqueCode: {
-                        type: "string"
-                    }
-                },
-                required: [
-                    "message",
-                    "timestamp"
-                ],
+                ...systemLogSchema.systemLog,
                 additionalProperties: true,
             }
         }
@@ -73,11 +49,9 @@ export async function listSystemLogsRoutes(fastify: FastifyInstance) {
         "/system-logs",
         {
             schema,
-            preHandler: fastify.auth([
-                allowAnonymous,
-                fastify.verifyBearerAuth,
-                accessToken
-            ]),
+            preHandler: authenticate(fastify, {
+                anonymous: true
+            }),
             async handler(request, response) {
                 const { partnerId } = request.query;
                 const data = await listSystemLogs({

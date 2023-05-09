@@ -44,7 +44,7 @@ export async function getIdentifiedBackground(backgroundId: string, data?: Backg
         // Make sure we stored the document that we were thought we were storing
         const stored = await store.get(backgroundId);
 
-        if (stored.backgroundKey !== backgroundKey) {
+        if (stored?.backgroundKey !== backgroundKey) {
             throw new Error("Failed to schedule background task");
         }
 
@@ -57,7 +57,7 @@ export async function getIdentifiedBackground(backgroundId: string, data?: Backg
 
             const current = await store.get(backgroundId);
 
-            if (current.backgroundKey !== backgroundKey) {
+            if (current?.backgroundKey !== backgroundKey) {
                 return;
             }
 

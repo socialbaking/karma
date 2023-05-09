@@ -1,6 +1,7 @@
 import {isNumberString, ProductSizeData} from "../product";
 
 export interface ReportData extends Record<string, unknown> {
+    countryCode: string; // "NZL"
     note?: string;
     parentReportId?: string;
     productId?: string;
@@ -18,7 +19,6 @@ export interface ReportData extends Record<string, unknown> {
     productSize?: ProductSizeData;
     createdByUserId?: string;
     anonymous?: boolean;
-    countryCode?: string; // "NZL"
     orderedAt?: string;
     shippedAt?: string;
     receivedAt?: string;
@@ -27,6 +27,7 @@ export interface ReportData extends Record<string, unknown> {
 export interface Report extends ReportData {
     reportId: string;
     createdAt: string;
+    updatedAt: string;
 }
 
 export interface ProductReport extends Report {
@@ -40,7 +41,7 @@ export interface ProductReport extends Report {
 }
 
 export function isProductReport(report: Report): report is ProductReport {
-    return (
+    return !!(
         report.productPurchase &&
         isNumberString(report.productPurchaseTotalCost) &&
         isNumberString(report.productPurchaseItemCost) &&

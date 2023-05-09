@@ -54,7 +54,6 @@ async function seedCategories() {
             return;
         }
         const category: Category = {
-            createdAt,
             ...existing,
             ...data,
             categoryId,
@@ -238,7 +237,6 @@ export async function seedPartners() {
             return;
         }
         const partner: Partner = {
-            createdAt,
             ...existing,
             ...data,
             updatedAt

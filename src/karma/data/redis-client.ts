@@ -96,7 +96,11 @@ export function createRedisKeyValueStore<T>(name: string): KeyValueStore<T> {
         await connect();
         const keys = await client.keys(`${getPrefix()}*`);
         for (const key of keys) {
-            yield await internalGet(key);
+            const value = await internalGet(key);
+            // Could return as deleted in between fetching
+            if (value) {
+                yield value;
+            }
         }
     }
 

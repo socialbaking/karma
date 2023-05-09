@@ -46,7 +46,7 @@ import {getReportMetrics} from "../karma/background";
         productPurchase: true,
         productPurchasePartnerId: wellworks.partnerId,
         productPurchasePartnerName: wellworks.partnerName,
-        productSize: shishkaberry.sizes.at(0),
+        productSize: shishkaberry.sizes?.at(0),
     });
 
     console.log(report);

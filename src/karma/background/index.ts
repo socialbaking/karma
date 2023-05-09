@@ -45,7 +45,7 @@ export async function getReportMetrics(report: Report): Promise<ReportMetrics> {
         if (productId) {
             const product = await getProduct(productId);
 
-            if (product.activeIngredients) {
+            if (product?.activeIngredients) {
 
                 const calculated = product
                     .activeIngredients
@@ -97,6 +97,8 @@ async function calculateReportMetrics() {
         if (await metrics.has(reportId)) continue;
 
         const report = await getReport(reportId);
+
+        if (!report) continue;
 
         await metrics.set(
             reportId,
