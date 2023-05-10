@@ -132,7 +132,6 @@
     "posttest": "mkdir -p coverage && node scripts/post-test.js",
     "postcoverage": "mkdir -p coverage && node scripts/post-test.js",
     "generate": "yarn build && node esnext/generate.js",
-    "prepublishOnly": "npm run build",
     "test": "yarn build && yarn test:node",
     "test:node": "export $(cat .env | xargs) && OTEL_SERVICE_NAME=karma-tests ENABLE_SEED=true node --enable-source-maps esnext/tests/index.js",
     "test:node:inspect": "yarn build && export $(cat .env | xargs) && OTEL_SERVICE_NAME=karma-tests ENABLE_SEED=true node --enable-source-maps --inspect-brk esnext/tests/index.js",
