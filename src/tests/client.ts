@@ -9,7 +9,7 @@ import {
     getMonthlyMetricsStore,
     getReportStore,
     getProductStore,
-    getBackgroundStore
+    getBackgroundStore, getReportQueueStore
 } from "../karma/data";
 import {KeyValueStore} from "../karma/data/types";
 import {isRedis} from "../karma/data/redis-client";
@@ -27,16 +27,17 @@ const {
 // Enterprise is 900 seconds
 const MAX_REPORT_PROCESSING_MS = TEST_REPORT_PROCESSING_TIMEOUT_MS ? +TEST_REPORT_PROCESSING_TIMEOUT_MS : 60 * 1000;
 
-if (TEST_PRODUCT_COUNT || TEST_REPORT_PER_PRODUCT_COUNT) {
-    await clear(
-        getDailyMetricsStore(),
-        getReportMetricsStore(),
-        getMonthlyMetricsStore(),
-        getReportStore(),
-        getProductStore(),
-        getBackgroundStore()
-    );
-}
+// if (TEST_PRODUCT_COUNT || TEST_REPORT_PER_PRODUCT_COUNT) {
+    // await clear(
+    //     getDailyMetricsStore(),
+    //     getReportMetricsStore(),
+    //     getMonthlyMetricsStore(),
+    //     getReportStore(),
+    //     getReportQueueStore(),
+    //     getProductStore(),
+    //     getBackgroundStore()
+    // );
+// }
 
 const chance = new Chance();
 
