@@ -4,6 +4,7 @@ on: [push, pull_request]
 jobs:
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     env:
       NO_COVERAGE_BADGE_UPDATE: 1
       PROMPT_NAME: test name
