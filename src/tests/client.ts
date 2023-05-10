@@ -178,11 +178,8 @@ async function testClient() {
             }
 
 
-            const additionalProductCount = TEST_PRODUCT_COUNT ? +TEST_PRODUCT_COUNT : products.length;
-            const reportCountPerProduct = TEST_REPORT_PER_PRODUCT_COUNT ? +TEST_REPORT_PER_PRODUCT_COUNT : chance.integer({
-                min: additionalProductCount,
-                max: additionalProductCount * 2
-            });
+            const additionalProductCount = TEST_PRODUCT_COUNT ? +TEST_PRODUCT_COUNT : 5;
+            const reportCountPerProduct = TEST_REPORT_PER_PRODUCT_COUNT ? +TEST_REPORT_PER_PRODUCT_COUNT : 10;
 
             const reportsStartedAt = Date.now();
 
