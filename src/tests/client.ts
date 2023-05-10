@@ -21,7 +21,10 @@ const {
 } = process.env;
 
 // Should be inline with vercel max function time
-const MAX_REPORT_PROCESSING_MS = TEST_REPORT_PROCESSING_TIMEOUT_MS ? +TEST_REPORT_PROCESSING_TIMEOUT_MS : 30 * 1000;
+// Hobby is 10 seconds
+// Pro is 60 seconds
+// Enterprise is 900 seconds
+const MAX_REPORT_PROCESSING_MS = TEST_REPORT_PROCESSING_TIMEOUT_MS ? +TEST_REPORT_PROCESSING_TIMEOUT_MS : 60 * 1000;
 
 if (TEST_PRODUCT_COUNT || TEST_REPORT_PER_PRODUCT_COUNT) {
     await clear(
@@ -333,7 +336,7 @@ async function testClient() {
                 reportsBackgroundTotalProcessing
             });
 
-            ok(reportsBackgroundTotalProcessing < MAX_REPORT_PROCESSING_MS, `Processing reports took longer than ${MAX_REPORT_PROCESSING_MS}`);
+            ok(reportsBackgroundTotalProcessing < MAX_REPORT_PROCESSING_MS, `Processing reports took longer than ${MAX_REPORT_PROCESSING_MS}ms`);
 
         }
 
