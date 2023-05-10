@@ -24,6 +24,8 @@ export interface Client {
     addCategory(category: CategoryData): Promise<Category>;
     addProduct(product: ProductData): Promise<Product>;
     addReport(report: ReportData): Promise<Report>;
+    getProduct(productId: string): Promise<Product | undefined>;
+    getReport(reportId: string): Promise<Report | undefined>
     listPartners(): Promise<Partner[]>;
     listSystemLogs(): Promise<SystemLog[]>;
     listProducts(): Promise<Product[]>;

@@ -255,4 +255,46 @@ export class Client implements ClientInterface {
         return response.json();
     }
 
+    async getProduct(productId: string): Promise<Product | undefined> {
+        const {
+            baseUrl,
+            headers,
+            prefix
+        } = this;
+        const response = await fetch(
+            new URL(
+                `${prefix}/products/${productId}`,
+                baseUrl
+            ),
+            {
+                method: "GET",
+                headers
+            }
+        );
+        if (response.status === 404) return undefined;
+        ok(response.ok, "getProduct response not ok");
+        return response.json();
+    }
+
+    async getReport(reportId: string): Promise<Report | undefined> {
+        const {
+            baseUrl,
+            headers,
+            prefix
+        } = this;
+        const response = await fetch(
+            new URL(
+                `${prefix}/reports/${reportId}`,
+                baseUrl
+            ),
+            {
+                method: "GET",
+                headers
+            }
+        );
+        if (response.status === 404) return undefined;
+        ok(response.ok, "getReport response not ok");
+        return response.json();
+    }
+
 }

@@ -9,7 +9,7 @@
 
 ### Test Coverage
 
- ![94.71%25 lines covered](https://img.shields.io/badge/lines-94.71%25-brightgreen) ![94.71%25 statements covered](https://img.shields.io/badge/statements-94.71%25-brightgreen) ![88.26%25 functions covered](https://img.shields.io/badge/functions-88.26%25-brightgreen) ![86.45%25 branches covered](https://img.shields.io/badge/branches-86.45%25-brightgreen)
+ ![94.73%25 lines covered](https://img.shields.io/badge/lines-94.73%25-brightgreen) ![94.73%25 statements covered](https://img.shields.io/badge/statements-94.73%25-brightgreen) ![88.26%25 functions covered](https://img.shields.io/badge/functions-88.26%25-brightgreen) ![87.08%25 branches covered](https://img.shields.io/badge/branches-87.08%25-brightgreen)
 
 [//]: # (badges)
 
@@ -42,6 +42,8 @@ export interface Client {
     addCategory(category: CategoryData): Promise<Category>;
     addProduct(product: ProductData): Promise<Product>;
     addReport(report: ReportData): Promise<Report>;
+    getProduct(productId: string): Promise<Product | undefined>;
+    getReport(reportId: string): Promise<Report | undefined>
     listPartners(): Promise<Partner[]>;
     listSystemLogs(): Promise<SystemLog[]>;
     listProducts(): Promise<Product[]>;

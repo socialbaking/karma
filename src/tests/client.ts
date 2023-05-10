@@ -176,7 +176,9 @@ async function testClient() {
                 ok(!product.activeIngredients?.length);
 
                 products = await client.listProducts();
-                const foundProduct = products.find(value => value.productId === product.productId);
+                let foundProduct = products.find(value => value.productId === product.productId);
+                ok(foundProduct);
+                foundProduct = await client.getProduct(product.productId);
                 ok(foundProduct);
 
 
@@ -312,8 +314,7 @@ async function testClient() {
                     ok(report);
                     ok(report.productId === productId);
 
-                    const reports = await client.listReports();
-                    const foundReport = reports.find(value => value.reportId === report.reportId);
+                    const foundReport = await client.getReport(report.reportId);
                     ok(foundReport);
 
                 }

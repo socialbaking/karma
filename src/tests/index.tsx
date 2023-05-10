@@ -43,8 +43,6 @@ console.log("Shutting down telemetry");
 await shutdown();
 console.log("Finished shutting down telemetry");
 
-console.log(why);
-
 if (process.env.TESTS_REPORT_HANDLES) {
   why.whyIsNodeStillRunning();
 }
