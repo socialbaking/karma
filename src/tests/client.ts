@@ -3,8 +3,40 @@ import {getOrigin} from "../karma/listen/config";
 import {Client} from "../karma";
 import {Chance} from "chance"
 import {ok} from "../is";
+import {
+    getDailyMetricsStore,
+    getReportMetricsStore,
+    getMonthlyMetricsStore,
+    getReportStore,
+    getProductStore,
+    getBackgroundStore
+} from "../karma/data";
+import {KeyValueStore} from "../karma/data/types";
+
+
+const {
+    TEST_PRODUCT_COUNT,
+    TEST_REPORT_PER_PRODUCT_COUNT,
+    TEST_REPORT_PROCESSING_TIMEOUT_MS
+} = process.env;
+
+// Should be inline with vercel max function time
+const MAX_REPORT_PROCESSING_MS = TEST_REPORT_PROCESSING_TIMEOUT_MS ? +TEST_REPORT_PROCESSING_TIMEOUT_MS : 30 * 1000;
+
+if (TEST_PRODUCT_COUNT || TEST_REPORT_PER_PRODUCT_COUNT) {
+    await clear(
+        getDailyMetricsStore(),
+        getReportMetricsStore(),
+        getMonthlyMetricsStore(),
+        getReportStore(),
+        getProductStore(),
+        getBackgroundStore()
+    );
+}
 
 const chance = new Chance();
+
+await testClient();
 
 async function testClient() {
 
@@ -115,6 +147,8 @@ async function testClient() {
                 pharmacy: true
             });
 
+            let products;
+
             {
 
                 // Simple product
@@ -136,14 +170,28 @@ async function testClient() {
                 ok(!product.activeIngredientDescriptions?.length);
                 ok(!product.activeIngredients?.length);
 
-                const products = await client.listProducts();
+                products = await client.listProducts();
                 const foundProduct = products.find(value => value.productId === product.productId);
                 ok(foundProduct);
 
 
             }
 
-            {
+
+            const additionalProductCount = TEST_PRODUCT_COUNT ? +TEST_PRODUCT_COUNT : products.length;
+            const reportCountPerProduct = TEST_REPORT_PER_PRODUCT_COUNT ? +TEST_REPORT_PER_PRODUCT_COUNT : chance.integer({
+                min: additionalProductCount,
+                max: additionalProductCount * 2
+            });
+
+            const reportsStartedAt = Date.now();
+
+            console.log({
+                additionalProductCount,
+                reportCountPerProduct
+            })
+
+            for (let productIndex = 0; productIndex <= additionalProductCount; productIndex += 1) {
 
                 // Complex product
 
@@ -229,7 +277,7 @@ async function testClient() {
                 ok(typeBCalculated.length >= 2);
 
 
-                {
+                for (let reportIndex = 0; reportIndex <= reportCountPerProduct; reportIndex += 1) {
                     const { productId, productName } = product;
 
                     const now = Date.now();
@@ -268,10 +316,27 @@ async function testClient() {
 
                 }
 
-                // Trigger background tasks :)
-                await client.background();
-
             }
+
+            const reportsSubmittedAt = Date.now();
+
+            // Trigger background tasks, after all reports submitted :)
+            await client.background();
+
+            const reportsProcessedAt = Date.now();
+
+            const reportsBackgroundTotalProcessing = reportsProcessedAt - reportsSubmittedAt;
+
+            console.log({
+                additionalProductCount,
+                reportCountPerProduct,
+                reportsStartedAt: new Date(reportsStartedAt),
+                reportsSubmittedAt: new Date(reportsSubmittedAt),
+                reportsProcessedAt: new Date(reportsProcessedAt),
+                reportsBackgroundTotalProcessing
+            });
+
+            ok(reportsBackgroundTotalProcessing < MAX_REPORT_PROCESSING_MS, `Processing reports took longer than ${MAX_REPORT_PROCESSING_MS}`);
 
         }
 
@@ -283,8 +348,6 @@ async function testClient() {
 
     await close();
 }
-
-await testClient();
 
 // I want to test with redis enabled too
 // TODO
@@ -298,3 +361,10 @@ await testClient();
 //
 //     process.env.REDIS_MEMORY = "";
 // }
+
+
+async function clear(...stores: KeyValueStore<unknown>[]) {
+    await Promise.all(
+        stores.map(store => store.clear())
+    );
+}

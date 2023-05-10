@@ -191,7 +191,7 @@ export class Client implements ClientInterface {
                 headers
             }
         );
-        ok(response.ok, "addReport response not ok");
+        ok(response.ok, "background response not ok");
         await response.blob();
     }
 

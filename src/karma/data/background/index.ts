@@ -1,7 +1,7 @@
 import {Background, BackgroundData} from "./types";
 import { getBackgroundStore } from "./store";
 import {v4} from "uuid";
-import {lock} from "../lock";
+import {isLocking, lock} from "../lock";
 
 export * from "./store";
 export * from "./types";
@@ -27,7 +27,7 @@ export async function getIdentifiedBackground(backgroundId: string, data?: Backg
 
         const existing = await store.get(backgroundId);
 
-        if (existing && !isExpired(existing)) {
+        if (existing && !isExpired(existing) && !isLocking()) {
             throw new Error(`Background task scheduled and not yet expired, please try again at ${existing.expiresAt}`);
         }
 
@@ -42,7 +42,7 @@ export async function getIdentifiedBackground(backgroundId: string, data?: Backg
         await store.set(backgroundId, background);
 
         // Make sure we stored the document that we were thought we were storing
-        const stored = await store.get(backgroundId);
+        let stored = await store.get(backgroundId);
 
         if (stored?.backgroundKey !== backgroundKey) {
             throw new Error("Failed to schedule background task");

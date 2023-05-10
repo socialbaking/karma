@@ -85,6 +85,22 @@ function createKeyValueStore<T>(name: string, storage: GenericStorageFn): KeyVal
         return store.has(key);
     }
 
+    async function keys(): Promise<string[]> {
+        const keys: string[] = [];
+        const store = await storage();
+        for await (const [key] of store) {
+            if (typeof key === "string") {
+                keys.push(key);
+            }
+        }
+        return keys;
+    }
+
+    async function clear(): Promise<void> {
+        const store = await storage();
+        await store.clear();
+    }
+
     return {
         name,
         get,
@@ -92,6 +108,8 @@ function createKeyValueStore<T>(name: string, storage: GenericStorageFn): KeyVal
         values,
         delete: deleteFn,
         has,
+        keys,
+        clear,
         [Symbol.asyncIterator]() {
             return asyncIterable()[Symbol.asyncIterator]()
         }

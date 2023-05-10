@@ -93,9 +93,7 @@ export function createRedisKeyValueStore<T>(name: string): KeyValueStore<T> {
     }
 
     async function *asyncIterable(): AsyncIterable<T> {
-        await connect();
-        const keys = await client.keys(`${getPrefix()}*`);
-        for (const key of keys) {
+        for (const key of await keys()) {
             const value = await internalGet(key);
             // Could return as deleted in between fetching
             if (value) {
@@ -114,6 +112,21 @@ export function createRedisKeyValueStore<T>(name: string): KeyValueStore<T> {
         return client.exists(key);
     }
 
+    async function keys(): Promise<string[]> {
+        await connect();
+        return await client.keys(`${getPrefix()}*`);
+    }
+
+    async function clear(): Promise<void> {
+        await Promise.all(
+            (await keys()).map(
+                async (key) => {
+                    await deleteFn(key);
+                }
+            )
+        )
+    }
+
     return {
         name,
         get,
@@ -121,6 +134,8 @@ export function createRedisKeyValueStore<T>(name: string): KeyValueStore<T> {
         values,
         delete: deleteFn,
         has,
+        keys,
+        clear,
         [Symbol.asyncIterator]() {
             return asyncIterable()[Symbol.asyncIterator]()
         }

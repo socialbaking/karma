@@ -140,7 +140,7 @@ async function calculateQueuedMetrics() {
     )
         .filter(Boolean);
 
-    console.log(reports.length, "reports to process into daily metrics");
+    console.log(reports.length, "reports to process into metrics");
 
     const stores: Record<CountryProductMetricDuration, KeyValueStore<CountryProductMetrics>> = {
         day: getDailyMetricsStore(),
@@ -257,6 +257,8 @@ async function calculateQueuedMetrics() {
 
                 return date.hasSame(targetDate, unit);
             });
+
+            console.log(dayReports.length, `reports to process into metrics for ${unit} ${timestamp}`);
 
             const productIds = new Set(
                 dayReports.map(report => report.productId ?? "").filter(Boolean)

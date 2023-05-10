@@ -5,6 +5,10 @@ import {UnlockFn} from "redis-lock";
 const globalRedis = isRedis() ? getGlobalRedisClient() : undefined;
 const globalLock = globalRedis ? createLockClient(globalRedis) : undefined;
 
+export function isLocking() {
+    return (globalRedis && globalLock) && !isRedisMemory();
+}
+
 export async function lock(name: string): Promise<UnlockFn> {
 
     if (!(globalRedis && globalLock) || isRedisMemory()) {
