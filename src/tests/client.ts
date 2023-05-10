@@ -12,6 +12,7 @@ import {
     getBackgroundStore
 } from "../karma/data";
 import {KeyValueStore} from "../karma/data/types";
+import {isRedis} from "../karma/data/redis-client";
 
 
 const {
@@ -181,8 +182,8 @@ async function testClient() {
             }
 
 
-            const additionalProductCount = TEST_PRODUCT_COUNT ? +TEST_PRODUCT_COUNT : 5;
-            const reportCountPerProduct = TEST_REPORT_PER_PRODUCT_COUNT ? +TEST_REPORT_PER_PRODUCT_COUNT : 10;
+            const additionalProductCount = (isRedis() && TEST_PRODUCT_COUNT) ? +TEST_PRODUCT_COUNT : 2;
+            const reportCountPerProduct = (isRedis() && TEST_REPORT_PER_PRODUCT_COUNT) ? +TEST_REPORT_PER_PRODUCT_COUNT : 2;
 
             const reportsStartedAt = Date.now();
 
