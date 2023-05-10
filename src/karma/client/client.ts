@@ -132,28 +132,128 @@ export class Client implements ClientInterface {
         return response.json();
     }
 
-    addProduct(product: ProductData): Promise<Product> {
-        return Promise.resolve(undefined);
+    async addProduct(product: ProductData): Promise<Product> {
+        const {
+            baseUrl,
+            headers,
+            prefix
+        } = this;
+        const response = await fetch(
+            new URL(
+                `${prefix}/products`,
+                baseUrl
+            ),
+            {
+                method: "POST",
+                body: JSON.stringify(product),
+                headers
+            }
+        );
+        ok(response.ok, "addProduct response not ok");
+        return await response.json();
     }
 
-    addReport(report: ReportData): Promise<Report> {
-        return Promise.resolve(undefined);
+    async addReport(report: ReportData): Promise<Report> {
+        const {
+            baseUrl,
+            headers,
+            prefix
+        } = this;
+        const response = await fetch(
+            new URL(
+                `${prefix}/reports`,
+                baseUrl
+            ),
+            {
+                method: "POST",
+                body: JSON.stringify(report),
+                headers
+            }
+        );
+        ok(response.ok, "addReport response not ok");
+        return await response.json();
     }
 
-    background(query: Parameters<URLSearchParams>): Promise<void> {
-        return Promise.resolve(undefined);
+    async background(query?: Record<string, string> | URLSearchParams): Promise<void> {
+        const {
+            baseUrl,
+            headers,
+            prefix
+        } = this;
+        const url = new URL(
+            "/api/background",
+            baseUrl
+        );
+        url.search = new URLSearchParams(query).toString();
+        const response = await fetch(
+            url,
+            {
+                method: "GET",
+                headers
+            }
+        );
+        ok(response.ok, "addReport response not ok");
+        await response.blob();
     }
 
-    listCategories(): Promise<Category[]> {
-        return Promise.resolve([]);
+    async listCategories(): Promise<Category[]> {
+        const {
+            baseUrl,
+            headers,
+            prefix
+        } = this;
+        const response = await fetch(
+            new URL(
+                `${prefix}/categories`,
+                baseUrl
+            ),
+            {
+                method: "GET",
+                headers
+            }
+        );
+        ok(response.ok, "listCategories response not ok");
+        return response.json();
     }
 
-    listProducts(): Promise<Product[]> {
-        return Promise.resolve([]);
+    async listProducts(): Promise<Product[]> {
+        const {
+            baseUrl,
+            headers,
+            prefix
+        } = this;
+        const response = await fetch(
+            new URL(
+                `${prefix}/products`,
+                baseUrl
+            ),
+            {
+                method: "GET",
+                headers
+            }
+        );
+        ok(response.ok, "listProducts response not ok");
+        return response.json();
     }
 
-    listReports(): Promise<Report[]> {
-        return Promise.resolve([]);
+    async listReports(): Promise<Report[]> {
+        const {
+            baseUrl,
+            headers,
+            prefix
+        } = this;
+        const response = await fetch(
+            new URL(
+                `${prefix}/reports`,
+                baseUrl
+            ),
+            {
+                method: "GET",
+                headers
+            }
+        );
+        ok(response.ok, "listReports response not ok");
+        return response.json();
     }
 
 }

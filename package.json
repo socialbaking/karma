@@ -129,13 +129,15 @@
     "build": "rm -rf esnext && tsc",
     "prebuild": "node scripts/pre-build.js",
     "postbuild": "mkdir -p coverage && node scripts/post-build.js",
+    "posttest": "mkdir -p coverage && node scripts/post-test.js",
+    "postcoverage": "mkdir -p coverage && node scripts/post-test.js",
     "generate": "yarn build && node esnext/generate.js",
     "prepublishOnly": "npm run build",
     "test": "yarn build && yarn test:node",
     "test:node": "export $(cat .env | xargs) && OTEL_SERVICE_NAME=karma-tests ENABLE_SEED=true node --enable-source-maps esnext/tests/index.js",
     "test:node:inspect": "yarn build && export $(cat .env | xargs) && OTEL_SERVICE_NAME=karma-tests ENABLE_SEED=true node --enable-source-maps --inspect-brk esnext/tests/index.js",
     "coverage": "export $(cat .env | xargs) && OTEL_SERVICE_NAME=karma-tests ENABLE_SEED=true c8 node esnext/tests/index.js && yarn postbuild",
-    "start": "yarn build && node esnext/karma/listen/main.js",
-    "local": "ENABLE_SEED=true yarn start"
+    "start": "node esnext/karma/listen/main.js",
+    "local": "ENABLE_SEED=true yarn build && yarn start"
   }
 }

@@ -9,7 +9,7 @@
 
 ### Test Coverage
 
- ![91.65%25 lines covered](https://img.shields.io/badge/lines-91.65%25-brightgreen) ![91.65%25 statements covered](https://img.shields.io/badge/statements-91.65%25-brightgreen) ![77.27%25 functions covered](https://img.shields.io/badge/functions-77.27%25-yellow) ![82.69%25 branches covered](https://img.shields.io/badge/branches-82.69%25-brightgreen)
+ ![88.11%25 lines covered](https://img.shields.io/badge/lines-88.11%25-brightgreen) ![88.11%25 statements covered](https://img.shields.io/badge/statements-88.11%25-brightgreen) ![70.98%25 functions covered](https://img.shields.io/badge/functions-70.98%25-yellow) ![82.03%25 branches covered](https://img.shields.io/badge/branches-82.03%25-brightgreen)
 
 [//]: # (badges)
 
@@ -18,6 +18,17 @@
 [//]: # (typescript client)
 
 ```typescript
+Category,
+    CategoryData,
+    Partner,
+    PartnerData,
+    SystemLog,
+    Product,
+    ProductData,
+    ReportData,
+    Report,
+} from "./interface.readonly";
+
 export interface ClientOptions {
     partnerId?: string;
     accessToken?: string;
@@ -29,8 +40,14 @@ export interface ClientOptions {
 export interface Client {
     addPartner(partner: PartnerData): Promise<Partner>;
     addCategory(category: CategoryData): Promise<Category>;
+    addProduct(product: ProductData): Promise<Product>;
+    addReport(report: ReportData): Promise<Report>;
     listPartners(): Promise<Partner[]>;
     listSystemLogs(): Promise<SystemLog[]>;
+    listProducts(): Promise<Product[]>;
+    listReports(): Promise<Report[]>;
+    listCategories(): Promise<Category[]>;
+    background(query: Record<string, string> | URLSearchParams): Promise<void>;
 }
 
 export interface CategoryData extends Record<string, unknown> {

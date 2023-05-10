@@ -29,5 +29,5 @@ export interface Client {
     listProducts(): Promise<Product[]>;
     listReports(): Promise<Report[]>;
     listCategories(): Promise<Category[]>;
-    background(query: Parameters<URLSearchParams>): Promise<void>;
+    background(query: Record<string, string> | URLSearchParams): Promise<void>;
 }

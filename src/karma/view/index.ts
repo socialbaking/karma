@@ -2,8 +2,9 @@ import {FastifyInstance} from "fastify";
 import {
     commit,
     commitAt, commitAuthor,
-    packageIdentifier, secondsBetweenCommitAndBuild,
-    timeBetweenCommitAndBuild
+    packageIdentifier, secondsBetweenCommitAndBuild, secondsBetweenCommitAndTestCompletion,
+    timeBetweenCommitAndBuild,
+    timeBetweenCommitAndTestCompletion
 } from "../package";
 
 export async function viewRoutes(fastify: FastifyInstance) {
@@ -22,6 +23,16 @@ export async function viewRoutes(fastify: FastifyInstance) {
                 <strong>Time between commit and build</strong><br/>
                 ${timeBetweenCommitAndBuild}
             </p>
+            ${
+            timeBetweenCommitAndTestCompletion ? (
+                `
+                <p data-seconds="${secondsBetweenCommitAndTestCompletion}">
+                    <strong>Time between commit and tests completion</strong><br/>
+                    ${timeBetweenCommitAndTestCompletion}
+                </p>
+                `
+            ) : "<!-- No tests ran after build -->"
+            }
             <p>
                 Source code last updated at ${commitAt} by ${commitAuthor}<br/>
                 Commit Hash: ${commit}

@@ -18,3 +18,5 @@ export async function replaceBetween(fileName, tagName, content) {
     const fileNext = `${fileBefore}${tag}\n\n${content}\n\n${tag}${fileAfter}`;
     await fs.writeFile(fileName, fileNext);
 }
+
+export const VARIABLES_REPLACE_AFTER_TEST_COMMENT = "// Variables to be replaced after tests";
