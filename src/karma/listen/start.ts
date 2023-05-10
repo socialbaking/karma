@@ -11,33 +11,13 @@ import { dirname, join } from "node:path";
 import { bearerAuthentication } from "./authentication";
 import bearerAuthPlugin from "@fastify/bearer-auth";
 import authPlugin from "@fastify/auth";
-import {seed} from "../data";
+import {seed, stopData} from "../data";
 import {commitAt, commitShort} from "../package";
 
 const { pathname } = new URL(import.meta.url);
 const directory = dirname(pathname)
 
-export async function initRedisMemory() {
-    const { RedisMemoryServer } = await import("redis-memory-server")
-    const redisServer = new RedisMemoryServer();
-
-    const host = await redisServer.getHost();
-    const port = await redisServer.getPort();
-
-    process.env.REDIS_URL = `redis://${host}:${port}`;
-
-    return async () => {
-        return redisServer.stop();
-    }
-}
-
 export async function create() {
-
-    const closeFns: (() => Promise<void>)[] = [];
-
-    if (process.env.REDIS_MEMORY && !process.env.REDIS_URL) {
-        closeFns.push(await initRedisMemory());
-    }
 
     const app = fastify({
         logger: true
@@ -96,17 +76,12 @@ export async function create() {
 
     register(routes);
 
-    return {
-        app,
-        closeFns
-    } as const;
+    return app;
 }
 
 export async function start() {
 
-    const {
-        app, closeFns
-    } = await create();
+    const app = await create();
 
     // Before we start, we should seed
     if (process.env.ENABLE_SEED) {
@@ -121,8 +96,7 @@ export async function start() {
 
     return async () => {
         await app.close();
-        await Promise.all(
-            closeFns.map(async (fn) => fn())
-        );
+        // close any opened connections
+        await stopData();
     }
 }

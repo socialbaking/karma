@@ -1,23 +1,42 @@
 import {connectGlobalRedisClient, getGlobalRedisClient, isRedis, isRedisMemory} from "./redis-client";
-import createLockClient from "redis-lock";
+import createLockClient, {LockFn} from "redis-lock";
 import {UnlockFn} from "redis-lock";
+import {RedisClientType} from "redis";
 
-const globalRedis = isRedis() ? getGlobalRedisClient() : undefined;
-const globalLock = globalRedis ? createLockClient(globalRedis) : undefined;
+const GLOBAL_LOCKS = new WeakMap<RedisClientType, LockFn>();
 
 export function isLocking() {
-    return (globalRedis && globalLock) && !isRedisMemory();
+    return !!getGlobalLock();
 }
 
 export async function lock(name: string): Promise<UnlockFn> {
+    const fn = getGlobalLock();
 
-    if (!(globalRedis && globalLock) || isRedisMemory()) {
+    if (!fn) {
         // noop for now
-        return async () => void 0;
+        return createFakeLock()
     }
 
-    await connectGlobalRedisClient(globalRedis);
+    return fn(name);
 
-    return globalLock(name);
+}
 
+export function createFakeLock(): UnlockFn {
+    return async () => {
+        return void 0; // noop
+    }
+}
+
+export function getGlobalLock(): LockFn | undefined {
+    if (isRedisMemory()) return undefined;
+    if (!isRedis()) return undefined;
+    const globalRedisClient = getGlobalRedisClient();
+    const existing = GLOBAL_LOCKS.get(globalRedisClient);
+    if (existing) return existing;
+    const fn = createLockClient(globalRedisClient);
+    GLOBAL_LOCKS.set(globalRedisClient, fn);
+    return async (name: string) => {
+        await connectGlobalRedisClient(globalRedisClient);
+        return fn(name);
+    };
 }

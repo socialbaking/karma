@@ -350,9 +350,6 @@ async function testClient() {
     await close();
 }
 
-// I want to test with redis enabled too
-// TODO
-//
 // {
 //     if (!process.env.REDIS_URL) {
 //         process.env.REDIS_MEMORY = "1";

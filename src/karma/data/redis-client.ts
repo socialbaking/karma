@@ -17,6 +17,7 @@ export function getRedisUrl() {
 }
 
 export function getGlobalRedisClient() {
+    // console.log("getGlobalRedisClient");
     const url = getRedisUrl();
     const existing = GLOBAL_CLIENTS.get(url);
     if (existing) {
@@ -138,6 +139,17 @@ export function createRedisKeyValueStore<T>(name: string): KeyValueStore<T> {
         clear,
         [Symbol.asyncIterator]() {
             return asyncIterable()[Symbol.asyncIterator]()
+        }
+    }
+}
+
+export async function stopRedis() {
+    // console.log("stopRedis", GLOBAL_CLIENTS.size);
+    for (const [key, client] of GLOBAL_CLIENTS.entries()) {
+        GLOBAL_CLIENTS.delete(key);
+        GLOBAL_CLIENT_CONNECTION_PROMISE.delete(client);
+        if (client.isOpen) {
+            await client.disconnect();
         }
     }
 }

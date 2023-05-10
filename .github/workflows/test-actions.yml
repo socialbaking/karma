@@ -12,6 +12,7 @@ jobs:
       REDIS_URL: redis://default@localhost:6379
       REDIS_HOST: localhost
       REDIS_PORT: 6379
+      TESTS_REPORT_HANDLES: 1
     services:
       # Label used to access the service container
       redis:
