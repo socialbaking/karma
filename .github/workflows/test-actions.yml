@@ -8,8 +8,8 @@ jobs:
       NO_COVERAGE_BADGE_UPDATE: 1
       PROMPT_NAME: test name
       PROMPT_EMAIL: test+email@example.com
-      REDIS_URL: redis://default@redis:6379
-      REDIS_HOST: redis
+      REDIS_URL: redis://default@localhost:6379
+      REDIS_HOST: localhost
       REDIS_PORT: 6379
     services:
       # Label used to access the service container
@@ -22,6 +22,9 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+        ports:
+          # Maps port 6379 on service container to the host
+          - 6379:6379
     steps:
       - run: uname -a
       - uses: actions/checkout@v2
