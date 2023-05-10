@@ -1,6 +1,6 @@
 import {readFile} from "node:fs/promises";
 import {dirname, join} from "node:path";
-import {commit, commitAt, commitAuthor, commitEmail} from "./package.readonly";
+import {commit, commitAt, commitAuthor, commitEmail, timeBetweenCommitAndBuild} from "./package.readonly";
 
 const { pathname } = new URL(import.meta.url);
 const directory = dirname(pathname);
@@ -23,7 +23,8 @@ export function logPackage() {
         commit,
         commitAt,
         commitAuthor,
-        commitEmail
+        commitEmail,
+        timeBetweenCommitAndBuild
     })
 
 }

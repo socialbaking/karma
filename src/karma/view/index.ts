@@ -1,5 +1,10 @@
 import {FastifyInstance} from "fastify";
-import {minutesBetweenCommitAndBuild, packageIdentifier, secondsBetweenCommitAndBuild} from "../package";
+import {
+    commit,
+    commitAt, commitAuthor,
+    packageIdentifier, secondsBetweenCommitAndBuild,
+    timeBetweenCommitAndBuild
+} from "../package";
 
 export async function viewRoutes(fastify: FastifyInstance) {
 
@@ -13,10 +18,13 @@ export async function viewRoutes(fastify: FastifyInstance) {
             <p>
                 <a href="/api/documentation">Checkout the documentation!</a>
             </p>
-            <p>
+            <p data-seconds="${secondsBetweenCommitAndBuild}">
                 <strong>Time between commit and build</strong><br/>
-                Seconds: ${secondsBetweenCommitAndBuild}<br/>
-                Minutes: ${minutesBetweenCommitAndBuild}
+                ${timeBetweenCommitAndBuild}
+            </p>
+            <p>
+                Source code last updated at ${commitAt} by ${commitAuthor}<br/>
+                Commit Hash: ${commit}
             </p>
         `);
     })
