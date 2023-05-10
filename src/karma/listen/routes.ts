@@ -7,6 +7,7 @@ import {partnerRoutes} from "./partner";
 import {metricRoutes} from "./metrics";
 import {categoryRoutes} from "./category";
 import {reportRoutes} from "./report";
+import {authenticationRoutes} from "./auth";
 
 export async function routes(fastify: FastifyInstance) {
 
@@ -23,9 +24,13 @@ export async function routes(fastify: FastifyInstance) {
         prefix: "/api/version/1"
     });
 
+    fastify.register(authenticationRoutes, {
+        prefix: "/api"
+    });
+
     fastify.register(backgroundRoutes, {
         prefix: "/api"
-    })
+    });
 
     fastify.register(viewRoutes);
 }
