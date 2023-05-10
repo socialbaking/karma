@@ -14,8 +14,9 @@ export async function setProduct(data: ProductData & Pick<Product, "productId"> 
     await store.set(data.productId, document);
     return document;
 
-    function getActiveIngredients(): ProductActiveIngredient[] {
-        const descriptions: string[] = data.activeIngredientDescriptions ?? []
+    function getActiveIngredients(): ProductActiveIngredient[] | undefined {
+        const descriptions: string[] = data.activeIngredientDescriptions;
+        if (!descriptions) return undefined;
         return descriptions.flatMap(getActiveIngredientsFromString);
     }
 

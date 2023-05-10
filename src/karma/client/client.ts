@@ -177,8 +177,7 @@ export class Client implements ClientInterface {
     async background(query?: Record<string, string> | URLSearchParams): Promise<void> {
         const {
             baseUrl,
-            headers,
-            prefix
+            headers
         } = this;
         const url = new URL(
             "/api/background",

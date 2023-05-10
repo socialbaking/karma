@@ -21,9 +21,12 @@ async function testClient() {
     const partnerName = chance.company();
     const location = chance.city();
 
+    const countryCode = Math.random() > 0.5 ? "NZL" : "CAN"
+
     const { partnerId, accessToken } = await publicClient.addPartner({
         partnerName,
         location,
+        countryCode,
         onsite: true,
         remote: true,
         pharmacy: true,
@@ -40,6 +43,15 @@ async function testClient() {
         });
 
         console.log(client);
+
+        // Seed 1 will re-run any seeding that can be done in the background task
+        // This should be fine to run over and over with no worries
+        await client.background({
+            seed: "1"
+        });
+
+        // Running background tasks with no seeding, will just run anything in the queue
+        await client.background();
 
         ok(Array.isArray(await client.listSystemLogs()));
 
@@ -77,34 +89,121 @@ async function testClient() {
 
             const categoryName = chance.animal();
             const category = await client.addCategory({
-                categoryName
+                categoryName,
+                countryCode
             })
             console.log(category);
             ok(category);
-            const { categoryId } = category;
+            const { categoryId, createdAt } = category;
+
+            const categories = await client.listCategories();
+            const foundCategory = categories.find(value => value.categoryId === categoryId);
+            ok(foundCategory);
+
+            const licencedPartner = await client.addPartner({
+                countryCode,
+                partnerName: chance.company()
+            });
+
+            {
+
+                // Simple product
+
+                const productName = chance.animal();
+
+                const product = await client.addProduct({
+                    productName,
+                    countryCode,
+                    categoryId
+                });
+
+                ok(product);
+                ok(product.productName === productName);
+                ok(product.categoryId === categoryId);
+                ok(product.createdAt);
+                ok(product.updatedAt);
+
+                ok(!product.activeIngredientDescriptions?.length);
+                ok(!product.activeIngredients?.length);
 
 
-            // TODO: Add category lists tests here, make sure its in the list
-            // const categories = await client.listCategories():
-            // const foundCategory = categories.find(value => value.categoryId === categoryId);
-            // ok(foundCategory);
+            }
+
+            {
+
+                // Complex product
+
+                const productName = chance.animal();
+                const typeA = chance.string({
+                    alpha: true,
+                    casing: "upper",
+                    length: 3
+                })
+                const typeANumber = chance.floating({
+                    min: 0.1,
+                    max: 34,
+                });
+                const typeB = chance.string({
+                    alpha: true,
+                    casing: "upper",
+                    length: 3
+                })
+                const typeBPercentageNumber = chance.floating({
+                    min: 0.1,
+                    max: 34,
+                });
+                const size = chance.integer({
+                    min: 1,
+                    max: 150
+                });
+                const typeBNumber = Math.round(size * typeBPercentageNumber) / 100
+                const sizeUnit = chance.string({
+                    alpha: true,
+                    casing: "lower",
+                    length: 2
+                })
+                const measurementUnit = chance.string({
+                    alpha: true,
+                    casing: "lower",
+                    length: 2
+                })
+                const product = await client.addProduct({
+                    productName,
+                    countryCode,
+                    categoryId,
+                    licencedPartnerId: licencedPartner.partnerId,
+                    licenceCountryCode: licencedPartner.countryCode,
+                    licenceApprovedAt: createdAt,
+                    availableAt: createdAt,
+                    sizes: [
+                        {
+                            value: size.toString(),
+                            unit: sizeUnit
+                        },
+                        {
+                            // Alpha sizes can be provided with alternative
+                            // unit descriptions
+                            //
+                            // These will not be used in activeIngredient calculations
+                            value: chance.string({ alpha: true }),
+                            unit: chance.string({ alpha: true })
+                        }
+                    ],
+                    activeIngredientDescriptions: [
+                        `Total ${typeA} ${typeANumber}%`,
+                        `Total ${typeB} (${typeB}+${typeB}Z) ${typeBPercentageNumber}% (${typeBNumber} ${measurementUnit}/${sizeUnit})`
+                    ]
+                });
+
+                console.log(product);
+
+            }
 
         }
 
 
-
-    }
-
-    {
-
-        const response = await fetch(
-            new URL(
-                "/api/background",
-                publicClient.baseUrl
-            )
-        );
-        ok(response.ok);
-        await response.blob();
+        // Running any post reporting background task
+        await client.background();
 
     }
 

@@ -10,11 +10,14 @@ interface GenericStorageFn {
     (): Promise<KVS<StorageSchema>>
 }
 
+export const STORE_NAMES = new Set<string>();
+
 export function getKeyValueStore<T>(name: string): KeyValueStore<T> {
     return getRequestContextKeyValueStoreWithName<T>(name);
 }
 
 function getRequestContextKeyValueStoreWithName<T>(name: string): KeyValueStore<T> {
+    STORE_NAMES.add(name);
     const key = `kvStore#${name}`;
     const store = get();
     if (store) return store;
