@@ -12,7 +12,6 @@ jobs:
       REDIS_URL: redis://default@localhost:6379
       REDIS_HOST: localhost
       REDIS_PORT: 6379
-      TESTS_REPORT_HANDLES: 1
     services:
       # Label used to access the service container
       redis:
@@ -50,4 +49,10 @@ jobs:
         env:
           TEST_PRODUCT_COUNT: 25
           TEST_REPORT_PER_PRODUCT_COUNT: 200
+          TEST_REPORT_PROCESSING_TIMEOUT_MS: 60000
+      - name: test:node with TEST_PRODUCT_COUNT 250 products, 6250000 reports
+        run: yarn test:node
+        env:
+          TEST_PRODUCT_COUNT: 250
+          TEST_REPORT_PER_PRODUCT_COUNT: 25000
           TEST_REPORT_PROCESSING_TIMEOUT_MS: 60000
