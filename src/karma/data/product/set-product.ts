@@ -22,12 +22,12 @@ export async function setProduct(data: ProductData & Pick<Product, "productId"> 
     function getActiveIngredientsFromString(string: string): ProductActiveIngredient[] {
 
         const percentageRegex = /([≤<]?\s*\d+(?:\.\d+)?\s*%)/;
-        const unitRegex = /([≤<]?\s*\d+(?:\.\d+)?\s*[a-z]+(?:\/[a-z]+)?)/i;
+        const unitRegex = /(?:^|\s|[\[(])([≤<]?\s*\d+(?:\.\d+)?\s*[a-z]+(?:\s*\/\s*[a-z]+)?)/ig;
 
         const ingredients: ProductActiveIngredient[] = [];
 
         const percentageMatch = string.match(percentageRegex);
-        const unitMatch = string.match(unitRegex);
+        const unitMatches = string.matchAll(unitRegex);
 
         let type = string;
 
@@ -78,47 +78,53 @@ export async function setProduct(data: ProductData & Pick<Product, "productId"> 
             }
         }
 
-        if (unitMatch) {
-            const unitSubMatch = unitMatch[1].match(/([a-z]+(?:\/[a-z]+)?)/i);
-            ok(unitSubMatch, "Expected unit to match regex");
-            const [,unit] = unitSubMatch;
-            const withoutUnit = unitMatch[1].replace(unit, "").trim();
-            const { value, prefix } = splitPrefix(withoutUnit);
+        if (unitMatches) {
+            for (const [,unitMatch] of unitMatches) {
 
-            ingredients.push({
-                type,
-                unit,
-                value,
-                prefix
-            });
+                const [withoutUnit, ...unitParts] = unitMatch
+                    .replace(/[\[\]()]/g, "")
+                    .trim()
+                    .split(/\s+/)
 
-            if (data.sizes?.length) {
+                const unit = unitParts.join("");
+                const { value, prefix } = splitPrefix(withoutUnit);
 
-                const [calculatedUnit,basis] = unit.split("/")
+                ingredients.push({
+                    type,
+                    unit,
+                    value,
+                    prefix
+                });
 
-                const numeric = +value;
+                if (data.sizes?.length) {
 
-                for (const size of data.sizes) {
-                    if (!isNumberString(size.value)) {
-                        continue;
+                    const [calculatedUnit,basis] = unit.split("/")
+
+                    const numeric = +value;
+
+                    for (const size of data.sizes) {
+                        if (!isNumberString(size.value)) {
+                            continue;
+                        }
+                        // If no basis, we will directly use size * unit
+                        if (basis && size.unit.toLowerCase() !== basis.toLowerCase()) {
+                            continue;
+                        }
+                        const numericSize = +size.value;
+                        ingredients.push({
+                            type,
+                            unit: calculatedUnit,
+                            calculated: true,
+                            calculatedUnit: unit,
+                            value: toHumanNumberString(numeric * numericSize),
+                            size,
+                            prefix
+                        });
                     }
-                    // If no basis, we will directly use size * unit
-                    if (basis && size.unit.toLowerCase() !== basis.toLowerCase()) {
-                        continue;
-                    }
-                    const numericSize = +size.value;
-                    ingredients.push({
-                        type,
-                        unit: calculatedUnit,
-                        calculated: true,
-                        calculatedUnit: unit,
-                        value: toHumanNumberString(numeric * numericSize),
-                        size,
-                        prefix
-                    });
+
                 }
-
             }
+
 
         }
 
