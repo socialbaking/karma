@@ -12,6 +12,7 @@ import { bearerAuthentication } from "./authentication";
 import bearerAuthPlugin from "@fastify/bearer-auth";
 import authPlugin from "@fastify/auth";
 import {seed} from "../data";
+import {commit, commitAt} from "../package.readonly";
 
 const { pathname } = new URL(import.meta.url);
 const directory = dirname(pathname)
@@ -74,6 +75,10 @@ export async function create() {
             request.requestContext.set("origin", `${request.protocol}://${request.hostname}`);
 
             response.header("X-Powered-By", `${name}@${version}`);
+
+            // Some details about time since commit
+            response.header("X-Source-Commit", commit);
+            response.header("X-Source-Commit-At", commitAt);
         }
     )
 

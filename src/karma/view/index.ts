@@ -1,5 +1,5 @@
 import {FastifyInstance} from "fastify";
-import {packageIdentifier} from "../package";
+import {minutesBetweenCommitAndBuild, packageIdentifier, secondsBetweenCommitAndBuild} from "../package";
 
 export async function viewRoutes(fastify: FastifyInstance) {
 
@@ -12,6 +12,11 @@ export async function viewRoutes(fastify: FastifyInstance) {
             <p>Welcome! You are running ${packageIdentifier}</p>
             <p>
                 <a href="/api/documentation">Checkout the documentation!</a>
+            </p>
+            <p>
+                <strong>Time between commit and build</strong><br/>
+                Seconds: ${secondsBetweenCommitAndBuild}<br/>
+                Minutes: ${minutesBetweenCommitAndBuild}
             </p>
         `);
     })
