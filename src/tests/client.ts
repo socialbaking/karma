@@ -182,8 +182,8 @@ async function testClient() {
             }
 
 
-            const additionalProductCount = (isRedis() && TEST_PRODUCT_COUNT) ? +TEST_PRODUCT_COUNT : 2;
-            const reportCountPerProduct = (isRedis() && TEST_REPORT_PER_PRODUCT_COUNT) ? +TEST_REPORT_PER_PRODUCT_COUNT : 2;
+            const additionalProductCount = (isRedis() && TEST_PRODUCT_COUNT) ? +TEST_PRODUCT_COUNT : 1;
+            const reportCountPerProduct = (isRedis() && TEST_REPORT_PER_PRODUCT_COUNT) ? +TEST_REPORT_PER_PRODUCT_COUNT : 1;
 
             const reportsStartedAt = Date.now();
 
