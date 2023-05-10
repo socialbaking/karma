@@ -44,15 +44,34 @@ jobs:
         run: yarn test:node
         env:
           PORT: 3400
+
+      # Takes 13256 ms first time ran
       - name: test:node with TEST_PRODUCT_COUNT 25 products, 5000 reports
         run: yarn test:node
         env:
           TEST_PRODUCT_COUNT: 25
           TEST_REPORT_PER_PRODUCT_COUNT: 200
           TEST_REPORT_PROCESSING_TIMEOUT_MS: 60000
-      - name: test:node with TEST_PRODUCT_COUNT 250 products, 6250000 reports
+      # Remember this is ADDING each time to the same database
+      # When we run the background task in here, it will be running the same reports
+      # Expected time
+      # (13256 / 5000 * 25000) / 1000 = 67 seconds
+      # (13256 ms / 5000 reports * 25000 reports) / 1000 ms = 67 seconds
+      - name: test:node with TEST_PRODUCT_COUNT 50 products, 25000 reports
         run: yarn test:node
         env:
-          TEST_PRODUCT_COUNT: 250
-          TEST_REPORT_PER_PRODUCT_COUNT: 25000
-          TEST_REPORT_PROCESSING_TIMEOUT_MS: 60000
+          TEST_PRODUCT_COUNT: 50
+          TEST_REPORT_PER_PRODUCT_COUNT: 500
+          # Should be over expected 67 seconds + 13 seconds from previous reports
+          TEST_REPORT_PROCESSING_TIMEOUT_MS: 120000
+
+#      - name: test:node with TEST_PRODUCT_COUNT 250 products, 6250000 reports
+#        run: yarn test:node
+#        env:
+#          TEST_PRODUCT_COUNT: 250
+#          TEST_REPORT_PER_PRODUCT_COUNT: 25000
+#          # (13256 / 5000 * 6250000) / 1000 / 60 = 276 minutes
+#          # (13256 ms / 5000 reports * 6250000 reports) / 1000 ms / 60 seconds = 276 minutes
+#          #
+#          # Requires enterprise processing time if we don't take into account workers
+#          TEST_REPORT_PROCESSING_TIMEOUT_MS: 60000
