@@ -125,6 +125,7 @@
     "postinstall": "patch-package || exit 0",
     "test:all": "yarn test:node",
     "build": "rm -rf esnext && tsc",
+    "prebuild": "node scripts/pre-build.js",
     "postbuild": "mkdir -p coverage && node scripts/post-build.js",
     "generate": "yarn build && node esnext/generate.js",
     "prepublishOnly": "npm run build",

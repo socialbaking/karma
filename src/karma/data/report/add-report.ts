@@ -1,6 +1,7 @@
 import {v4} from "uuid";
-import {Report, ReportData, ReportReference} from "./types";
+import {Report, ReportData} from "./types";
 import {getReportQueueStore, getReportStore} from "./store";
+import {ReportReference} from "./reference";
 
 export interface AddReportInput extends ReportData {
 

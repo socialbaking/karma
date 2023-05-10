@@ -11,6 +11,8 @@ import {
 } from "./client.interface"
 import {ok} from "../../is";
 
+export * from "./client.interface";
+
 export class Client implements ClientInterface {
 
     readonly baseUrl: string | URL;
