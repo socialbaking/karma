@@ -347,12 +347,28 @@ async function testClient() {
 
             ok(reportsBackgroundTotalProcessing < MAX_REPORT_PROCESSING_MS, `Processing reports took longer than ${MAX_REPORT_PROCESSING_MS}ms`);
 
+
+
         }
 
 
-        // Running any post reporting background task
-        await client.background();
+        {
+            // Ensure we can still completely list all the values available
+            // This will also show us the times for how long each of these take with the count we have
+            const reports = await client.listReports();
+            const products = await client.listProducts();
+            const partners = await client.listPartners();
+            const categories = await client.listCategories();
+            const systemLogs = await client.listSystemLogs();
 
+            console.log({
+                reports: reports.length,
+                products: products.length,
+                partners: partners.length,
+                categories: categories.length,
+                systemLogs: systemLogs.length
+            });
+        }
     }
 
     await close();
