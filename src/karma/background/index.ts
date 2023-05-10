@@ -4,7 +4,7 @@ import {
     getReport,
     getReportQueueStore,
     isProductReport,
-    Report,
+    Report, seed,
     toHumanNumberString
 } from "../data";
 import {
@@ -14,9 +14,14 @@ import {
     getReportMetricsStore,
     ReportMetrics
 } from "../data/metrics";
+import {isLike} from "../../is";
 
 export interface BackgroundInput extends Record<string, unknown> {
 
+}
+
+export interface QueryInput extends BackgroundInput {
+    query: Record<string, string>
 }
 
 export async function getReportMetrics(report: Report): Promise<ReportMetrics> {
@@ -133,6 +138,10 @@ async function calculateMonthlyMetrics() {
 
 }
 
+function isQueryInput(input: BackgroundInput): input is QueryInput {
+    return isLike<QueryInput>(input) && !!input.query;
+}
+
 export async function background(input: BackgroundInput) {
 
     console.log(`Running background tasks`, input);
@@ -141,8 +150,12 @@ export async function background(input: BackgroundInput) {
         // someInitialData: "start"
     });
 
-    await calculateDailyMetrics();
-    await calculateMonthlyMetrics();
+    if (isQueryInput(input) && input.query.seed) {
+        await seed();
+    }
+
+    // await calculateDailyMetrics();
+    // await calculateMonthlyMetrics();
 
     await complete({
         // someCompletedData: "complete"
