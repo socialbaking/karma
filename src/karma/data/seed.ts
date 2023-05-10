@@ -78,7 +78,7 @@ const partners: Partner[] = [
         website: "https://cannabisclinic.co.nz/",
         approvedAt,
         approved: true,
-        countryCode: "NZL"
+        countryCode: "NZ"
     },
     {
         partnerName: "CannaPlus+",
@@ -88,7 +88,7 @@ const partners: Partner[] = [
         website: "https://cannaplus.co.nz/",
         approvedAt,
         approved: true,
-        countryCode: "NZL"
+        countryCode: "NZ"
     },
     {
         partnerName: "The Pain Clinic",
@@ -96,7 +96,7 @@ const partners: Partner[] = [
         pharmacy: true,
         approvedAt,
         approved: true,
-        countryCode: "NZL"
+        countryCode: "NZ"
     },
     {
         partnerName: "Green Doctors",
@@ -106,7 +106,7 @@ const partners: Partner[] = [
         website: "https://greendoctors.co.nz/",
         approvedAt,
         approved: true,
-        countryCode: "NZL"
+        countryCode: "NZ"
     },
     {
         partnerName: "Dr Gulbransen GP",
@@ -114,7 +114,7 @@ const partners: Partner[] = [
         website: "https://www.cannabiscare.nz/",
         approvedAt,
         approved: true,
-        countryCode: "NZL"
+        countryCode: "NZ"
     },
     {
         partnerName: "Koru Medical Clinic",
@@ -122,7 +122,7 @@ const partners: Partner[] = [
         website: "https://korumedical.co.nz/",
         approvedAt,
         approved: true,
-        countryCode: "NZL"
+        countryCode: "NZ"
     },
     {
         partnerName: "RestoreMe",
@@ -130,7 +130,7 @@ const partners: Partner[] = [
         website: "https://www.restoremeclinic.co.nz/",
         approvedAt,
         approved: true,
-        countryCode: "NZL"
+        countryCode: "NZ"
     },
     {
         partnerName: "Wellworks Pharmacy Taranaki Street",
@@ -139,7 +139,7 @@ const partners: Partner[] = [
         website: "https://www.wellworks.co.nz/",
         approvedAt,
         approved: true,
-        countryCode: "NZL"
+        countryCode: "NZ"
     },
     {
         partnerName: "Nga Hua Pharmacy",
@@ -148,62 +148,62 @@ const partners: Partner[] = [
         website: "https://www.ngahuapharmacy.co.nz/",
         approvedAt,
         approved: true,
-        countryCode: "NZL"
+        countryCode: "NZ"
     },
     {
         partnerName: "Medleaf Therapeutics",
         website: "https://medleaf.co.nz/",
         approvedAt,
         approved: true,
-        countryCode: "NZL"
+        countryCode: "NZ"
     },
     {
         partnerName: "NUBU Pharmaceuticals",
         website: "https://www.nubupharma.com/",
         approvedAt,
         approved: true,
-        countryCode: "NZL"
+        countryCode: "NZ"
     },
     {
         partnerName: "MedReleaf NZ",
         approvedAt,
         approved: true,
-        countryCode: "NZL"
+        countryCode: "NZ"
     },
     {
         partnerName: "CDC Pharmaceuticals",
         website: "https://www.cdc.co.nz/",
         approvedAt,
         approved: true,
-        countryCode: "NZL"
+        countryCode: "NZ"
     },
     {
         partnerName: "Helius Therapeutics",
         website: "https://www.helius.co.nz/",
         approvedAt,
         approved: true,
-        countryCode: "NZL"
+        countryCode: "NZ"
     },
     {
         partnerName: "Cannasouth Bioscience",
         website: "https://www.cannasouth.co.nz/",
         approvedAt,
         approved: true,
-        countryCode: "NZL"
+        countryCode: "NZ"
     },
     {
         partnerName: "RUA Bioscience",
         website: "https://www.ruabio.com/",
         approvedAt,
         approved: true,
-        countryCode: "NZL"
+        countryCode: "NZ"
     },
     {
         partnerName: "Emerge Health New Zealand",
         website: "https://emergeaotearoa.org.nz/",
         approvedAt,
         approved: true,
-        countryCode: "NZL"
+        countryCode: "NZ"
     }
 ]
     .map((data): Partner => ({

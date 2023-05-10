@@ -6,3 +6,4 @@ export * from "./report";
 export * from "./product";
 export * from "./background";
 export * from "./lock";
+export * from "./metrics";

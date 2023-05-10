@@ -88,7 +88,7 @@ export const reportData = {
         },
     },
     required: [
-        "reportName"
+        "countryCode"
     ]
 } as const;
 

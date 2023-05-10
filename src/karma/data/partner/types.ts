@@ -1,7 +1,7 @@
 
 export interface PartnerData extends Record<string, unknown> {
     partnerName: string;
-    countryCode?: string; // "NZL"
+    countryCode?: string; // "NZ"
     location?: string;
     remote?: boolean;
     onsite?: boolean;

@@ -1,6 +1,6 @@
 import {addReport, listPartners, listProducts} from "../karma/data";
 import {ok} from "../is";
-import {getReportMetrics} from "../karma/background";
+import {calculateReportMetrics} from "../karma/background";
 
 {
 
@@ -34,7 +34,7 @@ import {getReportMetrics} from "../karma/background";
     const report = await addReport({
         productId: shishkaberry.productId,
         productName: shishkaberry.productName,
-        countryCode: "NZL",
+        countryCode: "NZ",
         orderedAt: new Date(now).toISOString(),
         shippedAt: new Date(now + (2 * ONE_DAY_MS)).toISOString(),
         receivedAt: new Date(now + (4 * ONE_DAY_MS)).toISOString(),
@@ -51,7 +51,7 @@ import {getReportMetrics} from "../karma/background";
 
     console.log(report);
 
-    const metrics = await getReportMetrics(report);
+    const metrics = await calculateReportMetrics(report);
     console.log(metrics);
 
 

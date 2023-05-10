@@ -1,5 +1,5 @@
 import {getKeyValueStore} from "../kv";
-import {MonthlyMetrics, DailyMetrics, ReportMetrics} from "./types";
+import {ReportMetrics, CountryProductMetrics} from "./types";
 
 const REPORT_METRICS_STORE_NAME = "reportMetrics"
 const DAILY_METRICS_STORE_NAME = "dailyMetrics"
@@ -10,9 +10,9 @@ export function getReportMetricsStore() {
 }
 
 export function getDailyMetricsStore() {
-    return getKeyValueStore<DailyMetrics>(DAILY_METRICS_STORE_NAME);
+    return getKeyValueStore<CountryProductMetrics>(DAILY_METRICS_STORE_NAME);
 }
 
 export function getMonthlyMetricsStore() {
-    return getKeyValueStore<MonthlyMetrics>(MONTHLY_METRICS_STORE_NAME);
+    return getKeyValueStore<CountryProductMetrics>(MONTHLY_METRICS_STORE_NAME);
 }

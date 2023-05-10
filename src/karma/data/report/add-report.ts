@@ -16,7 +16,8 @@ export async function addReport(data: AddReportInput): Promise<Report> {
         ...data,
         reportId,
         createdAt,
-        updatedAt: createdAt
+        updatedAt: createdAt,
+        reportedAt: createdAt
     };
     await store.set(reportId, report);
     const reference: ReportReference = {

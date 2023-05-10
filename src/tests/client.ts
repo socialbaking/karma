@@ -21,7 +21,7 @@ async function testClient() {
     const partnerName = chance.company();
     const location = chance.city();
 
-    const countryCode = Math.random() > 0.5 ? "NZL" : "CAN"
+    const countryCode = Math.random() > 0.5 ? "NZ" : "CA"
 
     const { partnerId, accessToken } = await publicClient.addPartner({
         partnerName,
@@ -104,6 +104,16 @@ async function testClient() {
                 countryCode,
                 partnerName: chance.company()
             });
+            const clinicPartner = await client.addPartner({
+                countryCode,
+                partnerName: chance.company(),
+                clinic: true
+            });
+            const pharmacyPartner = await client.addPartner({
+                countryCode,
+                partnerName: chance.company(),
+                pharmacy: true
+            });
 
             {
 
@@ -125,6 +135,10 @@ async function testClient() {
 
                 ok(!product.activeIngredientDescriptions?.length);
                 ok(!product.activeIngredients?.length);
+
+                const products = await client.listProducts();
+                const foundProduct = products.find(value => value.productId === product.productId);
+                ok(foundProduct);
 
 
             }
@@ -196,6 +210,66 @@ async function testClient() {
                 });
 
                 console.log(product);
+                ok(product);
+                ok(product.productName === productName);
+
+                // 2 percentage, 1 type b unit/unit, 3 units
+                ok(product.activeIngredients.length >= 5);
+                ok(product.sizes);
+                ok(product.sizes.length === 2);
+
+                const calculated = product.activeIngredients.filter(value => value.calculated);
+                // 2 percentage units, 1 multiple unit
+                ok(calculated.length >= 3);
+
+                const typeACalculated = calculated.filter(value => value.type === typeA);
+                ok(typeACalculated.length >= 1);
+
+                const typeBCalculated = calculated.filter(value => value.type === typeB);
+                ok(typeBCalculated.length >= 2);
+
+
+                {
+                    const { productId, productName } = product;
+
+                    const now = Date.now();
+
+                    const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+
+                    const report = await client.addReport({
+                        productId: productId,
+                        productName,
+                        countryCode,
+                        orderedAt: new Date(now).toISOString(),
+                        shippedAt: new Date(now + (2 * ONE_DAY_MS)).toISOString(),
+                        receivedAt: new Date(now + (4 * ONE_DAY_MS)).toISOString(),
+                        productPurchaseItemCost: "455",
+                        productPurchaseDeliveryCost: "8.50",
+                        productPurchaseTotalCost: "918.50",
+                        productPurchaseFeeCost: "0.00",
+                        productPurchaseItems: "2",
+                        productPurchase: true,
+                        productPurchasePartnerId: pharmacyPartner.partnerId,
+                        productPurchasePartnerName: pharmacyPartner.partnerName,
+                        productPrescription: true,
+                        productPrescriptionAt: new Date(now).toISOString(),
+                        productPrescriptionPartnerName: clinicPartner.partnerName,
+                        productPrescriptionPartnerId: clinicPartner.partnerId,
+                        productPrescriptionFeeCost: "49.50",
+                        productSize: product.sizes.at(0),
+                    });
+
+                    ok(report);
+                    ok(report.productId === productId);
+
+                    const reports = await client.listReports();
+                    const foundReport = reports.find(value => value.reportId === report.reportId);
+                    ok(foundReport);
+
+                }
+
+                // Trigger background tasks :)
+                await client.background();
 
             }
 

@@ -11,7 +11,7 @@ export interface Category extends CategoryData {
 
 export interface PartnerData extends Record<string, unknown> {
     partnerName: string;
-    countryCode?: string; // "NZL"
+    countryCode?: string; // "NZ"
     location?: string;
     remote?: boolean;
     onsite?: boolean;
@@ -74,8 +74,17 @@ export interface Product extends ProductData {
     activeIngredients?: ProductActiveIngredient[];
 }
 
-export interface ReportData extends Record<string, unknown> {
-    countryCode: string; // "NZL"
+export interface ReportDateData {
+    orderedAt?: string;
+    shippedAt?: string;
+    receivedAt?: string;
+    createdAt?: string;
+    updatedAt?: string;
+    reportedAt?: string;
+}
+
+export interface ReportData extends ReportDateData, Record<string, unknown> {
+    countryCode: string; // "NZ"
     note?: string;
     parentReportId?: string;
     productId?: string;
@@ -93,15 +102,13 @@ export interface ReportData extends Record<string, unknown> {
     productSize?: ProductSizeData;
     createdByUserId?: string;
     anonymous?: boolean;
-    orderedAt?: string;
-    shippedAt?: string;
-    receivedAt?: string;
 }
 
 export interface Report extends ReportData {
     reportId: string;
     createdAt: string;
     updatedAt: string;
+    reportedAt: string;
 }
 
 export interface SystemLogData extends Record<string, unknown> {
