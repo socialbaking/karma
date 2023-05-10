@@ -314,8 +314,14 @@ async function testClient() {
                     ok(report);
                     ok(report.productId === productId);
 
-                    const foundReport = await client.getReport(report.reportId);
+                    let foundReport = await client.getReport(report.reportId);
                     ok(foundReport);
+
+                    if (reportIndex <= 1 && productIndex <= 1) {
+                        const reports = await client.listReports();
+                        foundReport = reports.find(value => value.reportId === report.reportId);
+                        ok(foundReport);
+                    }
 
                 }
 
