@@ -10,6 +10,8 @@ const CLIENT_INTERFACE_PATH = "./src/karma/client/client.interface.ts"
 
 const PACKAGE_GENERATED_PATH = "./src/karma/package.readonly.ts"
 
+const CLIENT_START_LINE = "// Client start";
+
 const IGNORE_TYPES = [
     "access-token",
     "background",
@@ -60,6 +62,8 @@ await writeFile(
 let client = await readFile(CLIENT_INTERFACE_PATH, "utf-8");
 
 client = client
+    .split(CLIENT_START_LINE)
+    .at(1)
     .replace(/^\/\/.+/mg, "")
     .replace(/^import\s*.+/mg, "")
 

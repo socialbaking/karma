@@ -18,17 +18,6 @@
 [//]: # (typescript client)
 
 ```typescript
-Category,
-    CategoryData,
-    Partner,
-    PartnerData,
-    SystemLog,
-    Product,
-    ProductData,
-    ReportData,
-    Report,
-} from "./interface.readonly";
-
 export interface ClientOptions {
     partnerId?: string;
     accessToken?: string;
