@@ -1,7 +1,8 @@
 import {FastifyInstance} from "fastify";
 import {listSystemLogs, systemLogSchema} from "../../data";
 import {FromSchema} from "json-schema-to-ts";
-import {authenticate, getMaybeAuthorizedForPartnerId} from "../authentication";
+import {authenticate} from "../authentication";
+import {getMaybeAuthorizedForPartnerId} from "../../authentication";
 
 export async function listSystemLogsRoutes(fastify: FastifyInstance) {
 

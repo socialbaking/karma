@@ -1,6 +1,7 @@
 import {FastifyInstance, FastifyRequest} from "fastify";
 import {listPartners, partnerSchema} from "../../data";
-import {authenticate, getMaybeAuthorizedForPartnerId} from "../authentication";
+import {authenticate} from "../authentication";
+import {getMaybeAuthorizedForPartnerId} from "../../authentication";
 
 export async function listPartnerRoutes(fastify: FastifyInstance) {
 

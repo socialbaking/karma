@@ -1,6 +1,7 @@
 import {FastifyInstance} from "fastify";
 import {addReport, ReportData, reportSchema} from "../../data";
-import {authenticate, isAnonymous} from "../authentication";
+import {authenticate} from "../authentication";
+import {isAnonymous} from "../../authentication";
 
 export async function addReportRoutes(fastify: FastifyInstance) {
 
