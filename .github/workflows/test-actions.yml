@@ -45,9 +45,9 @@ jobs:
         run: yarn test:node
         env:
           PORT: 3400
-#      - name: test:node with TEST_PRODUCT_COUNT 2
-#        run: yarn test:node
-#        env:
-#          TEST_PRODUCT_COUNT: 2
-#          TEST_REPORT_PER_PRODUCT_COUNT: 2
-#          TEST_REPORT_PROCESSING_TIMEOUT_MS: 60000
+      - name: test:node with TEST_PRODUCT_COUNT 25 products, 5000 reports
+        run: yarn test:node
+        env:
+          TEST_PRODUCT_COUNT: 25
+          TEST_REPORT_PER_PRODUCT_COUNT: 200
+          TEST_REPORT_PROCESSING_TIMEOUT_MS: 60000
