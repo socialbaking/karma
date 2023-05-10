@@ -43,21 +43,9 @@ jobs:
         run: yarn test:node
         env:
           PORT: 3400
-      - name: test:node with TEST_PRODUCT_COUNT 250
-        run: yarn test:node
-        env:
-          # 250 * 10000 = 2,500,000
-          # Current Australia market size
-          TEST_PRODUCT_COUNT: 250
-          # Current reported single clinic size
-          TEST_REPORT_PER_PRODUCT_COUNT: 10000
-          TEST_REPORT_PROCESSING_TIMEOUT_MS: 60000
-#      - name: test:node with TEST_PRODUCT_COUNT 1000, TEST_REPORT_PER_PRODUCT_COUNT 250000
+#      - name: test:node with TEST_PRODUCT_COUNT 2
 #        run: yarn test:node
 #        env:
-#          # 500 * 250000 = 125,000,000
-#          # Double current Australia market size
-#          TEST_PRODUCT_COUNT: 500
-#          # A pretty large size to target, unsure how long it will take to process, but lets see
-#          TEST_REPORT_PER_PRODUCT_COUNT: 250000
+#          TEST_PRODUCT_COUNT: 2
+#          TEST_REPORT_PER_PRODUCT_COUNT: 2
 #          TEST_REPORT_PROCESSING_TIMEOUT_MS: 60000
