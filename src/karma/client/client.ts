@@ -1,9 +1,13 @@
 import {
-    Partner,
-    SystemLog,
-    PartnerData,
+    Category,
     CategoryData,
-    Category
+    Partner,
+    PartnerData,
+    SystemLog,
+    Product,
+    ProductData,
+    ReportData,
+    Report,
 } from "./interface.readonly";
 import {
     Client as ClientInterface,
@@ -126,6 +130,30 @@ export class Client implements ClientInterface {
         );
         ok(response.ok, "listSystemLogs response not ok");
         return response.json();
+    }
+
+    addProduct(product: ProductData): Promise<Product> {
+        return Promise.resolve(undefined);
+    }
+
+    addReport(report: ReportData): Promise<Report> {
+        return Promise.resolve(undefined);
+    }
+
+    background(query: Parameters<URLSearchParams>): Promise<void> {
+        return Promise.resolve(undefined);
+    }
+
+    listCategories(): Promise<Category[]> {
+        return Promise.resolve([]);
+    }
+
+    listProducts(): Promise<Product[]> {
+        return Promise.resolve([]);
+    }
+
+    listReports(): Promise<Report[]> {
+        return Promise.resolve([]);
     }
 
 }
