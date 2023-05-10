@@ -477,6 +477,18 @@ async function seedProducts() {
             ],
         },
         {
+            productName: "Tilray FS Oral Solution THC 5:  CBD 20",
+            licenceCountryCode: cdc.countryCode,
+            licencedPartnerId: cdc.partnerId,
+            licenceApprovedAt: "2023-05-10T02:20:00.000Z",
+            availableAt: undefined,
+            sizes: [{ value: "40", unit: "mL" }],
+            activeIngredientDescriptions: [
+                "Total THC (THC+THCA) 5.3 mg/g (5 mg/mL)",
+                "Total CBD (CBD+CBDA)  21.3 mg/g (20 mg/mL)"
+            ],
+        },
+        {
             productName: "KIKUYA Dune",
             licenceCountryCode: nubu.countryCode,
             licencedPartnerId: nubu.partnerId,
@@ -501,6 +513,18 @@ async function seedProducts() {
             sizes: [{ value: "10", unit: "g" }],
             activeIngredientDescriptions: [
                 "Total THC (THC+THCA) 200 mg/g (20% w/w)",
+                "Total CBD (CBD+CBDA) ≤10 mg/g (≤1% w/w)"
+            ],
+        },
+        {
+            productName: "KIKUYA Peak",
+            licenceCountryCode: nubu.countryCode,
+            licencedPartnerId: nubu.partnerId,
+            licenceApprovedAt: "2023-05-10T02:20:00.000Z",
+            availableAt: undefined,
+            sizes: [{ value: "10", unit: "g" }],
+            activeIngredientDescriptions: [
+                "Total THC (THC+THCA) 255 mg/g (25.5 % w/w)",
                 "Total CBD (CBD+CBDA) ≤10 mg/g (≤1% w/w)"
             ],
         },
