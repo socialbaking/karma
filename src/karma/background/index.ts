@@ -233,7 +233,7 @@ async function calculateQueuedMetrics() {
                 timezone: zone
             };
 
-            await store.set(timestamp, countryReport);
+            await store.set(`${countryCode}_${timestamp}`, countryReport);
         }
 
         // Only process a few days behind, if a report is made against the

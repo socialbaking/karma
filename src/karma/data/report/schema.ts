@@ -1,8 +1,39 @@
 import {productSizeData} from "../product/schema";
 
+export const reportDateData = {
+    type: "object",
+    properties: {
+        orderedAt: {
+            type: "string",
+            nullable: true
+        },
+        shippedAt: {
+            type: "string",
+            nullable: true
+        },
+        receivedAt: {
+            type: "string",
+            nullable: true
+        },
+        expiresAt: {
+            type: "string",
+            nullable: true
+        },
+        createdAt: {
+            type: "string",
+            nullable: true
+        },
+        updatedAt: {
+            type: "string",
+            nullable: true
+        },
+    }
+} as const;
+
 export const reportData = {
     type: "object",
     properties: {
+        ...reportDateData.properties,
         countryCode: {
             type: "string"
         },
@@ -73,22 +104,6 @@ export const reportData = {
         anonymous: {
             type: "boolean",
             nullable: true
-        },
-        orderedAt: {
-            type: "string",
-            nullable: true
-        },
-        shippedAt: {
-            type: "string",
-            nullable: true
-        },
-        receivedAt: {
-            type: "string",
-            nullable: true
-        },
-        expiresAt: {
-            type: "string",
-            nullable: true
         }
     },
     required: [
@@ -99,10 +114,10 @@ export const reportData = {
 export const report = {
     type: "object",
     properties: {
+        ...reportData.properties,
         reportId: {
             type: "string"
         },
-        ...reportData.properties,
         createdAt: {
             type: "string"
         },

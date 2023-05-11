@@ -14,16 +14,16 @@ export interface ActiveIngredientMetrics extends Record<string, unknown> {
 }
 
 export interface ReportMetricsData extends ReportDateData, Record<string, unknown> {
-    activeIngredients: ActiveIngredientMetrics[]
-}
-
-export interface ReportMetrics extends ReportMetricsData {
+    activeIngredients: ActiveIngredientMetrics[];
     reportId: string;
     productId: string;
     countryCode: string;
+    reportedAt: string;
+}
+
+export interface ReportMetrics extends ReportMetricsData {
     createdAt: string;
     updatedAt: string;
-    reportedAt: string;
 }
 
 export interface ProductMetricData extends Record<string, unknown> {
