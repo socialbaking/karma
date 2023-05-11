@@ -25,37 +25,32 @@ export interface ActiveIngredientMetrics extends Record<string, unknown> {
     prefix?: string;
 }
 
-export interface ReportMetricsData extends ReportDateData, Record<string, unknown> {
-    activeIngredients: ActiveIngredientMetrics[];
-    reportId: string;
-    productId: string;
-    countryCode: string;
-    reportedAt: string;
-}
-
-export interface ReportMetrics extends ReportMetricsData {
-    createdAt: string;
-    updatedAt: string;
-}
-
 export interface ProductMetricData extends Record<string, unknown> {
     productId: string;
     activeIngredients: ActiveIngredientMetrics[];
 }
 
-export interface CountryProductMetricData extends Record<string, unknown> {
+export interface MetricsData extends ReportDateData {
     products: ProductMetricData[];
+}
+
+export interface ReportMetrics extends MetricsData, Expiring, Record<string, unknown> {
+    reportId: string;
+    countryCode: string;
+    reportedAt: string;
+    createdAt: string;
+    updatedAt: string;
 }
 
 export type CountryProductMetricDuration = "day" | "month";
 
-export interface CountryProductMetrics extends CountryProductMetricData {
+export interface CountryProductMetrics extends MetricsData, Expiring {
     createdAt: string;
     updatedAt: string;
     countryCode: string;
     duration: CountryProductMetricDuration;
-    timestamp: string;
     timezone: string;
+    reportingDateKey: keyof ReportDateData;
 }
 
 export interface PartnerData extends Record<string, unknown> {
@@ -134,6 +129,7 @@ export interface ReportDateData {
 
 export interface ReportData extends ReportDateData, Expiring, Record<string, unknown> {
     countryCode: string; // "NZ"
+    currencySymbol?: string; // "$"
     note?: string;
     parentReportId?: string;
     productId?: string;

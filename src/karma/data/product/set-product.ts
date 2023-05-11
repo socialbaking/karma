@@ -1,6 +1,8 @@
 import {ProductActiveIngredient, Product, ProductData} from "./types";
 import {getProductStore} from "./store";
 import {ok} from "../../../is";
+import {toHumanNumberString} from "../../calculations";
+import {isNumberString} from "../../calculations/is";
 
 export async function setProduct(data: ProductData & Pick<Product, "productId"> & Partial<Product>): Promise<Product> {
     const store = await getProductStore();
@@ -141,21 +143,4 @@ export async function setProduct(data: ProductData & Pick<Product, "productId"> 
         }
 
     }
-}
-
-
-export function isNumberString(value?: unknown): value is `${number}` {
-    return (
-        typeof value === "string" &&
-        /^-?\d+(?:\.\d+)?$/.test(value)
-    );
-}
-
-export function toHumanNumberString(value: number) {
-    const string = value.toString();
-    const split = string.split(".");
-    if (split.length === 1) return string;
-    if (split[1].length <= 2) return string;
-    const rounded = Math.round(value * 10000) / 10000;
-    return rounded.toString();
 }

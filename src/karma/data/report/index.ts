@@ -4,6 +4,5 @@ export * from "./get-report";
 export * from "./list-reports";
 export * from "./add-report";
 export * as reportSchema from "./schema";
-export * from "./is";
 export * from "./reference";
 export * from "./report-dates";

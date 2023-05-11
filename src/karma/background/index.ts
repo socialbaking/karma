@@ -5,7 +5,6 @@ import {
     getReportQueueStore,
     Report,
     seed,
-    toHumanNumberString,
     ActiveIngredientMetrics,
     getDailyMetricsStore,
     getMonthlyMetricsStore,
@@ -13,17 +12,22 @@ import {
     getReportMetricsStore,
     ReportMetrics,
     ProductMetricData,
-    isNumberString,
     ReportDateData,
     CountryProductMetrics,
-    CountryProductMetricDuration, getCategory
+    CountryProductMetricDuration
 } from "../data";
 import {isLike, ok} from "../../is";
 import {mean} from "simple-statistics";
 import {getCountry} from "countries-and-timezones";
-import {DateTime, DateTimeUnit} from "luxon";
+import {DateTime} from "luxon";
 import {KeyValueStore} from "../data/types";
-import {CalculationContext, calculations} from "../calculations";
+import {
+    CalculationConfig,
+    CalculationContext,
+    calculations,
+    isNumberString,
+    toHumanNumberString
+} from "../calculations";
 
 const REPORTING_DATE_KEY: keyof ReportDateData = "orderedAt";
 
@@ -48,7 +52,6 @@ export async function calculateReportMetrics(report: Report): Promise<ReportMetr
         products: [product],
         reports: [report],
         categories: [],
-        reportMetrics: [],
         currencySymbol: report.currencySymbol || "$" // TODO make configurable
     });
 }
@@ -93,65 +96,7 @@ async function calculateQueuedMetrics() {
 
     console.log(reports.length, "reports to process into metrics");
 
-    const stores: Record<CountryProductMetricDuration, KeyValueStore<CountryProductMetrics>> = {
-        day: getDailyMetricsStore(),
-        month: getMonthlyMetricsStore()
-    };
-
     const countryCodes = new Set(reports.flatMap(report => report.countryCode));
-
-    function getProductMetricData(productId: string, reports: ReportMetrics[]): ProductMetricData | undefined {
-        const productReports: ReportMetrics[] = reports.filter(report => report.productId === productId);
-
-        const activeIngredients = productReports
-            .flatMap(report => report.activeIngredients);
-
-        const types = new Set(
-            activeIngredients.map(value => value.type)
-        );
-
-        const results: ActiveIngredientMetrics[] = [];
-
-        for (const type of types) {
-
-            const typeValues = activeIngredients.filter(value => value.type === type);
-            const units = new Set(typeValues.map(value => value.unit));
-
-            for (const unit of units) {
-
-                function withValues(values: ActiveIngredientMetrics[]) {
-                    const numericValues = values
-                        .map(value => value.value)
-                        .filter(isNumberString)
-                        .map(value => +value);
-                    const { length } = numericValues;
-                    if (!length) return;
-                    results.push({
-                        ...values.at(0),
-                        type,
-                        unit,
-                        value: toHumanNumberString(mean(numericValues)),
-                        mean: true
-                    });
-                }
-
-                const unitValues = typeValues.filter(value => value.unit === unit);
-
-                // We don't want to mix these two types of values
-                withValues(unitValues.filter(value => value.proportional));
-                withValues(unitValues.filter(value => !value.proportional));
-
-            }
-
-        }
-
-        if (!results.length) return undefined;
-
-        return {
-            productId,
-            activeIngredients: results,
-        }
-    }
 
     for (const countryCode of countryCodes) {
 
@@ -164,87 +109,63 @@ async function calculateQueuedMetrics() {
 
         const zone = timezone.timezones.at(0);
 
-        const products: ProductMetricData[] = [];
-
         const countryReports: ReportMetrics[] = reports
             .filter(report => report.countryCode === countryCode)
             .filter(report => report[REPORTING_DATE_KEY]);
 
-        // Use index compared of countryReports to get the date
-        const countryReportDateInstances: DateTime[] = countryReports
-            .map(
-                report => {
-                    const dateValue = report[REPORTING_DATE_KEY];
-                    return DateTime.fromISO(
-                        dateValue,
-                        {
-                            // Pick first timezone unless given in later iteration
-                            // Close enough for now
-                            zone: timezone.timezones.at(0)
-                        }
-                    )
+        const config: CalculationConfig = {
+            currencySymbol: "$",
+            timezone: zone,
+            reportingDateKey: REPORTING_DATE_KEY,
+            reportingDays: 7,
+            reportingMonths: 2,
+            countryCode
+        };
+
+        const context: CalculationContext = {
+            reports: [],
+            products: [],
+            categories: [],
+            ...config,
+            reportMetrics: countryReports,
+            dailyMetrics: [],
+            monthlyMetrics: []
+        };
+
+        const dailyUpdate = calculations.metrics.dayCostPerProduct.handler(context);
+
+        async function save(store: KeyValueStore<CountryProductMetrics>, metrics: CountryProductMetrics[]) {
+            for (const data of metrics) {
+                const {
+                    reportingDateKey,
+                    countryCode
+                } = data;
+                const timestamp = data[reportingDateKey];
+                if (!timestamp) {
+                    console.warn(`Warning, daily metrics returned without the reporting date key of ${reportingDateKey}`);
+                    continue;
                 }
-            );
-
-        async function processReportsForUnit(minus: number, unit: CountryProductMetricDuration) {
-            const store = stores[unit];
-
-            ok(store);
-
-            const targetDate = DateTime
-                .local()
-                .setZone(zone)
-                .startOf(unit)
-                .minus({
-                    [unit]: minus
-                })
-                .startOf(unit);
-
-            const timestamp = targetDate.toJSDate().toISOString();
-
-            const dayReports = countryReports.filter((report, index) => {
-                const date = countryReportDateInstances.at(index);
-                ok(date, `Expected countryReportDateInstances at index ${index} to exist with length ${countryReportDateInstances.length}`);
-
-                return date.hasSame(targetDate, unit);
-            });
-
-            console.log(dayReports.length, `reports to process into metrics for ${unit} ${timestamp}`);
-
-            const productIds = new Set(
-                dayReports.map(report => report.productId ?? "").filter(Boolean)
-            );
-
-            for (const productId of productIds) {
-                const data = getProductMetricData(productId, dayReports);
-                if (data) products.push(data);
+                await store.set(`${countryCode}_${reportingDateKey}_${timestamp}`, data);
             }
-
-            // console.log(unit, timestamp, countryCode, zone, ...products);
-
-            const createdAt = new Date().toISOString();
-            const countryReport: CountryProductMetrics = {
-                products,
-                createdAt,
-                updatedAt: createdAt,
-                countryCode,
-                duration: unit,
-                timestamp,
-                timezone: zone
-            };
-
-            await store.set(`${countryCode}_${timestamp}`, countryReport);
         }
 
-        // Only process a few days behind, if a report is made against the
-        // report date too late, then
-        for (let i = 0; i < 7; i += 1) {
-            await processReportsForUnit(i, "day");
-        }
+        await save(
+            getDailyMetricsStore(),
+            dailyUpdate.dailyMetrics
+        );
 
-        // Process this month and month before
-        await processReportsForUnit(0, "month");
-        await processReportsForUnit(1, "month");
+        context.dailyMetrics.push(...dailyUpdate.dailyMetrics);
+
+        // No longer need access to report specific metrics
+        // Clear to be sure we are not relying on them past here
+        context.reportMetrics = [];
+
+        const monthlyUpdate = calculations.metrics.monthCostPerProduct.handler(context);
+
+        await save(
+            getDailyMetricsStore(),
+            monthlyUpdate.monthlyMetrics
+        );
 
     }
 

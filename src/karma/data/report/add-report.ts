@@ -27,7 +27,8 @@ export async function addReport(data: AddReportInput): Promise<Report> {
     const reference: ReportReference = {
         ...getReportDates(report),
         reportId,
-        expiresAt: getExpiresAt(REPORT_REFERENCE_EXPIRES_IN_MS)
+        expiresAt: getExpiresAt(REPORT_REFERENCE_EXPIRES_IN_MS),
+        countryCode: data.countryCode
     };
     await queue.set(reportId, reference);
     return report

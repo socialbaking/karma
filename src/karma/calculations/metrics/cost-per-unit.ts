@@ -1,24 +1,26 @@
-import {Report, ReportMetrics} from "../../client";
-import {CalculationContext} from "../types";
+import {Report, ReportMetrics, ActiveIngredientMetrics, ProductMetricData} from "../../client";
+import {BaseCalculationContext} from "../types";
 import {isNumberString, isProductReport} from "../is";
 import {getReportDates} from "../get-report-dates";
-import {ActiveIngredientMetrics, toHumanNumberString} from "../../data";
 import {ok} from "../../../is";
+import {toHumanNumberString} from "../to-human-number-string";
 
 export const title = "Cost per size unit";
 export const description = "Calculates the value per size unit for the ingredients in the product";
 
-export function handler(context: CalculationContext): Partial<CalculationContext> {
+export function handler(context: BaseCalculationContext) {
     return {
         reportMetrics: context
             .reports
             .map((report) => calculate(report, context))
             .filter(Boolean)
-    }
+    } as const;
 }
 
-export function calculate(report: Report, { products, currencySymbol }: CalculationContext): ReportMetrics | undefined {
+export function calculate(report: Report, context: BaseCalculationContext): ReportMetrics | undefined {
     if (!isProductReport(report)) return undefined;
+
+    const { currencySymbol } = context;
 
     const {
         productId,
@@ -29,7 +31,7 @@ export function calculate(report: Report, { products, currencySymbol }: Calculat
         productSize
     } = report;
 
-    const product = products.find(product => product.productId === productId);
+    const product = context.products.find(product => product.productId === productId);
 
     if (!product) return undefined;
 
@@ -123,6 +125,13 @@ export function calculate(report: Report, { products, currencySymbol }: Calculat
 
     console.log(activeIngredients);
 
+    const products: ProductMetricData[] = [
+        {
+            activeIngredients,
+            productId: report.productId,
+        }
+    ];
+
     const createdAt = new Date().toISOString();
     return {
         ...getReportDates(report),
@@ -130,7 +139,6 @@ export function calculate(report: Report, { products, currencySymbol }: Calculat
         createdAt,
         updatedAt: createdAt,
         countryCode: report.countryCode,
-        activeIngredients,
-        productId: report.productId,
-    }
+        products
+    };
 }
