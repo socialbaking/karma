@@ -1,6 +1,9 @@
 
+export type AccessTokenType = "partner"
+
 export interface AccessTokenData extends Record<string, unknown> {
     partnerId?: string;
+    accessTokenType?: AccessTokenType | string;
 }
 
 export interface AccessToken extends AccessTokenData {

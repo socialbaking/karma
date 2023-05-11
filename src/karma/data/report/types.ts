@@ -1,15 +1,22 @@
 import {ProductSizeData} from "../product";
+import {Expiring} from "../expiring";
 
 export interface ReportDateData {
     orderedAt?: string;
     shippedAt?: string;
     receivedAt?: string;
-    createdAt?: string;
     updatedAt?: string;
+    createdAt?: string;
     reportedAt?: string;
 }
 
-export interface ReportData extends ReportDateData, Record<string, unknown> {
+export interface ReportDate extends ReportDateData {
+    createdAt: string;
+    updatedAt: string;
+    reportedAt: string;
+}
+
+export interface ReportData extends ReportDateData, Expiring, Record<string, unknown> {
     countryCode: string; // "NZ"
     note?: string;
     parentReportId?: string;
@@ -30,9 +37,6 @@ export interface ReportData extends ReportDateData, Record<string, unknown> {
     anonymous?: boolean;
 }
 
-export interface Report extends ReportData {
+export interface Report extends ReportData, ReportDate {
     reportId: string;
-    createdAt: string;
-    updatedAt: string;
-    reportedAt: string;
 }

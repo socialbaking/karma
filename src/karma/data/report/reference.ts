@@ -1,6 +1,7 @@
-
 // Private type
-export interface ReportReference extends Record<string, unknown> {
+import {ReportDateData} from "./types";
+import {Expiring} from "../expiring";
+
+export interface ReportReference extends ReportDateData, Expiring, Record<string, unknown> {
     reportId: string;
-    createdAt: string;
 }

@@ -86,6 +86,10 @@ export const reportData = {
             type: "string",
             nullable: true
         },
+        expiresAt: {
+            type: "string",
+            nullable: true
+        }
     },
     required: [
         "countryCode"
@@ -104,12 +108,16 @@ export const report = {
         },
         updatedAt: {
             type: "string"
+        },
+        reportedAt: {
+            type: "string"
         }
     },
     required: [
         ...reportData.required,
         "reportId",
         "createdAt",
-        "updatedAt"
+        "updatedAt",
+        "reportedAt"
     ]
 } as const;

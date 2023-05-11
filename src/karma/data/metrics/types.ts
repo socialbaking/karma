@@ -1,4 +1,4 @@
-import {ReportDateData} from "../report";
+import {ReportDate, ReportDateData} from "../report";
 
 export interface ActiveIngredientMetrics extends Record<string, unknown> {
     type: string;
@@ -14,12 +14,9 @@ export interface ReportMetricsData extends ReportDateData, Record<string, unknow
     activeIngredients: ActiveIngredientMetrics[]
 }
 
-export interface ReportMetrics extends ReportMetricsData {
+export interface ReportMetrics extends ReportMetricsData, ReportDate {
     reportId: string;
     productId: string;
-    createdAt: string;
-    updatedAt: string;
-    reportedAt: string;
     countryCode: string;
 }
 

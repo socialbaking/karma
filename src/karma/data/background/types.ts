@@ -1,7 +1,8 @@
+import {Expiring} from "../expiring";
 
 
-export interface BackgroundData extends Record<string, unknown> {
-    expiresIn?: number;
+export interface BackgroundData extends Expiring, Record<string, unknown> {
+
 }
 
 export interface Background extends BackgroundData {

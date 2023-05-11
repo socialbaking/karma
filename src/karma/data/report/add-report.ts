@@ -1,7 +1,10 @@
 import {v4} from "uuid";
 import {Report, ReportData} from "./types";
-import {getReportQueueStore, getReportStore} from "./store";
+import {REPORT_EXPIRES_IN_MS, REPORT_REFERENCE_EXPIRES_IN_MS, getReportQueueStore, getReportStore} from "./store";
 import {ReportReference} from "./reference";
+import {getReportDates} from "./get-report-dates";
+import {getExpiresAt} from "../expiring-kv";
+
 
 export interface AddReportInput extends ReportData {
 
@@ -17,12 +20,14 @@ export async function addReport(data: AddReportInput): Promise<Report> {
         reportId,
         createdAt,
         updatedAt: createdAt,
-        reportedAt: createdAt
+        reportedAt: createdAt,
+        expiresAt: data.expiresAt || getExpiresAt(REPORT_EXPIRES_IN_MS)
     };
     await store.set(reportId, report);
     const reference: ReportReference = {
-      reportId,
-      createdAt: report.createdAt
+        ...getReportDates(report),
+        reportId,
+        expiresAt: getExpiresAt(REPORT_REFERENCE_EXPIRES_IN_MS)
     };
     await queue.set(reportId, reference);
     return report

@@ -18,7 +18,7 @@ import {
     ProductReport,
     ReportDateData,
     CountryProductMetrics,
-    CountryProductMetricDuration
+    CountryProductMetricDuration, getReportDates
 } from "../data";
 import {isLike, ok} from "../../is";
 import {mean} from "simple-statistics";
@@ -88,17 +88,16 @@ export async function calculateReportMetrics(report: Report): Promise<ReportMetr
 
     }
 
+    const dates = getReportDates(report);
+
     return {
+        ...dates,
         reportId,
         productId,
         activeIngredients,
         createdAt,
         updatedAt: createdAt,
-        countryCode,
-        receivedAt: report.receivedAt,
-        shippedAt: report.shippedAt,
-        orderedAt: report.orderedAt,
-        reportedAt: report.reportedAt
+        countryCode
     }
 }
 

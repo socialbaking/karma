@@ -7,6 +7,16 @@ import {Expiring} from "./expiring";
 // Allows just for IDE based debugging
 export const EXPIRING_KEYS = new Set<`${string}|${string}`>();
 
+export const DAY_MS = 24 * 60 * 60 * 1000;
+export const MONTH_MS = 31 * DAY_MS;
+export const DEFAULT_EXPIRES_AT = 7 * DAY_MS;
+
+export function getExpiresAt(ms = DEFAULT_EXPIRES_AT) {
+    return new Date(
+        Date.now() + ms
+    ).toISOString();
+}
+
 export function getExpiringStore<T extends Expiring>(name: string): KeyValueStore<T> {
     const store = getKeyValueStore<T>(name);
 
@@ -29,7 +39,7 @@ export function getExpiringStore<T extends Expiring>(name: string): KeyValueStor
 
             const expiresAtMs = new Date(expiresAt).getTime();
             // now should be smaller than when it expires
-            // so we should minus the current time from it, then thats our ms left
+            // so we should minus the current time from it, then that's our ms left
             const expiresInMs = expiresAtMs - Date.now();
 
             if (expiresInMs <= 0) {

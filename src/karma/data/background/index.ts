@@ -2,6 +2,7 @@ import {Background, BackgroundData} from "./types";
 import { getBackgroundStore } from "./store";
 import {v4} from "uuid";
 import {isLocking, lock} from "../lock";
+import {getExpiresAt} from "../expiring-kv";
 
 export * from "./store";
 export * from "./types";
@@ -23,7 +24,6 @@ export async function getIdentifiedBackground(backgroundId: string, data?: Backg
     return get();
 
     async function get() {
-        const expiresIn = data?.expiresIn ?? DEFAULT_BACKGROUND_EXPIRES_IN;
 
         const existing = await store.get(backgroundId);
 
@@ -36,7 +36,7 @@ export async function getIdentifiedBackground(backgroundId: string, data?: Backg
             backgroundId,
             backgroundKey,
             createdAt: new Date().toISOString(),
-            expiresAt: new Date(Date.now() + expiresIn).toISOString()
+            expiresAt: data.expiresAt || getExpiresAt(DEFAULT_BACKGROUND_EXPIRES_IN)
         };
 
         await store.set(backgroundId, background);
