@@ -23,7 +23,7 @@ import {mean} from "simple-statistics";
 import {getCountry} from "countries-and-timezones";
 import {DateTime, DateTimeUnit} from "luxon";
 import {KeyValueStore} from "../data/types";
-import {CalculationContext, metrics} from "../calculations";
+import {CalculationContext, calculations} from "../calculations";
 
 const REPORTING_DATE_KEY: keyof ReportDateData = "orderedAt";
 
@@ -44,7 +44,7 @@ export async function calculateReportMetrics(report: Report): Promise<ReportMetr
     //     const category = await getCategory(product.categoryId);
     //     if (category) categories.push(category);
     // }
-    return metrics.dollarPerUnit.calculate(report,  {
+    return calculations.metrics.dollarPerUnit.calculate(report,  {
         products: [product],
         reports: [report],
         categories: [],
