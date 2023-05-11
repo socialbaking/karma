@@ -10,12 +10,6 @@ export interface ReportDateData {
     reportedAt?: string;
 }
 
-export interface ReportDate extends ReportDateData {
-    createdAt: string;
-    updatedAt: string;
-    reportedAt: string;
-}
-
 export interface ReportData extends ReportDateData, Expiring, Record<string, unknown> {
     countryCode: string; // "NZ"
     note?: string;
@@ -37,6 +31,9 @@ export interface ReportData extends ReportDateData, Expiring, Record<string, unk
     anonymous?: boolean;
 }
 
-export interface Report extends ReportData, ReportDate {
+export interface Report extends ReportData {
     reportId: string;
+    createdAt: string;
+    updatedAt: string;
+    reportedAt: string;
 }

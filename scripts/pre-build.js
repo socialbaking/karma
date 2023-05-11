@@ -15,7 +15,8 @@ const CLIENT_START_LINE = "// Client start";
 const IGNORE_TYPES = [
     "access-token",
     "background",
-    "metrics"
+    "metrics",
+    "authentication-state"
 ];
 
 const paths = await readdir(PATH)

@@ -1,17 +1,3 @@
-export type AuthenticationStateType = "discord";
-
-export interface AuthenticationStateData extends Expiring, Record<string, unknown> {
-    type: AuthenticationStateType | string;
-    userState?: string;
-    externalScope?: string;
-}
-
-export interface AuthenticationState extends AuthenticationStateData {
-    stateId: string;
-    stateKey: string;
-    createdAt: string;
-}
-
 export interface CategoryData extends Record<string, unknown> {
     categoryName: string;
     countryCode?: string;
@@ -96,12 +82,12 @@ export interface ReportDateData {
     orderedAt?: string;
     shippedAt?: string;
     receivedAt?: string;
-    createdAt?: string;
     updatedAt?: string;
+    createdAt?: string;
     reportedAt?: string;
 }
 
-export interface ReportData extends ReportDateData, Record<string, unknown> {
+export interface ReportData extends ReportDateData, Expiring, Record<string, unknown> {
     countryCode: string; // "NZ"
     note?: string;
     parentReportId?: string;

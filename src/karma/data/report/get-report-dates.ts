@@ -1,4 +1,10 @@
-import {Report, ReportDate} from "./types";
+import {Report, ReportDateData} from "./types";
+
+export interface ReportDate extends ReportDateData {
+    updatedAt: string;
+    createdAt: string;
+    reportedAt: string;
+}
 
 export function getReportDates(report: Report | ReportDate): ReportDate {
     return {
