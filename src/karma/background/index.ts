@@ -3,7 +3,6 @@ import {
     getProduct,
     getReport,
     getReportQueueStore,
-    isProductReport,
     Report,
     seed,
     toHumanNumberString,
@@ -15,16 +14,16 @@ import {
     ReportMetrics,
     ProductMetricData,
     isNumberString,
-    ProductReport,
     ReportDateData,
     CountryProductMetrics,
-    CountryProductMetricDuration, getReportDates
+    CountryProductMetricDuration, getCategory
 } from "../data";
 import {isLike, ok} from "../../is";
 import {mean} from "simple-statistics";
 import {getCountry} from "countries-and-timezones";
 import {DateTime, DateTimeUnit} from "luxon";
 import {KeyValueStore} from "../data/types";
+import {CalculationContext, metrics} from "../calculations";
 
 const REPORTING_DATE_KEY: keyof ReportDateData = "orderedAt";
 
@@ -37,68 +36,21 @@ export interface QueryInput extends BackgroundInput {
 }
 
 export async function calculateReportMetrics(report: Report): Promise<ReportMetrics> {
-    const { countryCode, reportId } = report;
-    const createdAt = new Date().toISOString();
-    let activeIngredients: ActiveIngredientMetrics[] = [];
-
-    if (!isProductReport(report)) return undefined;
-
-    const {
-        productId,
-        productPurchaseItems,
-        productPurchaseTotalCost,
-        productPurchaseDeliveryCost,
-        productPurchaseFeeCost
-    } = report;
-
-    const totalCost = +productPurchaseTotalCost;
-    const deliveryCost = +productPurchaseDeliveryCost;
-    const items = Math.max(1, +productPurchaseItems);
-    const feeCost = +(productPurchaseFeeCost ?? "0");
-
-    const productCost = totalCost - deliveryCost - feeCost;
-    const itemCost = productCost / items
-
+    const { productId } = report;
+    if (!productId) return undefined;
     const product = await getProduct(productId);
-
-    if (product?.activeIngredients) {
-
-        const calculated = product
-            .activeIngredients
-            .filter(value => value.calculated)
-
-        for (const { type, unit, value } of calculated) {
-
-            const numeric = +value;
-
-            // if (productSize && productSize.unit !== unit) {
-            //     continue;
-            // }
-
-            // console.log({ value, calculated, itemCost });
-
-            activeIngredients.push({
-                type,
-                unit: `$/${unit}`, // Note this is a specific currency symbol...
-                value: toHumanNumberString(itemCost / numeric),
-                proportional: false
-            });
-
-        }
-
-    }
-
-    const dates = getReportDates(report);
-
-    return {
-        ...dates,
-        reportId,
-        productId,
-        activeIngredients,
-        createdAt,
-        updatedAt: createdAt,
-        countryCode
-    }
+    // const categories = [];
+    // if (product.categoryId) {
+    //     const category = await getCategory(product.categoryId);
+    //     if (category) categories.push(category);
+    // }
+    return metrics.dollarPerUnit.calculate(report,  {
+        products: [product],
+        reports: [report],
+        categories: [],
+        reportMetrics: [],
+        currencySymbol: "$" // TODO make configurable
+    });
 }
 
 async function calculateQueuedReportMetrics() {

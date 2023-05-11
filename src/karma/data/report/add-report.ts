@@ -2,8 +2,8 @@ import {v4} from "uuid";
 import {Report, ReportData} from "./types";
 import {REPORT_EXPIRES_IN_MS, REPORT_REFERENCE_EXPIRES_IN_MS, getReportQueueStore, getReportStore} from "./store";
 import {ReportReference} from "./reference";
-import {getReportDates} from "./get-report-dates";
 import {getExpiresAt} from "../expiring-kv";
+import {getReportDates} from "../../calculations";
 
 
 export interface AddReportInput extends ReportData {

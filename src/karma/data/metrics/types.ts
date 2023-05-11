@@ -1,4 +1,5 @@
 import {ReportDateData} from "../report";
+import {ProductSizeData} from "../product";
 
 export interface ActiveIngredientMetrics extends Record<string, unknown> {
     type: string;
@@ -8,6 +9,8 @@ export interface ActiveIngredientMetrics extends Record<string, unknown> {
     // proportion of this vs total active ingredients
     proportional?: boolean;
     mean?: boolean;
+    size?: ProductSizeData;
+    prefix?: string;
 }
 
 export interface ReportMetricsData extends ReportDateData, Record<string, unknown> {

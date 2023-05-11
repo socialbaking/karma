@@ -7,4 +7,3 @@ export * as reportSchema from "./schema";
 export * from "./is";
 export * from "./reference";
 export * from "./report-dates";
-export * from "./get-report-dates";

@@ -1,4 +1,4 @@
-import {Report, ReportDateData} from "./types";
+import {Report, ReportDateData} from "../client";
 
 export interface ReportDate extends ReportDateData {
     updatedAt: string;

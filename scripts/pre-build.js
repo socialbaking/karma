@@ -1,8 +1,6 @@
 import { readFile, readdir, stat, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import {replaceBetween, VARIABLES_REPLACE_AFTER_TEST_COMMENT} from "./replace-between.js";
-import gitCommitInfo from "git-commit-info";
-import ago from "s-ago";
 
 const PATH = "./src/karma/data"
 const CLIENT_INTERFACE_GENERATED_PATH = "./src/karma/client/interface.readonly.ts"
@@ -15,7 +13,6 @@ const CLIENT_START_LINE = "// Client start";
 const IGNORE_TYPES = [
     "access-token",
     "background",
-    "metrics",
     "authentication-state"
 ];
 
