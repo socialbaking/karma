@@ -2,10 +2,9 @@ import {FastifyInstance} from "fastify";
 import DiscordOAuth2, {PartialGuild} from "discord-oauth2";
 import {ok} from "../../../is";
 import {getOrigin} from "../config";
-import {v4} from "uuid";
 import {getAuthenticationStateByKey, addAuthenticationState} from "../../data";
 
-interface DiscordRole {
+interface DiscordRole extends Record<string, unknown>  {
     id: string;
     name: string;
 }
@@ -15,8 +14,14 @@ interface DiscordParsedRole extends DiscordRole {
     user: string;
 }
 
-export interface DiscordGuild extends PartialGuild {
+export interface DiscordGuild extends PartialGuild, Record<string, unknown>  {
     roles: DiscordRole[]
+}
+
+export interface DiscordGuildMember extends Record<string, unknown> {
+    id: string;
+    name: string;
+    roles: string[]
 }
 
 export async function discordAuthenticationRoutes(fastify: FastifyInstance) {
@@ -28,11 +33,13 @@ export async function discordAuthenticationRoutes(fastify: FastifyInstance) {
         DISCORD_REDIRECT_URL,
         DISCORD_SERVER_NAME,
         DISCORD_BOT_PERMISSIONS,
-        DISCORD_BOT_TOKEN
+        DISCORD_BOT_TOKEN,
+        DISCORD_SERVER_ID
     } = process.env;
 
     ok(DISCORD_CLIENT_ID, "Expected DISCORD_CLIENT_ID");
     ok(DISCORD_CLIENT_SECRET, "Expected DISCORD_CLIENT_SECRET");
+    ok(DISCORD_SERVER_ID, "Expected DISCORD_SERVER_ID");
 
     const DISCORD_SERVER_NAMES: string[] = DISCORD_SERVER_NAME ?
         decodeURIComponent(DISCORD_SERVER_NAME).split(",") :
@@ -94,45 +101,57 @@ export async function discordAuthenticationRoutes(fastify: FastifyInstance) {
 
                 const isBot = scope === DISCORD_BOT_SCOPE;
                 const user = await oauth.getUser(accessToken);
-                const guilds = await oauth.getUserGuilds(accessToken);
 
-                const partial = (
-                    // Prefer the first server listed
-                    guilds.find(guild => DISCORD_SERVER_NAMES.at(0) === guild.name) ??
-                    // But check all the names if the first one isn't available
-                    guilds.find(guild => DISCORD_SERVER_NAMES.includes(guild.name))
-                );
+                const guild = await getGuild();
+                const member = await getMember()
 
-                if (!partial) {
-                    const message = `Please first join discord server/s ${DISCORD_SERVER_NAMES.join(", ")} before using this tool`;
+                if (!member) {
+                    const message = `Please join the discord server with associated with this tooling before logging in`;
                     response.status(500);
                     response.send(message);
                     return;
                 }
 
-                const guild = await getGuild()
-                const roles = await getUserRolesFromGuild();
+                const roles = mapRoles();
 
                 console.log({
                     guild,
-                    user,
+                    member,
                     isBot,
                     roles
-                })
+                });
 
                 response.status(200)
                 response.send({
-                    user,
+                    member,
                     guild,
                     roles,
                     state,
                     isBot
                 });
 
+                async function getMember(): Promise<DiscordGuildMember | undefined> {
+                    const response = await fetch(
+                        new URL(
+                            `/api/v10/guilds/${DISCORD_SERVER_ID}/members/${user.id}`,
+                            "https://discord.com"
+                        ),
+                        {
+                            method: "GET",
+                            headers: {
+                                "Authorization": `Bot ${DISCORD_BOT_TOKEN}`
+                            }
+                        }
+                    );
+                    if (response.status === 404) return undefined;
+                    ok(response.ok,`getMember returned ${response.status}`);
+                    return response.json();
+                }
+
                 async function getGuild(): Promise<DiscordGuild> {
                     const response = await fetch(
                         new URL(
-                            `/api/v10/guilds/${partial.id}`,
+                            `/api/v10/guilds/${DISCORD_SERVER_ID}`,
                             "https://discord.com"
                         ),
                         {
@@ -142,39 +161,16 @@ export async function discordAuthenticationRoutes(fastify: FastifyInstance) {
                             }
                         }
                     );
-                    if (!response.ok) {
-                        console.warn(`getGuild returned ${response.status}`);
-                        console.warn(await response.text());
-                        ok(response.ok, "Expected getGuild to respond ok");
-                    }
+                    ok(response.ok, "Expected getGuild to respond ok");
                     return await response.json();
                 }
 
-                async function getUserRolesFromGuild(): Promise<DiscordParsedRole[]> {
-                    const response = await fetch(
-                        new URL(
-                            `/api/v10/guilds/${guild.id}/members/${user.id}`,
-                            "https://discord.com"
-                        ),
-                        {
-                            method: "GET",
-                            headers: {
-                                "Authorization": `Bot ${DISCORD_BOT_TOKEN}`
-                            }
-                        }
-                    );
-                    if (!response.ok) {
-                        console.warn(`getUserRolesFromGuild returned ${response.status}`);
-                        console.warn(await response.text());
-                        return [];
-                    }
-                    const result = await response.json();
-                    console.log({ user: result, status: response.status });
-                    const { roles } = result;
+                function mapRoles(): DiscordParsedRole[] {
                     const roleMap = new Map<string, DiscordRole>(
                         guild.roles.map(role => [role.id, role] as const)
                     );
-                    return roles
+                    return member
+                        .roles
                         .map((id: string): DiscordParsedRole => {
                             const role = roleMap.get(id);
                             if (!role) return;
@@ -225,6 +221,8 @@ export async function discordAuthenticationRoutes(fastify: FastifyInstance) {
                         scope,
                         state: stateKey,
                         permissions,
+                        disableGuildSelect: true,
+                        guildId: DISCORD_SERVER_ID
                     });
                 }
 
