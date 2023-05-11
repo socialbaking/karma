@@ -12,6 +12,14 @@ jobs:
       REDIS_URL: redis://default@localhost:6379
       REDIS_HOST: localhost
       REDIS_PORT: 6379
+      DISCORD_CLIENT_ID: 1
+      DISCORD_CLIENT_SECRET: 1
+      DISCORD_INVITE_URL: 1
+      DISCORD_REDIRECT_URL: 1
+      DISCORD_SERVER_NAME: 1
+      DISCORD_SERVER_ROLE_IDS: 1
+      DISCORD_BOT_TOKEN: 1
+      DISCORD_BOT_PERMISSIONS: 1
     services:
       # Label used to access the service container
       redis:
