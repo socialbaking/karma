@@ -17,31 +17,35 @@ export async function discordAuthenticationRoutes(fastify: FastifyInstance) {
     const {
         DISCORD_CLIENT_ID,
         DISCORD_CLIENT_SECRET,
-        DISCORD_INVITE_URL,
+        // DISCORD_INVITE_URL,
         DISCORD_REDIRECT_URL,
         DISCORD_SERVER_NAME,
-        DISCORD_SERVER_ROLE_IDS
+        DISCORD_SERVER_ROLE_IDS,
+        DISCORD_BOT_PERMISSIONS
     } = process.env;
 
     ok(DISCORD_CLIENT_ID, "Expected DISCORD_CLIENT_ID");
     ok(DISCORD_CLIENT_SECRET, "Expected DISCORD_CLIENT_SECRET");
-    ok(DISCORD_SERVER_NAME, "Expected DISCORD_SERVER_NAME");
-    ok(DISCORD_SERVER_ROLE_IDS, "Expected DISCORD_SERVER_ROLE_IDS");
+    // ok(DISCORD_BOT_PERMISSIONS, "Expected DISCORD_BOT_PERMISSIONS");
 
-    const DISCORD_SERVER_NAMES = decodeURIComponent(DISCORD_SERVER_NAME).split(",");
+    const DISCORD_SERVER_NAMES: string[] = DISCORD_SERVER_NAME ?
+        decodeURIComponent(DISCORD_SERVER_NAME).split(",") :
+        []
 
     const ROLE_ERROR = "Expected DISCORD_SERVER_ROLE_IDS in the format 111|Name One,222|Name Two,333|Name Three";
 
     const DISCORD_EXPECTED_ROLES = new Map(
-        decodeURIComponent(DISCORD_SERVER_ROLE_IDS)
-            .split(",")
-            .map(role => {
-                const [key, value, ...rest] = role.split("|");
-                ok(key, ROLE_ERROR);
-                ok(value, ROLE_ERROR);
-                ok(!rest.length, ROLE_ERROR);
-                return [key, value] as const;
-            })
+        DISCORD_SERVER_ROLE_IDS ? (
+            decodeURIComponent(DISCORD_SERVER_ROLE_IDS)
+                .split(",")
+                .map(role => {
+                    const [key, value, ...rest] = role.split("|");
+                    ok(key, ROLE_ERROR);
+                    ok(value, ROLE_ERROR);
+                    ok(!rest.length, ROLE_ERROR);
+                    return [key, value] as const;
+                })
+        ) : []
     )
 
     const DISCORD_USER_SCOPE = "identify";
@@ -180,17 +184,20 @@ export async function discordAuthenticationRoutes(fastify: FastifyInstance) {
                 let url // = DISCORD_INVITE_URL;
 
                 const scope = bot ? DISCORD_BOT_SCOPE : DISCORD_USER_SCOPE;
+                const permissions = (bot && DISCORD_BOT_PERMISSIONS) ? +DISCORD_BOT_PERMISSIONS : undefined;
 
                 const { stateKey, expiresAt } = await addAuthenticationState({
                     type: "discord",
                     userState,
-                    externalScope: scope
+                    externalScope: scope,
+                    externalPermissions: permissions
                 });
 
                 if (!url) {
                     url = oauth.generateAuthUrl({
                         scope,
-                        state: stateKey
+                        state: stateKey,
+                        permissions
                     });
                 }
 
