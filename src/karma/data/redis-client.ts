@@ -31,13 +31,13 @@ export function getGlobalRedisClient() {
     return client;
 }
 
-export async function connectGlobalRedisClient(client: RedisClientType) {
+export async function connectGlobalRedisClient(client: RedisClientType = getGlobalRedisClient()) {
     if (client.isOpen) {
         return client;
     }
     const existingPromise = GLOBAL_CLIENT_CONNECTION_PROMISE.get(client);
     if (existingPromise) return existingPromise;
-    const promise = client.connect();
+    const promise = client.connect().then(() => client);
     GLOBAL_CLIENT_CONNECTION_PROMISE.set(client, promise);
     promise.finally(() => {
         if (promise === GLOBAL_CLIENT_CONNECTION_PROMISE.get(client)) {
@@ -53,19 +53,28 @@ export async function connectGlobalRedisClient(client: RedisClientType) {
 //     return client;
 // }
 
+
+function getRedisPrefix(name: string) {
+    return `${name}::`
+}
+
+export function getRedisPrefixedKey(name: string, key: string): string {
+    return `${getRedisPrefix(name)}${key}`;
+}
+
 export function createRedisKeyValueStore<T>(name: string): KeyValueStore<T> {
     const client = getGlobalRedisClient();
 
-    async function connect() {
-        return connectGlobalRedisClient(client);
-    }
-
     function getPrefix() {
-        return `${name}::`
+        return getRedisPrefix(name);
     }
 
     function getKey(key: string): string {
-        return `${getPrefix()}${key}`;
+        return getRedisPrefixedKey(name, key);
+    }
+
+    async function connect() {
+        return connectGlobalRedisClient(client);
     }
 
     async function get(key: string): Promise<T | undefined> {

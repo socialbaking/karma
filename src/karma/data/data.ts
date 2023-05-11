@@ -7,3 +7,4 @@ export * from "./product";
 export * from "./background";
 export * from "./lock";
 export * from "./metrics";
+export * from "./authentication-state";

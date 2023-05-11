@@ -45,19 +45,23 @@ export const productData = {
             type: "string",
             nullable: true
         },
+        // Availability cannot be publicly provided
         // Flag for products we don't have the exact availability date for
         availableBeforeGivenDate: {
             type: "boolean",
-            nullable: true
+            nullable: true,
+            description: "This information is not intended for public use"
         },
         availableAt: {
             type: "string",
-            nullable: true
+            nullable: true,
+            description: "This information is not intended for public use"
         },
         // For products that we will no longer have available
         availableUntil: {
             type: "string",
-            nullable: true
+            nullable: true,
+            description: "This information is not intended for public use"
         },
         sizes: {
             type: "array",
