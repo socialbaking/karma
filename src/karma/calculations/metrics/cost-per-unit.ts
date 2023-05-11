@@ -5,8 +5,8 @@ import {getReportDates} from "../get-report-dates";
 import {ActiveIngredientMetrics, toHumanNumberString} from "../../data";
 import {ok} from "../../../is";
 
-export const title = "Dollar per unit";
-export const description = "Calculates the value per unit for the ingredients in the product";
+export const title = "Cost per size unit";
+export const description = "Calculates the value per size unit for the ingredients in the product";
 
 export function handler(context: CalculationContext): Partial<CalculationContext> {
     return {

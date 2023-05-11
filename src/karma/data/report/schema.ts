@@ -37,6 +37,10 @@ export const reportData = {
         countryCode: {
             type: "string"
         },
+        currencySymbol: {
+            type: "string",
+            nullable: true
+        },
         note: {
             type: "string",
             nullable: true

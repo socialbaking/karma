@@ -44,12 +44,12 @@ export async function calculateReportMetrics(report: Report): Promise<ReportMetr
     //     const category = await getCategory(product.categoryId);
     //     if (category) categories.push(category);
     // }
-    return calculations.metrics.dollarPerUnit.calculate(report,  {
+    return calculations.metrics.costPerUnit.calculate(report,  {
         products: [product],
         reports: [report],
         categories: [],
         reportMetrics: [],
-        currencySymbol: "$" // TODO make configurable
+        currencySymbol: report.currencySymbol || "$" // TODO make configurable
     });
 }
 

@@ -12,6 +12,7 @@ export interface ReportDateData {
 
 export interface ReportData extends ReportDateData, Expiring, Record<string, unknown> {
     countryCode: string; // "NZ"
+    currencySymbol?: string; // "$"
     note?: string;
     parentReportId?: string;
     productId?: string;
