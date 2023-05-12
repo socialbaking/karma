@@ -1,5 +1,5 @@
 {
-  "name": "@socialbaking/pharmakarma",
+  "name": "@socialbaking/karma",
   "version": "1.0.0-alpha.69",
   "main": "./esnext/index.js",
   "module": "./esnext/index.js",

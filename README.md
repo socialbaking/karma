@@ -1,4 +1,4 @@
-# Pharmakarma - Node & JavaScript implementation
+# Karma - Node & JavaScript implementation
 
 
 [//]: # (badges)
