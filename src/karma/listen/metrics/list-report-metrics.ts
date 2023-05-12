@@ -24,7 +24,7 @@ export async function listReportMetricsRoutes(fastify: FastifyInstance) {
     };
 
     fastify.get(
-        "/report",
+        "/reports",
         {
             schema,
             preHandler: authenticate(fastify),

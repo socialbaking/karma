@@ -24,7 +24,7 @@ export async function listMonthlyMetricsRoutes(fastify: FastifyInstance) {
     };
 
     fastify.get(
-        "/month",
+        "/months",
         {
             schema,
             preHandler: authenticate(fastify),

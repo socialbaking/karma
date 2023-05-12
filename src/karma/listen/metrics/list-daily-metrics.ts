@@ -24,7 +24,7 @@ export async function listDailyMetricsRoutes(fastify: FastifyInstance) {
     };
 
     fastify.get(
-        "/day",
+        "/days",
         {
             schema,
             preHandler: authenticate(fastify),

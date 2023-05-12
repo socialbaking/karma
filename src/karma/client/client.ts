@@ -14,6 +14,7 @@ import {
     ClientOptions
 } from "./client.interface"
 import {ok} from "../../is";
+import {CountryProductMetrics} from "../data";
 
 export * from "./client.interface";
 
@@ -297,8 +298,126 @@ export class Client implements ClientInterface {
         return response.json();
     }
 
-    addReportMetrics(data: ReportMetricsData): Promise<ReportMetrics> {
-        return Promise.resolve(undefined);
+    async addReportMetrics(data: ReportMetricsData): Promise<ReportMetrics> {
+        const {
+            baseUrl,
+            headers,
+            prefix
+        } = this;
+        const response = await fetch(
+            new URL(
+                `${prefix}/metrics/reports`,
+                baseUrl
+            ),
+            {
+                method: "POST",
+                body: JSON.stringify(data),
+                headers
+            }
+        );
+        ok(response.ok, "addReportMetrics response not ok");
+        return await response.json();
     }
+
+    async listDailyMetrics(): Promise<CountryProductMetrics[]> {
+        const {
+            baseUrl,
+            headers,
+            prefix
+        } = this;
+        const response = await fetch(
+            new URL(
+                `${prefix}/metrics/days`,
+                baseUrl
+            ),
+            {
+                method: "GET",
+                headers
+            }
+        );
+        ok(response.ok, "listDailyMetrics response not ok");
+        return response.json();
+    }
+
+    async listMetrics(): Promise<CountryProductMetrics[]> {
+        const {
+            baseUrl,
+            headers,
+            prefix
+        } = this;
+        const response = await fetch(
+            new URL(
+                `${prefix}/metrics`,
+                baseUrl
+            ),
+            {
+                method: "GET",
+                headers
+            }
+        );
+        ok(response.ok, "listMetrics response not ok");
+        return response.json();
+    }
+
+    async listMonthlyMetrics(): Promise<CountryProductMetrics[]> {
+        const {
+            baseUrl,
+            headers,
+            prefix
+        } = this;
+        const response = await fetch(
+            new URL(
+                `${prefix}/metrics/months`,
+                baseUrl
+            ),
+            {
+                method: "GET",
+                headers
+            }
+        );
+        ok(response.ok, "listMonthlyMetrics response not ok");
+        return response.json();
+    }
+
+    async listReportMetrics(): Promise<ReportMetrics[]> {
+        const {
+            baseUrl,
+            headers,
+            prefix
+        } = this;
+        const response = await fetch(
+            new URL(
+                `${prefix}/metrics/reports`,
+                baseUrl
+            ),
+            {
+                method: "GET",
+                headers
+            }
+        );
+        ok(response.ok, "listReportMetrics response not ok");
+        return response.json();
+    }
+
+    async listProductMetrics(productId: string): Promise<CountryProductMetrics[]> {
+        const {
+            baseUrl,
+            headers,
+            prefix
+        } = this;
+        const response = await fetch(
+            new URL(
+                `${prefix}/metrics/products/${productId}`,
+                baseUrl
+            ),
+            {
+                method: "GET",
+                headers
+            }
+        );
+        ok(response.ok, "listProductMetrics response not ok");
+        return response.json();
+    }
+
 
 }
