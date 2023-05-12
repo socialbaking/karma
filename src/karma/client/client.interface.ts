@@ -9,6 +9,8 @@ import {
     ProductData,
     ReportData,
     Report,
+    ReportMetrics,
+    ReportMetricsData,
 } from "./interface.readonly";
 // Client start
 export interface ClientOptions {
@@ -24,6 +26,7 @@ export interface Client {
     addCategory(category: CategoryData): Promise<Category>;
     addProduct(product: ProductData): Promise<Product>;
     addReport(report: ReportData): Promise<Report>;
+    addReportMetrics(data: ReportMetricsData): Promise<ReportMetrics>;
     getProduct(productId: string): Promise<Product | undefined>;
     getReport(reportId: string): Promise<Report | undefined>
     listPartners(): Promise<Partner[]>;

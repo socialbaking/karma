@@ -1,5 +1,5 @@
 
-export type AccessTokenType = "partner"
+export type AccessTokenType = "partner" | "discord"
 
 export interface AccessTokenData extends Record<string, unknown> {
     partnerId?: string;

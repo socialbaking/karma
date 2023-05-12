@@ -2,15 +2,15 @@ import {
     getCategoryStore,
     Category,
     CategoryData,
-    PartnerData,
     Partner,
     getPartnerStore,
     ProductData,
-    getProduct, getProductStore, Product
+    getProductStore,
+    Product,
+    setProduct
 } from "./data";
 import {v5} from "uuid";
 import {ok} from "../../is";
-import {setProduct} from "./product/set-product";
 
 const firstSeedingDate = new Date(1683589864494).toISOString();
 const createdAt = firstSeedingDate;

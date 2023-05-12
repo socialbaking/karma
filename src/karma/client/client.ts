@@ -7,7 +7,7 @@ import {
     Product,
     ProductData,
     ReportData,
-    Report,
+    Report, MetricsData, ReportMetrics, ReportMetricsData,
 } from "./interface.readonly";
 import {
     Client as ClientInterface,
@@ -295,6 +295,10 @@ export class Client implements ClientInterface {
         if (response.status === 404) return undefined;
         ok(response.ok, "getReport response not ok");
         return response.json();
+    }
+
+    addReportMetrics(data: ReportMetricsData): Promise<ReportMetrics> {
+        return Promise.resolve(undefined);
     }
 
 }

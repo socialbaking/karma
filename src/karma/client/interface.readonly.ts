@@ -37,13 +37,17 @@ export interface MetricsData extends ReportDateData, Expiring, CalculationConsen
     anonymous?: boolean;
 }
 
-export interface ReportMetrics extends MetricsData, Record<string, unknown> {
+export interface ReportMetricsData extends MetricsData {
+    parentReportId?: string;
+}
+
+export interface ReportMetrics extends ReportMetricsData, Record<string, unknown> {
     metricsId: string;
     reportId: string;
     reportedAt: string;
     createdAt: string;
     updatedAt: string;
-    // consent required
+    // consent required to be stored
     calculationConsent: CalculationConsentItem[];
 }
 

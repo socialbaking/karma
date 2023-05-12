@@ -71,7 +71,7 @@ export const metricData = {
             nullable: true
         },
         anonymous: {
-            type: "string",
+            type: "boolean",
             nullable: true
         },
     },
@@ -81,10 +81,24 @@ export const metricData = {
     ]
 } as const;
 
-export const reportMetrics = {
+export const reportMetricData = {
     type: "object",
     properties: {
         ...metricData.properties,
+        parentReportId: {
+            type: "string",
+            nullable: true
+        }
+    },
+    required: [
+        ...metricData.required
+    ]
+} as const;
+
+export const reportMetrics = {
+    type: "object",
+    properties: {
+        ...reportMetricData.properties,
         metricsId: {
             type: "string"
         },
@@ -102,7 +116,7 @@ export const reportMetrics = {
         }
     },
     required: [
-        ...metricData.required,
+        ...reportMetricData.required,
         "reportId",
         "metricsId",
         "reportedAt",

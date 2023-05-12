@@ -31,6 +31,7 @@ try {
   }
 
   console.log("Tests successful");
+
 } catch (error) {
   console.error(error);
   if (typeof process !== "undefined") {

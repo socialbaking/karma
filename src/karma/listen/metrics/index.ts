@@ -4,6 +4,7 @@ import {listDailyMetricsRoutes} from "./list-daily-metrics";
 import {listReportMetricsRoutes} from "./list-report-metrics";
 import {listMetricsRoutes} from "./list-metrics";
 import {listProductMetricsRoutes} from "./list-product-metrics";
+import {addReportMetricsRoutes} from "./add-report-metrics";
 
 export async function metricRoutes(fastify: FastifyInstance) {
 
@@ -13,6 +14,7 @@ export async function metricRoutes(fastify: FastifyInstance) {
         fastify.register(listReportMetricsRoutes);
         fastify.register(listMetricsRoutes);
         fastify.register(listProductMetricsRoutes);
+        fastify.register(addReportMetricsRoutes);
     }
 
     fastify.register(routes, {

@@ -14,7 +14,7 @@ import {
     ProductMetricData,
     ReportDateData,
     CountryProductMetrics,
-    CountryProductMetricDuration
+    CountryProductMetricDuration, isNoReportMetricsId
 } from "../data";
 import {isLike, ok} from "../../is";
 import {mean} from "simple-statistics";
@@ -67,15 +67,19 @@ async function calculateQueuedReportMetrics() {
 
     for await (const { reportId } of queue) {
 
+        if (isNoReportMetricsId(reportId)) continue;
+
         // Metrics already processed
         if (await metrics.has(reportId)) continue;
 
         const report = await getReport(reportId);
 
+        ok(report, "Report in queue without being in store")
+
         // No consent to calculate
         if (!report.calculationConsent?.length) continue;
 
-        ok(report, "Report in queue without being in store")
+
 
         const calculated = await calculateReportMetrics(report);
 

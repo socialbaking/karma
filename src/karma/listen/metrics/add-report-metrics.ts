@@ -1,26 +1,26 @@
 import {FastifyInstance} from "fastify";
-import {addReport, ReportData, reportSchema} from "../../data";
+import {metricsSchema, addReportMetrics, MetricsData, partnerSchema} from "../../data";
 import {authenticate} from "../authentication";
 import {isAnonymous} from "../../authentication";
+import {reportMetricData} from "../../data/metrics/schema";
 
-export async function addReportRoutes(fastify: FastifyInstance) {
+export async function addReportMetricsRoutes(fastify: FastifyInstance) {
 
     type Schema = {
-        Body: ReportData
+        Body: MetricsData
     }
-
     const response = {
         201: {
-            description: "A new report",
-            ...reportSchema.report
+            description: "A new metrics report",
+            ...metricsSchema.reportMetrics
         }
     }
 
     const schema = {
-        description: "Add a new report",
-        tags: ["report"],
+        description: "Report new metrics",
+        tags: ["partner"],
         summary: "",
-        body: reportSchema.reportData,
+        body: metricsSchema.reportMetricData,
         response,
         security: [
             {
@@ -30,22 +30,21 @@ export async function addReportRoutes(fastify: FastifyInstance) {
     }
 
     fastify.post<Schema>(
-        "/",
+        "/reports",
         {
             schema,
             preHandler: authenticate(fastify, {
                 anonymous: true
             }),
-            async handler(request, response)  {
+            async handler(request, response) {
                 const data = request.body;
-                const report = await addReport({
+                const metrics = await addReportMetrics({
                     ...data,
                     anonymous: isAnonymous()
                 });
                 response.status(201);
-                response.send(report);
+                response.send(metrics);
             }
         }
-    )
+    );
 }
-

@@ -9,7 +9,7 @@
 
 ### Test Coverage
 
- ![92.25%25 lines covered](https://img.shields.io/badge/lines-92.25%25-brightgreen) ![92.25%25 statements covered](https://img.shields.io/badge/statements-92.25%25-brightgreen) ![85.09%25 functions covered](https://img.shields.io/badge/functions-85.09%25-brightgreen) ![84.83%25 branches covered](https://img.shields.io/badge/branches-84.83%25-brightgreen)
+ ![90.37%25 lines covered](https://img.shields.io/badge/lines-90.37%25-brightgreen) ![90.37%25 statements covered](https://img.shields.io/badge/statements-90.37%25-brightgreen) ![78.05%25 functions covered](https://img.shields.io/badge/functions-78.05%25-yellow) ![84.59%25 branches covered](https://img.shields.io/badge/branches-84.59%25-brightgreen)
 
 [//]: # (badges)
 
@@ -31,6 +31,7 @@ export interface Client {
     addCategory(category: CategoryData): Promise<Category>;
     addProduct(product: ProductData): Promise<Product>;
     addReport(report: ReportData): Promise<Report>;
+    addReportMetrics(data: ReportMetricsData): Promise<ReportMetrics>;
     getProduct(productId: string): Promise<Product | undefined>;
     getReport(reportId: string): Promise<Report | undefined>
     listPartners(): Promise<Partner[]>;
@@ -80,13 +81,17 @@ export interface MetricsData extends ReportDateData, Expiring, CalculationConsen
     anonymous?: boolean;
 }
 
-export interface ReportMetrics extends MetricsData, Record<string, unknown> {
+export interface ReportMetricsData extends MetricsData {
+    parentReportId?: string;
+}
+
+export interface ReportMetrics extends ReportMetricsData, Record<string, unknown> {
     metricsId: string;
     reportId: string;
     reportedAt: string;
     createdAt: string;
     updatedAt: string;
-    // consent required
+    // consent required to be stored
     calculationConsent: CalculationConsentItem[];
 }
 

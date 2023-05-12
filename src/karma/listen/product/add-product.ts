@@ -20,7 +20,12 @@ export async function addProductRoutes(fastify: FastifyInstance) {
         tags: ["product"],
         summary: "",
         body: productSchema.productData,
-        response
+        response,
+        security: [
+            {
+                apiKey: [] as string[]
+            }
+        ]
     }
 
     fastify.post<Schema>(

@@ -6,6 +6,7 @@ import {getCompleteCalculationConsent, Product, ReportData} from "../karma";
 // Default full consent for calculations
 const calculationConsent = getCompleteCalculationConsent();
 
+
 {
 
     const products = await listProducts();
