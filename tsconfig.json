@@ -2,7 +2,7 @@
   "compilerOptions": {
     "module": "esnext",
     "lib": ["es2018", "esnext", "dom"],
-    "types": ["jest", "node", ],
+    "types": ["jest", "node" ],
     "esModuleInterop": true,
     "target": "esnext",
     "noImplicitAny": true,

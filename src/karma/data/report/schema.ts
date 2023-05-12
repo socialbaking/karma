@@ -1,5 +1,33 @@
 import {productSizeData} from "../product/schema";
 
+export const calculationConsentItem = {
+    type: "object",
+    properties: {
+        calculationKey: {
+            type: "string"
+        },
+        consentedAt: {
+            type: "string"
+        }
+    },
+    additionalProperties: true,
+    required: [
+        "calculationKey",
+        "consentedAt"
+    ]
+}
+
+export const calculationConsent = {
+    type: "object",
+    properties: {
+        calculationConsent: {
+            type: "array",
+            items: calculationConsentItem,
+            nullable: true
+        }
+    }
+}
+
 export const reportDateData = {
     type: "object",
     properties: {
@@ -33,6 +61,7 @@ export const reportDateData = {
 export const reportData = {
     type: "object",
     properties: {
+        ...calculationConsent.properties,
         ...reportDateData.properties,
         countryCode: {
             type: "string"

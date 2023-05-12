@@ -70,6 +70,9 @@ async function calculateQueuedReportMetrics() {
 
         const report = await getReport(reportId);
 
+        // No consent to calculate
+        if (!report.calculationConsent?.length) continue;
+
         ok(report, "Report in queue without being in store")
 
         const calculated = await calculateReportMetrics(report);

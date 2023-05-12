@@ -170,7 +170,16 @@ export interface ReportDateData {
     reportedAt?: string;
 }
 
-export interface ReportData extends ReportDateData, Expiring, Record<string, unknown> {
+export interface CalculationConsentItem extends Record<string, unknown> {
+    calculationKey: string;
+    consentedAt: string;
+}
+
+export interface CalculationConsent {
+    calculationConsent?: CalculationConsentItem[];
+}
+
+export interface ReportData extends ReportDateData, Expiring, CalculationConsent, Record<string, unknown> {
     countryCode: string; // "NZ"
     currencySymbol?: string; // "$"
     note?: string;
