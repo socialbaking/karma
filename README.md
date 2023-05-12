@@ -9,7 +9,7 @@
 
 ### Test Coverage
 
- ![90.37%25 lines covered](https://img.shields.io/badge/lines-90.37%25-brightgreen) ![90.37%25 statements covered](https://img.shields.io/badge/statements-90.37%25-brightgreen) ![78.05%25 functions covered](https://img.shields.io/badge/functions-78.05%25-yellow) ![84.59%25 branches covered](https://img.shields.io/badge/branches-84.59%25-brightgreen)
+ ![88.93%25 lines covered](https://img.shields.io/badge/lines-88.93%25-brightgreen) ![88.93%25 statements covered](https://img.shields.io/badge/statements-88.93%25-brightgreen) ![76.44%25 functions covered](https://img.shields.io/badge/functions-76.44%25-yellow) ![84.63%25 branches covered](https://img.shields.io/badge/branches-84.63%25-brightgreen)
 
 [//]: # (badges)
 
@@ -39,6 +39,11 @@ export interface Client {
     listProducts(): Promise<Product[]>;
     listReports(): Promise<Report[]>;
     listCategories(): Promise<Category[]>;
+    listDailyMetrics(): Promise<CountryProductMetrics[]>;
+    listMonthlyMetrics(): Promise<CountryProductMetrics[]>;
+    listMetrics(): Promise<CountryProductMetrics[]>;
+    listReportMetrics(): Promise<ReportMetrics[]>;
+    listProductMetrics(productId: string): Promise<CountryProductMetrics[]>;
     background(query: Record<string, string> | URLSearchParams): Promise<void>;
 }
 
