@@ -1,4 +1,4 @@
-import {reportDateData} from "../report/schema";
+import {calculationConsent, reportDateData} from "../report/schema";
 import {productSizeData} from "../product/schema";
 
 export const activeIngredientMetrics = {
@@ -57,14 +57,27 @@ export const productMetricData = {
 export const metricData = {
     type: "object",
     properties: {
+        ...calculationConsent.properties,
         ...reportDateData.properties,
+        countryCode: {
+            type: "string"
+        },
         products: {
             type: "array",
             items: productMetricData
-        }
+        },
+        expiresAt: {
+            type: "string",
+            nullable: true
+        },
+        anonymous: {
+            type: "string",
+            nullable: true
+        },
     },
     required: [
-        "products"
+        "products",
+        "countryCode"
     ]
 } as const;
 
@@ -72,10 +85,10 @@ export const reportMetrics = {
     type: "object",
     properties: {
         ...metricData.properties,
-        reportId: {
+        metricsId: {
             type: "string"
         },
-        countryCode: {
+        reportId: {
             type: "string"
         },
         reportedAt: {
@@ -86,16 +99,12 @@ export const reportMetrics = {
         },
         updatedAt: {
             type: "string"
-        },
-        expiresAt: {
-            type: "string",
-            nullable: true
         }
     },
     required: [
         ...metricData.required,
         "reportId",
-        "countryCode",
+        "metricsId",
         "reportedAt",
         "createdAt",
         "updatedAt"
@@ -106,13 +115,13 @@ export const countryMetrics = {
     type: "object",
     properties: {
         ...metricData.properties,
+        metricsId: {
+            type: "string"
+        },
         createdAt: {
             type: "string"
         },
         updatedAt: {
-            type: "string"
-        },
-        countryCode: {
             type: "string"
         },
         duration: {
@@ -131,9 +140,9 @@ export const countryMetrics = {
     },
     required: [
         ...metricData.required,
+        "metricsId",
         "createdAt",
         "updatedAt",
-        "countryCode",
         "duration",
         "timezone",
         "reportingDateKey"

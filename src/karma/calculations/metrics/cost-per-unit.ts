@@ -4,6 +4,7 @@ import {isNumberString, isProductReport} from "../is";
 import {getReportDates} from "../get-report-dates";
 import {ok} from "../../../is";
 import {toHumanNumberString} from "../to-human-number-string";
+import {v4} from "uuid";
 
 export const title = "Cost per size unit";
 export const description = "Calculates the value per size unit for the ingredients in the product";
@@ -148,6 +149,7 @@ export function calculate(report: Report, context: BaseCalculationContext): Repo
     const createdAt = new Date().toISOString();
     return {
         ...getReportDates(report),
+        metricsId: v4(),
         reportId: report.reportId,
         createdAt,
         updatedAt: createdAt,

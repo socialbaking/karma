@@ -1,7 +1,10 @@
 import {addReport, listPartners, listProducts, seed, stopData} from "../karma/data";
 import {ok} from "../is";
 import {background, calculateReportMetrics} from "../karma/background";
-import {Product, ReportData} from "../karma";
+import {getCompleteCalculationConsent, Product, ReportData} from "../karma";
+
+// Default full consent for calculations
+const calculationConsent = getCompleteCalculationConsent();
 
 {
 
@@ -50,7 +53,8 @@ import {Product, ReportData} from "../karma";
             productPurchasePartnerId: wellworks.partnerId,
             productPurchasePartnerName: wellworks.partnerName,
             productSize: product.sizes?.at(0),
-            ...data
+            calculationConsent,
+            ...data,
         });
 
         console.log(report);

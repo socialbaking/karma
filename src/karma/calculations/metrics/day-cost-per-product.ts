@@ -7,6 +7,7 @@ import {DateTime} from "luxon";
 import {toHumanNumberString} from "../to-human-number-string";
 import {mean} from "simple-statistics";
 import {MetricsData} from "../../data";
+import {v4} from "uuid";
 
 export const title = "Cost per size unit";
 export const description = "Calculates the value per size unit for the ingredients in the product";
@@ -89,6 +90,7 @@ export function processReportsForUnit<M extends MetricsData>(config: Calculation
 
     const createdAt = new Date().toISOString();
     return {
+        metricsId: v4(),
         products,
         createdAt,
         updatedAt: createdAt,

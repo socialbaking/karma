@@ -1,6 +1,6 @@
 import { start } from "../karma/listen";
 import {getOrigin} from "../karma/listen/config";
-import {Client} from "../karma";
+import {Client, getCompleteCalculationConsent} from "../karma";
 import {Chance} from "chance"
 import {ok} from "../is";
 import {
@@ -14,6 +14,9 @@ import {
 import {KeyValueStore} from "../karma/data/types";
 import {isRedis} from "../karma/data/redis-client";
 
+
+// Default full consent for calculations
+const calculationConsent = getCompleteCalculationConsent();
 
 const {
     TEST_PRODUCT_COUNT,
@@ -329,6 +332,7 @@ async function testClient() {
                         productPrescriptionPartnerId: clinicPartner.partnerId,
                         productPrescriptionFeeCost: prescriptionFeeCost.toFixed(2),
                         productSize: product.sizes.at(0),
+                        calculationConsent
                     });
 
                     ok(report);

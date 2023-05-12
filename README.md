@@ -73,13 +73,16 @@ export interface ProductMetricData extends Record<string, unknown> {
     activeIngredients: ActiveIngredientMetrics[];
 }
 
-export interface MetricsData extends ReportDateData {
+export interface MetricsData extends ReportDateData, Expiring, CalculationConsent {
     products: ProductMetricData[];
+    countryCode: string;
+    timezone?: string;
+    anonymous?: boolean;
 }
 
-export interface ReportMetrics extends MetricsData, Expiring, CalculationConsent, Record<string, unknown> {
+export interface ReportMetrics extends MetricsData, Record<string, unknown> {
+    metricsId: string;
     reportId: string;
-    countryCode: string;
     reportedAt: string;
     createdAt: string;
     updatedAt: string;
@@ -89,10 +92,10 @@ export interface ReportMetrics extends MetricsData, Expiring, CalculationConsent
 
 export type CountryProductMetricDuration = "day" | "month";
 
-export interface CountryProductMetrics extends MetricsData, Expiring {
+export interface CountryProductMetrics extends MetricsData {
+    metricsId: string;
     createdAt: string;
     updatedAt: string;
-    countryCode: string;
     duration: CountryProductMetricDuration;
     timezone: string;
     reportingDateKey: keyof ReportDateData;
