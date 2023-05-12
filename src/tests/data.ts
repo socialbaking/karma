@@ -1,6 +1,6 @@
 import {addReport, listPartners, listProducts, seed, stopData} from "../karma/data";
 import {ok} from "../is";
-import {calculateReportMetrics} from "../karma/background";
+import {background, calculateReportMetrics} from "../karma/background";
 import {Product, ReportData} from "../karma";
 
 {
@@ -88,5 +88,12 @@ import {Product, ReportData} from "../karma";
         productPurchaseItems: "1",
     });
 
+
+    // If this env exists, we would have tested the background processing enough by now...
+    // we don't want to over run this function if not needed
+    if (!process.env.TEST_PRODUCT_COUNT) {
+        // Run the background processing on the reports
+        await background();
+    }
 
 }

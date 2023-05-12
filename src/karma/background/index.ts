@@ -28,8 +28,11 @@ import {
     isNumberString,
     toHumanNumberString
 } from "../calculations";
+import {DAY_MS, getExpiresAt, MONTH_MS} from "../data/expiring-kv";
 
 const REPORTING_DATE_KEY: keyof ReportDateData = "orderedAt";
+
+const EXPIRE_DURATION_MULTIPLIER = 4;
 
 export interface BackgroundInput extends Record<string, unknown> {
 
@@ -134,7 +137,7 @@ async function calculateQueuedMetrics() {
 
         const dailyUpdate = calculations.metrics.dayCostPerProduct.handler(context);
 
-        async function save(store: KeyValueStore<CountryProductMetrics>, metrics: CountryProductMetrics[]) {
+        async function save(store: KeyValueStore<CountryProductMetrics>, metrics: CountryProductMetrics[], expiresInMs: number) {
             for (const data of metrics) {
                 const {
                     reportingDateKey,
@@ -145,13 +148,18 @@ async function calculateQueuedMetrics() {
                     console.warn(`Warning, daily metrics returned without the reporting date key of ${reportingDateKey}`);
                     continue;
                 }
-                await store.set(`${countryCode}_${reportingDateKey}_${timestamp}`, data);
+                const key = `${countryCode}_${reportingDateKey}_${timestamp}`
+                await store.set(key, {
+                    ...data,
+                    expiresAt: getExpiresAt(expiresInMs)
+                });
             }
         }
 
         await save(
             getDailyMetricsStore(),
-            dailyUpdate.dailyMetrics
+            dailyUpdate.dailyMetrics,
+            context.reportingDays * EXPIRE_DURATION_MULTIPLIER * DAY_MS
         );
 
         context.dailyMetrics.push(...dailyUpdate.dailyMetrics);
@@ -163,8 +171,9 @@ async function calculateQueuedMetrics() {
         const monthlyUpdate = calculations.metrics.monthCostPerProduct.handler(context);
 
         await save(
-            getDailyMetricsStore(),
-            monthlyUpdate.monthlyMetrics
+            getMonthlyMetricsStore(),
+            monthlyUpdate.monthlyMetrics,
+            context.reportingMonths * EXPIRE_DURATION_MULTIPLIER * MONTH_MS
         );
 
     }
@@ -178,7 +187,7 @@ function isQueryInput(input: BackgroundInput): input is QueryInput {
     return isLike<QueryInput>(input) && !!input.query;
 }
 
-export async function background(input: BackgroundInput) {
+export async function background(input: BackgroundInput = {}) {
 
     console.log(`Running background tasks`, input);
 

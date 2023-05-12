@@ -288,6 +288,26 @@ async function testClient() {
 
                     const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 
+                    const itemCost = chance.natural({ min: 100, max: 700 });
+                    const deliveryCost = chance.natural({ min: 0, max: 25 });
+                    // I have personally ordered 16 of one product before,
+                    // 24 was the next bundle size I was looking to get
+                    // Specifically we will see high item counts for cancer patients
+                    const items = chance.integer({ min: 1, max: 25 });
+                    // There are sometimes fees charged to actually purchase the product sometimes
+                    // Could be say buy now pay later fees
+                    const feeCost = chance.natural({ min: 0, max: 30 });
+
+                    // Total cost of just the product excluding the prescription fee
+                    const totalCost = (
+                        (items * itemCost) +
+                        deliveryCost +
+                        feeCost
+                    );
+
+                    // There are sometimes fees charged to prescribe the product by a medical professional
+                    const prescriptionFeeCost = chance.natural({ min: 0, max: 100 });
+
                     const report = await client.addReport({
                         productId: productId,
                         productName,
@@ -295,11 +315,11 @@ async function testClient() {
                         orderedAt: new Date(now).toISOString(),
                         shippedAt: new Date(now + (2 * ONE_DAY_MS)).toISOString(),
                         receivedAt: new Date(now + (4 * ONE_DAY_MS)).toISOString(),
-                        productPurchaseItemCost: "455",
-                        productPurchaseDeliveryCost: "8.50",
-                        productPurchaseTotalCost: "918.50",
-                        productPurchaseFeeCost: "0.00",
-                        productPurchaseItems: "2",
+                        productPurchaseItemCost: itemCost.toFixed(2),
+                        productPurchaseDeliveryCost: deliveryCost.toFixed(2),
+                        productPurchaseTotalCost: totalCost.toFixed(2),
+                        productPurchaseFeeCost: feeCost.toFixed(2),
+                        productPurchaseItems: items.toString(),
                         productPurchase: true,
                         productPurchasePartnerId: pharmacyPartner.partnerId,
                         productPurchasePartnerName: pharmacyPartner.partnerName,
@@ -307,7 +327,7 @@ async function testClient() {
                         productPrescriptionAt: new Date(now).toISOString(),
                         productPrescriptionPartnerName: clinicPartner.partnerName,
                         productPrescriptionPartnerId: clinicPartner.partnerId,
-                        productPrescriptionFeeCost: "49.50",
+                        productPrescriptionFeeCost: prescriptionFeeCost.toFixed(2),
                         productSize: product.sizes.at(0),
                     });
 

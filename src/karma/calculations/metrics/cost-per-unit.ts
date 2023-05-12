@@ -73,26 +73,35 @@ export function calculate(report: Report, context: BaseCalculationContext): Repo
                     size
                 }))
         ),
-        ...Object.keys(unitTotals).map((unit): ActiveIngredientMetrics => ({
-            type: [...new Set(
-                calculated
-                    .filter(value => value.unit === unit)
-                    .map(value => value.type)
-            )].join("+"),
-            unit,
-            value: toHumanNumberString(unitTotals[unit])
-        })),
-        ...Object.keys(unitTotals).map((unit): ActiveIngredientMetrics => ({
-            type: [...new Set(
-                calculated
-                    .filter(value => value.unit === unit)
-                    .map(value => value.type)
-            )].join("+"),
-            unit: `${currencySymbol}/${unit}`,
-            value: toHumanNumberString(
-                itemCost / unitTotals[unit]
-            )
-        })),
+        ...Object.keys(unitTotals).map((unit): ActiveIngredientMetrics => {
+            const values = calculated.filter(value => value.unit === unit);
+            const prefixes = values.map(value => value.prefix).filter(Boolean);
+            const prefix = prefixes[0];
+            return {
+                type: [...new Set(
+                    values
+                        .map(value => value.type)
+                )].join("+"),
+                unit,
+                value: toHumanNumberString(unitTotals[unit]),
+                prefix
+            }
+        }),
+        ...Object.keys(unitTotals).map((unit): ActiveIngredientMetrics => {
+            const values = calculated.filter(value => value.unit === unit);
+            const prefixes = values.map(value => value.prefix).filter(Boolean);
+            const prefix = prefixes[0];
+            return {
+                type: [...new Set(
+                    values.map(value => value.type)
+                )].join("+"),
+                unit: `${currencySymbol}/${unit}`,
+                value: toHumanNumberString(
+                    itemCost / unitTotals[unit]
+                ),
+                prefix
+            }
+        }),
         ...calculated
             .flatMap(({ type, unit, value, prefix }) => {
                 const numeric = +value;

@@ -37,54 +37,6 @@ export const activeIngredientMetrics = {
     ]
 } as const
 
-export const reportMetricsData = {
-    type: "object",
-    properties: {
-        ...reportDateData.properties,
-        reportId: {
-            type: "string"
-        },
-        productId: {
-            type: "string"
-        },
-        countryCode: {
-            type: "string"
-        },
-        reportedAt: {
-            type: "string"
-        },
-        activeIngredients: {
-            type: "array",
-            items: activeIngredientMetrics
-        }
-    },
-    required: [
-        "reportId",
-        "reportedAt",
-        "activeIngredients",
-        "countryCode",
-        "productId"
-    ]
-} as const;
-
-export const reportMetrics = {
-    type: "object",
-    properties: {
-        ...reportDateData.properties,
-        createdAt: {
-            type: "string"
-        },
-        updatedAt: {
-            type: "string"
-        },
-    },
-    required: [
-        ...reportMetricsData.required,
-        "createdAt",
-        "updatedAt"
-    ]
-} as const;
-
 export const productMetricData = {
     type: "object",
     properties: {
@@ -102,9 +54,10 @@ export const productMetricData = {
     ]
 } as const;
 
-export const countryMetricData = {
+export const metricData = {
     type: "object",
     properties: {
+        ...reportDateData.properties,
         products: {
             type: "array",
             items: productMetricData
@@ -115,10 +68,44 @@ export const countryMetricData = {
     ]
 } as const;
 
+export const reportMetrics = {
+    type: "object",
+    properties: {
+        ...metricData.properties,
+        reportId: {
+            type: "string"
+        },
+        countryCode: {
+            type: "string"
+        },
+        reportedAt: {
+            type: "string"
+        },
+        createdAt: {
+            type: "string"
+        },
+        updatedAt: {
+            type: "string"
+        },
+        expiresAt: {
+            type: "string",
+            nullable: true
+        }
+    },
+    required: [
+        ...metricData.required,
+        "reportId",
+        "countryCode",
+        "reportedAt",
+        "createdAt",
+        "updatedAt"
+    ]
+} as const;
+
 export const countryMetrics = {
     type: "object",
     properties: {
-        ...countryMetricData.properties,
+        ...metricData.properties,
         createdAt: {
             type: "string"
         },
@@ -131,21 +118,25 @@ export const countryMetrics = {
         duration: {
             type: "string"
         },
-        timestamp: {
-            type: "string"
-        },
         timezone: {
             type: "string"
         },
+        reportingDateKey: {
+            type: "string"
+        },
+        expiresAt: {
+            type: "string",
+            nullable: true
+        }
     },
     required: [
-        ...countryMetricData.required,
+        ...metricData.required,
         "createdAt",
         "updatedAt",
         "countryCode",
         "duration",
-        "timestamp",
-        "timezone"
+        "timezone",
+        "reportingDateKey"
     ]
 } as const;
 

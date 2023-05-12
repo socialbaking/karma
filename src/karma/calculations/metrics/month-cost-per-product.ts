@@ -16,7 +16,14 @@ export function calculate(context: CalculationContext): CountryProductMetrics[] 
         reportingMonths
     } = context;
 
-    return Array.from({ length: reportingMonths })
-        .map((ignore, offset) => processReportsForUnit(context, context.dailyMetrics, offset, "month"))
-        .filter(Boolean)
+    let results = [];
+
+    for (let offset = 0; offset <= reportingMonths; offset += 1) {
+        const data = processReportsForUnit(context, context.dailyMetrics, offset,"month");
+        if (data) {
+            results.push(data);
+        }
+    }
+
+    return results;
 }

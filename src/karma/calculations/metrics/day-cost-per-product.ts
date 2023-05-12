@@ -1,5 +1,5 @@
 import {CountryProductMetrics, ReportMetrics, ProductMetricData} from "../../client";
-import {CalculationContext, MetricCalculationContext} from "../types";
+import {CalculationConfig, CalculationContext, MetricCalculationContext} from "../types";
 import {isNumberString} from "../is";
 import {ActiveIngredientMetrics, CountryProductMetricDuration} from "../../client";
 import {ok} from "../../../is";
@@ -17,25 +17,32 @@ export function handler(context: CalculationContext) {
     } as const;
 }
 
-export function processReportsForUnit<M extends MetricsData>(context: CalculationContext, metrics: MetricsData[], offset: number, unit: CountryProductMetricDuration): CountryProductMetrics | undefined {
-    const { countryCode, timezone, reportingDateKey } = context;
+export function processReportsForUnit<M extends MetricsData>(config: CalculationConfig, metrics: MetricsData[], offset: number, unit: CountryProductMetricDuration): CountryProductMetrics | undefined {
+    const { countryCode, timezone, reportingDateKey } = config;
 
-    const targetDate = DateTime
+    let targetDate = DateTime
         .local()
-        .setZone(context.timezone)
-        .startOf(unit)
-        .minus({
-            [unit]: offset
-        })
+        .setZone(timezone)
         .startOf(unit);
+
+    if (offset) {
+        targetDate = targetDate
+            .minus({
+                [unit]: offset
+            })
+            .startOf(unit);
+    }
 
     const timestamp = targetDate.toJSDate().toISOString();
 
     const dates: (DateTime | undefined)[] = metrics
         .map(
-            report => {
+            (report, index) => {
                 const dateValue = report[reportingDateKey];
-                if (!dateValue) return undefined
+                if (!dateValue) {
+                    console.warn(`Warning metrics does not have ${reportingDateKey} at index ${index}`);
+                    return undefined;
+                }
                 return DateTime.fromISO(
                     dateValue,
                     {
@@ -47,13 +54,13 @@ export function processReportsForUnit<M extends MetricsData>(context: Calculatio
             }
         );
 
-    const durationReports = context.reportMetrics.filter((report, index) => {
+    const durationReports = metrics.filter((report, index) => {
         const date = dates.at(index);
         if (!date) return false;
         return date.hasSame(targetDate, unit);
     });
 
-    console.log(durationReports.length, `reports to process into metrics for ${countryCode} ${unit} ${reportingDateKey} ${timestamp} `);
+    console.log(`${durationReports.length}/${metrics.length} reports to process into metrics for ${countryCode} ${unit} ${reportingDateKey} ${timestamp} `);
 
     if (!durationReports.length) return undefined;
 
@@ -67,7 +74,7 @@ export function processReportsForUnit<M extends MetricsData>(context: Calculatio
     const products = productIds
         .map((productId): ProductMetricData => {
             const input = durationProducts
-                .filter(({ productId }) => productId)
+                .filter(product => product.productId === productId)
                 .flatMap<ActiveIngredientMetrics>(product => product.activeIngredients);
             const activeIngredients = getProductMetricData(input);
             if (!activeIngredients.length) return undefined;
@@ -112,6 +119,9 @@ export function processReportsForUnit<M extends MetricsData>(context: Calculatio
                                     .map(value => value.value)
                                     .filter(isNumberString)
                                     .map(value => +value);
+                                const prefixes = values
+                                    .map(value => value.prefix)
+                                    .filter(Boolean)
                                 const { length } = numericValues;
                                 if (!length) return;
                                 return {
@@ -119,7 +129,8 @@ export function processReportsForUnit<M extends MetricsData>(context: Calculatio
                                     type,
                                     unit,
                                     value: toHumanNumberString(mean(numericValues)),
-                                    mean: true
+                                    mean: true,
+                                    prefix: prefixes[0]
                                 };
                             }
 
@@ -143,7 +154,14 @@ export function calculate(context: CalculationContext): CountryProductMetrics[] 
         reportingDays
     } = context;
 
-    return Array.from({ length: reportingDays })
-        .map((ignore, offset) => processReportsForUnit(context, context.reportMetrics, offset, "day"))
-        .filter(Boolean)
+    let results = [];
+
+    for (let offset = 0; offset <= reportingDays; offset += 1) {
+        const data = processReportsForUnit(context, context.reportMetrics, offset,"day");
+        if (data) {
+            results.push(data);
+        }
+    }
+
+    return results;
 }

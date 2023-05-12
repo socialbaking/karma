@@ -9,9 +9,9 @@ export const EXPIRING_KEYS = new Set<`${string}|${string}`>();
 
 export const DAY_MS = 24 * 60 * 60 * 1000;
 export const MONTH_MS = 31 * DAY_MS;
-export const DEFAULT_EXPIRES_AT = 7 * DAY_MS;
+export const DEFAULT_EXPIRES_IN_MS = 7 * DAY_MS;
 
-export function getExpiresAt(ms = DEFAULT_EXPIRES_AT) {
+export function getExpiresAt(ms = DEFAULT_EXPIRES_IN_MS) {
     return new Date(
         Date.now() + ms
     ).toISOString();
