@@ -77,12 +77,14 @@ export interface MetricsData extends ReportDateData {
     products: ProductMetricData[];
 }
 
-export interface ReportMetrics extends MetricsData, Expiring, Record<string, unknown> {
+export interface ReportMetrics extends MetricsData, Expiring, CalculationConsent, Record<string, unknown> {
     reportId: string;
     countryCode: string;
     reportedAt: string;
     createdAt: string;
     updatedAt: string;
+    // consent required
+    calculationConsent: CalculationConsentItem[];
 }
 
 export type CountryProductMetricDuration = "day" | "month";

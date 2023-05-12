@@ -28,8 +28,12 @@ export function calculate(report: Report, context: BaseCalculationContext): Repo
         productPurchaseTotalCost,
         productPurchaseDeliveryCost,
         productPurchaseFeeCost,
-        productSize
+        productSize,
+        calculationConsent
     } = report;
+
+    // Only need to check its existence, external to this function the actual consent keys are checked
+    if (!calculationConsent) return undefined;
 
     const product = context.products.find(product => product.productId === productId);
 
@@ -148,6 +152,7 @@ export function calculate(report: Report, context: BaseCalculationContext): Repo
         createdAt,
         updatedAt: createdAt,
         countryCode: report.countryCode,
-        products
+        products,
+        calculationConsent
     };
 }

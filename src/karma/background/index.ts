@@ -51,6 +51,8 @@ export async function calculateReportMetrics(report: Report): Promise<ReportMetr
     //     const category = await getCategory(product.categoryId);
     //     if (category) categories.push(category);
     // }
+    // if (!report.calculationConsent?.findIndex("calculations.metrics.costPerUnit")) return undefined;
+
     return calculations.metrics.costPerUnit.calculate(report,  {
         products: [product],
         reports: [report],

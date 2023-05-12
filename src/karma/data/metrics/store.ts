@@ -2,7 +2,7 @@ import {getExpiringStore} from "../expiring-kv";
 import {ReportMetrics, CountryProductMetrics} from "./types";
 import {Expiring} from "../expiring";
 
-const METRICS_VERSION = 1;
+const METRICS_VERSION = 2;
 
 const REPORT_METRICS_STORE_NAME = "reportMetrics"
 const DAILY_METRICS_STORE_NAME = "dailyMetrics"
