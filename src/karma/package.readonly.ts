@@ -10,6 +10,6 @@ export const secondsBetweenCommitAndBuild = 86.86;
 export const minutesBetweenCommitAndBuild = 1.45;
 export const timeBetweenCommitAndBuild = "1 minutes and 26 seconds";
 // Variables to be replaced after tests
-export const secondsBetweenCommitAndTestCompletion = "97.1";
-export const minutesBetweenCommitAndTestCompletion = "1.62";
-export const timeBetweenCommitAndTestCompletion = "1 minutes and 37 seconds";
+export const secondsBetweenCommitAndTestCompletion = "117.91";
+export const minutesBetweenCommitAndTestCompletion = "1.97";
+export const timeBetweenCommitAndTestCompletion = "1 minutes and 57 seconds";
