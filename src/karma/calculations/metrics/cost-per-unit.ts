@@ -21,7 +21,6 @@ export function handler(context: BaseCalculationContext) {
 export function calculate(report: Report, context: BaseCalculationContext): ReportMetrics | undefined {
     if (!isProductReport(report)) return undefined;
 
-    const { currencySymbol } = context;
 
     const {
         productId,
@@ -30,8 +29,12 @@ export function calculate(report: Report, context: BaseCalculationContext): Repo
         productPurchaseDeliveryCost,
         productPurchaseFeeCost,
         productSize,
-        calculationConsent
+        calculationConsent,
+        countryCode,
+        timezone
     } = report;
+
+    const currencySymbol = report.currencySymbol || context.currencySymbol;
 
     // Only need to check its existence, external to this function the actual consent keys are checked
     if (!calculationConsent) return undefined;
@@ -153,7 +156,9 @@ export function calculate(report: Report, context: BaseCalculationContext): Repo
         reportId: report.reportId,
         createdAt,
         updatedAt: createdAt,
-        countryCode: report.countryCode,
+        countryCode,
+        currencySymbol,
+        timezone,
         products,
         calculationConsent
     };

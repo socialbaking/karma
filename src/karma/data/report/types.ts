@@ -22,6 +22,7 @@ export interface CalculationConsent {
 export interface ReportData extends ReportDateData, Expiring, CalculationConsent, Record<string, unknown> {
     countryCode: string; // "NZ"
     currencySymbol?: string; // "$"
+    timezone?: string; // Pacific/Auckland
     note?: string;
     parentReportId?: string;
     productId?: string;

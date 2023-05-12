@@ -62,6 +62,14 @@ export const metricData = {
         countryCode: {
             type: "string"
         },
+        currencySymbol: {
+            type: "string",
+            nullable: true
+        },
+        timezone: {
+            type: "string",
+            nullable: true
+        },
         products: {
             type: "array",
             items: productMetricData
@@ -141,16 +149,19 @@ export const countryMetrics = {
         duration: {
             type: "string"
         },
-        timezone: {
-            type: "string"
-        },
         reportingDateKey: {
             type: "string"
         },
         expiresAt: {
             type: "string",
             nullable: true
-        }
+        },
+        currencySymbol: {
+            type: "string"
+        },
+        timezone: {
+            type: "string"
+        },
     },
     required: [
         ...metricData.required,
@@ -159,7 +170,8 @@ export const countryMetrics = {
         "updatedAt",
         "duration",
         "timezone",
-        "reportingDateKey"
+        "reportingDateKey",
+        "currencySymbol"
     ]
 } as const;
 

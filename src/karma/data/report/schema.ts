@@ -70,6 +70,10 @@ export const reportData = {
             type: "string",
             nullable: true
         },
+        timezone: {
+            type: "string",
+            nullable: true
+        },
         note: {
             type: "string",
             nullable: true

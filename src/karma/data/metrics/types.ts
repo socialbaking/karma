@@ -22,7 +22,8 @@ export interface ProductMetricData extends Record<string, unknown> {
 export interface MetricsData extends ReportDateData, Expiring, CalculationConsent {
     products: ProductMetricData[];
     countryCode: string;
-    timezone?: string;
+    currencySymbol?: string; // "$"
+    timezone?: string; // Pacific/Auckland
     anonymous?: boolean;
 }
 
@@ -46,7 +47,8 @@ export interface CountryProductMetrics extends MetricsData {
     metricsId: string;
     createdAt: string;
     updatedAt: string;
-    duration: CountryProductMetricDuration;
+    currencySymbol: string; // "$"
     timezone: string;
+    duration: CountryProductMetricDuration;
     reportingDateKey: keyof ReportDateData;
 }

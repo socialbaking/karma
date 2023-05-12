@@ -19,7 +19,7 @@ export function handler(context: CalculationContext) {
 }
 
 export function processReportsForUnit<M extends MetricsData>(config: CalculationConfig, metrics: MetricsData[], offset: number, unit: CountryProductMetricDuration): CountryProductMetrics | undefined {
-    const { countryCode, timezone, reportingDateKey } = config;
+    const { countryCode, timezone, reportingDateKey, currencySymbol } = config;
 
     let targetDate = DateTime
         .local()
@@ -95,6 +95,7 @@ export function processReportsForUnit<M extends MetricsData>(config: Calculation
         createdAt,
         updatedAt: createdAt,
         countryCode,
+        currencySymbol,
         duration: unit,
         reportingDateKey,
         timezone,
