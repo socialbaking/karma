@@ -44,6 +44,7 @@ export interface Client {
     listMetrics(): Promise<CountryProductMetrics[]>;
     listReportMetrics(): Promise<ReportMetrics[]>;
     listProductMetrics(productId: string): Promise<CountryProductMetrics[]>;
+    listCalculationKeys(): Promise<string[]>
     background(query: Record<string, string> | URLSearchParams): Promise<void>;
 }
 

@@ -419,5 +419,25 @@ export class Client implements ClientInterface {
         return response.json();
     }
 
+    async listCalculationKeys(): Promise<string[]> {
+        const {
+            baseUrl,
+            headers,
+            prefix
+        } = this;
+        const response = await fetch(
+            new URL(
+                `${prefix}/calculations/keys`,
+                baseUrl
+            ),
+            {
+                method: "GET",
+                headers
+            }
+        );
+        ok(response.ok, "listCalculationKeys response not ok");
+        return response.json();
+    }
+
 
 }

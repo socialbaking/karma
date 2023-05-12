@@ -57,6 +57,9 @@ async function testClient() {
     });
 
     ok(Array.isArray(await publicClient.listPartners()));
+    const calculationKeys = await publicClient.listCalculationKeys();
+    ok(Array.isArray(calculationKeys));
+    ok(calculationKeys.length);
 
     const partnerName = chance.company();
     const location = chance.city();
