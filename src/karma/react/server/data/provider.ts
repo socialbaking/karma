@@ -3,9 +3,8 @@ import {
     CountryProductMetrics, Partner,
     Product
 } from "../../../data";
-import {createContext, useContext} from "react";
+import {createContext, useContext, useMemo} from "react";
 import {ok} from "../../../../is";
-import {useMemo} from "preact/compat";
 
 export interface Data {
     products: Product[];
