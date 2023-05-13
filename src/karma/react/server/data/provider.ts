@@ -1,0 +1,69 @@
+import {
+    Category,
+    CountryProductMetrics, Partner,
+    Product
+} from "../../../data";
+import {createContext, useContext} from "react";
+import {ok} from "../../../../is";
+import {useMemo} from "preact/compat";
+
+export interface Data {
+    products: Product[];
+    categories: Category[];
+    partners: Partner[];
+    metrics?: CountryProductMetrics[];
+}
+
+export const DataContext = createContext<Data | undefined>(undefined);
+export const DataProvider = DataContext.Provider;
+
+export function useData(): Data {
+    const context = useContext(DataContext);
+    ok(context, "Expected DataProvider to be used");
+    return context;
+}
+
+export function useProducts() {
+    const { products } = useData();
+    return products;
+}
+
+export function useProduct(productId: string): Product | undefined {
+    const products = useProducts();
+    return useMemo(() => products.find(product => product.productId === productId), [products]);
+}
+
+export function useCategories() {
+    const { categories } = useData();
+    return categories;
+}
+
+export function useCategory(categoryId: string): Category | undefined {
+    const categories = useCategories();
+    return useMemo(() => categories.find(category => category.categoryId === categoryId), [categories]);
+}
+
+export function usePartners() {
+    const { partners } = useData();
+    return partners;
+}
+
+export function usePartner(partnerId: string) {
+    const partners = usePartners();
+    return useMemo(() => partners.find(partner => partner.partnerId === partnerId), [partners]);
+}
+
+export function useMetrics() {
+    const { metrics } = useData();
+    return metrics || [];
+}
+
+export function useMonthlyMetrics() {
+    const metrics = useMetrics();
+    return useMemo(() => metrics.filter(metric => metric.duration === "month"), [metrics]);
+}
+
+export function useDailyMetrics() {
+    const metrics = useMetrics();
+    return useMemo(() => metrics.filter(metric => metric.duration === "day"), [metrics]);
+}

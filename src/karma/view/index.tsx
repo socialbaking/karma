@@ -6,10 +6,33 @@ import {
     timeBetweenCommitAndBuild,
     timeBetweenCommitAndTestCompletion
 } from "../package";
+import {paths} from "../react/server/paths";
+import KarmaServer from "../react/server";
+import {renderToStaticMarkup} from "react-dom/server";
+import {listCategories, listMetrics, listPartners, listProducts} from "../data";
 
 export async function viewRoutes(fastify: FastifyInstance) {
 
     // TODO: Register view endpoints here
+
+    Object.keys(paths).forEach(path => {
+        fastify.get(path, async (request, response) => {
+            response.header("Content-Type", "text/html");
+            response.status(200);
+            response.send(
+                // Can go right to static, should be no async loading within components
+                renderToStaticMarkup(
+                    <KarmaServer
+                        url={request.url}
+                        partners={await listPartners()}
+                        categories={await listCategories()}
+                        metrics={request.url.includes("metrics") ? await listMetrics() : undefined}
+                        products={await listProducts()}
+                    />
+                )
+            )
+        });
+    });
 
     fastify.get("/", async (request, response) => {
 

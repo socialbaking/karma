@@ -12,9 +12,7 @@
     "sourceMap": true,
     "outDir": "esnext",
     "baseUrl": "./src",
-    "jsx": "react",
-    "jsxFactory": "h",
-    "jsxFragmentFactory": "createFragment",
+    "jsx": "react-jsx",
     "allowJs": true,
     "paths": {
     }
