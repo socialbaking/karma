@@ -13,6 +13,7 @@ export interface ProductData extends Record<string, unknown> {
     licenceApprovedBeforeGivenDate?: boolean;
     licenceApprovedAt?: string;
     licenceExpiredAt?: string;
+    licenceApprovalWebsite?: string;
     // ISO 3166-1 alpha-3 country code
     licenceCountryCode?: string;
     // Flag for products we don't have the exact availability date for

@@ -40,6 +40,10 @@ export const productData = {
             type: "string",
             nullable: true
         },
+        licenceApprovalWebsite: {
+            type: "string",
+            nullable: true
+        },
         // ISO 3166-1 alpha-3 country code
         licenceCountryCode: {
             type: "string",
