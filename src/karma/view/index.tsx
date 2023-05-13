@@ -16,11 +16,15 @@ export async function viewRoutes(fastify: FastifyInstance) {
 
     // TODO: Register view endpoints here
 
+    const { ALLOW_ANONYMOUS_VIEWS } = process.env;
+
     Object.keys(paths).forEach(path => {
         fastify.get(path, {
-            preHandler: authenticate(fastify),
+            preHandler: authenticate(fastify, {
+                anonymous: !!ALLOW_ANONYMOUS_VIEWS
+            }),
             async handler(request, response) {
-                response.header("Content-Type", "text/html");
+                response.header("Content-Type", "text/html; charset=utf-8");
                 response.status(200);
                 response.send(
                     // Can go right to static, should be no async loading within components
