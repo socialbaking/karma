@@ -132,7 +132,10 @@ export function processReportsForUnit<M extends MetricsData>(config: Calculation
                                     type,
                                     unit,
                                     value: toHumanNumberString(mean(numericValues)),
-                                    mean: true,
+                                    // If its one value it is not a mean, it is a real value
+                                    // This lets us filter it correctly and not give real values without mixing it
+                                    // with at least one other value
+                                    mean: length > 1 ? true : undefined,
                                     prefix: prefixes[0]
                                 };
                             }

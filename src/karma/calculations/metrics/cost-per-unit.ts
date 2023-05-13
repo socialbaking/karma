@@ -132,7 +132,7 @@ export function calculate(report: Report, context: BaseCalculationContext): Repo
                     {
                         type,
                         unit: `${currencySymbol}/${unit}`,
-                        value: toHumanNumberString(itemCost / totalUnit * numeric),
+                        value: toHumanNumberString(itemCost / totalUnit),
                         proportional: true,
                         prefix
                     }
