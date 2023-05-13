@@ -19,7 +19,7 @@ export async function listSystemLogsRoutes(fastify: FastifyInstance) {
 
     const schema = {
         description: "List of system logs",
-        tags: ["partner"],
+        tags: ["system"],
         summary: "",
         response,
         security: [

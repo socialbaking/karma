@@ -2,7 +2,7 @@ import {FastifyInstance} from "fastify";
 import DiscordOAuth2, {PartialGuild} from "discord-oauth2";
 import {ok} from "../../../is";
 import {getOrigin} from "../config";
-import {getAuthenticationStateByKey, addAuthenticationState} from "../../data";
+import {getAuthenticationStateByKey, addAuthenticationState, systemLogSchema} from "../../data";
 
 interface DiscordRole extends Record<string, unknown>  {
     id: string;
@@ -74,7 +74,10 @@ export async function discordAuthenticationRoutes(fastify: FastifyInstance) {
                 state: string;
             }
         }
-        const schema = { querystring }
+        const schema = {
+            querystring,
+            tags: ["system"]
+        }
         fastify.get<Schema>("/discord/callback", {
             schema,
             async handler(request, response) {
@@ -197,7 +200,10 @@ export async function discordAuthenticationRoutes(fastify: FastifyInstance) {
         type Schema = {
             Querystring: Record<string, string>
         }
-        const schema = { querystring }
+        const schema = {
+            querystring,
+            tags: ["system"]
+        }
         fastify.get<Schema>("/discord/redirect", {
             schema,
             async handler(request, response) {

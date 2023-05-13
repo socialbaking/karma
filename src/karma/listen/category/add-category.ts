@@ -18,7 +18,7 @@ export async function addCategoryRoutes(fastify: FastifyInstance) {
 
     const schema = {
         description: "Add a new Category",
-        tags: ["Category"],
+        tags: ["category"],
         summary: "",
         body: categorySchema.categoryData,
         response

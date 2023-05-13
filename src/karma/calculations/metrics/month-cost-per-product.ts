@@ -2,8 +2,8 @@ import {CountryProductMetrics} from "../../client";
 import {CalculationContext, MetricCalculationContext} from "../types";
 import {processReportsForUnit} from "./day-cost-per-product";
 
-export const title = "Cost per size unit";
-export const description = "Calculates the value per size unit for the ingredients in the product";
+export const title = "Montly Average";
+export const description = "Calculates the average values for a month";
 
 export function handler(context: CalculationContext) {
     return {

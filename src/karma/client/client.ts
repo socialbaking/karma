@@ -7,7 +7,7 @@ import {
     Product,
     ProductData,
     ReportData,
-    Report, MetricsData, ReportMetrics, ReportMetricsData,
+    Report, MetricsData, ReportMetrics, ReportMetricsData, CalculationSource,
 } from "./interface.readonly";
 import {
     Client as ClientInterface,
@@ -439,5 +439,24 @@ export class Client implements ClientInterface {
         return response.json();
     }
 
+    async listCalculations(): Promise<CalculationSource[]> {
+        const {
+            baseUrl,
+            headers,
+            prefix
+        } = this;
+        const response = await fetch(
+            new URL(
+                `${prefix}/calculations`,
+                baseUrl
+            ),
+            {
+                method: "GET",
+                headers
+            }
+        );
+        ok(response.ok, "listCalculations response not ok");
+        return response.json();
+    }
 
 }

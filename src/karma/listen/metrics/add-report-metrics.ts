@@ -18,7 +18,7 @@ export async function addReportMetricsRoutes(fastify: FastifyInstance) {
 
     const schema = {
         description: "Report new metrics",
-        tags: ["partner"],
+        tags: ["metrics"],
         summary: "",
         body: metricsSchema.reportMetricData,
         response,

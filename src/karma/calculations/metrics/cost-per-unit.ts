@@ -6,8 +6,8 @@ import {ok} from "../../../is";
 import {toHumanNumberString} from "../to-human-number-string";
 import {v4} from "uuid";
 
-export const title = "Cost per size unit";
-export const description = "Calculates the value per size unit for the ingredients in the product";
+export const title = "Product Costs";
+export const description = "Calculates the values related to the product, like cost per active ingredient";
 
 export function handler(context: BaseCalculationContext) {
     return {

@@ -1,40 +1,53 @@
 import * as metrics from "./metrics";
-import {CalculationConsent, CalculationConsentItem} from "../client";
+import {CalculationConsentItem, CalculationSource} from "../client";
 
 export const calculations = {
     metrics
 } as const;
 
-function getCalculationKeys(object: unknown, key: string): string[] {
-    type UnknownRecord = Record<string, unknown>;
-    interface HandlerObject extends UnknownRecord {
-        handler: Function
-    }
+type UnknownRecord = Record<string, unknown>;
+
+interface HandlerObject extends UnknownRecord {
+    handler: Function
+    title: string;
+    description: string;
+}
+
+function isRecord(value: unknown): value is UnknownRecord {
+    return !!(value && typeof value === "object");
+}
+
+function isHandlerObject(value: UnknownRecord): value is HandlerObject {
+    return (
+        typeof value.handler === "function" &&
+        typeof value.title === "string" &&
+        typeof value.description === "string"
+    );
+}
+
+function getCalculations(object: unknown, key: string): CalculationSource[] {
 
     if (!isRecord(object)) return [];
 
     if (isHandlerObject(object)) {
         return [
-            key
+            {
+                calculationKey: key,
+                title: object.title,
+                description: object.description
+            }
         ]
     }
 
     return Object.entries(object)
         .flatMap(([childKey, value]) => (
-            getCalculationKeys(value, `${key}.${childKey}`)
+            getCalculations(value, `${key}.${childKey}`)
         ))
-
-    function isRecord(value: unknown): value is UnknownRecord {
-        return !!(value && typeof value === "object");
-    }
-
-    function isHandlerObject(value: UnknownRecord): value is HandlerObject {
-        return typeof value.handler === "function";
-    }
 
 }
 
-export const calculationKeys = getCalculationKeys(calculations, "calculations");
+export const calculationSources = getCalculations(calculations, "calculations");
+export const calculationKeys = calculationSources.map(value => value.calculationKey);
 
 export function getCompleteCalculationConsent(): CalculationConsentItem[] {
     const consentedAt = new Date().toISOString()

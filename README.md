@@ -9,7 +9,7 @@
 
 ### Test Coverage
 
- ![90.43%25 lines covered](https://img.shields.io/badge/lines-90.43%25-brightgreen) ![90.43%25 statements covered](https://img.shields.io/badge/statements-90.43%25-brightgreen) ![80.16%25 functions covered](https://img.shields.io/badge/functions-80.16%25-brightgreen) ![85.32%25 branches covered](https://img.shields.io/badge/branches-85.32%25-brightgreen)
+ ![90.51%25 lines covered](https://img.shields.io/badge/lines-90.51%25-brightgreen) ![90.51%25 statements covered](https://img.shields.io/badge/statements-90.51%25-brightgreen) ![80.24%25 functions covered](https://img.shields.io/badge/functions-80.24%25-brightgreen) ![85.22%25 branches covered](https://img.shields.io/badge/branches-85.22%25-brightgreen)
 
 [//]: # (badges)
 
@@ -46,6 +46,12 @@ export interface Client {
     listProductMetrics(productId: string): Promise<CountryProductMetrics[]>;
     listCalculationKeys(): Promise<string[]>
     background(query: Record<string, string> | URLSearchParams): Promise<void>;
+}
+
+export interface CalculationSource {
+    calculationKey: string;
+    title: string;
+    description: string;
 }
 
 export interface CategoryData extends Record<string, unknown> {

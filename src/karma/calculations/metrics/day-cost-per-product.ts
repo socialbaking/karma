@@ -9,8 +9,8 @@ import {mean} from "simple-statistics";
 import {MetricsData} from "../../data";
 import {v4} from "uuid";
 
-export const title = "Cost per size unit";
-export const description = "Calculates the value per size unit for the ingredients in the product";
+export const title = "Daily Average";
+export const description = "Calculates the average values for a day";
 
 export function handler(context: CalculationContext) {
     return {
