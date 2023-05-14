@@ -50,7 +50,11 @@ export function getActiveIngredients(product: Product): ActiveIngredient[] {
                 const prefix = unitValues.find(value => value.prefix)?.prefix;
                 const values = [...new Set(
                     unitValues
-                        .map(value => +value.value)
+                        .map(value => {
+                            const numeric = +value.value;
+                            if (prefix) return numeric;
+                            return Math.round(numeric * 10) / 10;
+                        })
                 )]
                     .sort((a, b) => a > b ? -1 : 1);
                 const max = Math.max(...values);
