@@ -12,13 +12,13 @@ export interface PercentageLabelProps extends ActiveIngredient {
 
 }
 
-const PercentageLabel = React.memo(({ label, sortIndex }: PercentageLabelProps) => (
+const PercentageLabel = React.memo(({ type, label, sortIndex }: PercentageLabelProps) => (
   <span
     className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
         sortIndex === 0 ? "bg-green-400" : "bg-green-100"
     } text-green-800`}
   >
-    {label}
+    {type} {label}
   </span>
 ));
 
