@@ -42,11 +42,11 @@ export function Calculator() {
                 <input type="text" name="productText" placeholder="Product Name" />
                 <input type="hidden" name="productName" />
                 <input type="hidden" name="productId" />
-                <input type="number" name="productPurchaseTotalCost" placeholder="Total Cost" />
-                <input type="number" name="productPurchaseItems" placeholder="Item Count" />
-                <input type="number" name="productPurchaseItemCost" placeholder="Item Cost" disabled hidden />
-                <input type="number" name="productPurchaseDeliveryCost" placeholder="Delivery Cost" />
-                <input type="number" name="productPurchaseFeeCost" placeholder="Purchase Fees" />
+                <input type="number" name="productPurchaseTotalCost" step="0.01" placeholder="Total Cost" />
+                <input type="number" name="productPurchaseItems" step="1" placeholder="Item Count" />
+                <input type="number" name="productPurchaseItemCost" step="0.01" placeholder="Item Cost" disabled hidden />
+                <input type="number" name="productPurchaseDeliveryCost" step="0.01" placeholder="Delivery Cost" />
+                <input type="number" name="productPurchaseFeeCost" step="0.01" placeholder="Purchase Fees" />
                 <input type="text" name="productPurchasePartnerText" placeholder="Purchased From" />
                 <input type="hidden" name="productPurchasePartnerName" />
                 <input type="hidden" name="productPurchasePartnerId" />

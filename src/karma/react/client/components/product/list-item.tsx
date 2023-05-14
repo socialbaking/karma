@@ -68,9 +68,12 @@ function ListItem({ product, category }: ProductProps) {
                 className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
                 aria-hidden="true"
               />
-              {formattedDate && (
+              {product.sizes && (
                 <p>
-                  Added on <time dateTime={attributes?.createdAt}>{formattedDate}</time>
+                  Available in {product.sizes.map(({ value, unit }, index, array) => {
+                    const isLast = index && array.length === (index + 1);
+                    return `${isLast ? "& " : ""}${value}${unit}`
+                  }).join(", ")}
                 </p>
               )}
             </div>
