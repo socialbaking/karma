@@ -2,7 +2,7 @@ import {FastifyInstance, FastifyReply, FastifyRequest} from "fastify";
 import {addReport, CalculationConsentItem, listProducts, Report, ReportData, reportSchema} from "../../data";
 import {authenticate} from "../authentication";
 import {isAnonymous} from "../../authentication";
-import {isProductReport} from "../../calculations";
+import {isProductReport, isProductReportData} from "../../calculations";
 import {REPORTING_DATE_KEY} from "../../background";
 import {ok} from "../../../is";
 
@@ -59,7 +59,7 @@ export async function addReportFromRequest(request: FastifyRequest): Promise<Rep
     });
 
     const withTotal = { ...request.body, productPurchaseTotalCost: "1" };
-    if (!productPurchaseTotalCost && isProductReport(withTotal)) {
+    if (!productPurchaseTotalCost && isProductReportData(withTotal)) {
         const {
             productPurchaseDeliveryCost,
             productPurchaseItemCost,
@@ -71,19 +71,29 @@ export async function addReportFromRequest(request: FastifyRequest): Promise<Rep
             ((+productPurchaseItems) * (+productPurchaseItemCost)) +
             (+productPurchaseFeeCost) +
             (+productPurchaseDeliveryCost)
-        );
+        ).toFixed(2);
     }
 
-    if (productText && !productId) {
+    if ((productText || productName) && !productId) {
         const products = await listProducts();
-        const lower = productText.toLowerCase();
-        const product = products.find(product => product.productName.toLowerCase().includes(lower));
+        const name = productText || productName
+        const lower = name.toLowerCase();
+        const matching = products.filter(product => product.productName.toLowerCase().includes(lower));
+        if (matching.length > 1) {
+            throw new Error(`Name "${name}" matches multiple products`)
+        }
+        const product = matching[0];
         if (product) {
+            if (!productText) {
+                productText = product.productName;
+            }
             productName = product.productName;
             productId = product.productId;
             if (product.sizes?.length === 1) {
                 productSize = product.sizes[0];
             }
+        } else {
+            throw new Error("Product not found");
         }
     }
 
@@ -123,6 +133,13 @@ export async function addReportFromRequest(request: FastifyRequest): Promise<Rep
         // on the day of ordering
         data[REPORTING_DATE_KEY] = new Date().toISOString();
     }
+
+    // Replace the body with the updated
+    // report data so that it is consistent
+    request.body = {
+        ...request.body,
+        ...data
+    };
 
     return await addReport(data);
 }

@@ -93,13 +93,6 @@ export async function viewRoutes(fastify: FastifyInstance) {
             anonymous: pathsAnonymous[path] || !!ALLOW_ANONYMOUS_VIEWS
         });
 
-        if (pathsSubmit[path]) {
-            fastify.post(`${path}/submit`, {
-                preHandler,
-                handler: createPathSubmitHandler(path)
-            });
-        }
-
         fastify.get(`${path}/fragment`, {
             preHandler,
             handler
@@ -108,6 +101,13 @@ export async function viewRoutes(fastify: FastifyInstance) {
             preHandler,
             handler
         });
+
+        if (pathsSubmit[path]) {
+            fastify.post(path, {
+                preHandler,
+                handler: createPathSubmitHandler(path)
+            });
+        }
     });
 
     const handler = createPathHandler("/home");

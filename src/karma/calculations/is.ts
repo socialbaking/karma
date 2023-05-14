@@ -1,6 +1,6 @@
-import {Report} from "../client";
+import {Report, ReportData} from "../client";
 
-export interface ProductReport extends Report {
+export interface ProductReportData {
     // These are the expected field for a completed product report
     productPurchase: true
     productPurchaseTotalCost: `${number}` | number;
@@ -10,7 +10,11 @@ export interface ProductReport extends Report {
     productPurchaseFeeCost?: `${number}` | number;
 }
 
-export function isProductReport(report: Report): report is ProductReport {
+export function isProductReport(report: Report): report is (Report & ProductReportData) {
+    return !!isProductReportData(report);
+}
+
+export function isProductReportData(report: ReportData): report is (ReportData & ProductReportData) {
     return !!(
         report.productPurchase &&
         isNumberString(report.productPurchaseTotalCost) &&

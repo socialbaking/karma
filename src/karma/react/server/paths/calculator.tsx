@@ -17,11 +17,17 @@ export function Calculator() {
     const error = useError();
     const { productName } = useQuery();
     return (
-        <form name="calculator" action="/calculator/submit" method="post">
+        <form name="calculator" action="/calculator" method="post">
             {error ? (
-                <p>
-                    {String(error)}
-                </p>
+                <>
+                    <div className="pointer-events-auto flex items-center justify-between gap-x-6 bg-red-400 px-6 py-2.5 sm:rounded-xl sm:py-3 sm:pl-4 sm:pr-3.5">
+                        <p className="text-sm leading-6 text-white">
+                            {error instanceof Error ? error.message : String(error)}
+                        </p>
+                    </div>
+                    <br/>
+                    <br/>
+                </>
             ) : undefined}
             {
               submitted && result ? (
@@ -40,6 +46,11 @@ export function Calculator() {
                   </p>
               ) : undefined
             }
+            {
+                result ? (
+                    <script type="application/json" id="result" dangerouslySetInnerHTML={{__html: JSON.stringify(result, undefined, "  ")}} />
+                ) : undefined
+            }
             <script type="application/json" id="products" dangerouslySetInnerHTML={{__html: JSON.stringify(products)}} />
 
             <input type="hidden" name="countryCode" value={body?.countryCode ?? "NZ"} />
@@ -54,7 +65,10 @@ export function Calculator() {
 
             <div>
                 <input className="form-input rounded-md disabled:bg-slate-300 disabled:cursor-not-allowed" type="text" name="productText" placeholder="Product Name" disabled={!!productName} defaultValue={productName ?? (error ? body?.productText : undefined)} />
-                <input className="form-input rounded-md" type="number" name="productPurchaseTotalCost" step="0.01" placeholder="Item Cost" defaultValue={error ? body?.productPurchaseItemCost : undefined} />
+                {
+                    productName ? <input type="hidden" name="productName" value={productName} /> : undefined
+                }
+                <input className="form-input rounded-md" type="number" name="productPurchaseItemCost" step="0.01" placeholder="Item Cost" defaultValue={error ? body?.productPurchaseItemCost : undefined} />
                 <input className="form-input rounded-md" type="number" name="productPurchaseItems" step="1" placeholder="Item Count" defaultValue={body?.productPurchaseItems} />
                 <input className="form-input rounded-md" type="number" name="productPurchaseDeliveryCost" step="0.01" placeholder="Delivery Cost" defaultValue={body?.productPurchaseDeliveryCost} />
                 <input className="form-input rounded-md" type="number" name="productPurchaseFeeCost" step="0.01" placeholder="Purchase Fees" defaultValue={body?.productPurchaseFeeCost} />
