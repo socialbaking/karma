@@ -69,10 +69,16 @@ export async function viewRoutes(fastify: FastifyInstance) {
         ok(typeof submit === "function", `Expected pathSubmit.${path} to be a functon`);
 
         return async function handler(request: FastifyRequest, response: FastifyReply) {
-            const result = await submit(request, response);
+            let result, error;
+            try {
+                result = await submit(request, response);
+            } catch (caught) {
+                error = caught;
+            }
             const view = createPathHandler(path, {
                 body: request.body,
                 result,
+                error,
                 submitted: true
             });
             await view(request, response);

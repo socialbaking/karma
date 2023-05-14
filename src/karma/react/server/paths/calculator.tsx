@@ -1,4 +1,4 @@
-import {useMaybeBody, useMaybeResult, useSortedProducts, useSubmitted} from "../data";
+import {useError, useMaybeBody, useMaybeResult, useSortedProducts, useSubmitted} from "../data";
 import {calculationSources} from "../../../calculations";
 import {ReportData, Report} from "../../../client";
 import {FastifyRequest} from "fastify";
@@ -14,41 +14,31 @@ export function Calculator() {
     const body = useMaybeBody<ReportData>();
     const submitted = useSubmitted();
     const result = useMaybeResult<Report>();
-    if (submitted && result) {
-        return (
-            <p>
-                Your calculation is being processed, please see <a href="/metrics" className="text-blue-600 hover:bg-white underline hover:underline-offset-2">Metrics</a><br/>
-                <br/>
-                Report ID: {result.reportId}<br/>
-                Product Name: {result.productName ?? result.productText}<br/>
-                Product ID: {result.productId ?? "Product not found in database"}<br/>
-            </p>
-        );
-    }
+    const error = useError();
     return (
         <form name="calculator" action="/calculator/submit" method="post">
-            {/*
-             countryCode: string; // "NZ"
-            currencySymbol?: string; // "$"
-            timezone?: string; // Pacific/Auckland
-            note?: string;
-            parentReportId?: string;
-            productId?: string;
-            productName?: string; // Actual productName, not free text
-            productText?: string; // User free text of the product
-            productPurchase?: boolean;
-            productPurchaseTotalCost?: string; // "908.50", capture the user input raw
-            productPurchaseItems?: string; // "2", capture the user input raw
-            productPurchaseItemCost?: string; // "450", capture the user input raw
-            productPurchaseDeliveryCost?: string; // "8.50", capture the user input raw
-            productPurchaseFeeCost?: string; // "3.50", capture the user input raw
-            productPurchasePartnerId?: string;
-            productPurchasePartnerName?: string; // Actual partnerName, not free text
-            productPurchasePartnerText?: string; // User free text of the partnerName
-            productSize?: ProductSizeData;
-            createdByUserId?: string;
-            anonymous?: boolean;
-            */}
+            {error ? (
+                <p>
+                    {String(error)}
+                </p>
+            ) : undefined}
+            {
+              submitted && result ? (
+
+                  <p>
+                      Your calculation is being processed, please see <a href="/metrics" className="text-blue-600 hover:bg-white underline hover:underline-offset-2">Metrics</a><br/>
+                      <br/>
+                      Report ID: {result.reportId}<br/>
+                      Product Name: {result.productName ?? result.productText}<br/>
+                      Product ID: {result.productId ?? "Product not found in database"}<br/>
+                      <br/>
+                      <br/>
+                      <hr />
+                      <br/>
+                      <br/>
+                  </p>
+              ) : undefined
+            }
             <script type="application/json" id="products" dangerouslySetInnerHTML={{__html: JSON.stringify(products)}} />
 
             <input type="hidden" name="countryCode" value={body?.countryCode ?? "NZ"} />

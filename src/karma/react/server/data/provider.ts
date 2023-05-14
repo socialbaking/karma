@@ -10,6 +10,7 @@ import {ok} from "../../../../is";
 export interface Data {
     body?: unknown;
     result?: unknown;
+    error?: unknown;
     submitted?: true;
     url: string;
     isAnonymous: boolean;
@@ -54,6 +55,11 @@ export function useResult<R>(): R {
     const result = useMaybeBody<R>();
     ok(result, "Expected result");
     return result;
+}
+
+export function useError(): unknown | undefined {
+    const { error } = useData();
+    return error;
 }
 
 export function useSubmitted(): boolean {
