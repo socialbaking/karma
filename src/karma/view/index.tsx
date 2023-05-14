@@ -53,6 +53,8 @@ export async function viewRoutes(fastify: FastifyInstance) {
                     metrics={(!anonymous && path.includes("metrics")) ? await listMetrics() : undefined}
                     products={anonymous ? [] : await listProducts()}
                     roles={state?.roles}
+                    query={request.query}
+                    body={request.body}
                 />
             );
 
@@ -76,7 +78,6 @@ export async function viewRoutes(fastify: FastifyInstance) {
                 error = caught;
             }
             const view = createPathHandler(path, {
-                body: request.body,
                 result,
                 error,
                 submitted: true

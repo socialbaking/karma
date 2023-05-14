@@ -1,4 +1,4 @@
-import {useError, useMaybeBody, useMaybeResult, useSortedProducts, useSubmitted} from "../data";
+import {useError, useMaybeBody, useMaybeResult, useQuery, useSortedProducts, useSubmitted} from "../data";
 import {calculationSources} from "../../../calculations";
 import {ReportData, Report} from "../../../client";
 import {FastifyRequest} from "fastify";
@@ -15,6 +15,7 @@ export function Calculator() {
     const submitted = useSubmitted();
     const result = useMaybeResult<Report>();
     const error = useError();
+    const { productName } = useQuery();
     return (
         <form name="calculator" action="/calculator/submit" method="post">
             {error ? (
@@ -52,7 +53,7 @@ export function Calculator() {
             <br />
 
             <div>
-                <input className="form-input rounded-md" type="text" name="productText" placeholder="Product Name" defaultValue={body?.productText} />
+                <input className="form-input rounded-md" type="text" name="productText" placeholder="Product Name" defaultValue={productName ?? body?.productText} />
                 <input className="form-input rounded-md" type="number" name="productPurchaseTotalCost" step="0.01" placeholder="Total Cost" defaultValue={body?.productPurchaseTotalCost} />
                 <input className="form-input rounded-md" type="number" name="productPurchaseItems" step="1" placeholder="Item Count" defaultValue={body?.productPurchaseItems} />
                 <input className="form-input rounded-md" type="number" name="productPurchaseDeliveryCost" step="0.01" placeholder="Delivery Cost" defaultValue={body?.productPurchaseDeliveryCost} />

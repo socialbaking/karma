@@ -11,6 +11,7 @@ export interface Data {
     body?: unknown;
     result?: unknown;
     error?: unknown;
+    query?: unknown;
     submitted?: true;
     url: string;
     isAnonymous: boolean;
@@ -42,6 +43,12 @@ export function useBody<B>(): B {
     const body = useMaybeBody<B>();
     ok(body, "Expected body");
     return body;
+}
+
+export function useQuery<Q = Record<string, string>>(): Q {
+    const { query } = useData();
+    ok<Q>(query, "Expected query");
+    return query;
 }
 
 export function useMaybeResult<R>(): R | undefined {

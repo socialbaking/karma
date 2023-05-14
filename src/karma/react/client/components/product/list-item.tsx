@@ -24,22 +24,12 @@ const PercentageLabel = React.memo(({ type, label, sortIndex }: PercentageLabelP
 
 function ListItem({ product, category }: ProductProps) {
   const { productId, ...attributes } = product;
-  const productUrl = `/products/${product.productId}`;
-
-  const formattedDate = useMemo(() => {
-    if (!attributes?.createdAt) return "";
-
-    return new Intl.DateTimeFormat("en-NZ", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    }).format(new Date(attributes.createdAt));
-  }, [attributes?.createdAt]);
+  const productUrl = `/calculator?productName=${encodeURIComponent(product.productName)}`;
 
   const ingredients = useActiveIngredients(product);
 
   return (
-    <li key={productId}>
+    <li>
       <a href={productUrl} className="block hover:bg-gray-50">
         <div className="px-4 py-4 sm:px-6">
           <div className="flex items-center justify-between">
