@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import {Category, Product} from "../../../../client";
-import {CalendarIcon, CategoryIcon, GlobeIcon} from "../icons";
+import {CalendarIcon, CategoryIcon, GlobeIcon, PrescriptionBottleIcon} from "../icons";
 import {ActiveIngredient, useActiveIngredients} from "./utils";
 
 export interface ProductProps {
@@ -63,20 +63,22 @@ function ListItem({ product, category }: ProductProps) {
                 ) : undefined
               }
             </div>
-            <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
-              <CalendarIcon
-                className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
-                aria-hidden="true"
-              />
-              {product.sizes && (
-                <p>
-                  Available in {product.sizes.map(({ value, unit }, index, array) => {
-                    const isLast = index && array.length === (index + 1);
-                    return `${isLast ? "& " : ""}${value}${unit}`
-                  }).join(", ")}
-                </p>
-              )}
-            </div>
+            {
+              product.sizes?.length ? (
+                  <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
+                    <PrescriptionBottleIcon
+                        className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
+                        aria-hidden="true"
+                    />
+                    <p>
+                      Available in {product.sizes.map(({ value, unit }, index, array) => {
+                      const isLast = index && array.length === (index + 1);
+                      return `${isLast ? "& " : ""}${value}${unit}`
+                    }).join(", ")}
+                    </p>
+                  </div>
+              ) : undefined
+            }
           </div>
         </div>
       </a>
