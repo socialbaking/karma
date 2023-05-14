@@ -2,7 +2,7 @@ import {FunctionComponent} from "react";
 import {Metrics} from "./metrics";
 import {Products} from "./products";
 import {Partners} from "./partners";
-import {Calculator} from "./calculator";
+import {Calculator, submit} from "./calculator";
 import {Settings} from "./settings";
 import {Home} from "./home";
 
@@ -18,4 +18,8 @@ export const paths: Record<string, FunctionComponent> = {
 export const pathsAnonymous: Record<string, boolean> = {
     "/home": true,
     "/calculator": true
+}
+
+export const pathsSubmit: Record<string, (...args: unknown[]) => Promise<unknown | void> | unknown | void> = {
+    "/calculator": submit
 }

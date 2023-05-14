@@ -8,6 +8,10 @@ import {createContext, useContext, useMemo} from "react";
 import {ok} from "../../../../is";
 
 export interface Data {
+    body?: unknown;
+    result?: unknown;
+    submitted?: true;
+    url: string;
     isAnonymous: boolean;
     isFragment: boolean;
     products: Product[];
@@ -24,6 +28,37 @@ export function useData(): Data {
     const context = useContext(DataContext);
     ok(context, "Expected DataProvider to be used");
     return context;
+}
+
+export function useMaybeBody<B>(): B | undefined {
+    const { body } = useData();
+    if (!body) return undefined;
+    ok<B>(body);
+    return body;
+}
+
+export function useBody<B>(): B {
+    const body = useMaybeBody<B>();
+    ok(body, "Expected body");
+    return body;
+}
+
+export function useMaybeResult<R>(): R | undefined {
+    const { result } = useData();
+    if (!result) return undefined;
+    ok<R>(result);
+    return result;
+}
+
+export function useResult<R>(): R {
+    const result = useMaybeBody<R>();
+    ok(result, "Expected result");
+    return result;
+}
+
+export function useSubmitted(): boolean {
+    const { submitted } = useData();
+    return !!submitted;
 }
 
 export function useProducts() {

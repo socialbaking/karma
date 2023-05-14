@@ -6,7 +6,7 @@ export function Metrics() {
         <div className="metric-list">
             {metrics.map((metric, index) => (
                 <div key={index} className="metric-list-item">
-                    <div className="metric-list-item-name">{metric.metricsId}</div>
+                    <div className="metric-list-item-name">{metric.duration} {metric[metric.reportingDateKey]}</div>
                     <pre className="metric-list-item-values">
                         {JSON.stringify(metric.products, undefined, "  ")}
                     </pre>
