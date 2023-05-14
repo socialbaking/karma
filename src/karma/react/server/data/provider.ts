@@ -41,9 +41,12 @@ export function useCategories() {
     return categories;
 }
 
-export function useCategory(categoryId: string): Category | undefined {
+export function useCategory(categoryId?: string): Category | undefined {
     const categories = useCategories();
-    return useMemo(() => categories.find(category => category.categoryId === categoryId), [categories]);
+    return useMemo(() => {
+        if (!categoryId) return undefined;
+        return categories.find(category => category.categoryId === categoryId)
+    }, [categories]);
 }
 
 export function usePartners() {

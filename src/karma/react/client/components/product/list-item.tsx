@@ -1,10 +1,11 @@
 import React, { useMemo } from "react";
-import { Product } from "../../../../client";
+import {Category, Product} from "../../../../client";
 import { CalendarIcon, GlobeIcon } from "../icons";
 import {ActiveIngredient, useActiveIngredients} from "./utils";
 
 export interface ProductProps {
   product: Product;
+  category?: Category;
 }
 
 export interface PercentageLabelProps extends ActiveIngredient {
@@ -21,7 +22,7 @@ const PercentageLabel = React.memo(({ label, sortIndex }: PercentageLabelProps) 
   </span>
 ));
 
-function ListItem({ product }: ProductProps) {
+function ListItem({ product, category }: ProductProps) {
   const { productId, ...attributes } = product;
   const productUrl = `/products/${product.productId}`;
 
@@ -53,13 +54,17 @@ function ListItem({ product }: ProductProps) {
           </div>
           <div className="mt-2 sm:flex sm:justify-between">
             <div className="sm:flex">
-              <p className="flex items-center text-sm text-gray-500">
-                <GlobeIcon
-                  className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
-                  aria-hidden="true"
-                />
-                {/*attributes?.category?.data?.attributes?.name*/"Category Name"}
-              </p>
+              {
+                category ? (
+                    <p className="flex items-center text-sm text-gray-500">
+                      <GlobeIcon
+                          className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
+                          aria-hidden="true"
+                      />
+                      {category.categoryName}
+                    </p>
+                ) : undefined
+              }
             </div>
             <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
               <CalendarIcon

@@ -28,10 +28,10 @@ export function getActiveIngredients(product: Product): ActiveIngredient[] {
         ));
     return calculatedMatching
         .map(
-            (value): ActiveIngredientData => ({
-                type: value.type,
+            ({ type, value, unit }): ActiveIngredientData => ({
+                type: type,
                 value: +value,
-                label: `${value} ${value.unit}`
+                label: `${value} ${unit}`
             })
         )
         .sort(({ value: a }, { value: b }) => a > b ? -1 : 1)
