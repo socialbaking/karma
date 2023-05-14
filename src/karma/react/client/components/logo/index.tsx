@@ -1,7 +1,6 @@
 import React from "react";
-import dynamic from 'next/dynamic'
 
-const Logo = ({
+export const Logo = ({
   primary = "",
   secondary = "",
   size = "1rem",
@@ -47,5 +46,3 @@ const Logo = ({
     </div>
   );
 };
-
-export default dynamic(()=> Promise.resolve(Logo), {ssr: false});
