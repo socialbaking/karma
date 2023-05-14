@@ -53,8 +53,8 @@ export function Calculator() {
             <br />
 
             <div>
-                <input className="form-input rounded-md" type="text" name="productText" placeholder="Product Name" defaultValue={productName ?? body?.productText} />
-                <input className="form-input rounded-md" type="number" name="productPurchaseTotalCost" step="0.01" placeholder="Total Cost" defaultValue={body?.productPurchaseTotalCost} />
+                <input className="form-input rounded-md disabled:bg-slate-300 disabled:cursor-not-allowed" type="text" name="productText" placeholder="Product Name" disabled={!!productName} defaultValue={productName ?? (error ? body?.productText : undefined)} />
+                <input className="form-input rounded-md" type="number" name="productPurchaseTotalCost" step="0.01" placeholder="Item Cost" defaultValue={error ? body?.productPurchaseItemCost : undefined} />
                 <input className="form-input rounded-md" type="number" name="productPurchaseItems" step="1" placeholder="Item Count" defaultValue={body?.productPurchaseItems} />
                 <input className="form-input rounded-md" type="number" name="productPurchaseDeliveryCost" step="0.01" placeholder="Delivery Cost" defaultValue={body?.productPurchaseDeliveryCost} />
                 <input className="form-input rounded-md" type="number" name="productPurchaseFeeCost" step="0.01" placeholder="Purchase Fees" defaultValue={body?.productPurchaseFeeCost} />

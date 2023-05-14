@@ -14,10 +14,7 @@ export function isProductReport(report: Report): report is ProductReport {
     return !!(
         report.productPurchase &&
         isNumberString(report.productPurchaseTotalCost) &&
-        (
-            isNumberString(report.productPurchaseItemCost) ||
-            !report.productPurchaseItemCost
-        ) &&
+        isNumberString(report.productPurchaseItemCost) &&
         isNumberString(report.productPurchaseItems) &&
         isNumberString(report.productPurchaseDeliveryCost) &&
         (

@@ -58,6 +58,22 @@ export async function addReportFromRequest(request: FastifyRequest): Promise<Rep
         };
     });
 
+    const withTotal = { ...request.body, productPurchaseTotalCost: "1" };
+    if (!productPurchaseTotalCost && isProductReport(withTotal)) {
+        const {
+            productPurchaseDeliveryCost,
+            productPurchaseItemCost,
+            productPurchaseFeeCost,
+            productPurchaseItems,
+        } = withTotal;
+
+        productPurchaseTotalCost = (
+            ((+productPurchaseItems) * (+productPurchaseItemCost)) +
+            (+productPurchaseFeeCost) +
+            (+productPurchaseDeliveryCost)
+        );
+    }
+
     if (productText && !productId) {
         const products = await listProducts();
         const lower = productText.toLowerCase();
