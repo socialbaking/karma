@@ -31,6 +31,28 @@ export function useProducts() {
     return products;
 }
 
+export function useSortedProducts() {
+    const products = useProducts();
+    const categories = useCategories();
+    return useMemo(() => {
+        const categoryOrder = new Map<string, number | undefined>(
+            categories.map(category => [category.categoryId, category.order] as const)
+        );
+        return products
+            .slice()
+            .sort((a, b) => {
+                const categoryOrderA = categoryOrder.get(a.categoryId) ?? Number.MAX_SAFE_INTEGER
+                const categoryOrderB = categoryOrder.get(b.categoryId) ?? Number.MAX_SAFE_INTEGER;
+                if (categoryOrderA !== categoryOrderB) {
+                    return categoryOrderA < categoryOrderB ? -1 : 1;
+                }
+                const orderA = a.order ?? Number.MAX_SAFE_INTEGER;
+                const orderB = b.order ?? Number.MAX_SAFE_INTEGER;
+                return orderA < orderB ? -1 : 1;
+            });
+    }, [products, categories]);
+}
+
 export function useProduct(productId: string): Product | undefined {
     const products = useProducts();
     return useMemo(() => products.find(product => product.productId === productId), [products]);

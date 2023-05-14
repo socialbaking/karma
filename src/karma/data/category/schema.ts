@@ -4,6 +4,10 @@ export const categoryData = {
         categoryName: {
             type: "string"
         },
+        order: {
+            type: "number",
+            nullable: true
+        },
         countryCode: {
             type: "string",
             nullable: true

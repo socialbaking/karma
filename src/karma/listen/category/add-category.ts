@@ -30,10 +30,10 @@ export async function addCategoryRoutes(fastify: FastifyInstance) {
             schema,
             preHandler: authenticate(fastify),
             async handler(request, response)  {
-                const Category = await addCategory(request.body);
+                const category = await addCategory(request.body);
 
                 response.status(201);
-                response.send(Category);
+                response.send(category);
             }
         }
     )

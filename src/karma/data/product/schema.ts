@@ -20,6 +20,10 @@ export const productData = {
         productName: {
             type: "string"
         },
+        order: {
+            type: "number",
+            nullable: true
+        },
         countryCode: {
             type: "string",
             nullable: true

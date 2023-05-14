@@ -7,6 +7,7 @@ export interface CalculationSource {
 export interface CategoryData extends Record<string, unknown> {
     categoryName: string;
     countryCode?: string;
+    order?: number;
 }
 
 export interface Category extends CategoryData {
@@ -99,6 +100,7 @@ export interface ProductSizeData extends Record<string, unknown> {
 
 export interface ProductData extends Record<string, unknown> {
     productName: string;
+    order?: number;
     countryCode?: string;
     licencedPartnerId?: string;
     // Flag for products we don't have the exact licence date for

@@ -1,4 +1,4 @@
-import {useCategory, useProducts} from "../data";
+import {useCategory, useSortedProducts} from "../data";
 import ClientProductListItem, { ProductProps } from "../../client/components/product/list-item";
 
 function ProductListItem(props: ProductProps) {
@@ -8,7 +8,7 @@ function ProductListItem(props: ProductProps) {
 
 
 export function Products() {
-    const products = useProducts();
+    const products = useSortedProducts();
     return (
         <div className="bg-white shadow overflow-hidden sm:rounded-md">
             <ul role="list" className="divide-y divide-gray-200">

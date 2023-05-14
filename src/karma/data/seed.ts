@@ -21,10 +21,10 @@ const namespace = "536165e4-aa2a-4d17-ad7e-751251497a11";
 
 const categories: Category[] = [
     {
-        categoryName: "Flower"
+        categoryName: "Oil"
     },
     {
-        categoryName: "Oil"
+        categoryName: "Flower"
     },
     {
         categoryName: "Equipment"
@@ -36,11 +36,12 @@ const categories: Category[] = [
         categoryName: "Fee"
     }
 ]
-    .map((data: CategoryData): Category => ({
+    .map((data: CategoryData, index): Category => ({
         ...data,
         categoryId: v5(data.categoryName, namespace),
         createdAt,
-        updatedAt
+        updatedAt,
+        order: index
     }));
 
 async function seedCategories() {
@@ -221,6 +222,12 @@ function getPartner(name: string) {
     return found;
 }
 
+function getCategory(name: string) {
+    const found = categories.find(category => category.categoryName === name);
+    ok(found, `Expected category ${name}`);
+    return found;
+}
+
 function getPartnerId(name: string) {
     return getPartner(name).partnerId;
 }
@@ -290,9 +297,13 @@ async function seedProducts() {
     // The below product information was sourced from this licenceApprovalWebsite url
     const licenceApprovalWebsite = "https://www.health.govt.nz/our-work/regulation-health-and-disability-system/medicinal-cannabis-agency/medicinal-cannabis-agency-information-health-professionals/medicinal-cannabis-products-meet-minimum-quality-standard"
 
+    const flower = getCategory("Flower");
+    const oil = getCategory("Oil");
+
     const products: ProductData[] = [
         {
             productName: "Helius CBD25 Full Spectrum",
+            categoryId: oil.categoryId,
             licenceCountryCode: helius.countryCode,
             licencedPartnerId: helius.partnerId,
             licenceApprovedBeforeGivenDate: true,
@@ -303,10 +314,11 @@ async function seedProducts() {
             sizes: [{ value: "30", unit: "mL" }],
             activeIngredientDescriptions: [
                 "Total CBD (CBD+CBDA) 25 mg/mL"
-            ],
+            ]
         },
         {
             productName: "Helius CBD100 Full Spectrum",
+            categoryId: oil.categoryId,
             licenceCountryCode: helius.countryCode,
             licencedPartnerId: helius.partnerId,
             licenceApprovedBeforeGivenDate: true,
@@ -321,6 +333,7 @@ async function seedProducts() {
         },
         {
             productName: "RUA CBD100",
+            categoryId: oil.categoryId,
             licenceCountryCode: rua.countryCode,
             licencedPartnerId: rua.partnerId,
             licenceApprovedBeforeGivenDate: true,
@@ -335,6 +348,7 @@ async function seedProducts() {
         },
         {
             productName: "Tilray P Oral Solution CBD 100",
+            categoryId: oil.categoryId,
             licenceCountryCode: cdc.countryCode,
             licencedPartnerId: cdc.partnerId,
             licenceApprovedBeforeGivenDate: true,
@@ -349,6 +363,7 @@ async function seedProducts() {
         },
         {
             productName: "Tilray P Oral Solution CBD 25",
+            categoryId: oil.categoryId,
             licenceCountryCode: cdc.countryCode,
             licencedPartnerId: cdc.partnerId,
             licenceApprovedBeforeGivenDate: true,
@@ -363,6 +378,7 @@ async function seedProducts() {
         },
         {
             productName: "SubDrops™ CBD100",
+            categoryId: oil.categoryId,
             licenceCountryCode: helius.countryCode,
             licencedPartnerId: helius.partnerId,
             licenceApprovedBeforeGivenDate: true,
@@ -377,6 +393,7 @@ async function seedProducts() {
         },
         {
             productName: "SubDrops™ CBD25",
+            categoryId: oil.categoryId,
             licenceCountryCode: helius.countryCode,
             licencedPartnerId: helius.partnerId,
             licenceApprovedBeforeGivenDate: true,
@@ -391,6 +408,7 @@ async function seedProducts() {
         },
         {
             productName: "evalaCann THC ≤1 mg: CBD 20 mg",
+            categoryId: oil.categoryId,
             licenceCountryCode: cannasouth.countryCode,
             licencedPartnerId: cannasouth.partnerId,
             licenceApprovedBeforeGivenDate: true,
@@ -406,6 +424,7 @@ async function seedProducts() {
         },
         {
             productName: "evalaCann THC 10 mg: CBD 15 mg",
+            categoryId: oil.categoryId,
             licenceCountryCode: cannasouth.countryCode,
             licencedPartnerId: cannasouth.partnerId,
             licenceApprovedBeforeGivenDate: true,
@@ -421,6 +440,7 @@ async function seedProducts() {
         },
         {
             productName: "evalaCann THC 10 mg: CBD  ≤1 mg",
+            categoryId: oil.categoryId,
             licenceCountryCode: cannasouth.countryCode,
             licencedPartnerId: cannasouth.partnerId,
             licenceApprovedBeforeGivenDate: true,
@@ -436,6 +456,7 @@ async function seedProducts() {
         },
         {
             productName: "Helius THC25 Full Spectrum",
+            categoryId: oil.categoryId,
             licenceCountryCode: helius.countryCode,
             licencedPartnerId: helius.partnerId,
             licenceApprovedBeforeGivenDate: true,
@@ -451,6 +472,7 @@ async function seedProducts() {
         },
         {
             productName: "Helius THC10:CBD10 Full Spectrum",
+            categoryId: oil.categoryId,
             licenceCountryCode: helius.countryCode,
             licencedPartnerId: helius.partnerId,
             licenceApprovedBeforeGivenDate: true,
@@ -466,6 +488,7 @@ async function seedProducts() {
         },
         {
             productName: "Tilray FS oral Solution THC 25",
+            categoryId: oil.categoryId,
             licenceCountryCode: cdc.countryCode,
             licencedPartnerId: cdc.partnerId,
             licenceApprovedBeforeGivenDate: true,
@@ -480,6 +503,7 @@ async function seedProducts() {
         },
         {
             productName: "Tilray FS Oral Solution THC 10 CBD 10",
+            categoryId: oil.categoryId,
             licenceCountryCode: cdc.countryCode,
             licencedPartnerId: cdc.partnerId,
             licenceApprovedBeforeGivenDate: true,
@@ -495,6 +519,7 @@ async function seedProducts() {
         },
         {
             productName: "Tilray FS Oral Solution THC 5:  CBD 20",
+            categoryId: oil.categoryId,
             licenceCountryCode: cdc.countryCode,
             licencedPartnerId: cdc.partnerId,
             licenceApprovedAt: "2023-05-10T02:20:00.000Z",
@@ -508,6 +533,7 @@ async function seedProducts() {
         },
         {
             productName: "KIKUYA Dune",
+            categoryId: flower.categoryId,
             licenceCountryCode: nubu.countryCode,
             licencedPartnerId: nubu.partnerId,
             licenceApprovedBeforeGivenDate: true,
@@ -523,6 +549,7 @@ async function seedProducts() {
         },
         {
             productName: "KIKUYA Arroyo",
+            categoryId: flower.categoryId,
             licenceCountryCode: nubu.countryCode,
             licencedPartnerId: nubu.partnerId,
             licenceApprovedBeforeGivenDate: true,
@@ -538,6 +565,7 @@ async function seedProducts() {
         },
         {
             productName: "KIKUYA Peak",
+            categoryId: flower.categoryId,
             licenceCountryCode: nubu.countryCode,
             licencedPartnerId: nubu.partnerId,
             licenceApprovedAt: "2023-05-10T02:20:00.000Z",
@@ -551,6 +579,7 @@ async function seedProducts() {
         },
         {
             productName: "Medleaf Medium THC Afghan Haze",
+            categoryId: flower.categoryId,
             licenceCountryCode: medleaf.countryCode,
             licencedPartnerId: medleaf.partnerId,
             licenceApprovedBeforeGivenDate: true,
@@ -566,6 +595,7 @@ async function seedProducts() {
         },
         {
             productName: "Tilray Whole Flower Dried Cannabis THC 22",
+            categoryId: flower.categoryId,
             licenceCountryCode: cdc.countryCode,
             licencedPartnerId: cdc.partnerId,
             licenceApprovedBeforeGivenDate: true,
@@ -581,6 +611,7 @@ async function seedProducts() {
         },
         {
             productName: "Equiposa",
+            categoryId: flower.categoryId,
             licenceCountryCode: medReleaf.countryCode,
             licencedPartnerId: medReleaf.partnerId,
             licenceApprovedBeforeGivenDate: true,
@@ -596,6 +627,7 @@ async function seedProducts() {
         },
         {
             productName: "Luminarium",
+            categoryId: flower.categoryId,
             licenceCountryCode: medReleaf.countryCode,
             licencedPartnerId: medReleaf.partnerId,
             licenceApprovedBeforeGivenDate: true,
@@ -611,6 +643,7 @@ async function seedProducts() {
         },
         {
             productName: "Sedaprem",
+            categoryId: flower.categoryId,
             licenceCountryCode: medReleaf.countryCode,
             licencedPartnerId: medReleaf.partnerId,
             licenceApprovedBeforeGivenDate: true,
@@ -626,6 +659,7 @@ async function seedProducts() {
         },
         {
             productName: "ANTG Eve",
+            categoryId: flower.categoryId,
             licenceCountryCode: nubu.countryCode,
             licencedPartnerId: nubu.partnerId,
             licenceApprovedBeforeGivenDate: true,
@@ -641,6 +675,7 @@ async function seedProducts() {
         },
         {
             productName: "ANTG Mariposa",
+            categoryId: flower.categoryId,
             licenceCountryCode: nubu.countryCode,
             licencedPartnerId: nubu.partnerId,
             licenceApprovedBeforeGivenDate: true,
@@ -656,6 +691,7 @@ async function seedProducts() {
         },
         {
             productName: "ANTG Rocky",
+            categoryId: flower.categoryId,
             licenceCountryCode: nubu.countryCode,
             licencedPartnerId: nubu.partnerId,
             licenceApprovedBeforeGivenDate: true,
@@ -671,6 +707,7 @@ async function seedProducts() {
         },
         {
             productName: "ANTG Solace",
+            categoryId: flower.categoryId,
             licenceCountryCode: nubu.countryCode,
             licencedPartnerId: nubu.partnerId,
             licenceApprovedBeforeGivenDate: true,
@@ -686,6 +723,7 @@ async function seedProducts() {
         },
         {
             productName: "Medleaf Medium THC Shishkaberry",
+            categoryId: flower.categoryId,
             licenceCountryCode: medleaf.countryCode,
             licencedPartnerId: medleaf.partnerId,
             licenceApprovedBeforeGivenDate: true,
@@ -701,6 +739,7 @@ async function seedProducts() {
         },
         {
             productName: "Medleaf High THC Zour Apple",
+            categoryId: flower.categoryId,
             licenceCountryCode: medleaf.countryCode,
             licencedPartnerId: medleaf.partnerId,
             licenceApprovedBeforeGivenDate: true,
@@ -716,6 +755,7 @@ async function seedProducts() {
         },
         {
             productName: "Medleaf High THC GG#4",
+            categoryId: flower.categoryId,
             licenceCountryCode: medleaf.countryCode,
             licencedPartnerId: medleaf.partnerId,
             licenceApprovedBeforeGivenDate: true,
@@ -737,7 +777,11 @@ async function seedProducts() {
             // This product is generally available
             availableAt: undefined
         }
-    ];
+    ]
+        .map((data, index) => ({
+            ...data,
+            order: index
+        }))
 
     const productStore = getProductStore();
 

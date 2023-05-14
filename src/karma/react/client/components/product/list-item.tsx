@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import {Category, Product} from "../../../../client";
-import { CalendarIcon, GlobeIcon } from "../icons";
+import {CalendarIcon, CategoryIcon, GlobeIcon} from "../icons";
 import {ActiveIngredient, useActiveIngredients} from "./utils";
 
 export interface ProductProps {
@@ -18,7 +18,7 @@ const PercentageLabel = React.memo(({ type, label, sortIndex }: PercentageLabelP
         sortIndex === 0 ? "bg-green-400" : "bg-green-100"
     } text-green-800`}
   >
-    {type} {label}
+    {label} {type}
   </span>
 ));
 
@@ -57,10 +57,7 @@ function ListItem({ product, category }: ProductProps) {
               {
                 category ? (
                     <p className="flex items-center text-sm text-gray-500">
-                      <GlobeIcon
-                          className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
-                          aria-hidden="true"
-                      />
+                      <CategoryIcon categoryName={category.categoryName} />
                       {category.categoryName}
                     </p>
                 ) : undefined
