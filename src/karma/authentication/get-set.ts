@@ -1,10 +1,11 @@
 import {requestContext} from "@fastify/request-context";
 import {ok} from "../../is";
-import {Partner} from "../data";
+import {AuthenticationRole, AuthenticationState, Partner} from "../data";
 
 export const AUTHORIZED_PARTNER_ID_KEY = "authorizedForPartnerIds";
 export const AUTHORIZED_ACCESS_TOKEN_KEY = "accessTokenKeyValue";
 export const AUTHORIZED_PARTNER = "partner";
+export const AUTHENTICATION_STATE = "authenticationState";
 
 export function setAuthorizedForPartnerId(partnerId: string) {
     requestContext.set(AUTHORIZED_PARTNER_ID_KEY, partnerId)
@@ -63,4 +64,58 @@ export function getAccessToken(): string {
     const accessToken = getMaybeAccessToken();
     ok(accessToken, "Expected access token to be supplied");
     return accessToken;
+}
+
+export function setAuthenticationState(state: AuthenticationState) {
+    requestContext.set(AUTHENTICATION_STATE, state);
+}
+
+export function getMaybeAuthenticationState(): AuthenticationState | undefined {
+    return requestContext.get(AUTHENTICATION_STATE);
+}
+
+export function getAuthenticationState(): AuthenticationState {
+    const state = getMaybeAuthenticationState();
+    if (!state) {
+        const partner = getMaybePartner();
+        if (partner) {
+            throw new Error("Expected to be authenticated as a member");
+        }
+    }
+    ok(state, "Expected to be authenticated");
+    return state;
+}
+
+export function getAuthenticationRoles(): AuthenticationRole[] {
+    const { roles } = getAuthenticationState();
+    return roles ?? [];
+}
+
+export function isRole(role: AuthenticationRole) {
+    const roles = getAuthenticationRoles();
+    return roles.includes(role);
+}
+
+export function isMember() {
+    return isRole("member");
+}
+
+export function isAdmin() {
+    return isRole("admin");
+}
+
+export function isModerator() {
+    return isAdmin() || isRole("moderator");
+}
+
+export function isPharmacy() {
+    return isRole("pharmacy");
+}
+
+export function isIndustry() {
+    return isRole("industry");
+}
+
+export function isClinic() {
+    return isRole("clinic");
 }

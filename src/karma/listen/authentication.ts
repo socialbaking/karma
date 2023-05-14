@@ -1,8 +1,20 @@
 import {ok} from "../../is";
-import {getAccessToken as getAccessTokenDocument, getPartner as getPartnerDocument} from "../data";
+import {
+    getAccessToken as getAccessTokenDocument,
+    getAuthenticationState,
+    getPartner as getPartnerDocument
+} from "../data";
 import {FastifyInstance, FastifyRequest} from "fastify";
 import {FastifyAuthFunction} from "@fastify/auth";
-import {AUTHORIZED_ACCESS_TOKEN_KEY, AUTHORIZED_PARTNER, setAuthorizedForPartnerId} from "../authentication";
+import {
+    AUTHORIZED_ACCESS_TOKEN_KEY,
+    AUTHORIZED_PARTNER,
+    setAuthenticationState,
+    setAuthorizedForPartnerId
+} from "../authentication";
+
+export const NOT_AUTHORIZED_ERROR_MESSAGE = "not authorized";
+export const NOT_ANONYMOUS_ERROR_MESSAGE = "not anonymous";
 
 export async function bearerAuthentication(key: string, request: FastifyRequest): Promise<boolean> {
     if (!key) return false;
@@ -29,21 +41,52 @@ export async function bearerAuthentication(key: string, request: FastifyRequest)
     return true;
 }
 
+function getCookieState(request: FastifyRequest) {
+    return request.cookies.state;
+}
+
+function getAccessToken(request: FastifyRequest) {
+    ok<{ accessToken?: string }>(request.query);
+    return request.query.accessToken;
+}
+
+function getAuthorizationHeader(request: FastifyRequest) {
+    return request.headers.authorization;
+}
+
 export const allowAnonymous: FastifyAuthFunction = (request, response, done) => {
-    if (request.headers.authorization) {
-        return done(Error('not anonymous'))
+    const value = !!(
+        getCookieState(request) ||
+        getAuthorizationHeader(request) ||
+        getAccessToken(request)
+    )
+    console.log({ value, cookies: request.cookies });
+    if (value) {
+        return done(Error(NOT_ANONYMOUS_ERROR_MESSAGE))
     }
     return done()
 }
 
-export const accessToken: FastifyAuthFunction = async (request, response) => {
-    ok<{ accessToken?: string }>(request.query);
-    if (!request.query.accessToken) {
-        throw new Error('not authorized');
+export const accessToken: FastifyAuthFunction = async (request) => {
+    const accessToken = getAccessToken(request);
+    if (!accessToken) {
+        throw new Error(NOT_AUTHORIZED_ERROR_MESSAGE);
     }
-    const success = await bearerAuthentication(request.query.accessToken, request);
+    const success = await bearerAuthentication(accessToken, request);
     if (!success) {
-        throw new Error('not authorized');
+        throw new Error(NOT_AUTHORIZED_ERROR_MESSAGE);
+    }
+}
+
+function createCookieAuth(fastify: FastifyInstance): FastifyAuthFunction {
+    return async (request) => {
+        const signedStateId = getCookieState(request);
+        ok(typeof signedStateId === "string", NOT_AUTHORIZED_ERROR_MESSAGE);
+        const unsignedCookie = fastify.unsignCookie(signedStateId);
+        ok(unsignedCookie.valid, NOT_AUTHORIZED_ERROR_MESSAGE)
+        const state = await getAuthenticationState(unsignedCookie.value);
+        ok(state, NOT_AUTHORIZED_ERROR_MESSAGE);
+        setAuthenticationState(state);
     }
 }
 
@@ -71,6 +114,7 @@ export interface AuthInput extends FastifyAuthOptions {
 
 export function authenticate(fastify: FastifyInstance, options?: AuthInput) {
     const methods: FastifyAuthFunction[] = [
+        createCookieAuth(fastify),
         accessToken,
         getFastifyVerifyBearerAuth(fastify)
     ];

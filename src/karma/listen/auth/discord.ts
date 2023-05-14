@@ -2,20 +2,22 @@ import {FastifyInstance} from "fastify";
 import DiscordOAuth2, {PartialGuild} from "discord-oauth2";
 import {ok} from "../../../is";
 import {getOrigin} from "../config";
-import {getAuthenticationStateByKey, addAuthenticationState, systemLogSchema} from "../../data";
+import {
+    getAuthenticationStateByKey,
+    addAuthenticationState,
+    systemLogSchema,
+    addCookieState,
+    AuthenticationRole, getAuthenticationRoles
+} from "../../data";
 
 interface DiscordRole extends Record<string, unknown>  {
     id: string;
     name: string;
 }
 
-interface DiscordParsedRole extends DiscordRole {
-    guild: string;
-    user: string;
-}
-
 export interface DiscordGuild extends PartialGuild, Record<string, unknown>  {
     roles: DiscordRole[]
+    owner_id: string;
 }
 
 export interface DiscordGuildMember extends Record<string, unknown> {
@@ -124,6 +126,16 @@ export async function discordAuthenticationRoutes(fastify: FastifyInstance) {
                     roles
                 });
 
+                const { stateId, expiresAt } = await addCookieState({
+                    roles
+                });
+
+                response.setCookie("state", stateId, {
+                    path: "/",
+                    signed: true,
+                    expires: new Date(expiresAt)
+                });
+
                 response.status(200)
                 response.send({
                     member,
@@ -168,22 +180,32 @@ export async function discordAuthenticationRoutes(fastify: FastifyInstance) {
                     return await response.json();
                 }
 
-                function mapRoles(): DiscordParsedRole[] {
+                function mapRoles(): AuthenticationRole[] {
                     const roleMap = new Map<string, DiscordRole>(
                         guild.roles.map(role => [role.id, role] as const)
                     );
-                    return member
+                    const externalRoleNames = member
                         .roles
-                        .map((id: string): DiscordParsedRole => {
+                        .map((id: string): string => {
                             const role = roleMap.get(id);
                             if (!role) return;
-                            return {
-                                ...role,
-                                guild: guild.id,
-                                user: user.id
-                            };
+                            return role.name;
                         })
                         .filter(Boolean);
+                    const externalRoles = getAuthenticationRoles(externalRoleNames);
+                    const roles: AuthenticationRole[] = [
+                        "member",
+                        ...externalRoles
+                    ];
+
+                    // If the user is the guild owner, automatically give them
+                    // the owner and admin role
+                    if (guild.owner_id === user.id) {
+                        roles.push("owner");
+                        roles.push("admin");
+                    }
+
+                    return [...new Set(roles)];
                 }
             }
         })

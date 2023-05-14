@@ -13,17 +13,33 @@ import bearerAuthPlugin from "@fastify/bearer-auth";
 import authPlugin from "@fastify/auth";
 import {seed, stopData} from "../data";
 import {commitAt, commitShort} from "../package";
+import cookie from "@fastify/cookie";
+import {ok} from "../../is";
 
 const { pathname } = new URL(import.meta.url);
 const directory = dirname(pathname)
 
 export async function create() {
 
+    const {
+        COOKIE_SECRET
+    } = process.env;
+
+    ok(COOKIE_SECRET, "Expected COOKIE_SECRET");
+
     const app = fastify({
         logger: true
     });
 
     const register: (...args: unknown[]) => void = app.register.bind(fastify);
+
+    register(cookie, {
+        secret: COOKIE_SECRET,
+        hook: "onRequest",
+        parseOptions: {
+
+        }
+    });
 
     const packageJSON = await readFile(join(directory, "../../../package.json"), "utf-8")
     const {
