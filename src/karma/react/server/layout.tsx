@@ -9,6 +9,16 @@ export interface LayoutProps {
 
 const items = [
     {
+       path: "/home",
+       name: "Home",
+       icon: (
+           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="h-6 w-6 shrink-0 text-indigo-200 group-hover:text-white">
+               <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 21v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21m0 0h4.5V3.545M12.75 21h7.5V10.75M2.25 21h1.5m18 0h-18M2.25 9l4.5-1.636M18.75 3l-1.5.545m0 6.205l3 1m1.5.5l-1.5-.5M6.75 7.364V3h-3v18m3-13.636l10.5-3.819" />
+           </svg>
+
+       )
+    },
+    {
         path: "/metrics",
         name: "Reports",
         icon: (
@@ -40,45 +50,100 @@ const items = [
     }
 ] as const;
 
-export function Layout({ children, title, url }: PropsWithChildren<LayoutProps>) {
+export function BaseLayout({ children, title }: PropsWithChildren<LayoutProps>) {
+    return (
+        <html lang="en" className="h-full bg-white">
+        <head>
+            <meta charSet="utf-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            <title>{title || project}</title>
+            <meta name="description" content={description} />
+            <meta name="author" content={namespace} />
+            <link href="/server.css" rel="stylesheet" />
+        </head>
+        <body className="h-full">
+        {children}
+        </body>
+        </html>
+    )
+}
+
+export function AnonymousLayout(props: PropsWithChildren<LayoutProps>) {
+    const { children } = props;
+    return (
+        <BaseLayout {...props}>
+            <div className="min-h-full">
+                <nav className="bg-indigo-600">
+                    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                        <div className="flex h-16 items-center justify-between">
+                            <div className="flex items-center">
+                                <div className="flex-shrink-0">
+                                    <img className="h-8 w-8"
+                                         src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=300"
+                                         alt="Your Company" />
+                                </div>
+                                <div className="hidden md:block">
+                                    <div className="ml-10 flex items-baseline space-x-4">
+                                        {/* Current: "bg-indigo-700 text-white", Default: "text-white hover:bg-indigo-500 hover:bg-opacity-75" */}
+                                        <a href="#"
+                                           className="bg-indigo-700 text-white rounded-md px-3 py-2 text-sm font-medium"
+                                           aria-current="page">Home</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="-mr-2 flex md:hidden">
+                                {/* Mobile menu button */}
+                                <button type="button"
+                                        className="inline-flex items-center justify-center rounded-md bg-indigo-600 p-2 text-indigo-200 hover:bg-indigo-500 hover:bg-opacity-75 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600"
+                                        aria-controls="mobile-menu" aria-expanded="false">
+                                    <span className="sr-only">Open main menu</span>
+                                    {/* Menu open: "hidden", Menu closed: "block" */}
+                                    <svg className="block h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5"
+                                         stroke="currentColor" aria-hidden="true">
+                                        <path strokeLinecap="round" strokeLinejoin="round"
+                                              d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/>
+                                    </svg>
+                                    {/* Menu open: "block", Menu closed: "hidden" */}
+                                    <svg className="hidden h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5"
+                                         stroke="currentColor" aria-hidden="true">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Mobile menu, show/hide based on menu state. */}
+                    <div className="md:hidden" id="mobile-menu">
+                        <div className="space-y-1 px-2 pb-3 pt-2 sm:px-3">
+                            {/* Current: "bg-indigo-700 text-white", Default: "text-white hover:bg-indigo-500 hover:bg-opacity-75" */}
+                            <a href="#"
+                               className="bg-indigo-700 text-white block rounded-md px-3 py-2 text-base font-medium"
+                               aria-current="page">Home</a>
+                        </div>
+                        <div className="border-t border-indigo-700 pb-3 pt-4">
+
+                        </div>
+                    </div>
+                </nav>
+                <main>
+                    <div className="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
+                        {children}
+                    </div>
+                </main>
+            </div>
+        </BaseLayout>
+    )
+}
+
+export function Layout(props: PropsWithChildren<LayoutProps>) {
+    const { children, url } = props;
     const {
         pathname
     } = new URL(url, getOrigin());
 
     return (
-        <html lang="en" className="h-full bg-white">
-            <head>
-                <meta charSet="utf-8" />
-                <meta name="viewport" content="width=device-width, initial-scale=1" />
-                <title>{title || project}</title>
-                <meta name="description" content={description} />
-                <meta name="author" content={namespace} />
-                <link href="/server.css" rel="stylesheet" />
-            </head>
-            <body className="h-full">
-
-            {/*
-  This example requires some changes to your config:
-  
-  ```
-  // tailwind.config.js
-  module.exports = {
-    // ...
-    plugins: [
-      // ...
-      require('@tailwindcss/forms'),
-    ],
-  }
-  ```
-*/}
-            {/*
-              This example requires updating your template:
-            
-              ```
-              <html className="h-full bg-white">
-              <body className="h-full">
-              ```
-            */}
+        <BaseLayout {...props}>
             <div>
                 {/* Off-canvas menu for mobile, show/hide based on off-canvas menu state. */}
                 <div className="relative z-50 lg:hidden" role="dialog" aria-modal="true">
@@ -226,8 +291,6 @@ export function Layout({ children, title, url }: PropsWithChildren<LayoutProps>)
                 </div>
             </div>
 
-
-            </body>
-        </html>
+        </BaseLayout>
     )
 }

@@ -1,7 +1,7 @@
 import {Data, DataProvider} from "./data/provider";
 import {paths} from "./paths";
 import {getOrigin} from "../../listen/config";
-import {Layout} from "./layout";
+import {AnonymousLayout, Layout, LayoutProps} from "./layout";
 
 export interface KarmaServerProps extends Data {
     url: string;
@@ -21,11 +21,22 @@ export default function KarmaServer(options: KarmaServerProps) {
     let children = <Component />;
 
     if (!options.isFragment) {
-        children = (
-            <Layout url={options.url}>
-                {children}
-            </Layout>
-        );
+        const layoutProps: LayoutProps = {
+            url: options.url
+        }
+        if (options.isAnonymous) {
+            children = (
+                <AnonymousLayout {...layoutProps}>
+                    {children}
+                </AnonymousLayout>
+            );
+        } else {
+            children = (
+                <Layout {...layoutProps}>
+                    {children}
+                </Layout>
+            );
+        }
     }
 
     return (

@@ -7,6 +7,7 @@ import {createContext, useContext, useMemo} from "react";
 import {ok} from "../../../../is";
 
 export interface Data {
+    isAnonymous: boolean;
     isFragment: boolean;
     products: Product[];
     categories: Category[];

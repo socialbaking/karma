@@ -22,7 +22,8 @@ export function isAnonymous() {
 export function isAuthorized() {
     // Later add more here if more authentication methods or types are available
     return !!(
-        getMaybeAuthorizedForPartnerId()
+        getMaybeAuthorizedForPartnerId() ||
+        getMaybeAuthenticationState()
     )
 }
 

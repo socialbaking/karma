@@ -136,14 +136,19 @@ export async function discordAuthenticationRoutes(fastify: FastifyInstance) {
                     expires: new Date(expiresAt)
                 });
 
-                response.status(200)
-                response.send({
-                    member,
-                    guild,
-                    roles,
-                    state,
-                    isBot
-                });
+                // "/home" is authenticated, "/" is not
+                response.header("Location", "/home");
+                response.status(302);
+                response.send();
+
+                // response.status(200)
+                // response.send({
+                //     member,
+                //     guild,
+                //     roles,
+                //     state,
+                //     isBot
+                // });
 
                 async function getMember(): Promise<DiscordGuildMember | undefined> {
                     const response = await fetch(

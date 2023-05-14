@@ -6,12 +6,13 @@ import {
     timeBetweenCommitAndBuild,
     timeBetweenCommitAndTestCompletion
 } from "../package";
-import {paths} from "../react/server/paths";
+import {paths, pathsAnonymous} from "../react/server/paths";
 import KarmaServer from "../react/server";
 import {renderToStaticMarkup} from "react-dom/server";
 import {listCategories, listMetrics, listPartners, listProducts} from "../data";
 import {authenticate} from "../listen/authentication";
 import ServerCSS from "../react/server/server-css";
+import {isAnonymous} from "../authentication";
 
 export async function viewRoutes(fastify: FastifyInstance) {
 
@@ -24,23 +25,28 @@ export async function viewRoutes(fastify: FastifyInstance) {
         response.send(ServerCSS);
     })
 
-    Object.keys(paths).forEach(path => {
 
-        async function handler(request: FastifyRequest, response: FastifyReply) {
+    function createPathHandler(path: string) {
+        return async function handler(request: FastifyRequest, response: FastifyReply) {
             const isFragment = request.url.includes("fragment");
             response.header("Content-Type", "text/html; charset=utf-8");
             // TODO swap to same host hosted documents
             response.header("Cross-Origin-Embedder-Policy", "unsafe-none");
 
+            const anonymous = isAnonymous();
+
+            console.log({ anonymous });
+
             // Can go right to static, should be no async loading within components
             let html = renderToStaticMarkup(
                 <KarmaServer
                     url={path}
+                    isAnonymous={anonymous}
                     isFragment={isFragment}
-                    partners={await listPartners()}
-                    categories={await listCategories()}
-                    metrics={path.includes("metrics") ? await listMetrics() : undefined}
-                    products={await listProducts()}
+                    partners={anonymous ? [] : await listPartners()}
+                    categories={anonymous ? [] : await listCategories()}
+                    metrics={(!anonymous && path.includes("metrics")) ? await listMetrics() : undefined}
+                    products={anonymous ? [] : await listProducts()}
                 />
             );
 
@@ -51,9 +57,13 @@ export async function viewRoutes(fastify: FastifyInstance) {
             response.status(200);
             response.send(html)
         }
+    }
+
+    Object.keys(paths).forEach(path => {
+        const handler = createPathHandler(path);
 
         const preHandler = authenticate(fastify, {
-            anonymous: !!ALLOW_ANONYMOUS_VIEWS
+            anonymous: pathsAnonymous[path] || !!ALLOW_ANONYMOUS_VIEWS
         });
 
         fastify.get(`${path}/fragment`, {
@@ -66,32 +76,6 @@ export async function viewRoutes(fastify: FastifyInstance) {
         });
     });
 
-    fastify.get("/", async (request, response) => {
-
-        response.header("Content-Type", "text/html");
-        response.send(`
-            <p>Welcome! You are running ${packageIdentifier}</p>
-            <p>
-                <a href="/api/documentation">Checkout the documentation!</a>
-            </p>
-            <p data-seconds="${secondsBetweenCommitAndBuild}">
-                <strong>Time between commit and build</strong><br/>
-                ${timeBetweenCommitAndBuild}
-            </p>
-            ${
-            timeBetweenCommitAndTestCompletion ? (
-                `
-                <p data-seconds="${secondsBetweenCommitAndTestCompletion}">
-                    <strong>Time between commit and tests completion</strong><br/>
-                    ${timeBetweenCommitAndTestCompletion}
-                </p>
-                `
-            ) : "<!-- No tests ran after build -->"
-            }
-            <p>
-                Source code last updated at ${commitAt} by ${commitAuthor}<br/>
-                Commit Hash: ${commit}
-            </p>
-        `);
-    })
+    const handler = createPathHandler("/home");
+    fastify.get("/", handler);
 }
