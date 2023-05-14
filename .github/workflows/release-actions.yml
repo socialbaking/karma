@@ -24,6 +24,7 @@ jobs:
       DISCORD_BOT_TOKEN: 1
       DISCORD_BOT_PERMISSIONS: 1
       DISCORD_SERVER_ID: 1
+      COOKIE_SECRET: 866cb15f-cac8-4164-b05c-a8551c432d4f
     services:
       # Label used to access the service container
       redis:
