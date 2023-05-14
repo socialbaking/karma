@@ -28,7 +28,6 @@ export function Calculator() {
             anonymous?: boolean;
             */}
             <script type="application/json" id="products" dangerouslySetInnerHTML={{__html: JSON.stringify(products)}} />
-            <script type="application/json" id="calculations" dangerouslySetInnerHTML={{__html: JSON.stringify(calculationSources)}} />
 
             <input type="hidden" name="countryCode" value="NZ" />
             <input type="hidden" name="timezone" value="Pacific/Auckland" />
@@ -37,6 +36,8 @@ export function Calculator() {
                 <label htmlFor="productPurchase">Product Purchase Calculation?</label>
                 <input type="checkbox" name="productPurchase_boolean" defaultChecked />
             </div>
+            <br />
+            <br />
 
             <div>
                 <input type="text" name="productText" placeholder="Product Name" />
@@ -51,12 +52,14 @@ export function Calculator() {
                 <input type="hidden" name="productPurchasePartnerName" />
                 <input type="hidden" name="productPurchasePartnerId" />
             </div>
-
+            <br />
+            <br />
             <div>
                 <label htmlFor="anonymous">Anonymous</label>
                 <input type="checkbox" name="anonymous_boolean" />
             </div>
-
+            <br />
+            <br />
             <p>
                 I give consent for the above information to be used with the following calculations,
                 and be used for any purpose that the calculation results are intended for including
@@ -76,7 +79,8 @@ export function Calculator() {
                     </div>
                 ))
             }
-            <button type="submit">
+            <br />
+            <button type="submit" className="bg-sky-500 hover:bg-sky-700 px-5 py-2.5 text-sm leading-5 rounded-md font-semibold text-white">
                 Submit & Calculate
             </button>
         </form>
