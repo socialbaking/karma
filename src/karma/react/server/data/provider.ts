@@ -1,4 +1,5 @@
 import {
+    AuthenticationRole,
     Category,
     CountryProductMetrics, Partner,
     Product
@@ -13,6 +14,7 @@ export interface Data {
     categories: Category[];
     partners: Partner[];
     metrics?: CountryProductMetrics[];
+    roles?: AuthenticationRole[];
 }
 
 export const DataContext = createContext<Data | undefined>(undefined);
@@ -56,7 +58,7 @@ export function usePartner(partnerId: string) {
 
 export function useMetrics() {
     const { metrics } = useData();
-    return metrics || [];
+    return useMemo(() => metrics || [], [metrics]);
 }
 
 export function useMonthlyMetrics() {
@@ -67,4 +69,9 @@ export function useMonthlyMetrics() {
 export function useDailyMetrics() {
     const metrics = useMetrics();
     return useMemo(() => metrics.filter(metric => metric.duration === "day"), [metrics]);
+}
+
+export function useRoles() {
+    const { roles } = useData();
+    return useMemo(() => roles ?? [], [roles]);
 }

@@ -12,7 +12,7 @@ import {renderToStaticMarkup} from "react-dom/server";
 import {listCategories, listMetrics, listPartners, listProducts} from "../data";
 import {authenticate} from "../listen/authentication";
 import ServerCSS from "../react/server/server-css";
-import {isAnonymous} from "../authentication";
+import {getMaybeAuthenticationState, isAnonymous} from "../authentication";
 
 export async function viewRoutes(fastify: FastifyInstance) {
 
@@ -34,8 +34,9 @@ export async function viewRoutes(fastify: FastifyInstance) {
             response.header("Cross-Origin-Embedder-Policy", "unsafe-none");
 
             const anonymous = isAnonymous();
+            const state = getMaybeAuthenticationState();
 
-            console.log({ anonymous });
+            // console.log({ anonymous, state, roles: state?.roles });
 
             // Can go right to static, should be no async loading within components
             let html = renderToStaticMarkup(
@@ -47,6 +48,7 @@ export async function viewRoutes(fastify: FastifyInstance) {
                     categories={anonymous ? [] : await listCategories()}
                     metrics={(!anonymous && path.includes("metrics")) ? await listMetrics() : undefined}
                     products={anonymous ? [] : await listProducts()}
+                    roles={state?.roles}
                 />
             );
 
