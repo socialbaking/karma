@@ -59,8 +59,7 @@ export const allowAnonymous: FastifyAuthFunction = (request, response, done) => 
         getCookieState(request) ||
         getAuthorizationHeader(request) ||
         getAccessToken(request)
-    )
-    console.log({ value, cookies: request.cookies });
+    );
     if (value) {
         return done(Error(NOT_ANONYMOUS_ERROR_MESSAGE))
     }

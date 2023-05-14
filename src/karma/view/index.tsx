@@ -1,4 +1,4 @@
-import {FastifyInstance} from "fastify";
+import {FastifyInstance, FastifyReply, FastifyRequest} from "fastify";
 import {
     commit,
     commitAt, commitAuthor,
@@ -11,6 +11,7 @@ import KarmaServer from "../react/server";
 import {renderToStaticMarkup} from "react-dom/server";
 import {listCategories, listMetrics, listPartners, listProducts} from "../data";
 import {authenticate} from "../listen/authentication";
+import ServerCSS from "../react/server/server-css";
 
 export async function viewRoutes(fastify: FastifyInstance) {
 
@@ -18,27 +19,50 @@ export async function viewRoutes(fastify: FastifyInstance) {
 
     const { ALLOW_ANONYMOUS_VIEWS } = process.env;
 
+    fastify.get("/server.css", async (request, response) => {
+        response.header("Content-Type", "text/css");
+        response.send(ServerCSS);
+    })
+
     Object.keys(paths).forEach(path => {
-        fastify.get(path, {
-            preHandler: authenticate(fastify, {
-                anonymous: !!ALLOW_ANONYMOUS_VIEWS
-            }),
-            async handler(request, response) {
-                response.header("Content-Type", "text/html; charset=utf-8");
-                response.status(200);
-                response.send(
-                    // Can go right to static, should be no async loading within components
-                    renderToStaticMarkup(
-                        <KarmaServer
-                            url={request.url}
-                            partners={await listPartners()}
-                            categories={await listCategories()}
-                            metrics={request.url.includes("metrics") ? await listMetrics() : undefined}
-                            products={await listProducts()}
-                        />
-                    )
-                )
+
+        async function handler(request: FastifyRequest, response: FastifyReply) {
+            const isFragment = request.url.includes("fragment");
+            response.header("Content-Type", "text/html; charset=utf-8");
+            // TODO swap to same host hosted documents
+            response.header("Cross-Origin-Embedder-Policy", "unsafe-none");
+
+            // Can go right to static, should be no async loading within components
+            let html = renderToStaticMarkup(
+                <KarmaServer
+                    url={path}
+                    isFragment={isFragment}
+                    partners={await listPartners()}
+                    categories={await listCategories()}
+                    metrics={path.includes("metrics") ? await listMetrics() : undefined}
+                    products={await listProducts()}
+                />
+            );
+
+            if (!isFragment) {
+                html = `<!doctype html>\n${html}`
             }
+
+            response.status(200);
+            response.send(html)
+        }
+
+        const preHandler = authenticate(fastify, {
+            anonymous: !!ALLOW_ANONYMOUS_VIEWS
+        });
+
+        fastify.get(`${path}/fragment`, {
+            preHandler,
+            handler
+        });
+        fastify.get(path, {
+            preHandler,
+            handler
         });
     });
 

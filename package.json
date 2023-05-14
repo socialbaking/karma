@@ -89,6 +89,7 @@
     "redis-lock": "^1.0.0",
     "s-ago": "^2.2.0",
     "simple-statistics": "^7.8.3",
+    "tailwindcss": "^3.3.2",
     "tmp": "^0.2.1",
     "uuid": "^8.3.2",
     "whatwg-url": "^9.1.0"
@@ -138,7 +139,8 @@
     "test:all": "yarn test:node",
     "build": "rm -rf esnext && tsc",
     "prebuild": "node scripts/pre-build.js",
-    "postbuild": "mkdir -p coverage && node scripts/post-build.js",
+    "postbuild": "mkdir -p coverage && yarn tailwind && node scripts/post-build.js",
+    "tailwind": "tailwindcss -i src/karma/react/server/server.css -o esnext/karma/react/server/server.css",
     "posttest": "mkdir -p coverage && node scripts/post-test.js",
     "postcoverage": "mkdir -p coverage && node scripts/post-test.js",
     "generate": "yarn build && node esnext/generate.js",
