@@ -34,51 +34,53 @@ export function Calculator() {
 
             <div>
                 <label htmlFor="productPurchase">Product Purchase Calculation?</label>
-                <input type="checkbox" name="productPurchase_boolean" defaultChecked />
+                <input type="checkbox" name="productPurchase_boolean" defaultChecked className="form-checkbox rounded mx-4" />
             </div>
             <br />
             <br />
 
             <div>
-                <input type="text" name="productText" placeholder="Product Name" />
+                <input className="form-input rounded-md" type="text" name="productText" placeholder="Product Name" />
                 <input type="hidden" name="productName" />
                 <input type="hidden" name="productId" />
-                <input type="number" name="productPurchaseTotalCost" step="0.01" placeholder="Total Cost" />
-                <input type="number" name="productPurchaseItems" step="1" placeholder="Item Count" />
-                <input type="number" name="productPurchaseItemCost" step="0.01" placeholder="Item Cost" disabled hidden />
-                <input type="number" name="productPurchaseDeliveryCost" step="0.01" placeholder="Delivery Cost" />
-                <input type="number" name="productPurchaseFeeCost" step="0.01" placeholder="Purchase Fees" />
-                <input type="text" name="productPurchasePartnerText" placeholder="Purchased From" />
-                <input type="hidden" name="productPurchasePartnerName" />
-                <input type="hidden" name="productPurchasePartnerId" />
+                <input className="form-input rounded-md" type="number" name="productPurchaseTotalCost" step="0.01" placeholder="Total Cost" />
+                <input className="form-input rounded-md" type="number" name="productPurchaseItems" step="1" placeholder="Item Count" />
+                <input className="form-input rounded-md" type="number" name="productPurchaseItemCost" step="0.01" placeholder="Item Cost" disabled hidden />
+                <input className="form-input rounded-md" type="number" name="productPurchaseDeliveryCost" step="0.01" placeholder="Delivery Cost" />
+                <input className="form-input rounded-md" type="number" name="productPurchaseFeeCost" step="0.01" placeholder="Purchase Fees" />
+                <input className="form-input rounded-md" type="text" name="productPurchasePartnerText" placeholder="Purchased From" />
+                <input className="form-input rounded-md" type="hidden" name="productPurchasePartnerName" />
+                <input className="form-input rounded-md" type="hidden" name="productPurchasePartnerId" />
             </div>
             <br />
             <br />
             <div>
                 <label htmlFor="anonymous">Anonymous</label>
-                <input type="checkbox" name="anonymous_boolean" />
+                <input type="checkbox" name="anonymous_boolean" className="form-checkbox rounded mx-4" />
             </div>
             <br />
             <br />
             <p>
-                I give consent for the above information to be used with the following calculations,
-                and be used for any purpose that the calculation results are intended for including
+                I give consent for the above information to be stored and used with the following calculations,
+                and be used for any purpose that the calculation results are intended for, including
                 but not limited to public publishing of the information.
             </p>
-            {
-                calculationSources.map(({ calculationKey, title, description }, index) => (
-                    <div key={calculationKey}>
-                        <input name={`calculationConsent[${index}].calculationKey`} type="hidden" value={calculationKey} />
-                        <div>
-                            <label htmlFor={`calculationConsent[${index}].consented_boolean`}>{title}</label>
-                            <input name={`calculationConsent[${index}].consented_boolean`} type="checkbox" />
-                        </div>
-                        <div>
-                            {description}
-                        </div>
-                    </div>
-                ))
-            }
+            <ul className="list-none">
+                {
+                    calculationSources.map(({ calculationKey, title, description }, index) => (
+                        <li key={calculationKey} className="my-4">
+                            <input name={`calculationConsent[${index}].calculationKey`} type="hidden" value={calculationKey} />
+                            <div>
+                                <label htmlFor={`calculationConsent[${index}].consented_boolean`}>{title}</label>
+                                <input name={`calculationConsent[${index}].consented_boolean`} type="checkbox" className="form-checkbox rounded mx-4" />
+                            </div>
+                            <div>
+                                {description}
+                            </div>
+                        </li>
+                    ))
+                }
+            </ul>
             <br />
             <button type="submit" className="bg-sky-500 hover:bg-sky-700 px-5 py-2.5 text-sm leading-5 rounded-md font-semibold text-white">
                 Submit & Calculate
