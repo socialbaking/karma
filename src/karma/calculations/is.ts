@@ -3,18 +3,21 @@ import {Report} from "../client";
 export interface ProductReport extends Report {
     // These are the expected field for a completed product report
     productPurchase: true
-    productPurchaseTotalCost: `${number}`;
-    productPurchaseItems: `${number}`;
-    productPurchaseItemCost: `${number}`;
-    productPurchaseDeliveryCost: `${number}`;
-    productPurchaseFeeCost?: `${number}`;
+    productPurchaseTotalCost: `${number}` | number;
+    productPurchaseItems?: `${number}` | number;
+    productPurchaseItemCost: `${number}` | number;
+    productPurchaseDeliveryCost: `${number}` | number;
+    productPurchaseFeeCost?: `${number}` | number;
 }
 
 export function isProductReport(report: Report): report is ProductReport {
     return !!(
         report.productPurchase &&
         isNumberString(report.productPurchaseTotalCost) &&
-        isNumberString(report.productPurchaseItemCost) &&
+        (
+            isNumberString(report.productPurchaseItemCost) ||
+            !report.productPurchaseItemCost
+        ) &&
         isNumberString(report.productPurchaseItems) &&
         isNumberString(report.productPurchaseDeliveryCost) &&
         (
@@ -28,9 +31,12 @@ export function isProductReport(report: Report): report is ProductReport {
 }
 
 
-export function isNumberString(value?: unknown): value is `${number}` {
+export function isNumberString(value?: unknown): value is `${number}` | number {
     return (
-        typeof value === "string" &&
-        /^-?\d+(?:\.\d+)?$/.test(value)
+        (
+            typeof value === "string" &&
+            /^-?\d+(?:\.\d+)?$/.test(value)
+        ) ||
+        typeof value === "number"
     );
 }

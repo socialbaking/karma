@@ -6,14 +6,19 @@ export const calculationConsentItem = {
         calculationKey: {
             type: "string"
         },
+        // One of these can be provided, if neither, not consented
+        consented: {
+            type: "boolean",
+            nullable: true
+        },
         consentedAt: {
-            type: "string"
+            type: "string",
+            nullable: true
         }
     },
     additionalProperties: true,
     required: [
-        "calculationKey",
-        "consentedAt"
+        "calculationKey"
     ]
 }
 
@@ -99,24 +104,64 @@ export const reportData = {
             nullable: true
         },
         productPurchaseTotalCost: {
-            type: "string",
-            nullable: true
+            anyOf: [
+                {
+                    type: "string",
+                    nullable: true
+                },
+                {
+                    type: "number",
+                    nullable: true
+                }
+            ]
         },
         productPurchaseItems: {
-            type: "string",
-            nullable: true
+            anyOf: [
+                {
+                    type: "string",
+                    nullable: true
+                },
+                {
+                    type: "number",
+                    nullable: true
+                }
+            ]
         },
         productPurchaseItemCost: {
-            type: "string",
-            nullable: true
+            anyOf: [
+                {
+                    type: "string",
+                    nullable: true
+                },
+                {
+                    type: "number",
+                    nullable: true
+                }
+            ]
         },
         productPurchaseDeliveryCost: {
-            type: "string",
-            nullable: true
+            anyOf: [
+                {
+                    type: "string",
+                    nullable: true
+                },
+                {
+                    type: "number",
+                    nullable: true
+                }
+            ]
         },
         productPurchaseFeeCost: {
-            type: "string",
-            nullable: true
+            anyOf: [
+                {
+                    type: "string",
+                    nullable: true
+                },
+                {
+                    type: "number",
+                    nullable: true
+                }
+            ]
         },
         productPurchasePartnerId: {
             type: "string",

@@ -14,7 +14,7 @@ import {
     ProductMetricData,
     ReportDateData,
     CountryProductMetrics,
-    CountryProductMetricDuration, isNoReportMetricsId
+    CountryProductMetricDuration, isNoReportMetricsId, ReportReference
 } from "../data";
 import {isLike, ok} from "../../is";
 import {mean} from "simple-statistics";
@@ -30,7 +30,7 @@ import {
 } from "../calculations";
 import {DAY_MS, getExpiresAt, MONTH_MS} from "../data/expiring-kv";
 
-const REPORTING_DATE_KEY: keyof ReportDateData = "orderedAt";
+export const REPORTING_DATE_KEY: keyof ReportDateData = "orderedAt";
 
 const EXPIRE_DURATION_MULTIPLIER = 4;
 
@@ -46,6 +46,7 @@ export async function calculateReportMetrics(report: Report): Promise<ReportMetr
     const { productId } = report;
     if (!productId) return undefined;
     const product = await getProduct(productId);
+    if (!product) return undefined;
     // const categories = [];
     // if (product.categoryId) {
     //     const category = await getCategory(product.categoryId);
@@ -61,11 +62,10 @@ export async function calculateReportMetrics(report: Report): Promise<ReportMetr
     });
 }
 
-async function calculateQueuedReportMetrics() {
-    const queue = getReportQueueStore();
+async function calculateQueuedReportMetrics(references: ReportReference[]) {
     const metrics = getReportMetricsStore();
 
-    for await (const { reportId } of queue) {
+    for await (const { reportId } of references) {
 
         if (isNoReportMetricsId(reportId)) continue;
 
@@ -76,12 +76,14 @@ async function calculateQueuedReportMetrics() {
 
         ok(report, "Report in queue without being in store")
 
+        console.log(report.reportId, report.productId, report.calculationConsent?.length)
+
         // No consent to calculate
         if (!report.calculationConsent?.length) continue;
 
-
-
         const calculated = await calculateReportMetrics(report);
+
+        console.log(report.reportId, report.productId, calculated);
 
         if (!calculated) continue;
 
@@ -94,10 +96,7 @@ async function calculateQueuedReportMetrics() {
 
 }
 
-async function calculateQueuedMetrics() {
-    const queue = getReportQueueStore();
-
-    const references = await queue.values();
+async function calculateQueuedMetrics(references: ReportReference[]) {
 
     const reports: ReportMetrics[] = (
         await Promise.all(
@@ -106,7 +105,7 @@ async function calculateQueuedMetrics() {
     )
         .filter(Boolean);
 
-    console.log(reports.length, "reports to process into metrics");
+    console.log(`${reports.length}/${references.length} reports to process into metrics`);
 
     const countryCodes = new Set(reports.flatMap(report => report.countryCode));
 
@@ -208,8 +207,10 @@ export async function background(input: BackgroundInput = {}) {
         await seed();
     }
 
-    await calculateQueuedReportMetrics();
-    await calculateQueuedMetrics();
+    const queue = getReportQueueStore();
+    const references = await queue.values();
+    await calculateQueuedReportMetrics(references);
+    await calculateQueuedMetrics(references);
 
     await complete({
         // someCompletedData: "complete"
