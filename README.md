@@ -178,6 +178,7 @@ export interface ProductActiveIngredient {
     calculated?: boolean;
     calculatedUnit?: string;
     size?: ProductSizeData;
+    proportional?: boolean;
 }
 
 export interface Product extends ProductData {

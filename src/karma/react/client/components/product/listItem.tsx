@@ -1,21 +1,30 @@
 import React, { useMemo } from "react";
-import ProductType from "types/product.d";
-import { CalendarIcon, GlobeIcon } from "@heroicons/react/solid";
+import { Product } from "../../../../client";
+import { CalendarIcon, GlobeIcon } from "../icons";
+import {ActiveIngredient, useActiveIngredients} from "./utils";
 
-const PercentageLabel = React.memo(({ value, isHigher }: { value: number; isHigher: boolean }) => (
+export interface ProductProps {
+  product: Product;
+}
+
+export interface PercentageLabelProps extends ActiveIngredient {
+
+}
+
+const PercentageLabel = React.memo(({ label, sortIndex }: PercentageLabelProps) => (
   <span
     className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-      isHigher ? "bg-green-400" : "bg-green-100"
+        sortIndex === 0 ? "bg-green-400" : "bg-green-100"
     } text-green-800`}
   >
-    {value}%
+    {label}
   </span>
 ));
 
-function ListItem({ id, attributes }: ProductType) {
-  const productUrl = `/products/${id}`;
+function ListItem({ product }: ProductProps) {
+  const { productId, ...attributes } = product;
+  const productUrl = `/products/${product.productId}`;
 
-  const isTHCHigher = useMemo(() => attributes?.THC > attributes?.CBD, [attributes]);
   const formattedDate = useMemo(() => {
     if (!attributes?.createdAt) return "";
 
@@ -26,15 +35,20 @@ function ListItem({ id, attributes }: ProductType) {
     }).format(new Date(attributes.createdAt));
   }, [attributes?.createdAt]);
 
+  const ingredients = useActiveIngredients(product);
+
   return (
-    <li key={id}>
+    <li key={productId}>
       <a href={productUrl} className="block hover:bg-gray-50">
         <div className="px-4 py-4 sm:px-6">
           <div className="flex items-center justify-between">
-            <p className="text-sm font-medium text-indigo-600 truncate">{attributes?.name}</p>
+            <p className="text-sm font-medium text-indigo-600 truncate">{attributes?.productName}</p>
             <div className="ml-2 flex-shrink-0 flex">
-              <PercentageLabel value={attributes?.THC ?? 0} isHigher={isTHCHigher} />
-              <PercentageLabel value={attributes?.CBD ?? 0} isHigher={!isTHCHigher} />
+              {
+                ingredients.map((value, index) => (
+                    <PercentageLabel key={index} {...value} />
+                ))
+              }
             </div>
           </div>
           <div className="mt-2 sm:flex sm:justify-between">
@@ -44,7 +58,7 @@ function ListItem({ id, attributes }: ProductType) {
                   className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
                   aria-hidden="true"
                 />
-                {attributes?.category?.data?.attributes?.name}
+                {/*attributes?.category?.data?.attributes?.name*/"Category Name"}
               </p>
             </div>
             <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">

@@ -1,6 +1,6 @@
-import Header from "@/components/header";
-import Footer from "@/components/footer";
-import { XCircleIcon } from "@heroicons/react/solid";
+import Header from "./header";
+import Footer from "./footer";
+import { XCircleIcon } from "./icons";
 
 interface Props {
 	message?: string;

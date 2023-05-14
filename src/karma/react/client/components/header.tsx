@@ -1,7 +1,4 @@
-import Head from 'next/head';
-// import Image from 'next/image'
-// import logo from "@/public/logo.png"
-import Logo from '@/components/logo';
+import { Logo } from './logo';
 
 const navigation = [
   { name: 'Home', href: '/' },
@@ -13,11 +10,11 @@ const navigation = [
 function Header() {
   return (
     <div>
-      <Head>
+      <head>
         <title>pharmakarma</title>
         <meta property="og:title" content="pharmakarma" key="title" />
         <link rel="icon" href="/logo.png" />
-      </Head>
+      </head>
       <header className="relative bg-white">
         <nav
           className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"

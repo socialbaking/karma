@@ -1,12 +1,19 @@
 import React from "react";
-import ProductType from "types/product.d";
+import { Product } from "../../../../client";
+import {useActiveIngredients} from "./utils";
 
-const ProductFeature = ({product}: ProductType) => {
+export interface ProductProps {
+	product: Product
+}
+
+const ProductFeature = ({product}: ProductProps) => {
 	// const features = rest?.features; //prob?
 	// const { description } = features;
 	// const { attributes } = product;
-	const { id, attributes } = product;
+	const { id, ...attributes } = product;
 	console.log("id", id);
+
+	const ingredients = useActiveIngredients(product);
 
 	return (
 		<div className="bg-white">
@@ -20,37 +27,25 @@ const ProductFeature = ({product}: ProductType) => {
 							id="features-heading"
 							className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl"
 						>
-							{attributes?.name}
+							{attributes?.productName}
 						</h2>
-						<p className="mt-4 text-gray-500">
-							{attributes?.description}
-						</p>
 					</div>
 					<div className="ml-2 flex-shrink-0 flex">
-							{/* {ingredients.map(key => (
-              <p key={key} className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${attributes?.THC > attributes?.CBD ? "bg-green-400" : "bg-green-100"} bg-green-100 text-green-800`}>
-                {key}: {attributes?.[key]}%
-              </p>
-              ))} */}
-							<p
-								className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-									attributes?.THC > attributes?.CBD
-										? "bg-green-400"
-										: "bg-green-100"
-								} text-green-800`}
-							>
-								THC: {attributes?.THC}%
-							</p>
-							<p
-								className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-									attributes?.THC < attributes?.CBD
-										? "bg-green-400"
-										: "bg-green-100"
-								} text-green-800`}
-							>
-								CBD: {attributes?.CBD}%
-							</p>
-						</div>
+						{
+							ingredients
+								.map(({ type, label, sortIndex }, index) => (
+									<p
+										className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+											sortIndex === 0
+												? "bg-green-400"
+												: "bg-green-100"
+										} text-green-800`}
+									>
+										{type}: {label}
+									</p>
+								))
+						}
+					</div>
 				</div>
 			</section>
 		</div>

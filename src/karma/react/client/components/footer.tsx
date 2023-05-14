@@ -1,5 +1,5 @@
 import React from "react";
-import Logo from "@/components/logo";
+import {Logo} from "./logo";
 
 const FooterContent = () => (
 	<div className="container px-5 py-8 mx-auto flex items-center sm:flex-row flex-col">
