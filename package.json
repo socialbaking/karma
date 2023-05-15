@@ -57,7 +57,7 @@
     "@fastify/cookie": "^8.3.0",
     "@fastify/cors": "^8.2.1",
     "@fastify/formbody": "^7.4.0",
-    "@fastify/helmet": "^10.1.0",
+    "@fastify/helmet": "^10.1.1",
     "@fastify/multipart": "^7.6.0",
     "@fastify/request-context": "^4.2.0",
     "@fastify/swagger": "^8.3.1",
@@ -142,7 +142,6 @@
     "redis-memory-server": "^0.6.0"
   },
   "scripts": {
-    "postinstall": "patch-package || exit 0",
     "test:all": "yarn test:node",
     "build": "rm -rf esnext && tsc",
     "prebuild": "node scripts/pre-build.js",
