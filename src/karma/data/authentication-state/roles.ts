@@ -68,25 +68,23 @@ export function isAuthenticationRole(key: string): key is AuthenticationRole {
 }
 
 export function getAuthenticationRole(name: string): AuthenticationRole | undefined {
-    const roles = getAuthenticationRoles([name]);
-    return roles.at(0);
+    const lowerName = name.toLowerCase();
+    for (const key of roles) {
+        if (name === key || lowerName === key) return key;
+        for (const value of [namedRoles[key], ...(alternativeRoleNames[key] ?? [])]) {
+            if (name === value) return key;
+            const lower = value.toLowerCase();
+            if (lowerName === lower) return key;
+        }
+    }
+    return undefined;
 }
+
 
 export function getAuthenticationRoles(names: string[]): AuthenticationRole[] {
     const result = names
         .filter(Boolean)
-        .map((name): AuthenticationRole => {
-            const lowerName = name.toLowerCase();
-            for (const key of roles) {
-                if (name === key || lowerName === key) return key;
-                for (const value of [namedRoles[key], ...(alternativeRoleNames[key] ?? [])]) {
-                    if (name === value) return key;
-                    const lower = value.toLowerCase();
-                    if (lowerName === lower) return key;
-                }
-            }
-            return undefined;
-        })
+        .map(getAuthenticationRole)
         .filter(Boolean);
     return [...new Set(result)];
 }

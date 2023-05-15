@@ -7,7 +7,7 @@ import {
     addAuthenticationState,
     systemLogSchema,
     addCookieState,
-    AuthenticationRole, getAuthenticationRoles
+    AuthenticationRole, getAuthenticationRoles, getAuthenticationRole
 } from "../../data";
 import {packageIdentifier} from "../../package";
 
@@ -185,6 +185,10 @@ export async function redditAuthenticationRoutes(fastify: FastifyInstance) {
                     };
                 }
 
+                async function getCachedFlair() {
+
+                }
+
                 async function getSubscriptions(type: "moderator" | "subscriber" | "contributor"): Promise<RedditSubscriptionListing> {
                     const response = await fetch(
                         new URL(`/subreddits/mine/${type}`, API_DOMAIN),
@@ -198,6 +202,56 @@ export async function redditAuthenticationRoutes(fastify: FastifyInstance) {
                     );
                     ok(response, "getSubscriptions response not ok");
                     return response.json();
+                }
+
+                async function getUserFlairRole(): Promise<AuthenticationRole | undefined> {
+
+                    const flair = await getUserFlair();
+                    if (flair) {
+                        const role = getAuthenticationRole(flair);
+                        if (!role) return undefined; // Don't use cached, just undefined;
+                        await setCache(role);
+                        return role;
+                    }
+                    return getCached();
+
+                    async function getCached(): Promise<AuthenticationRole | undefined> {
+                        // const cached = await Promise.all(
+                        //     roles.map(async (role): Promise<AuthenticationRole | undefined> => {
+                        //         // TODO #18, implement get from cache store
+                        //         /*
+                        //         const found = await getCachedAuthenticationRoleForUser(
+                        //             role
+                        //         )
+                        //         if (!found) undefined
+                        //
+                        //         return role;
+                        //          */
+                        //     })
+                        // )
+                        //
+                        // const found = cached.find(Boolean);
+                        // if (!found) return undefined;
+                        // // Set in cache if it is going to be used
+                        // await setCache(role);
+                        // return role;
+                        return undefined;
+                    }
+
+                    /*
+                    async function getCachedAuthenticationRoleForUser(role: AuthenticationRole) {
+                        const name = me.name;
+                        const hash = createHash("sha256");
+                        ...
+                        ...
+
+                    }
+                     */
+
+                    async function setCache(role: AuthenticationRole) {
+                        // TODO #18, implement set in cache store
+                    }
+
                 }
 
                 async function getUserFlair(): Promise<string | undefined> {
