@@ -15,6 +15,7 @@ export * from "./eye-dropper";
 export * from "./wrench";
 export * from "./cannabis";
 export * from "./prescription-bottle";
+export * from "./svg-text";
 
 export function CategoryIcon({ categoryName }: { categoryName: string }) {
     const Icon = getCategoryIcon();

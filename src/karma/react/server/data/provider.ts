@@ -7,6 +7,7 @@ import {
 import {createContext, useContext, useMemo} from "react";
 import {ok} from "../../../../is";
 import {getMatchingProducts} from "../../../utils";
+import {COPYRIGHT_LINK, COPYRIGHT_SVG_TEXT, COPYRIGHT_TEXT} from "../../../static";
 
 export interface Data {
     body?: unknown;
@@ -80,6 +81,36 @@ export function useSubmitted(): boolean {
 export function useProducts() {
     const { products } = useData();
     return products;
+}
+
+export interface CopyrightItem {
+    contentUrl: string;
+    copyrightUrl: string;
+    label: string;
+    svg?: string;
+}
+
+export function useCopyrightInformation(products: Product[]) {
+    return useMemo(() => {
+        const websites = [
+            ...new Set(
+                products.map(
+                    product => product.licenceApprovalWebsite
+                )
+            )
+        ]
+            .filter(url => COPYRIGHT_TEXT[url])
+            .filter(Boolean);
+        return websites.map((url): CopyrightItem => {
+            const svg = COPYRIGHT_SVG_TEXT[url];
+            return {
+                contentUrl: url,
+                copyrightUrl: COPYRIGHT_LINK[url],
+                label: COPYRIGHT_TEXT[url],
+                svg: svg ? `data:image/svg+xml;base64,${Buffer.from(svg, "utf-8").toString("base64")}` : undefined
+            } as const;
+        });
+    }, [products]);
 }
 
 export function useSortedProducts(query?: QueryRecord) {

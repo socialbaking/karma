@@ -11,6 +11,7 @@ import {
 } from "./data";
 import {v5} from "uuid";
 import {ok} from "../../is";
+import {HEALTH_GOVT_NZ_MINIMUM_PRODUCTS} from "../static";
 
 const firstSeedingDate = new Date(1683589864494).toISOString();
 const createdAt = firstSeedingDate;
@@ -295,7 +296,7 @@ async function seedProducts() {
     ok(helius.countryCode, "Expected countryCode to be set");
 
     // The below product information was sourced from this licenceApprovalWebsite url
-    const licenceApprovalWebsite = "https://www.health.govt.nz/our-work/regulation-health-and-disability-system/medicinal-cannabis-agency/medicinal-cannabis-agency-information-health-professionals/medicinal-cannabis-products-meet-minimum-quality-standard"
+    const licenceApprovalWebsite = HEALTH_GOVT_NZ_MINIMUM_PRODUCTS;
 
     const flower = getCategory("Flower");
     const oil = getCategory("Oil");
