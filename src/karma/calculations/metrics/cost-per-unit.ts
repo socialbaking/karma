@@ -21,13 +21,13 @@ export function handler(context: BaseCalculationContext) {
 export function calculate(report: Report, context: BaseCalculationContext): ReportMetrics | undefined {
     if (!isProductReport(report)) return undefined;
 
-
     const {
         productId,
-        productPurchaseItems,
-        productPurchaseTotalCost,
-        productPurchaseDeliveryCost,
-        productPurchaseFeeCost,
+        // productPurchaseItems,
+        // productPurchaseTotalCost,
+        productPurchaseItemCost,
+        // productPurchaseDeliveryCost,
+        // productPurchaseFeeCost,
         productSize,
         calculationConsent,
         countryCode,
@@ -47,13 +47,14 @@ export function calculate(report: Report, context: BaseCalculationContext): Repo
 
     if (!productActiveIngredients) return undefined;
 
-    const totalCost = +productPurchaseTotalCost;
-    const deliveryCost = +productPurchaseDeliveryCost;
-    const items = Math.max(1, +productPurchaseItems);
-    const feeCost = +(productPurchaseFeeCost ?? "0");
+    // const totalCost = +productPurchaseTotalCost;
+    // const deliveryCost = +productPurchaseDeliveryCost;
+    // const items = Math.max(1, +productPurchaseItems);
+    // const feeCost = +(productPurchaseFeeCost ?? "0");
 
-    const productCost = totalCost - deliveryCost - feeCost;
-    const itemCost = productCost / items;
+    // const productCost = totalCost - deliveryCost - feeCost;
+    // const calculatedItemCost = productCost / items;
+    const itemCost = +productPurchaseItemCost;
 
     const calculated = productActiveIngredients.filter(value => value.calculated)
 

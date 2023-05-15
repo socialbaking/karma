@@ -4,7 +4,7 @@ export interface ProductReportData {
     // These are the expected field for a completed product report
     productPurchase: true
     productPurchaseTotalCost: `${number}` | number;
-    productPurchaseItems?: `${number}` | number;
+    productPurchaseItems: `${number}` | number;
     productPurchaseItemCost: `${number}` | number;
     productPurchaseDeliveryCost: `${number}` | number;
     productPurchaseFeeCost?: `${number}` | number;

@@ -256,3 +256,9 @@ export interface SystemLog extends SystemLogData {
 
 [//]: # (typescript client)
 
+### Local Development
+
+#### `mkcert`
+
+[`mkcert`](https://github.com/FiloSottile/mkcert) is used
+to setup local https 
