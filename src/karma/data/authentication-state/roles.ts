@@ -60,15 +60,17 @@ export const roles: AuthenticationRole[] = [
     "booster",
     "clinic"
 ];
+const stringRoles: string[] = roles;
 
 ok(Object.keys(namedRoles).length === roles.length, "Expected roles array to include all named roles");
 
 export function isAuthenticationRole(key: string): key is AuthenticationRole {
-    return isLike<AuthenticationRole>(key) && roles.includes(key);
+    return stringRoles.includes(key);
 }
 
 export function getAuthenticationRole(name: string): AuthenticationRole | undefined {
     const lowerName = name.toLowerCase();
+    if (isAuthenticationRole(lowerName)) return lowerName;
     for (const key of roles) {
         if (name === key || lowerName === key) return key;
         for (const value of [namedRoles[key], ...(alternativeRoleNames[key] ?? [])]) {

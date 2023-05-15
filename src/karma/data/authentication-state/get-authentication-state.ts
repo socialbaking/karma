@@ -10,7 +10,6 @@ export async function getAuthenticationState(stateId: string) {
 export async function getAuthenticationStateByKey(stateKey: string) {
     const { stateId, userState } = splitKey(stateKey);
     const state = await getAuthenticationState(stateId);
-    console.log({ stateId, userState, state });
     if (!state) return undefined;
     if (userState) {
         ok(state.userState === userState, "Expected stored state to match given state");

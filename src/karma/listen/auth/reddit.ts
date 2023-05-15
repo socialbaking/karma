@@ -13,6 +13,8 @@ import {packageIdentifier} from "../../package";
 
 interface RedditUserContent extends Record<string, unknown> {
     author_flair_text?: string;
+    subreddit?: string;
+    author?: string;
 }
 
 interface RedditSubscription extends Record<string, unknown> {
@@ -118,20 +120,16 @@ export async function redditAuthenticationRoutes(fastify: FastifyInstance) {
 
                 const me = await getMe();
                 const subscriptions = await getSubscriptionStatus();
-                const flair = await getUserFlair();
+                const flairRole = await getUserFlairRole();
 
                 const roles = getAuthenticationRoles([
                     "member", // Everyone is a member by default :)
-                    flair,
+                    flairRole,
                     ...Object.entries(subscriptions)
                         .filter(entry => entry[1])
                         .map(entry => entry[0])
                 ]);
-                console.log({ me: me.name, scope, subscriptions, flair, roles });
-
-                // const { externalScope: scope } = state;
-                //
-                // ok(scope, "Expected externalScope with reddit state");
+                console.log({ me: me.name, scope, subscriptions, flairRole, roles });
 
                 const { stateId, expiresAt } = await addCookieState({
                     roles
@@ -183,10 +181,6 @@ export async function redditAuthenticationRoutes(fastify: FastifyInstance) {
                             node => node.data
                         )
                     };
-                }
-
-                async function getCachedFlair() {
-
                 }
 
                 async function getSubscriptions(type: "moderator" | "subscriber" | "contributor"): Promise<RedditSubscriptionListing> {
@@ -259,40 +253,26 @@ export async function redditAuthenticationRoutes(fastify: FastifyInstance) {
                         getUserContent("comments"),
                         getUserContent("submitted")
                     ]);
-                    // const flairs = await getFlairs();
 
-                    // console.log(flairs);
-                    // console.log(comments);
-                    // console.log(submitted);
-
-                    let found = comments.find(content => content.author_flair_text?.startsWith(REDDIT_FLAIR))
+                    let found = comments.find(isMatching)
 
                     if (!found) {
-                        found = submitted.find(content => content.author_flair_text?.startsWith(REDDIT_FLAIR))
+                        found = submitted.find(isMatching)
                         if (!found) return undefined;
                     }
 
                     return found
                         .author_flair_text
                         .replace(/:[^:]+:/g, "").trim();
-                }
 
-                // async function getFlairs() {
-                //     const url = new URL(`/r/${REDDIT_NAME}/api/user_flairs`, API_DOMAIN);
-                //     url.searchParams.set("limit", "100");
-                //     const response = await fetch(
-                //         url,
-                //         {
-                //             method: "GET",
-                //             headers: {
-                //                 Authorization: `bearer ${accessToken}`,
-                //                 "User-Agent": USER_AGENT
-                //             },
-                //         }
-                //     );
-                //     ok(response, "getSidebar response not ok");
-                //     return await response.json();
-                // }
+                    function isMatching(content: RedditUserContent) {
+                        return (
+                            content.author_flair_text?.startsWith(REDDIT_FLAIR) &&
+                            content.subreddit === REDDIT_NAME &&
+                            content.author === me.name
+                        )
+                    }
+                }
 
                 async function getUserContent(type: "comments" | "submitted"): Promise<RedditUserContent[]> {
                     const url = new URL(`/user/${me.name}/${type}`, API_DOMAIN);
