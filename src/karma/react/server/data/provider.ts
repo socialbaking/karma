@@ -6,6 +6,7 @@ import {
 } from "../../../data";
 import {createContext, useContext, useMemo} from "react";
 import {ok} from "../../../../is";
+import {getMatchingProducts} from "../../../utils";
 
 export interface Data {
     body?: unknown;
@@ -45,7 +46,9 @@ export function useBody<B>(): B {
     return body;
 }
 
-export function useQuery<Q = Record<string, string>>(): Q {
+type QueryRecord = Record<string, string>;
+
+export function useQuery<Q = QueryRecord>(): Q {
     const { query } = useData();
     ok<Q>(query, "Expected query");
     return query;
@@ -79,14 +82,16 @@ export function useProducts() {
     return products;
 }
 
-export function useSortedProducts() {
+export function useSortedProducts(query?: QueryRecord) {
     const products = useProducts();
     const categories = useCategories();
+
+    const search = query?.search;
     return useMemo(() => {
         const categoryOrder = new Map<string, number | undefined>(
             categories.map(category => [category.categoryId, category.order] as const)
         );
-        return products
+        const sortedProducts = products
             .slice()
             .sort((a, b) => {
                 const categoryOrderA = categoryOrder.get(a.categoryId) ?? Number.MAX_SAFE_INTEGER
@@ -98,7 +103,11 @@ export function useSortedProducts() {
                 const orderB = b.order ?? Number.MAX_SAFE_INTEGER;
                 return orderA < orderB ? -1 : 1;
             });
-    }, [products, categories]);
+        if (!search) {
+            return sortedProducts;
+        }
+        return getMatchingProducts(sortedProducts, search);
+    }, [products, categories, search]);
 }
 
 export function useProduct(productId: string): Product | undefined {

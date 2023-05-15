@@ -22,17 +22,23 @@ export function Home() {
             {
                 isAnonymous ? (
                     <>
-                        <p>Welcome! You are running {packageIdentifier}</p>
+                        <p>Welcome!</p>
+                        <br />
+                        <br />
+                        <p>
+                            <a href="/api/authentication/discord/redirect" className="text-blue-600 hover:bg-white underline hover:underline-offset-2">Login with Discord</a>
+                        </p>
+                        <br />
+                        <br />
+                        <hr />
+                        <br />
+                        <br />
+                        <p>You are running {packageIdentifier}</p>
                         <p>
                             <a href="/api/documentation" target="_blank" className="text-blue-600 hover:bg-white underline hover:underline-offset-2">Checkout the API documentation!</a>
                         </p>
                         <p>
                             <a href={homepage} target="_blank" className="text-blue-600 hover:bg-white underline hover:underline-offset-2">Checkout the source code!</a>
-                        </p>
-                        <br />
-                        <br />
-                        <p>
-                            <a href="/api/authentication/discord/redirect" className="text-blue-600 hover:bg-white underline hover:underline-offset-2">Login with Discord</a>
                         </p>
                     </>
                 ) : <>

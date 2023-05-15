@@ -5,7 +5,7 @@ import {isAnonymous} from "../../authentication";
 import {isProductReport, isProductReportData} from "../../calculations";
 import {REPORTING_DATE_KEY} from "../../background";
 import {ok} from "../../../is";
-
+import {getMatchingProducts} from "../../utils";
 
 type Schema = {
     Body: ReportData
@@ -77,19 +77,7 @@ export async function addReportFromRequest(request: FastifyRequest): Promise<Rep
     if ((productText || productName) && !productId) {
         const products = await listProducts();
         const name = productText || productName
-        const lower = name.toLowerCase();
-        const lowerSplit = lower.split(" ");
-        let matching = products.filter(product => product.productName.toLowerCase().includes(lower));
-        if (!matching.length) {
-            matching = products.filter(
-                product => {
-                    const lowerName = product
-                        .productName
-                        .toLowerCase();
-                    return lowerSplit.every(value => lowerName.includes(value));
-                }
-            )
-        }
+        const matching = getMatchingProducts(products, name);
         if (matching.length > 1) {
             throw new Error(`Name "${name}" matches multiple products: ${matching.map(value => `"${value.productName}"`).join(", ")}`)
         }

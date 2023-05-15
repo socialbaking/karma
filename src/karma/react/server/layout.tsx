@@ -1,6 +1,7 @@
 import {PropsWithChildren} from "react";
 import {description, namespace, project} from "../../package";
 import {getOrigin} from "../../listen/config";
+import {useQuery} from "./data";
 
 export interface LayoutProps {
     title?: string;
@@ -141,7 +142,8 @@ export function Layout(props: PropsWithChildren<LayoutProps>) {
     const {
         pathname
     } = new URL(url, getOrigin());
-
+    const query = useQuery();
+    const search = query.search || "";
     return (
         <BaseLayout {...props}>
             <div>
@@ -273,12 +275,12 @@ export function Layout(props: PropsWithChildren<LayoutProps>) {
                         <div className="h-6 w-px bg-gray-900/10 lg:hidden" aria-hidden="true"></div>
 
                         <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
-                            <form className="relative flex flex-1" action="#" method="GET">
-                                <label htmlFor="search-field" className="sr-only">Search</label>
+                            <form className="relative flex flex-1" action="/products" method="GET">
+                                <label htmlFor="search-field" className="sr-only">Search Products</label>
                                 <svg className="pointer-events-none absolute inset-y-0 left-0 h-full w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                     <path fillRule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clipRule="evenodd" />
                                 </svg>
-                                <input id="search-field" className="block h-full w-full border-0 py-0 pl-8 pr-0 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm" placeholder="Search..." type="search" name="search" />
+                                <input id="search-field" className="block h-full w-full border-0 py-0 pl-8 pr-0 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm" placeholder="Search products..." type="search" name="search" defaultValue={search} />
                             </form>
                         </div>
                     </div>
