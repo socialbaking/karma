@@ -18,7 +18,12 @@ export async function stopRedisMemory() {
 
 export async function startRedisMemory() {
     if (redisServer) return;
-    const { RedisMemoryServer } = await import("redis-memory-server")
+    const mod = await import("redis-memory-server").catch(() => undefined);
+    if (!mod) {
+        console.warn("Redis memory enabled but redis-memory-server not installed");
+        return;
+    }
+    const { RedisMemoryServer } = mod
     redisServer = new RedisMemoryServer();
 
     const host = await redisServer.getHost();
