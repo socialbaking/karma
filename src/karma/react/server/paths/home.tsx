@@ -1,6 +1,6 @@
 import {
     commit,
-    commitAt, commitAuthor,
+    commitAt, commitAuthor, homepage,
     packageIdentifier,
     secondsBetweenCommitAndTestCompletion,
     timeBetweenCommitAndBuild,
@@ -19,20 +19,21 @@ export function Home() {
     // })
     return (
         <>
-            <p>Welcome! You are running {packageIdentifier}</p>
-            <p>
-                <a href="/api/documentation" className="text-blue-600 hover:bg-white underline hover:underline-offset-2">Checkout the documentation!</a>
-            </p>
-            <br />
-            <br />
             {
                 isAnonymous ? (
                     <>
+                        <p>Welcome! You are running {packageIdentifier}</p>
                         <p>
-                            <a href="/api/authentication/discord/redirect" className="text-blue-600 hover:bg-white underline hover:underline-offset-2">Login with Discord</a>
+                            <a href="/api/documentation" target="_blank" className="text-blue-600 hover:bg-white underline hover:underline-offset-2">Checkout the API documentation!</a>
+                        </p>
+                        <p>
+                            <a href={homepage} target="_blank" className="text-blue-600 hover:bg-white underline hover:underline-offset-2">Checkout the source code!</a>
                         </p>
                         <br />
                         <br />
+                        <p>
+                            <a href="/api/authentication/discord/redirect" className="text-blue-600 hover:bg-white underline hover:underline-offset-2">Login with Discord</a>
+                        </p>
                     </>
                 ) : <>
                     You are logged in!<br />
@@ -52,22 +53,8 @@ export function Home() {
                     }
                 </>
             }
-            <p data-seconds="${secondsBetweenCommitAndBuild}">
-                <strong>Time between commit and build</strong><br/>
-                {timeBetweenCommitAndBuild}
-            </p>
-            {
-                timeBetweenCommitAndTestCompletion ? (
-                    <p data-seconds={secondsBetweenCommitAndTestCompletion}>
-                        <strong>Time between commit and tests completion</strong><br/>
-                        {timeBetweenCommitAndTestCompletion}
-                    </p>
-                ) : ""
-            }
-            <p>
-                Source code last updated at {commitAt} by {commitAuthor}<br/>
-                Commit Hash: {commit}
-            </p>
+            <br />
+            <br />
         </>
     )
 }
