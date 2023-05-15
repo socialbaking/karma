@@ -78,22 +78,29 @@ export async function addReportFromRequest(request: FastifyRequest): Promise<Rep
         const products = await listProducts();
         const name = productText || productName
         const lower = name.toLowerCase();
-        const matching = products.filter(product => product.productName.toLowerCase().includes(lower));
+        const lowerSplit = lower.split(" ");
+        let matching = products.filter(product => product.productName.toLowerCase().includes(lower));
+        if (!matching.length) {
+            matching = products.filter(
+                product => {
+                    const lowerName = product
+                        .productName
+                        .toLowerCase();
+                    return lowerSplit.every(value => lowerName.includes(value));
+                }
+            )
+        }
         if (matching.length > 1) {
-            throw new Error(`Name "${name}" matches multiple products`)
+            throw new Error(`Name "${name}" matches multiple products: ${matching.map(value => `"${value.productName}"`).join(", ")}`)
         }
         const product = matching[0];
-        if (product) {
-            if (!productText) {
-                productText = product.productName;
-            }
-            productName = product.productName;
-            productId = product.productId;
-            if (product.sizes?.length === 1) {
-                productSize = product.sizes[0];
-            }
-        } else {
-            throw new Error("Product not found");
+        if (!productText) {
+            productText = product.productName;
+        }
+        productName = product.productName;
+        productId = product.productId;
+        if (product.sizes?.length === 1) {
+            productSize = product.sizes[0];
         }
     }
 
