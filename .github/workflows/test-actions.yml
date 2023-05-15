@@ -20,6 +20,10 @@ jobs:
       DISCORD_BOT_PERMISSIONS: 1
       DISCORD_SERVER_ID: 1
       COOKIE_SECRET: 866cb15f-cac8-4164-b05c-a8551c432d4f
+      REDDIT_CLIENT_ID: 1
+      REDDIT_CLIENT_SECRET: 1
+      REDDIT_NAME: 1
+      REDDIT_FLAIR: 1
     services:
       # Label used to access the service container
       redis:
