@@ -1,6 +1,6 @@
 import {Expiring} from "../expiring";
 
-export type AuthenticationStateType = "discord" | "cookie" | "partner";
+export type AuthenticationStateType = "discord" | "reddit" | "cookie" | "partner";
 
 export type AuthenticationRole = (
     | "moderator"
@@ -22,6 +22,7 @@ export interface AuthenticationStateData extends Expiring, Record<string, unknow
     externalScope?: string;
     roles?: AuthenticationRole[];
     partnerId?: string;
+    redirectUrl?: string;
 }
 
 export interface AuthenticationState extends AuthenticationStateData {

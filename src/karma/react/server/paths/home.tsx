@@ -26,7 +26,8 @@ export function Home() {
                         <br />
                         <br />
                         <p>
-                            <a href="/api/authentication/discord/redirect" className="text-blue-600 hover:bg-white underline hover:underline-offset-2">Login with Discord</a>
+                            <a href="/api/authentication/discord/redirect" className="text-blue-600 hover:bg-white underline hover:underline-offset-2">Login with Discord</a><br/>
+                            <a href="/api/authentication/reddit/redirect" className="text-blue-600 hover:bg-white underline hover:underline-offset-2">Login with Reddit</a>
                         </p>
                         <br />
                         <br />

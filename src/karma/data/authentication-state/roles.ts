@@ -16,8 +16,13 @@ export const namedRoles: Record<AuthenticationRole, string> = {
 };
 
 export const alternativeRoleNames: Partial<Record<AuthenticationRole, string[]>> = {
+    member: [
+        "Contributor",
+        "Subscriber"
+    ],
     patient: [
-        "Prescribed Medical Cannabis"
+        "Prescribed Medical Cannabis",
+        "Medical Patient"
     ],
     pharmacy: [
         "Verified Pharmacy"
@@ -68,7 +73,8 @@ export function getAuthenticationRole(name: string): AuthenticationRole | undefi
 }
 
 export function getAuthenticationRoles(names: string[]): AuthenticationRole[] {
-    return names
+    const result = names
+        .filter(Boolean)
         .map((name): AuthenticationRole => {
             const lowerName = name.toLowerCase();
             for (const key of roles) {
@@ -82,4 +88,5 @@ export function getAuthenticationRoles(names: string[]): AuthenticationRole[] {
             return undefined;
         })
         .filter(Boolean);
+    return [...new Set(result)];
 }
