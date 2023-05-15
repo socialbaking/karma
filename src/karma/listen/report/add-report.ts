@@ -77,7 +77,7 @@ export async function addReportFromRequest(request: FastifyRequest): Promise<Rep
     if ((productText || productName) && !productId) {
         const products = await listProducts();
         const name = productText || productName
-        const matching = getMatchingProducts(products, name);
+        const matching = getMatchingProducts(products, name, true);
         if (matching.length > 1) {
             throw new Error(`Name "${name}" matches multiple products: ${matching.map(value => `"${value.productName}"`).join(", ")}`)
         }
