@@ -1,9 +1,10 @@
-import {useError, useMaybeBody, useMaybeResult, useQuery, useSortedProducts, useSubmitted} from "../data";
+import {useError, useMaybeBody, useMaybeResult, useProduct, useQuery, useSortedProducts, useSubmitted} from "../data";
 import {calculationSources} from "../../../calculations";
 import {ReportData, Report} from "../../../client";
 import {FastifyRequest} from "fastify";
 import {addReportFromRequest} from "../../../listen/report/add-report";
 import {background} from "../../../background";
+import {ProductListItem} from "../../client/components/product/list-item";
 
 export async function submit(request: FastifyRequest) {
     // 👀
@@ -27,6 +28,7 @@ export function Calculator() {
     const result = useMaybeResult<Report>();
     const error = useError();
     const { productName } = useQuery();
+    const submittedProduct = useProduct(body?.productId);
     return (
         <form name="calculator" action="/calculator" method="post">
             {error ? (
@@ -46,9 +48,20 @@ export function Calculator() {
                   <p>
                       Your calculation is being processed, please see <a href="/metrics" className="text-blue-600 hover:bg-white underline hover:underline-offset-2">Metrics</a><br/>
                       <br/>
-                      Report ID: {result.reportId}<br/>
-                      Product Name: {result.productName ?? result.productText}<br/>
-                      Product ID: {result.productId ?? "Product not found in database"}<br/>
+                      {
+                          submittedProduct ? (
+                              <ul className="list-none max-w-md">
+                                  <ProductListItem product={submittedProduct} />
+                              </ul>
+                          ) : (
+                              <>
+                                  Provided Name: {result.productText}<br/>
+                                  Product not found in database<br/>
+                                  Metrics stored, but not applied to daily metrics
+                              </>
+                          )
+                      }
+                      {(result.productId && !submittedProduct?.activeIngredients) ? "No active ingredients listed for product" : ""}
                       <br/>
                       <br/>
                       <hr />

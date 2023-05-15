@@ -141,9 +141,12 @@ export function useSortedProducts(query?: QueryRecord) {
     }, [products, categories, search]);
 }
 
-export function useProduct(productId: string): Product | undefined {
+export function useProduct(productId?: string): Product | undefined {
     const products = useProducts();
-    return useMemo(() => products.find(product => product.productId === productId), [products]);
+    return useMemo(() => {
+        if (!productId) return undefined;
+        return products.find(product => product.productId === productId)
+    }, [products, productId]);
 }
 
 export function useCategories() {

@@ -22,7 +22,7 @@ const PercentageLabel = React.memo(({ type, label, sortIndex }: PercentageLabelP
   </span>
 ));
 
-function ListItem({ product, category }: ProductProps) {
+export function ProductListItem({ product, category }: ProductProps) {
   const { productId, ...attributes } = product;
   const productUrl = `/calculator?productName=${encodeURIComponent(product.productName)}`;
 
@@ -76,4 +76,4 @@ function ListItem({ product, category }: ProductProps) {
   );
 }
 
-export default React.memo(ListItem);
+export default React.memo(ProductListItem);
