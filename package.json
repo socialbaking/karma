@@ -89,6 +89,7 @@
     "postinstall-postinstall": "^2.1.0",
     "qs": "^6.11.1",
     "react-dom": "^18.2.0",
+    "react-svg-line-chart": "^2.0.2",
     "redis": "^4.6.6",
     "redis-lock": "^1.0.0",
     "s-ago": "^2.2.0",
