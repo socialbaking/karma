@@ -3,10 +3,21 @@ import {calculationSources} from "../../../calculations";
 import {ReportData, Report} from "../../../client";
 import {FastifyRequest} from "fastify";
 import {addReportFromRequest} from "../../../listen/report/add-report";
+import {background} from "../../../background";
 
 export async function submit(request: FastifyRequest) {
     // 👀
-    return await addReportFromRequest(request);
+    const report = await addReportFromRequest(request);
+
+    // For now try to trigger the background job for the
+    // report processing.
+    //
+    // ... it will block the submission until then
+    //
+    // Later we will do this only on a schedule
+    await background();
+
+    return report;
 }
 
 export function Calculator() {
