@@ -4,42 +4,77 @@ import {MetricsGraph} from "../../client/components/graph";
 export function Metrics() {
     const metrics = useMetrics();
     const products = useProducts();
+
+
     return (
         <div className="metric-list">
-            {metrics.map((metric, index) => (
-                <div key={index} className="metric-list-item">
-                    <div className="metric-list-item-name">{metric.duration} {metric[metric.reportingDateKey]}</div>
-                    <br />
-                    {
-                        metric.products
-                            .map(({ productId, activeIngredients }) => {
-                                const product = products.find(product => product.productId === productId);
-                                if (!product) return undefined;
-                                return (
-                                    <div>
-                                        <strong>Product: {product.productName}</strong><br/>
-                                        <ul className="list-disc list-outside">
-                                            {
-                                                activeIngredients
-                                                    .sort((a, b) => {
-                                                        if (a.type !== b.type) return a.type > b.type ? -1 : 1;
-                                                        if (a.prefix && !b.prefix) return -1;
-                                                        if (b.prefix && !a.prefix) return 1;
-                                                        return a.value < b.value ? -1 : 1;
-                                                    })
-                                                    .map(({ type, unit, value, prefix }) => {
-                                                        return <li>{prefix || ""}{value} {unit} {type}</li>
-                                                    })
-                                            }
-                                        </ul>
-                                        <br />
-                                    </div>
-                                )
-                            })
-                    }
-                    <MetricsGraph metrics={[metric]} />
-                </div>
-            ))}
+            {metrics.map((metric, index) => {
+                return (
+                    <div key={index} className="metric-list-item">
+                        <div className="metric-list-item-name">{metric.duration} {metric[metric.reportingDateKey]}</div>
+                        <br />
+                        {
+                            metric.products
+                                .map(({ productId, activeIngredients }) => {
+                                    const product = products.find(product => product.productId === productId);
+                                    if (!product) return undefined;
+                                    const units = [...new Set(
+                                        activeIngredients.flatMap(value => value.unit)
+                                    )]
+                                    return (
+                                        <>
+                                            <details open>
+                                                <summary className="cursor-pointer"><strong>Product: {product.productName}</strong></summary>
+                                                <ul className="list-none">
+                                                    {
+                                                        units
+                                                            .map((unit, unitIndex) => {
+                                                                const labels = activeIngredients
+                                                                    .filter(value => value.unit === unit)
+                                                                    .sort((a, b) => {
+                                                                        if (a.type !== b.type) return a.type > b.type ? -1 : 1;
+                                                                        if (a.prefix && !b.prefix) return -1;
+                                                                        if (b.prefix && !a.prefix) return 1;
+                                                                        if (a.proportional) return b.proportional ? 0 : -1;
+                                                                        return a.value < b.value ? -1 : 1;
+                                                                    })
+                                                                    .map(({ type, unit, value, prefix, proportional }, index) => {
+                                                                        let valuePrefix = "",
+                                                                            valueSuffix = "";
+                                                                        if (metric.currencySymbol && unit.startsWith(`${metric.currencySymbol}/`)) {
+                                                                            valuePrefix = metric.currencySymbol;
+                                                                        } else if (!unit.includes("/")) {
+                                                                            valueSuffix = unit;
+                                                                        }
+                                                                        return <li key={index}>{type}: {prefix || ""}{valuePrefix}{value}{valueSuffix}{proportional ? " (active ingredient cost)" : ""}</li>
+                                                                    });
+                                                                return (
+                                                                    <li>
+                                                                        <details {...(unitIndex ? {} : {open: true})}>
+                                                                            <summary className="cursor-pointer"><strong>{unit}</strong></summary>
+                                                                            <ul className="list-none">
+                                                                                {labels}
+                                                                            </ul>
+                                                                        </details>
+                                                                    </li>
+                                                                )
+                                                            })
+
+
+                                                    }
+                                                </ul>
+                                            </details>
+                                            <br />
+                                            <hr />
+                                            <br />
+                                        </>
+                                    )
+                                })
+                        }
+                        <MetricsGraph metrics={[metric]} />
+                    </div>
+                )
+            })}
         </div>
     )
 }
