@@ -108,7 +108,8 @@ export async function redditAuthenticationRoutes(fastify: FastifyInstance) {
                     return;
                 }
 
-                const { redirectUrl } = state;
+                const { redirectUrl, type } = state;
+                ok(type === "reddit", "Expected type to be reddit");
 
                 const {
                     message,

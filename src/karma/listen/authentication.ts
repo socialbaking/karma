@@ -85,6 +85,7 @@ function createCookieAuth(fastify: FastifyInstance): FastifyAuthFunction {
         ok(unsignedCookie.valid, NOT_AUTHORIZED_ERROR_MESSAGE)
         const state = await getAuthenticationState(unsignedCookie.value);
         ok(state, NOT_AUTHORIZED_ERROR_MESSAGE);
+        ok(state.type === "cookie", NOT_AUTHORIZED_ERROR_MESSAGE);
         setAuthenticationState(state);
     }
 }

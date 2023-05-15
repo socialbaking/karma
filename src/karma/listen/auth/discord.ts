@@ -94,8 +94,9 @@ export async function discordAuthenticationRoutes(fastify: FastifyInstance) {
                     return;
                 }
 
-                const { externalScope: scope } = state;
+                const { externalScope: scope, type } = state;
 
+                ok(type === "discord", "Expected type to be discord");
                 ok(scope, "Expected externalScope with discord state");
 
                 const { access_token: accessToken } = await oauth.tokenRequest({
