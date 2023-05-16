@@ -8,6 +8,7 @@ export function Metrics() {
 
     return (
         <div className="metric-list">
+            <MetricsGraph metrics={metrics} duration="day" />
             {metrics.map((metric, index) => {
                 return (
                     <div key={index} className="metric-list-item">
@@ -71,7 +72,6 @@ export function Metrics() {
                                     )
                                 })
                         }
-                        <MetricsGraph metrics={[metric]} />
                     </div>
                 )
             })}

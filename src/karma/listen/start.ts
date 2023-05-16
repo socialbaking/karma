@@ -18,6 +18,8 @@ import {isLike, ok} from "../../is";
 import multipart from "@fastify/multipart";
 import formbody from "@fastify/formbody";
 import qs from "qs";
+import {REACT_CLIENT_DIRECTORY} from "../view";
+import files from "@fastify/static";
 
 const { pathname } = new URL(import.meta.url);
 const directory = dirname(pathname)
@@ -131,6 +133,10 @@ export async function create() {
 
     register(blippPlugin);
     register(corsPlugin);
+    register(files, {
+        root: REACT_CLIENT_DIRECTORY,
+        prefix: "/client"
+    })
 
     await setupSwagger(app);
 

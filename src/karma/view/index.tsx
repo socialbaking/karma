@@ -14,50 +14,19 @@ import {authenticate} from "../listen/authentication";
 import ServerCSS from "../react/server/server-css";
 import {getMaybeAuthenticationState, isAnonymous} from "../authentication";
 import {ok} from "../../is";
-import {readFile, stat} from "node:fs/promises";
-import {join, dirname, extname} from "node:path";
-import mime from "mime-types";
-import {createReadStream} from "fs";
+import {join, dirname} from "node:path";
 
 const { pathname } = new URL(import.meta.url);
 const DIRECTORY = dirname(pathname);
-const CLIENT_URL_PATHNAME = "/client";
-const REACT_CLIENT_DIRECTORY = join(DIRECTORY, "../react", `.${CLIENT_URL_PATHNAME}`);
+export const REACT_CLIENT_DIRECTORY = join(DIRECTORY, "../react/client");
 
 export async function viewRoutes(fastify: FastifyInstance) {
-
-    // TODO: Register view endpoints here
-
     const { ALLOW_ANONYMOUS_VIEWS } = process.env;
 
     fastify.get("/server.css", async (request, response) => {
         response.header("Content-Type", "text/css");
         response.send(ServerCSS);
-    })
-
-    fastify.get("/client/*", async (request, response) => {
-        ok(request.url.startsWith(CLIENT_URL_PATHNAME), `Expected url to start with ${CLIENT_URL_PATHNAME}`)
-        const path = join(
-            REACT_CLIENT_DIRECTORY,
-            request.url.replace(CLIENT_URL_PATHNAME, "./")
-        );
-        const isFile = await stat(path)
-            .then(stat => stat.isFile())
-            .catch(() => false);
-        console.log({ path, isFile });
-        if (!isFile) {
-            response.status(404);
-            response.send();
-            return;
-        }
-        response.header(
-            "Content-Type",
-            mime.contentType(extname(path)) || "application/octet-stream"
-        );
-        response.status(200);
-        response.send(await readFile(path));
-    })
-
+    });
 
     function createPathHandler(path: string, options?: Partial<KarmaServerProps>) {
 

@@ -10,6 +10,7 @@ export async function client() {
 }
 
 async function runGlobal() {
+    hiddenNoScript();
     menu();
 }
 

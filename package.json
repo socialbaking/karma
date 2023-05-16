@@ -60,6 +60,7 @@
     "@fastify/helmet": "^10.1.1",
     "@fastify/multipart": "^7.6.0",
     "@fastify/request-context": "^4.2.0",
+    "@fastify/static": "^6.10.1",
     "@fastify/swagger": "^8.3.1",
     "@fastify/swagger-ui": "^1.8.0",
     "@honeycombio/opentelemetry-node": "^0.4.0",

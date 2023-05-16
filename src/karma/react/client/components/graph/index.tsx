@@ -90,6 +90,10 @@ function getXY(props: ProductMetricsProps, metric: ProductValue) {
         x,
         y,
         ms,
+        width,
+        height,
+        minValue,
+        maxValue,
         first: first.toString,
         date: metric.date.toString()
     })
