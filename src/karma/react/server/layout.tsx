@@ -2,6 +2,7 @@ import {PropsWithChildren} from "react";
 import {description, namespace, project} from "../../package";
 import {getOrigin} from "../../listen/config";
 import {useQuery} from "./data";
+import {CannabisSolidIcon} from "../client/components/icons";
 
 export interface LayoutProps {
     title?: string;
@@ -50,6 +51,10 @@ const items = [
     //     )
     // },
 ] as const;
+
+function Logo() {
+    return <CannabisSolidIcon className="h-8 w-auto fill-white" title="Social Baking Karma" />;
+}
 
 export function BaseLayout({ children, title }: PropsWithChildren<LayoutProps>) {
     const script = `
@@ -104,9 +109,7 @@ export function AnonymousLayout(props: PropsWithChildren<LayoutProps>) {
                         <div className="flex h-16 items-center justify-between">
                             <div className="flex items-center">
                                 <div className="flex-shrink-0">
-                                    <img className="h-8 w-8"
-                                         src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=300"
-                                         alt="Your Company" />
+                                    <Logo />
                                 </div>
                                 <div className="hidden md:block">
                                     <div className="ml-10 flex items-baseline space-x-4">
@@ -203,7 +206,7 @@ export function Layout(props: PropsWithChildren<LayoutProps>) {
                             {/* Sidebar component, swap this element with another sidebar if you like */}
                             <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-indigo-600 px-6 pb-4">
                                 <div className="flex h-16 shrink-0 items-center">
-                                    <img className="h-8 w-auto" src="https://tailwindui.com/img/logos/mark.svg?color=white" alt="Your Company" />
+                                    <Logo />
                                 </div>
                                 <nav className="flex flex-1 flex-col">
                                     <ul role="list" className="flex flex-1 flex-col gap-y-7">
@@ -240,7 +243,7 @@ export function Layout(props: PropsWithChildren<LayoutProps>) {
                     {/* Sidebar component, swap this element with another sidebar if you like */}
                     <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-indigo-600 px-6 pb-4">
                         <div className="flex h-16 shrink-0 items-center">
-                            <img className="h-8 w-auto" src="https://tailwindui.com/img/logos/mark.svg?color=white" alt="Your Company" />
+                            <Logo />
                         </div>
                         <nav className="flex flex-1 flex-col">
                             <ul role="list" className="flex flex-1 flex-col gap-y-7">

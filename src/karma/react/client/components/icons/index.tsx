@@ -14,6 +14,7 @@ export * from "./scale";
 export * from "./eye-dropper";
 export * from "./wrench";
 export * from "./cannabis";
+export * from "./cannabis-solid";
 export * from "./prescription-bottle";
 export * from "./svg-text";
 
