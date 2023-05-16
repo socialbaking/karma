@@ -15,9 +15,14 @@ async function runGlobal() {
 
 function menu() {
 
-    const backdrop = document.getElementById("sidebar-backdrop");
+    const sidebar = transition({
+       query: ".sidebar",
+       entering: "relative z-50 lg:hidden",
+       leaving: "hidden"
+    });
+
     const backdropTransition = transition({
-        element: backdrop,
+        query: ".sidebar-backdrop",
         entering: "transition-opacity ease-linear duration-300",
         enteringFrom: "opacity-0",
         enteringTo: "opacity-100",
@@ -26,9 +31,8 @@ function menu() {
         leavingTo: "opacity-0",
     })
 
-    const closeButton = document.getElementById("sidebar-close-button");
     const closeButtonTransition = transition({
-        element: closeButton,
+        query: ".sidebar-close-button",
         entering: "ease-in-out duration-300",
         enteringFrom: "opacity-0",
         enteringTo: "opacity-100",
@@ -37,9 +41,8 @@ function menu() {
         leavingTo: "opacity-0",
     });
 
-    const menu = document.getElementById("sidebar-menu");
     const menuTransition = transition({
-        element: menu,
+        query: ".sidebar-menu",
         entering: "transition ease-in-out duration-300 transform",
         enteringFrom: "-translate-x-full",
         enteringTo: "translate-x-0",
@@ -53,71 +56,86 @@ function menu() {
     reset(); // Ensure its closed
 
     interface TransitionEvent {
-        element: Element;
+        query: string;
         entering: string;
-        enteringFrom: string;
-        enteringTo: string;
+        enteringFrom?: string;
+        enteringTo?: string;
         leaving: string;
-        leavingFrom: string;
-        leavingTo: string;
+        leavingFrom?: string;
+        leavingTo?: string;
     }
     
     function transition(event: TransitionEvent) {
-        const { element } = event;
+        const elements = document.querySelectorAll(event.query);
         const entering = event.entering.split(" ");
-        const enteringFrom = event.enteringFrom.split(" ");
-        const enteringTo = event.enteringTo.split(" ");
+        const enteringFrom = event.enteringFrom?.split(" ") ?? [];
+        const enteringTo = event.enteringTo?.split(" ") ?? [];
         const leaving = event.leaving.split(" ");
-        const leavingFrom = event.leavingFrom.split(" ");
-        const leavingTo = event.leavingTo.split(" ");
+        const leavingFrom = event.leavingFrom?.split(" ") ?? [];
+        const leavingTo = event.leavingTo?.split(" ") ?? [];
         return {
             entering() {
-                element.classList.remove(...leaving.filter(value => entering.includes(value)));
-                element.classList.remove(...enteringFrom);
-                element.classList.add(...entering);
-                element.classList.add(...enteringTo);
+                elements.forEach(element => {
+                    element.classList.remove(...leaving);
+                    element.classList.remove(...enteringFrom);
+                    element.classList.add(...entering);
+                    element.classList.add(...enteringTo);
+                })
             },
             leaving() {
-                element.classList.remove(...entering.filter(value => leaving.includes(value)));
-                element.classList.remove(...leavingFrom);
-                element.classList.add(...leaving);
-                element.classList.add(...leavingTo);
+                elements.forEach(element => {
+                    element.classList.remove(...entering);
+                    element.classList.remove(...leavingFrom);
+                    element.classList.add(...leaving);
+                    element.classList.add(...leavingTo);
+                })
             },
             leave() {
                 const add = leaving.filter(value => value !== "transition");
-                element.classList.remove(...entering);
-                element.classList.remove(...enteringTo);
-                element.classList.remove(...leavingFrom);
-                element.classList.add(...add);
+                elements.forEach(element => {
+                    element.classList.remove(...entering);
+                    element.classList.remove(...enteringTo);
+                    element.classList.remove(...leavingFrom);
+                    element.classList.add(...add);
+                })
             }
         } as const;
     }
 
     function openButtonEvents() {
-        const element = document.getElementById("sidebar-open-button");
-        element.addEventListener("click", open);
+        const elements = document.querySelectorAll(".sidebar-open-button");
+        elements.forEach(element => {
+            element.addEventListener("click", open);
+        })
     }
 
     function closeButtonEvents() {
-        closeButton.addEventListener("click", close);
+        const elements = document.querySelectorAll(".sidebar-close-button");
+        elements.forEach(element => {
+            element.addEventListener("click", close);
+        })
     }
 
     function open() {
-        console.log("entering");
+        console.log("open");
         backdropTransition.entering();
         closeButtonTransition.entering();
         menuTransition.entering();
+        sidebar.entering();
     }
 
     function close() {
+        console.log("close");
         backdropTransition.leaving();
         closeButtonTransition.leaving();
         menuTransition.leaving();
+        sidebar.leaving();
     }
 
     function reset() {
         backdropTransition.leave();
         closeButtonTransition.leave();
         menuTransition.leave();
+        sidebar.leave();
     }
 }

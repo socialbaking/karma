@@ -74,10 +74,12 @@ export function BaseLayout({ children, title }: PropsWithChildren<LayoutProps>) 
         <div className="flex items-center gap-x-6 bg-gray-900 px-6 py-2.5 sm:px-3.5 sm:before:flex-1 sm:after:flex-1 justify-center">
             <p className="text-sm leading-6 text-white">
                 <span className="flex items-center flex-row justify-center">
-                    <strong className="font-semibold">This software is still being refined</strong>&nbsp;
+                    <strong className="font-semibold">This software is still being refined</strong>
+                    &nbsp;&nbsp;
                     <svg viewBox="0 0 2 2" className="hidden lg:block mx-2 inline h-0.5 w-0.5 fill-current" aria-hidden="true">
                         <circle cx="1" cy="1" r="1"/>
                     </svg>
+                    &nbsp;&nbsp;
                     <span>
                         Data displayed is not currently verified or checked, and will be removed without further notice.<br />
                         Data is intended to be used only for user experience testing.
@@ -139,7 +141,7 @@ export function Layout(props: PropsWithChildren<LayoutProps>) {
         <BaseLayout {...props}>
             <div>
                 {/* Off-canvas menu for mobile, show/hide based on off-canvas menu state. */}
-                <div className="relative z-50 lg:hidden" role="dialog" aria-modal="true">
+                <div className="hidden sidebar" role="dialog" aria-modal="true">
                     {/*
                       Off-canvas menu backdrop, show/hide based on off-canvas menu state.
                 
@@ -150,7 +152,7 @@ export function Layout(props: PropsWithChildren<LayoutProps>) {
                         From: "opacity-100"
                         To: "opacity-0"
                     */}
-                    <div className="fixed inset-0 bg-gray-900/80" id="sidebar-backdrop"></div>
+                    <div className="fixed inset-0 bg-gray-900/80 sidebar-backdrop" />
 
                     <div className="fixed inset-0 flex">
                         {/*
@@ -163,7 +165,7 @@ export function Layout(props: PropsWithChildren<LayoutProps>) {
                             From: "translate-x-0"
                             To: "-translate-x-full"
                         */}
-                        <div className="relative mr-16 flex w-full max-w-xs flex-1" id="sidebar-menu">
+                        <div className="relative mr-16 flex w-full max-w-xs flex-1 sidebar-menu">
                             {/*
                               Close button, show/hide based on off-canvas menu state.
                     
@@ -175,7 +177,7 @@ export function Layout(props: PropsWithChildren<LayoutProps>) {
                                 To: "opacity-0"
                             */}
                             <div className="absolute left-full top-0 flex w-16 justify-center pt-5">
-                                <button type="button" id="sidebar-close-button" className="-m-2.5 p-2.5">
+                                <button type="button" className="sidebar-close-button -m-2.5 p-2.5">
                                     <span className="sr-only">Close sidebar</span>
                                     <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" aria-hidden="true">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -255,7 +257,7 @@ export function Layout(props: PropsWithChildren<LayoutProps>) {
 
                 <div className="lg:pl-72">
                     <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
-                        <button type="button" id="sidebar-open-button" className="-m-2.5 p-2.5 text-gray-700 lg:hidden">
+                        <button type="button" className="sidebar-open-button -m-2.5 p-2.5 text-gray-700 lg:hidden">
                             <span className="sr-only">Open sidebar</span>
                             <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" aria-hidden="true">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
