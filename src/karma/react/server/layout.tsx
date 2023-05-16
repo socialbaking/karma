@@ -140,8 +140,23 @@ export function Layout(props: PropsWithChildren<LayoutProps>) {
     return (
         <BaseLayout {...props}>
             <div>
+                <noscript className="lg:hidden">
+                    <ul role="list" className="-mx-2 space-y-1 list-none">
+                        {items.map(({ path, name, icon }, index) => (
+                            <li key={index}>
+                                <a href={path} className="text-blue-600 hover:bg-white underline hover:underline-offset-2 flex flex-row align-center justify-left p-4">
+                                    {icon}
+                                    <span className="px-4">
+                                        {name}
+                                    </span>
+                                </a>
+                            </li>
+                        ))}
+                    </ul>
+                    <hr />
+                </noscript>
                 {/* Off-canvas menu for mobile, show/hide based on off-canvas menu state. */}
-                <div className="hidden sidebar" role="dialog" aria-modal="true">
+                <div className="hidden sidebar lg:hidden" role="dialog" aria-modal="true">
                     {/*
                       Off-canvas menu backdrop, show/hide based on off-canvas menu state.
                 
@@ -257,7 +272,7 @@ export function Layout(props: PropsWithChildren<LayoutProps>) {
 
                 <div className="lg:pl-72">
                     <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
-                        <button type="button" className="sidebar-open-button -m-2.5 p-2.5 text-gray-700 lg:hidden">
+                        <button type="button" className="hidden script-visible sidebar-open-button -m-2.5 p-2.5 text-gray-700 lg:hidden">
                             <span className="sr-only">Open sidebar</span>
                             <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" aria-hidden="true">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
@@ -265,7 +280,7 @@ export function Layout(props: PropsWithChildren<LayoutProps>) {
                         </button>
 
                         {/* Separator */}
-                        <div className="h-6 w-px bg-gray-900/10 lg:hidden" aria-hidden="true"></div>
+                        <div className="h-6 w-px bg-gray-900/10 lg:hidden hidden script-visible" aria-hidden="true"></div>
 
                         <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
                             <form className="relative flex flex-1" action="/products" method="GET">

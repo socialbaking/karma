@@ -13,6 +13,18 @@ async function runGlobal() {
     menu();
 }
 
+function hiddenNoScript() {
+    // Remove hidden from any elements that were hidden
+    // for js only functionality
+    //
+    // .hidden is the actual hiding class
+    // .script-visible is our trigger to remove it
+    const elements = document.querySelectorAll(".hidden.script-visible");
+    elements.forEach(element => {
+        element.classList.remove("script-visible", "hidden");
+    })
+}
+
 function menu() {
 
     const sidebar = transition({
@@ -105,6 +117,7 @@ function menu() {
     function openButtonEvents() {
         const elements = document.querySelectorAll(".sidebar-open-button");
         elements.forEach(element => {
+            // Enable the button with javascript being available
             element.addEventListener("click", open);
         })
     }
