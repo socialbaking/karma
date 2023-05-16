@@ -60,7 +60,7 @@ export async function viewRoutes(fastify: FastifyInstance) {
                         authorizedOrganisationId: getMaybeAuthorizedForOrganisationId()
                     })}
                     categories={anonymous ? [] : await listCategories()}
-                    metrics={(!anonymous && path.includes("metrics")) ? await listMetrics() : undefined}
+                    metrics={anonymous ? [] : await listMetrics()}
                     products={anonymous ? [] : await listProducts()}
                     roles={state?.roles}
                     query={request.query}

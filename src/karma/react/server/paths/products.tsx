@@ -1,4 +1,11 @@
-import {useCategory, useCopyrightInformation, useQuery, useSortedProducts} from "../data";
+import {
+    useCategory,
+    useCopyrightInformation,
+    useMetrics,
+    useProductMetrics,
+    useQuery,
+    useSortedProducts
+} from "../data";
 import ClientProductListItem, { ProductProps } from "../../client/components/product/list-item";
 import {SvgTextIcon} from "../../client/components/icons";
 
@@ -7,17 +14,17 @@ function ProductListItem(props: ProductProps) {
     return <ClientProductListItem {...props} category={category} />
 }
 
-
 export function Products() {
     const query = useQuery();
     const products = useSortedProducts(query);
-    const copyright = useCopyrightInformation(products)
+    const copyright = useCopyrightInformation(products);
+    const metrics = useProductMetrics("month");
     return (
         <>
             <div className="bg-white shadow overflow-hidden sm:rounded-md">
                 <ul role="list" className="divide-y divide-gray-200">
                     {products.map((product, index) => (
-                        <ProductListItem key={index} product={product} />
+                        <ProductListItem key={index} product={product} metrics={metrics[product.productId]} />
                     ))}
                 </ul>
             </div>

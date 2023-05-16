@@ -4,12 +4,14 @@ import {
     CountryProductMetrics,
     Partner,
     Product,
-    Organisation
+    Organisation,
+    CountryProductMetricDuration, ProductMetricData, ActiveIngredientMetrics
 } from "../../../data";
 import {createContext, useContext, useMemo} from "react";
 import {ok} from "../../../../is";
 import {getMatchingProducts} from "../../../utils";
 import {COPYRIGHT_LINK, COPYRIGHT_SVG_TEXT, COPYRIGHT_TEXT} from "../../../static";
+import {SingleProductMetrics} from "../../client/data";
 
 export interface Data {
     body?: unknown;
@@ -24,7 +26,7 @@ export interface Data {
     categories: Category[];
     partners: Partner[];
     organisations: Organisation[];
-    metrics?: CountryProductMetrics[];
+    metrics: CountryProductMetrics[];
     roles?: AuthenticationRole[];
 }
 
@@ -188,6 +190,37 @@ export function useOrganisation(organisationId: string) {
 export function useMetrics() {
     const { metrics } = useData();
     return useMemo(() => metrics || [], [metrics]);
+}
+
+export type ProductMetricsRecord = Record<string, SingleProductMetrics>;
+
+export function useProductMetrics(duration: CountryProductMetricDuration = "day"): ProductMetricsRecord {
+    const metrics = useMetrics();
+    return useMemo(() => {
+        const durationMetrics = metrics
+            .filter(value => value.duration === duration);
+        const productIds = new Set(
+            durationMetrics
+                .flatMap<string>(value => value.products.map(product => product.productId))
+        );
+        const results: ProductMetricsRecord = {};
+        let countryCode: string | undefined = undefined;
+        for (const productId of productIds) {
+            let matchingMetrics = durationMetrics
+                .filter(value => value.products.find(product => product.productId === productId));
+            ok(matchingMetrics.length);
+            const products = matchingMetrics
+                .flatMap<ProductMetricData>(value => value.products.filter(
+                    product => product.productId === productId
+                ));
+            results[productId] = {
+                metrics: matchingMetrics,
+                products
+            };
+        }
+        console.log(results);
+        return results;
+    }, [metrics, duration]);
 }
 
 export function useMonthlyMetrics() {
