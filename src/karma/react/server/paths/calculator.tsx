@@ -1,10 +1,20 @@
-import {useError, useMaybeBody, useMaybeResult, useProduct, useQuery, useSortedProducts, useSubmitted} from "../data";
+import {
+    useError,
+    useMaybeBody,
+    useMaybeResult,
+    useMetrics,
+    useProduct, useProductMetrics,
+    useQuery,
+    useSortedProducts,
+    useSubmitted
+} from "../data";
 import {calculationSources} from "../../../calculations";
 import {ReportData, Report} from "../../../client";
 import {FastifyRequest} from "fastify";
 import {addReportFromRequest} from "../../../listen/report/add-report";
 import {background} from "../../../background";
 import {ProductListItem} from "../../client/components/product/list-item";
+import {getReportMetrics, ReportMetrics} from "../../../data";
 
 export async function submit(request: FastifyRequest) {
     // 👀
@@ -18,17 +28,21 @@ export async function submit(request: FastifyRequest) {
     // Later we will do this only on a schedule
     await background();
 
-    return report;
+    return {
+        report,
+        metrics: await getReportMetrics(report.reportId)
+    };
 }
 
 export function Calculator() {
     const products = useSortedProducts();
     const body = useMaybeBody<ReportData>();
     const submitted = useSubmitted();
-    const result = useMaybeResult<Report>();
+    const result = useMaybeResult<{ report: Report, metrics: ReportMetrics }>();
     const error = useError();
     const { productName } = useQuery();
     const submittedProduct = useProduct(body?.productId);
+    const metrics = useProductMetrics("month");
     return (
         <form name="calculator" action="/calculator" method="post">
             {error ? (
@@ -50,18 +64,21 @@ export function Calculator() {
                       <br/>
                       {
                           submittedProduct ? (
-                              <ul className="list-none max-w-md">
-                                  <ProductListItem product={submittedProduct} />
+                              <ul className="list-none">
+                                  <ProductListItem report={!!result.metrics} product={submittedProduct} metrics={result.metrics ? ({
+                                      metrics: [result.metrics],
+                                      products: result.metrics.products
+                                  }) : metrics[submittedProduct.productId]} />
                               </ul>
                           ) : (
                               <>
-                                  Provided Name: {result.productText}<br/>
+                                  Provided Name: {result.report.productText}<br/>
                                   Product not found in database<br/>
                                   Metrics stored, but not applied to daily metrics
                               </>
                           )
                       }
-                      {(result.productId && !submittedProduct?.activeIngredients) ? "No active ingredients listed for product" : ""}
+                      {(result.report.productId && !submittedProduct?.activeIngredients) ? "No active ingredients listed for product" : ""}
                       <br/>
                       <br/>
                       <hr />

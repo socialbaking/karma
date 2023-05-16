@@ -2,23 +2,24 @@ import React, {PropsWithChildren, useMemo} from "react";
 import {Category, Product} from "../../../../client";
 import {CalendarIcon, CategoryIcon, GlobeIcon, PrescriptionBottleIcon} from "../icons";
 import {ActiveIngredient, useActiveIngredients} from "./utils";
-import {SingleProductMetrics, useMetric} from "../../data";
+import {SingleProductMetrics, useMetrics, useMetricMatch} from "../../data";
 import {ActiveIngredientMetrics} from "../../../../data";
 import {isNumberString} from "../../../../calculations";
 
 export interface ProductProps {
   product: Product;
   metrics?: SingleProductMetrics;
+  report?: boolean;
   category?: Category;
 }
 
 export interface PercentageLabelProps extends ActiveIngredient {
-
+    className?: string
 }
 
-const PercentageLabel = React.memo(({ type, label, sortIndex }: PercentageLabelProps) => (
+const PercentageLabel = React.memo(({ type, label, sortIndex, className }: PercentageLabelProps) => (
     <Label
-        className={sortIndex === 0 ? "bg-green-400" : "bg-green-100"}
+        className={`${sortIndex === 0 ? "bg-green-400" : "bg-green-100"} ${className || ""}`}
     >
       {label} {type}
     </Label>
@@ -42,14 +43,19 @@ function trimNumber(value: string | number) {
 }
 
 function toMetricLabel(metric: ActiveIngredientMetrics) {
-    const { unit } = metric;
+    const { unit, type } = metric;
     let prefix,
         suffix = toMetricTypeName(unit);
+    let valueUnit = unit;
     if (unit.includes("/")) {
         const [start, ...restSplit] = unit.split("/");
         const rest = restSplit.join("/");
+        valueUnit = rest;
         prefix = start;
         suffix = `per ${toMetricTypeName(rest)}`
+    }
+    if (valueUnit !== type) {
+        suffix = `${suffix} of ${type}`;
     }
     return `${prefix}${trimNumber(metric.value)} ${suffix}`;
 }
@@ -64,14 +70,18 @@ function toMetricTypeName(value: string): string {
     return value;
 }
 
-export function ProductListItem({ product, category, metrics }: ProductProps) {
-  const { productId, ...attributes } = product;
+export function ProductListItem({ product, category, metrics: allMetrics, report: isReporting }: ProductProps) {
+  const { productId, sizes, ...attributes } = product;
   const productUrl = `/calculator?productName=${encodeURIComponent(product.productName)}`;
 
   const ingredients = useActiveIngredients(product);
-  const metric = useMetric(metrics, {
-      unit: "$/g",
-      type: "g",
+  const sizeUnit = sizes?.[0]?.unit;
+  const unit = sizeUnit || "g";
+  const metrics = useMetrics(allMetrics, {
+      unit: `$/${unit}`
+  });
+  const unitMetric = useMetricMatch(metrics, {
+      type: unit,
       numeric: true
   });
 
@@ -79,25 +89,57 @@ export function ProductListItem({ product, category, metrics }: ProductProps) {
     <li>
       <a href={productUrl} className="block hover:bg-gray-50">
         <div className="px-4 py-4 sm:px-6">
-          <div className="flex items-center justify-between">
-            <p className="text-sm font-medium text-indigo-600 flex flex-row align-start">
-                <span className="truncate">
+          <div className="flex items-center justify-between flex-wrap">
+            <div className={`text-sm font-medium text-indigo-600 flex flex-wrap mb-4 ${isReporting ? "flex-col" : "flex-row align-start"}`}>
+                <div className="truncate">
                     {attributes?.productName}
-                </span>
-                {
-                    metric ? (
-                        <Label>
-                            {toMetricLabel(metric)}
-                        </Label>
+                </div>
+                <div className="flex flex-col">
+                    {
+                        isReporting ? (
+                            metrics
+                                .filter(value => !value.proportional)
+                                .map(
+                                    (metric, index) => (
+                                        <Label key={index} className="mt-1">
+                                            {toMetricLabel(metric)}
+                                        </Label>
+                                    )
+                                )
+                        ) : (
+                            unitMetric ? (
+                                <Label>
+                                    {toMetricLabel(unitMetric)}
+                                </Label>
+                            ) : undefined
+                        )
+                    }
+                </div>
+            </div>
+            <div className="ml-2 flex-shrink-0 flex flex-col align-start justify-end mb-4">
+              <div className="flex flex-row">
+                  {
+                      ingredients.map((value, index) => (
+                          <PercentageLabel key={index} {...value} className="ml-1" />
+                      ))
+                  }
+              </div>
+              {
+                    product.sizes?.length ? (
+                        <div className="flex items-center text-sm text-gray-500 justify-end flex-row mt-2">
+                            <PrescriptionBottleIcon
+                                className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
+                                aria-hidden="true"
+                            />
+                            <p>
+                                Available in {product.sizes.map(({ value, unit }, index, array) => {
+                                const isLast = index && array.length === (index + 1);
+                                return `${isLast ? "& " : ""}${value}${unit}`
+                            }).join(", ")}
+                            </p>
+                        </div>
                     ) : undefined
                 }
-            </p>
-            <div className="ml-2 flex-shrink-0 flex">
-              {
-                ingredients.map((value, index) => (
-                    <PercentageLabel key={index} {...value} />
-                ))
-              }
             </div>
           </div>
           <div className="mt-2 sm:flex sm:justify-between">
@@ -111,22 +153,6 @@ export function ProductListItem({ product, category, metrics }: ProductProps) {
                 ) : undefined
               }
             </div>
-            {
-              product.sizes?.length ? (
-                  <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
-                    <PrescriptionBottleIcon
-                        className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
-                        aria-hidden="true"
-                    />
-                    <p>
-                      Available in {product.sizes.map(({ value, unit }, index, array) => {
-                      const isLast = index && array.length === (index + 1);
-                      return `${isLast ? "& " : ""}${value}${unit}`
-                    }).join(", ")}
-                    </p>
-                  </div>
-              ) : undefined
-            }
           </div>
         </div>
       </a>
