@@ -6,8 +6,6 @@ export interface ProductReportData {
     productPurchaseTotalCost: `${number}` | number;
     productPurchaseItems: `${number}` | number;
     productPurchaseItemCost: `${number}` | number;
-    productPurchaseDeliveryCost: `${number}` | number;
-    productPurchaseFeeCost?: `${number}` | number;
 }
 
 export function isProductReport(report: Report): report is (Report & ProductReportData) {
@@ -19,15 +17,7 @@ export function isProductReportData(report: ReportData): report is (ReportData &
         report.productPurchase &&
         isNumberString(report.productPurchaseTotalCost) &&
         isNumberString(report.productPurchaseItemCost) &&
-        isNumberString(report.productPurchaseItems) &&
-        isNumberString(report.productPurchaseDeliveryCost) &&
-        (
-            (
-                !report.productPurchaseFeeCost &&
-                typeof report.productPurchaseFeeCost !== "string"
-            ) ||
-            isNumberString(report.productPurchaseFeeCost)
-        )
+        isNumberString(report.productPurchaseItems)
     )
 }
 

@@ -13,6 +13,11 @@ export interface ProductProps {
   category?: Category;
 }
 
+export interface ProductItemProps extends ProductProps {
+    className?: string;
+    overrideClassName?: string;
+}
+
 export interface PercentageLabelProps extends ActiveIngredient {
     className?: string
 }
@@ -70,7 +75,7 @@ function toMetricTypeName(value: string): string {
     return value;
 }
 
-export function ProductListItem({ product, category, metrics: allMetrics, report: isReporting }: ProductProps) {
+export function ProductListItem({ product, category, metrics: allMetrics, report: isReporting, overrideClassName, className }: ProductItemProps) {
   const { productId, sizes, ...attributes } = product;
   const productUrl = `/calculator?productName=${encodeURIComponent(product.productName)}`;
 
@@ -87,11 +92,10 @@ export function ProductListItem({ product, category, metrics: allMetrics, report
 
   return (
     <li>
-      <a href={productUrl} className="block hover:bg-gray-50">
-        <div className="px-4 py-4 sm:px-6">
-          <div className="flex items-center justify-between flex-wrap">
+      <a href={productUrl} className={overrideClassName ?? `block hover:bg-gray-50 px-4 py-4 sm:px-6 ${className || ""}`}>
+          <div className="flex justify-between flex-wrap">
             <div className={`text-sm font-medium text-indigo-600 flex flex-wrap mb-4 ${isReporting ? "flex-col" : "flex-row align-start"}`}>
-                <div className="truncate">
+                <div className="truncate mr-1">
                     {attributes?.productName}
                 </div>
                 <div className="flex flex-col">
@@ -116,7 +120,7 @@ export function ProductListItem({ product, category, metrics: allMetrics, report
                     }
                 </div>
             </div>
-            <div className="ml-2 flex-shrink-0 flex flex-col align-start justify-end mb-4">
+            <div className="ml-2 flex-shrink-0 flex flex-col align-start justify-between mb-4">
               <div className="flex flex-row">
                   {
                       ingredients.map((value, index) => (
@@ -154,7 +158,6 @@ export function ProductListItem({ product, category, metrics: allMetrics, report
               }
             </div>
           </div>
-        </div>
       </a>
     </li>
   );

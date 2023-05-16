@@ -58,3 +58,8 @@ export function getCompleteCalculationConsent(): CalculationConsentItem[] {
         })
     )
 }
+
+export function hasConsent(consent: CalculationConsentItem[] | undefined, calculationKey: string) {
+    if (!consent) return false;
+    return !!consent.find(value => value.calculationKey === calculationKey && (value.consented || value.consentedAt))
+}

@@ -2,7 +2,7 @@ import {FastifyInstance, FastifyReply, FastifyRequest} from "fastify";
 import {addReport, CalculationConsentItem, listProducts, Report, ReportData, reportSchema} from "../../data";
 import {authenticate} from "../authentication";
 import {isAnonymous} from "../../authentication";
-import {isProductReport, isProductReportData} from "../../calculations";
+import {isNumberString, isProductReport, isProductReportData} from "../../calculations";
 import {REPORTING_DATE_KEY} from "../../background";
 import {ok} from "../../../is";
 import {getMatchingProducts} from "../../utils";
@@ -56,7 +56,15 @@ export async function addReportFromRequest(request: FastifyRequest): Promise<Rep
             consented,
             consentedAt: consented ? (value.consentedAt || new Date().toISOString()) : undefined
         };
-    });
+    }).filter(value => value.consented);
+
+    if (!productPurchaseFeeCost) {
+        productPurchaseFeeCost = "0";
+    }
+
+    if (!productPurchaseDeliveryCost) {
+        productPurchaseDeliveryCost = "0";
+    }
 
     const withTotal = { ...request.body, productPurchaseTotalCost: "1" };
     if (!productPurchaseTotalCost && isProductReportData(withTotal)) {
@@ -67,11 +75,15 @@ export async function addReportFromRequest(request: FastifyRequest): Promise<Rep
             productPurchaseItems,
         } = withTotal;
 
-        productPurchaseTotalCost = (
+        const numeric = (
             ((+productPurchaseItems) * (+productPurchaseItemCost)) +
-            (+productPurchaseFeeCost) +
-            (+productPurchaseDeliveryCost)
-        ).toFixed(2);
+            (productPurchaseFeeCost ? +productPurchaseFeeCost : 0) +
+            (productPurchaseDeliveryCost ? +productPurchaseDeliveryCost : 0)
+        );
+
+        if (!isNaN(numeric)) {
+            productPurchaseTotalCost = numeric.toFixed(2);
+        }
     }
 
     if ((productText || productName) && !productId) {
@@ -90,6 +102,18 @@ export async function addReportFromRequest(request: FastifyRequest): Promise<Rep
         if (product.sizes?.length === 1) {
             productSize = product.sizes[0];
         }
+    }
+
+    if (!(productId || productName || productText)) {
+        throw new Error("No product name provided");
+    }
+
+    if (!(isNumberString(productPurchaseItemCost) || isNumberString(productPurchaseTotalCost))) {
+        throw new Error("Expected item cost");
+    }
+
+    if (!isNumberString(productPurchaseItems)) {
+        throw new Error("Expected item count");
     }
 
     const data: ReportData = {

@@ -8,7 +8,7 @@ import {
     useSortedProducts,
     useSubmitted
 } from "../data";
-import {calculationSources} from "../../../calculations";
+import {calculationSources, hasConsent} from "../../../calculations";
 import {ReportData, Report} from "../../../client";
 import {FastifyRequest} from "fastify";
 import {addReportFromRequest} from "../../../listen/report/add-report";
@@ -34,59 +34,31 @@ export async function submit(request: FastifyRequest) {
     };
 }
 
+const FORM_CLASS = `
+mt-1
+block
+w-full
+md:max-w-sm
+rounded-md
+border-gray-300
+shadow-sm
+focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50
+disabled:bg-slate-300 disabled:cursor-not-allowed
+`.trim();
+
+const FORM_GROUP_CLASS = `block py-2`;
+
 export function Calculator() {
     const products = useSortedProducts();
     const body = useMaybeBody<ReportData>();
     const submitted = useSubmitted();
-    const result = useMaybeResult<{ report: Report, metrics: ReportMetrics }>();
+    const result = useMaybeResult<{ report: Report, metrics?: ReportMetrics }>();
     const error = useError();
     const { productName } = useQuery();
     const submittedProduct = useProduct(body?.productId);
     const metrics = useProductMetrics("month");
     return (
-        <form name="calculator" action="/calculator" method="post">
-            {error ? (
-                <>
-                    <div className="pointer-events-auto flex items-center justify-between gap-x-6 bg-red-400 px-6 py-2.5 sm:rounded-xl sm:py-3 sm:pl-4 sm:pr-3.5">
-                        <p className="text-sm leading-6 text-white">
-                            {error instanceof Error ? error.message : String(error)}
-                        </p>
-                    </div>
-                    <br/>
-                    <br/>
-                </>
-            ) : undefined}
-            {
-              submitted && result ? (
-
-                  <p>
-                      Your calculation is being processed, please see <a href="/metrics" className="text-blue-600 hover:bg-white underline hover:underline-offset-2">Metrics</a><br/>
-                      <br/>
-                      {
-                          submittedProduct ? (
-                              <ul className="list-none">
-                                  <ProductListItem report={!!result.metrics} product={submittedProduct} metrics={result.metrics ? ({
-                                      metrics: [result.metrics],
-                                      products: result.metrics.products
-                                  }) : metrics[submittedProduct.productId]} />
-                              </ul>
-                          ) : (
-                              <>
-                                  Provided Name: {result.report.productText}<br/>
-                                  Product not found in database<br/>
-                                  Metrics stored, but not applied to daily metrics
-                              </>
-                          )
-                      }
-                      {(result.report.productId && !submittedProduct?.activeIngredients) ? "No active ingredients listed for product" : ""}
-                      <br/>
-                      <br/>
-                      <hr />
-                      <br/>
-                      <br/>
-                  </p>
-              ) : undefined
-            }
+        <form name="calculator" action="/calculator#action-section" method="post">
             {
                 result ? (
                     <script type="application/json" id="result" dangerouslySetInnerHTML={{__html: JSON.stringify(result, undefined, "  ")}} />
@@ -97,62 +69,137 @@ export function Calculator() {
             <input type="hidden" name="countryCode" value={body?.countryCode ?? "NZ"} />
             <input type="hidden" name="timezone" value={body?.timezone ?? "Pacific/Auckland"} />
 
-            <div>
-                <label htmlFor="productPurchase">Product Purchase Calculation?</label>
-                <input type="checkbox" name="productPurchase_boolean" defaultChecked={body?.productPurchase ?? true} className="form-checkbox rounded mx-4" />
-            </div>
-            <br />
-            <br />
+            {/* calculation type */}
+            <input type="hidden" value="true" name="productPurchase_boolean" />
 
-            <div>
-                <input className="form-input rounded-md disabled:bg-slate-300 disabled:cursor-not-allowed" type="text" name="productText" placeholder="Product Name" disabled={!!productName} defaultValue={productName ?? (error ? body?.productText : undefined)} />
-                {
-                    productName ? <input type="hidden" name="productName" value={productName} /> : undefined
-                }
-                <input className="form-input rounded-md" type="number" name="productPurchaseItemCost" step="0.01" placeholder="Item Cost" defaultValue={error ? body?.productPurchaseItemCost : undefined} />
-                <input className="form-input rounded-md" type="number" name="productPurchaseItems" step="1" placeholder="Item Count" defaultValue={body?.productPurchaseItems} />
-                <input className="form-input rounded-md" type="number" name="productPurchaseDeliveryCost" step="0.01" placeholder="Delivery Cost" defaultValue={body?.productPurchaseDeliveryCost} />
-                <input className="form-input rounded-md" type="number" name="productPurchaseFeeCost" step="0.01" placeholder="Purchase Fees" defaultValue={body?.productPurchaseFeeCost} />
-                <input className="form-input rounded-md" type="text" name="productPurchaseOrganisationText" placeholder="Purchased From" defaultValue={body?.productPurchaseOrganisationText} />
+            <div className="flex flex-col">
+                <label className={FORM_GROUP_CLASS}>
+                    <span className="text-gray-700">Product Name</span>
+                    <input className={FORM_CLASS} type="text" name="productText" placeholder="Product Name" disabled={!!productName} defaultValue={productName ?? body?.productText} />
+                </label>
+                <label className={FORM_GROUP_CLASS}>
+                    <span className="text-gray-700">Item Cost</span>
+                    <input className={FORM_CLASS} type="number" name="productPurchaseItemCost" step="0.01" placeholder="Item Cost" defaultValue={body?.productPurchaseItemCost} />
+                </label>
+                <label className={FORM_GROUP_CLASS}>
+                    <span className="text-gray-700">Item Count</span>
+                    <input className={FORM_CLASS} type="number" name="productPurchaseItems" step="1" placeholder="Item Count" defaultValue={body?.productPurchaseItems ?? "1"} />
+                </label>
+                {/*<label className={FORM_GROUP_CLASS}>*/}
+                {/*    <span className="text-gray-700">Delivery Cost</span>*/}
+                {/*    <input className={FORM_CLASS} type="number" name="productPurchaseDeliveryCost" step="0.01" placeholder="Delivery Cost" defaultValue={body?.productPurchaseDeliveryCost} />*/}
+                {/*</label>*/}
+                {/*<label className={FORM_GROUP_CLASS}>*/}
+                {/*    <span className="text-gray-700">Purchase Fees (e.g. Health Now)</span>*/}
+                {/*    <input className={FORM_CLASS} type="number" name="productPurchaseFeeCost" step="0.01" placeholder="Purchase Fees" defaultValue={body?.productPurchaseFeeCost} />*/}
+                {/*</label>*/}
+                {/*<label className={FORM_GROUP_CLASS}>*/}
+                {/*    <span className="text-gray-700">Purchased From (e.g. Pharmacy or Clinic Name)</span>*/}
+                {/*    <input className={FORM_CLASS} type="text" name="productPurchaseOrganisationText" placeholder="Purchased From" defaultValue={body?.productPurchaseOrganisationText} />*/}
+                {/*</label>*/}
             </div>
-            <br />
-            <br />
-            <div>
-                <label htmlFor="anonymous">Anonymous</label>
-                <input type="checkbox" name="anonymous_boolean" className="form-checkbox rounded mx-4" defaultChecked={body?.anonymous ?? false} />
+            <hr className="my-8" />
+            <div className="flex flex-row">
+                <input type="checkbox" name="anonymous_boolean" id="anonymous_boolean" className="form-checkbox rounded m-1" defaultChecked={body?.anonymous ?? false} />
+                <label htmlFor="anonymous_boolean" className="ml-4 flex">Anonymous</label>
             </div>
-            <br />
-            <br />
+            <hr className="my-8" />
             <p>
                 I give consent for the above information to be stored and used with the following calculations,
                 and be used for any purpose that the calculation results are intended for, including
                 but not limited to public publishing of the information.
             </p>
-            <ul className="list-none">
+            <ul className="list-none" id="select-calculations">
                 {
                     calculationSources.map(({ calculationKey, title, description }, index) => {
                         const consented = !!body?.calculationConsent?.find(
                             value => value.calculationKey === calculationKey
                         )?.consented;
+                        const consentedKey = `calculationConsent[${index}].consented_boolean`;
                         return (
-                            <li key={calculationKey} className="my-4">
+                            <li key={calculationKey} className="my-4 flex flex-row align-start">
                                 <input name={`calculationConsent[${index}].calculationKey`} type="hidden" value={calculationKey} />
-                                <div>
-                                    <label htmlFor={`calculationConsent[${index}].consented_boolean`}>{title}</label>
-                                    <input name={`calculationConsent[${index}].consented_boolean`} type="checkbox" className="form-checkbox rounded mx-4" defaultChecked={consented} />
-                                </div>
-                                <div>
-                                    {description}
-                                </div>
+                                <input name={consentedKey} id={consentedKey} type="checkbox" className="form-checkbox rounded m-1" defaultChecked={consented} />
+                                <label htmlFor={consentedKey} className="flex flex-col ml-4">
+                                    <span>{title}</span>
+                                    <span>
+                                        {description}{index > 0 ? " and includes the results in our metrics" : ""}
+                                    </span>
+                                </label>
                             </li>
                         )
                     })
                 }
             </ul>
-            <br />
-            <button type="submit" className="bg-sky-500 hover:bg-sky-700 px-5 py-2.5 text-sm leading-5 rounded-md font-semibold text-white">
-                Submit & Calculate
-            </button>
+            <hr className="my-8" />
+            <div id="action-section">
+                <button type="submit" className="bg-sky-500 hover:bg-sky-700 px-5 py-2.5 text-sm leading-5 rounded-md font-semibold text-white">
+                    Submit & Calculate
+                </button>
+                <section id="result-section">
+                    {error ? (
+                        <>
+                            <hr className="my-8" />
+                            <div className="pointer-events-auto flex items-center justify-between gap-x-6 bg-red-400 px-6 py-2.5 sm:rounded-xl sm:py-3 sm:pl-4 sm:pr-3.5">
+                                <p className="text-sm leading-6 text-white">
+                                    {error instanceof Error ? error.message : String(error)}
+                                </p>
+                            </div>
+                            <hr className="my-8" />
+                        </>
+                    ) : undefined}
+                    {
+                        submitted && result ? (
+                            <div>
+                                <hr className="my-8" />
+                                {
+                                    submittedProduct ? (
+                                        <>
+                                            {!hasConsent(result.report.calculationConsent, "calculations.metrics.costPerUnit") ? (
+                                                <div>
+                                                    No calculation performed, please tick <a href="#select-calculations" className="text-blue-600 hover:bg-white underline hover:underline-offset-2">the boxes above</a> if you would like to calculate a value or contribute to our running metrics
+                                                    <br/>
+                                                    <br/>
+                                                    Showing default product details below for the product selected
+                                                    <hr className="my-8" />
+                                                </div>
+                                            ) : undefined}
+                                            {!result.metrics ? (
+                                                <div>
+                                                    Could not calculate product metrics from report<br/>
+                                                    This may be an error, or we do not have enough information about the product to do the calculation.
+                                                    <br/>
+                                                    <br/>
+                                                    Showing default product details below for the product selected
+                                                    <hr className="my-8" />
+                                                </div>
+                                            ) : undefined}
+                                            <ul className="list-none">
+                                                <ProductListItem
+                                                    report={!!result.metrics}
+                                                    product={submittedProduct}
+                                                    metrics={result.metrics ? ({
+                                                        metrics: [result.metrics],
+                                                        products: result.metrics.products
+                                                    }) : metrics[submittedProduct.productId]}
+                                                    overrideClassName="block hover:bg-gray-50 -mx-4 py-4 px-4"
+                                                />
+                                            </ul>
+                                        </>
+                                    ) : (
+                                        <>
+                                            Provided Name: {result.report.productText}<br/>
+                                            Product not found in database<br/>
+                                            Metrics stored, but not applied to daily metrics
+                                        </>
+                                    )
+                                }
+                                {(result.report.productId && !submittedProduct?.activeIngredients) ? "No active ingredients listed for product" : ""}
+                            </div>
+                        ) : undefined
+                    }
+                </section>
+            </div>
         </form>
     )
 }
