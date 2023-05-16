@@ -1,7 +1,7 @@
 import {PropsWithChildren} from "react";
 import {description, namespace, project} from "../../package";
 import {getOrigin} from "../../listen/config";
-import {useQuery} from "./data";
+import {useQuery, useQuerySearch} from "./data";
 import {BASIC_CATEGORY_FLOWER, CategoryIcon} from "../client/components/icons";
 
 export interface LayoutProps {
@@ -142,8 +142,7 @@ export function Layout(props: PropsWithChildren<LayoutProps>) {
     const {
         pathname
     } = new URL(url, getOrigin());
-    const query = useQuery();
-    const search = query.search || "";
+    const search = useQuerySearch();
     return (
         <BaseLayout {...props}>
             <div>

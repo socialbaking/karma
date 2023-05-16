@@ -3,7 +3,7 @@ import {
     useCopyrightInformation,
     useMetrics,
     useProductMetrics,
-    useQuery,
+    useQuery, useQuerySearch,
     useSortedProducts
 } from "../data";
 import ClientProductListItem, { ProductProps } from "../../client/components/product/list-item";
@@ -15,10 +15,10 @@ function ProductListItem(props: ProductProps) {
 }
 
 export function Products() {
-    const query = useQuery();
-    const products = useSortedProducts(query);
+    const products = useSortedProducts(true);
     const copyright = useCopyrightInformation(products);
     const metrics = useProductMetrics("month");
+    const search = useQuerySearch();
     return (
         <>
             <div className="bg-white shadow overflow-hidden sm:rounded-md">
@@ -28,6 +28,15 @@ export function Products() {
                     ))}
                 </ul>
             </div>
+            {search ? (
+                <div>
+                    <br />
+                    <br />
+                    <a href="?">Clear search</a>
+                    <br />
+                    <br />
+                </div>
+            ) : undefined}
             {
                 copyright.length ? (
                     <ul className="list-none">

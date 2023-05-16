@@ -1,4 +1,5 @@
 import {
+    useCategory,
     useError,
     useMaybeBody,
     useMaybeResult,
@@ -56,6 +57,7 @@ export function Calculator() {
     const error = useError();
     const { productName } = useQuery();
     const submittedProduct = useProduct(body?.productId);
+    const category = useCategory(submittedProduct?.categoryId);
     const metrics = useProductMetrics("month");
     return (
         <form name="calculator" action="/calculator#action-section" method="post">
@@ -76,6 +78,9 @@ export function Calculator() {
                 <label className={FORM_GROUP_CLASS}>
                     <span className="text-gray-700">Product Name</span>
                     <input className={FORM_CLASS} type="text" name="productText" placeholder="Product Name" disabled={!!productName} defaultValue={productName ?? body?.productText} />
+                    {
+                        productName ? <input type="hidden" value={productName} name="productName" /> : undefined
+                    }
                 </label>
                 <label className={FORM_GROUP_CLASS}>
                     <span className="text-gray-700">Item Cost</span>
@@ -176,8 +181,10 @@ export function Calculator() {
                                             ) : undefined}
                                             <ul className="list-none">
                                                 <ProductListItem
+                                                    url="/products"
                                                     report={!!result.metrics}
                                                     product={submittedProduct}
+                                                    category={category}
                                                     metrics={result.metrics ? ({
                                                         metrics: [result.metrics],
                                                         products: result.metrics.products

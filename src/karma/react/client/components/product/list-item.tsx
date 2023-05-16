@@ -16,6 +16,7 @@ export interface ProductProps {
 export interface ProductItemProps extends ProductProps {
     className?: string;
     overrideClassName?: string;
+    url?: string; // search path for product
 }
 
 export interface PercentageLabelProps extends ActiveIngredient {
@@ -24,7 +25,7 @@ export interface PercentageLabelProps extends ActiveIngredient {
 
 const PercentageLabel = React.memo(({ type, label, sortIndex, className }: PercentageLabelProps) => (
     <Label
-        className={`${sortIndex === 0 ? "bg-green-400" : "bg-green-100"} ${className || ""}`}
+        className={`px-2 leading-5 text-green-800 ${sortIndex === 0 ? "bg-green-400" : "bg-green-100"} ${className || ""}`}
     >
       {label} {type}
     </Label>
@@ -36,7 +37,7 @@ interface LabelProps {
 
 const Label = React.memo(({ children, className }: PropsWithChildren<LabelProps>) => (
     <span
-        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full  text-green-800 bg-green-100 ${className}`}
+        className={`inline-flex text-xs font-semibold rounded-full ${className}`}
     >
       {children}
     </span>
@@ -75,9 +76,9 @@ function toMetricTypeName(value: string): string {
     return value;
 }
 
-export function ProductListItem({ product, category, metrics: allMetrics, report: isReporting, overrideClassName, className }: ProductItemProps) {
+export function ProductListItem({ product, category, metrics: allMetrics, report: isReporting, overrideClassName, className, url }: ProductItemProps) {
   const { productId, sizes, ...attributes } = product;
-  const productUrl = `/calculator?productName=${encodeURIComponent(product.productName)}`;
+  const productUrl = `${url || "calculator"}?productName=${encodeURIComponent(product.productName)}`;
 
   const ingredients = useActiveIngredients(product);
   const sizeUnit = sizes?.[0]?.unit;
@@ -94,7 +95,7 @@ export function ProductListItem({ product, category, metrics: allMetrics, report
     <li>
       <a href={productUrl} className={overrideClassName ?? `block hover:bg-gray-50 px-4 py-4 sm:px-6 ${className || ""}`}>
           <div className="flex justify-between flex-wrap">
-            <div className={`text-sm font-medium text-indigo-600 flex flex-wrap mb-4 ${isReporting ? "flex-col" : "flex-row align-start"}`}>
+            <div className={`text-sm font-medium text-indigo-600 flex flex-wrap mb-4 flex-col`}>
                 <div className="truncate mr-1">
                     {attributes?.productName}
                 </div>
@@ -105,23 +106,33 @@ export function ProductListItem({ product, category, metrics: allMetrics, report
                                 .filter(value => !value.proportional)
                                 .map(
                                     (metric, index) => (
-                                        <Label key={index} className="mt-1">
+                                        <Label key={index} className="mt-1 px-2 leading-5 text-green-800 bg-green-100">
                                             {toMetricLabel(metric)}
                                         </Label>
                                     )
                                 )
                         ) : (
                             unitMetric ? (
-                                <Label>
-                                    {toMetricLabel(unitMetric)}
-                                </Label>
+                                <div className="block">
+                                    <Label className="mt-1 text-gray-400">
+                                        {toMetricLabel(unitMetric)}
+                                    </Label>
+                                </div>
                             ) : undefined
                         )
                     }
                 </div>
+                {
+                    category ? (
+                        <p className="flex items-center text-sm text-gray-500 mt-8">
+                            <CategoryIcon categoryName={category.categoryName} />
+                            {category.categoryName}
+                        </p>
+                    ) : undefined
+                }
             </div>
             <div className="ml-2 flex-shrink-0 flex flex-col align-start justify-between mb-4">
-              <div className="flex flex-row">
+              <div className="flex flex-row justify-end">
                   {
                       ingredients.map((value, index) => (
                           <PercentageLabel key={index} {...value} className="ml-1" />
@@ -144,18 +155,6 @@ export function ProductListItem({ product, category, metrics: allMetrics, report
                         </div>
                     ) : undefined
                 }
-            </div>
-          </div>
-          <div className="mt-2 sm:flex sm:justify-between">
-            <div className="sm:flex">
-              {
-                category ? (
-                    <p className="flex items-center text-sm text-gray-500">
-                      <CategoryIcon categoryName={category.categoryName} />
-                      {category.categoryName}
-                    </p>
-                ) : undefined
-              }
             </div>
           </div>
       </a>

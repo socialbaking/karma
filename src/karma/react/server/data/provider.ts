@@ -60,6 +60,11 @@ export function useQuery<Q = QueryRecord>(): Q {
     return query;
 }
 
+export function useQuerySearch() {
+    const query = useQuery();
+    return query.search || query.productName || "";
+}
+
 export function useMaybeResult<R>(): R | undefined {
     const { result } = useData();
     if (!result) return undefined;
@@ -123,11 +128,11 @@ export function useCopyrightInformation(products: Product[]) {
     }, [products]);
 }
 
-export function useSortedProducts(query?: QueryRecord) {
+export function useSortedProducts(isSearch?: boolean) {
     const products = useProducts();
     const categories = useCategories();
 
-    const search = query?.search;
+    const search = useQuerySearch();
     return useMemo(() => {
         const categoryOrder = new Map<string, number | undefined>(
             categories.map(category => [category.categoryId, category.order] as const)
@@ -144,7 +149,7 @@ export function useSortedProducts(query?: QueryRecord) {
                 const orderB = b.order ?? Number.MAX_SAFE_INTEGER;
                 return orderA < orderB ? -1 : 1;
             });
-        if (!search) {
+        if (!isSearch || !search) {
             return sortedProducts;
         }
         return getMatchingProducts(sortedProducts, search);
