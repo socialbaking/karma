@@ -9,7 +9,7 @@ export interface ProductData extends Record<string, unknown> {
     productName: string;
     order?: number;
     countryCode?: string;
-    licencedPartnerId?: string;
+    licencedOrganisationId?: string;
     // Flag for products we don't have the exact licence date for
     licenceApprovedBeforeGivenDate?: boolean;
     licenceApprovedAt?: string;

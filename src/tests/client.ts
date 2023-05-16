@@ -98,16 +98,14 @@ async function testClient() {
 
         ok(Array.isArray(await client.listSystemLogs()));
 
-        const partners = await client.listPartners();
-        const partner = partners.find(partner => partner.partnerId === partnerId);
-        ok(partner);
+        const organisations = await client.listOrganisations();
 
         // There should be seeded partners available
-        ok(partners.length > 1);
-        const clinics = partners.filter(partner => partner.clinic);
-        const pharmacies = partners.filter(partner => partner.pharmacy);
-        const onlyPharmacies = partners.filter(partner => partner.pharmacy && !partner.clinic);
-        const otherPartners = partners.filter(partner => !(partner.clinic || partner.pharmacy));
+        ok(organisations.length > 1);
+        const clinics = organisations.filter(organisation => organisation.clinic);
+        const pharmacies = organisations.filter(organisation => organisation.pharmacy);
+        const onlyPharmacies = organisations.filter(organisation => organisation.pharmacy && !organisation.clinic);
+        const otherPartners = organisations.filter(organisation => !(organisation.clinic || organisation.pharmacy));
 
         console.log({
             clinics,
@@ -243,7 +241,7 @@ async function testClient() {
                     productName,
                     countryCode,
                     categoryId,
-                    licencedPartnerId: licencedPartner.partnerId,
+                    licencedOrganisationId: licencedPartner.organisationId,
                     licenceCountryCode: licencedPartner.countryCode,
                     licenceApprovedAt: createdAt,
                     availableAt: createdAt,
@@ -327,12 +325,12 @@ async function testClient() {
                         productPurchaseFeeCost: feeCost.toFixed(2),
                         productPurchaseItems: items.toString(),
                         productPurchase: true,
-                        productPurchasePartnerId: pharmacyPartner.partnerId,
-                        productPurchasePartnerName: pharmacyPartner.partnerName,
+                        productPurchaseOrganisationId: pharmacyPartner.organisationId,
+                        productPurchaseOrganisationName: pharmacyPartner.partnerName,
                         productPrescription: true,
                         productPrescriptionAt: new Date(now).toISOString(),
-                        productPrescriptionPartnerName: clinicPartner.partnerName,
-                        productPrescriptionPartnerId: clinicPartner.partnerId,
+                        productPrescriptionOrganisationName: clinicPartner.partnerName,
+                        productPrescriptionOrganisationId: clinicPartner.organisationId,
                         productPrescriptionFeeCost: prescriptionFeeCost.toFixed(2),
                         productSize: product.sizes.at(0),
                         calculationConsent

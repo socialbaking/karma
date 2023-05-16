@@ -9,10 +9,15 @@ import {
 import {paths, pathsAnonymous, pathsSubmit} from "../react/server/paths";
 import KarmaServer, {KarmaServerProps} from "../react/server";
 import {renderToStaticMarkup} from "react-dom/server";
-import {listCategories, listMetrics, listPartners, listProducts} from "../data";
+import {listCategories, listMetrics, listOrganisations, listPartners, listProducts} from "../data";
 import {authenticate} from "../listen/authentication";
 import ServerCSS from "../react/server/server-css";
-import {getMaybeAuthenticationState, isAnonymous} from "../authentication";
+import {
+    getMaybeAuthenticationState,
+    getMaybeAuthorizedForOrganisationId,
+    getMaybeAuthorizedForPartnerId,
+    isAnonymous
+} from "../authentication";
 import {ok} from "../../is";
 import {join, dirname} from "node:path";
 
@@ -48,7 +53,12 @@ export async function viewRoutes(fastify: FastifyInstance) {
                     url={path}
                     isAnonymous={anonymous}
                     isFragment={isFragment}
-                    partners={anonymous ? [] : await listPartners()}
+                    partners={anonymous ? [] : await listPartners({
+                        authorizedPartnerId: getMaybeAuthorizedForPartnerId()
+                    })}
+                    organisations={anonymous ? [] : await listOrganisations({
+                        authorizedOrganisationId: getMaybeAuthorizedForOrganisationId()
+                    })}
                     categories={anonymous ? [] : await listCategories()}
                     metrics={(!anonymous && path.includes("metrics")) ? await listMetrics() : undefined}
                     products={anonymous ? [] : await listProducts()}

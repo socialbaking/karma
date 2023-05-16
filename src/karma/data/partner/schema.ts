@@ -1,40 +1,11 @@
+import {organisationBaseData} from "../organisation/schema";
+
 export const partnerData = {
     type: "object",
     properties: {
+        ...organisationBaseData.properties,
         partnerName: {
             type: "string"
-        },
-        countryCode: {
-            type: "string",
-            nullable: true
-        },
-        location: {
-            type: "string",
-            nullable: true
-        },
-        remote: {
-            type: "boolean",
-            nullable: true
-        },
-        onsite: {
-            type: "boolean",
-            nullable: true
-        },
-        pharmacy: {
-            type: "boolean",
-            nullable: true
-        },
-        delivery: {
-            type: "boolean",
-            nullable: true
-        },
-        clinic: {
-            type: "boolean",
-            nullable: true
-        },
-        website: {
-            type: "string",
-            nullable: true
         }
     },
     required: [
@@ -48,7 +19,16 @@ export const partner = {
         partnerId: {
             type: "string"
         },
-        ...partnerData.properties,
+        organisationId: {
+            type: "string"
+        },
+        partnerName: {
+            type: "string"
+        },
+        countryCode: {
+            type: "string",
+            nullable: true
+        },
         accessToken: {
             type: "string",
             nullable: true
@@ -73,7 +53,8 @@ export const partner = {
         }
     },
     required: [
-        ...partnerData.required,
+        "partnerName",
+        "organisationId",
         "partnerId",
         "createdAt",
         "updatedAt"

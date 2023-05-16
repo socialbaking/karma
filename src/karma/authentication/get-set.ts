@@ -15,6 +15,11 @@ export function getMaybeAuthorizedForPartnerId() {
     return requestContext.get(AUTHORIZED_PARTNER_ID_KEY);
 }
 
+export function getMaybeAuthorizedForOrganisationId() {
+    const partner = getMaybePartner();
+    return partner?.organisationId;
+}
+
 export function isAnonymous() {
     return !isAuthorized();
 }

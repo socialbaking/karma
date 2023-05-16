@@ -96,7 +96,7 @@ export function Calculator() {
                 <input className="form-input rounded-md" type="number" name="productPurchaseItems" step="1" placeholder="Item Count" defaultValue={body?.productPurchaseItems} />
                 <input className="form-input rounded-md" type="number" name="productPurchaseDeliveryCost" step="0.01" placeholder="Delivery Cost" defaultValue={body?.productPurchaseDeliveryCost} />
                 <input className="form-input rounded-md" type="number" name="productPurchaseFeeCost" step="0.01" placeholder="Purchase Fees" defaultValue={body?.productPurchaseFeeCost} />
-                <input className="form-input rounded-md" type="text" name="productPurchasePartnerText" placeholder="Purchased From" defaultValue={body?.productPurchasePartnerText} />
+                <input className="form-input rounded-md" type="text" name="productPurchaseOrganisationText" placeholder="Purchased From" defaultValue={body?.productPurchaseOrganisationText} />
             </div>
             <br />
             <br />

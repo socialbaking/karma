@@ -1,8 +1,10 @@
 import {
     AuthenticationRole,
     Category,
-    CountryProductMetrics, Partner,
-    Product
+    CountryProductMetrics,
+    Partner,
+    Product,
+    Organisation
 } from "../../../data";
 import {createContext, useContext, useMemo} from "react";
 import {ok} from "../../../../is";
@@ -21,6 +23,7 @@ export interface Data {
     products: Product[];
     categories: Category[];
     partners: Partner[];
+    organisations: Organisation[];
     metrics?: CountryProductMetrics[];
     roles?: AuthenticationRole[];
 }
@@ -81,6 +84,11 @@ export function useSubmitted(): boolean {
 export function useProducts() {
     const { products } = useData();
     return products;
+}
+
+export function useOrganisations() {
+    const { organisations } = useData();
+    return organisations;
 }
 
 export interface CopyrightItem {
@@ -170,6 +178,11 @@ export function usePartners() {
 export function usePartner(partnerId: string) {
     const partners = usePartners();
     return useMemo(() => partners.find(partner => partner.partnerId === partnerId), [partners]);
+}
+
+export function useOrganisation(organisationId: string) {
+    const organisations = useOrganisations();
+    return useMemo(() => organisations.find(organisation => organisation.organisationId === organisationId), [organisationId]);
 }
 
 export function useMetrics() {

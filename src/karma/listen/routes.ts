@@ -9,6 +9,7 @@ import {categoryRoutes} from "./category";
 import {reportRoutes} from "./report";
 import {authenticationRoutes} from "./auth";
 import {calculationRoutes} from "./calculations";
+import {organisationRoutes} from "./organisation";
 
 export async function routes(fastify: FastifyInstance) {
 
@@ -20,6 +21,7 @@ export async function routes(fastify: FastifyInstance) {
         fastify.register(categoryRoutes);
         fastify.register(reportRoutes);
         fastify.register(calculationRoutes);
+        fastify.register(organisationRoutes);
     }
 
     fastify.register(apiRoutes, {

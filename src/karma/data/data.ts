@@ -9,3 +9,4 @@ export * from "./lock";
 export * from "./metrics";
 export * from "./authentication-state";
 export * from "./calculation";
+export * from "./organisation";

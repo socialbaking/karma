@@ -35,9 +35,9 @@ export interface ReportData extends ReportDateData, Expiring, CalculationConsent
     productPurchaseItemCost?: string | number; // "450", capture the user input raw
     productPurchaseDeliveryCost?: string | number; // "8.50", capture the user input raw
     productPurchaseFeeCost?: string | number; // "3.50", capture the user input raw
-    productPurchasePartnerId?: string;
-    productPurchasePartnerName?: string; // Actual partnerName, not free text
-    productPurchasePartnerText?: string; // User free text of the partnerName
+    productPurchaseOrganisationId?: string;
+    productPurchaseOrganisationName?: string; // Actual organisationName, not free text
+    productPurchaseOrganisationText?: string; // User free text of the organisationName
     productSize?: ProductSizeData;
     createdByUserId?: string;
     anonymous?: boolean;

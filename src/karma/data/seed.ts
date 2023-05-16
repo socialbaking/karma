@@ -7,7 +7,7 @@ import {
     ProductData,
     getProductStore,
     Product,
-    setProduct
+    setProduct, PartnerData, Organisation, getOrganisationStore, OrganisationData
 } from "./data";
 import {v5} from "uuid";
 import {ok} from "../../is";
@@ -71,29 +71,31 @@ async function seedCategories() {
 }
 
 const approvedAt = createdAt;
-const partners: Partner[] = [
+const organisationData: (OrganisationData & { partner?: boolean })[] = [
     {
-        partnerName: "Cannabis Clinic",
+        organisationName: "Cannabis Clinic",
         clinic: true,
         pharmacy: true,
         delivery: true,
         website: "https://cannabisclinic.co.nz/",
         approvedAt,
         approved: true,
-        countryCode: "NZ"
+        countryCode: "NZ",
+        partner: true
     },
     {
-        partnerName: "CannaPlus+",
+        organisationName: "CannaPlus+",
         clinic: true,
         pharmacy: true,
         delivery: true,
         website: "https://cannaplus.co.nz/",
         approvedAt,
         approved: true,
-        countryCode: "NZ"
+        countryCode: "NZ",
+        partner: true
     },
     {
-        partnerName: "The Pain Clinic",
+        organisationName: "The Pain Clinic",
         clinic: true,
         pharmacy: true,
         approvedAt,
@@ -101,7 +103,7 @@ const partners: Partner[] = [
         countryCode: "NZ"
     },
     {
-        partnerName: "Green Doctors",
+        organisationName: "Green Doctors",
         clinic: true,
         pharmacy: true,
         delivery: true,
@@ -111,7 +113,7 @@ const partners: Partner[] = [
         countryCode: "NZ"
     },
     {
-        partnerName: "Dr Gulbransen GP",
+        organisationName: "Dr Gulbransen GP",
         clinic: true,
         website: "https://www.cannabiscare.nz/",
         approvedAt,
@@ -119,7 +121,7 @@ const partners: Partner[] = [
         countryCode: "NZ"
     },
     {
-        partnerName: "Koru Medical Clinic",
+        organisationName: "Koru Medical Clinic",
         clinic: true,
         website: "https://korumedical.co.nz/",
         approvedAt,
@@ -127,7 +129,7 @@ const partners: Partner[] = [
         countryCode: "NZ"
     },
     {
-        partnerName: "RestoreMe",
+        organisationName: "RestoreMe",
         clinic: true,
         website: "https://www.restoremeclinic.co.nz/",
         approvedAt,
@@ -135,7 +137,7 @@ const partners: Partner[] = [
         countryCode: "NZ"
     },
     {
-        partnerName: "Wellworks Pharmacy Taranaki Street",
+        organisationName: "Wellworks Pharmacy Taranaki Street",
         pharmacy: true,
         delivery: true,
         website: "https://www.wellworks.co.nz/",
@@ -144,82 +146,105 @@ const partners: Partner[] = [
         countryCode: "NZ"
     },
     {
-        partnerName: "Nga Hua Pharmacy",
+        organisationName: "Nga Hua Pharmacy",
         pharmacy: true,
         delivery: true,
         website: "https://www.ngahuapharmacy.co.nz/",
         approvedAt,
         approved: true,
-        countryCode: "NZ"
+        countryCode: "NZ",
+        partner: true
     },
     {
-        partnerName: "Medleaf Therapeutics",
+        organisationName: "Medleaf Therapeutics",
         website: "https://medleaf.co.nz/",
         approvedAt,
         approved: true,
         countryCode: "NZ"
     },
     {
-        partnerName: "NUBU Pharmaceuticals",
+        organisationName: "NUBU Pharmaceuticals",
         website: "https://www.nubupharma.com/",
         approvedAt,
         approved: true,
         countryCode: "NZ"
     },
     {
-        partnerName: "MedReleaf NZ",
+        organisationName: "MedReleaf NZ",
         approvedAt,
         approved: true,
         countryCode: "NZ"
     },
     {
-        partnerName: "CDC Pharmaceuticals",
+        organisationName: "CDC Pharmaceuticals",
         website: "https://www.cdc.co.nz/",
         approvedAt,
         approved: true,
         countryCode: "NZ"
     },
     {
-        partnerName: "Helius Therapeutics",
+        organisationName: "Helius Therapeutics",
         website: "https://www.helius.co.nz/",
         approvedAt,
         approved: true,
         countryCode: "NZ"
     },
     {
-        partnerName: "Cannasouth Bioscience",
+        organisationName: "Cannasouth Bioscience",
         website: "https://www.cannasouth.co.nz/",
         approvedAt,
         approved: true,
         countryCode: "NZ"
     },
     {
-        partnerName: "RUA Bioscience",
+        organisationName: "RUA Bioscience",
         website: "https://www.ruabio.com/",
         approvedAt,
         approved: true,
         countryCode: "NZ"
     },
     {
-        partnerName: "Emerge Health New Zealand",
+        organisationName: "Emerge Health New Zealand",
         website: "https://emergeaotearoa.org.nz/",
         approvedAt,
         approved: true,
         countryCode: "NZ"
     }
-]
-    .map((data): Partner => ({
+];
+
+const partners = organisationData
+    .filter(({ partner }) => partner)
+    .map(({ organisationName, approved, approvedAt }: OrganisationData): Partner => ({
+        partnerName: organisationName,
+        partnerId: v5(organisationName, namespace),
+        organisationId: v5(organisationName, namespace),
+        createdAt,
+        updatedAt,
+        approved,
+        approvedAt
+    }));
+
+ok(partners.length);
+
+const organisations = organisationData
+    .map(({ organisationName, partner, ...data }): Organisation => ({
         ...data,
-        partnerId: v5(data.partnerName, namespace),
+        organisationName,
+        partnerId: partner ? v5(organisationName, namespace) : undefined,
+        organisationId: v5(organisationName, namespace),
         createdAt,
         updatedAt
     }));
 
-
-
 function getPartner(name: string) {
     const found = partners.find(partner => partner.partnerName === name);
     ok(found, `Expected partner ${name}`);
+    return found;
+}
+
+function getOrganisation(name: string) {
+    const found = organisations.find(organisation => organisation.organisationName === name);
+    ok(found, `Expected organisation ${name}`);
     return found;
 }
 
@@ -236,7 +261,7 @@ function getPartnerId(name: string) {
 
 export async function seedPartners() {
     const partnerStore = getPartnerStore();
-
+    const organisationStore = getOrganisationStore();
 
     async function putPartner(data: Partner) {
         const { partnerId } = data;
@@ -251,6 +276,24 @@ export async function seedPartners() {
         };
         await partnerStore.set(partnerId, partner);
     }
+
+    async function putOrganisation(data: Organisation) {
+        const { organisationId } = data;
+        const existing = await organisationStore.get(organisationId);
+        if (existing && !isChange(data, existing)) {
+            return;
+        }
+        const organisation: Organisation = {
+            ...existing,
+            ...data,
+            updatedAt
+        };
+        await organisationStore.set(organisationId, organisation);
+    }
+
+    await Promise.all(
+        organisations.map(putOrganisation)
+    );
 
     await Promise.all(
         partners.map(putPartner)
@@ -277,7 +320,7 @@ async function seedProducts() {
         "Cannasouth Bioscience",
         "RUA Bioscience",
         "Emerge Health New Zealand"
-    ].map(getPartner);
+    ].map(getOrganisation);
 
     console.log({
         medleaf,
@@ -306,7 +349,7 @@ async function seedProducts() {
             productName: "Helius CBD25 Full Spectrum",
             categoryId: oil.categoryId,
             licenceCountryCode: helius.countryCode,
-            licencedPartnerId: helius.partnerId,
+            licencedOrganisationId: helius.organisationId,
             licenceApprovedBeforeGivenDate: true,
             licenceApprovedAt,
             licenceApprovalWebsite,
@@ -321,7 +364,7 @@ async function seedProducts() {
             productName: "Helius CBD100 Full Spectrum",
             categoryId: oil.categoryId,
             licenceCountryCode: helius.countryCode,
-            licencedPartnerId: helius.partnerId,
+            licencedOrganisationId: helius.organisationId,
             licenceApprovedBeforeGivenDate: true,
             licenceApprovedAt,
             licenceApprovalWebsite,
@@ -336,7 +379,7 @@ async function seedProducts() {
             productName: "RUA CBD100",
             categoryId: oil.categoryId,
             licenceCountryCode: rua.countryCode,
-            licencedPartnerId: rua.partnerId,
+            licencedOrganisationId: rua.organisationId,
             licenceApprovedBeforeGivenDate: true,
             licenceApprovedAt,
             licenceApprovalWebsite,
@@ -351,7 +394,7 @@ async function seedProducts() {
             productName: "Tilray P Oral Solution CBD 100",
             categoryId: oil.categoryId,
             licenceCountryCode: cdc.countryCode,
-            licencedPartnerId: cdc.partnerId,
+            licencedOrganisationId: cdc.organisationId,
             licenceApprovedBeforeGivenDate: true,
             licenceApprovedAt,
             licenceApprovalWebsite,
@@ -366,7 +409,7 @@ async function seedProducts() {
             productName: "Tilray P Oral Solution CBD 25",
             categoryId: oil.categoryId,
             licenceCountryCode: cdc.countryCode,
-            licencedPartnerId: cdc.partnerId,
+            licencedOrganisationId: cdc.organisationId,
             licenceApprovedBeforeGivenDate: true,
             licenceApprovedAt,
             licenceApprovalWebsite,
@@ -381,7 +424,7 @@ async function seedProducts() {
             productName: "SubDrops™ CBD100",
             categoryId: oil.categoryId,
             licenceCountryCode: helius.countryCode,
-            licencedPartnerId: helius.partnerId,
+            licencedOrganisationId: helius.organisationId,
             licenceApprovedBeforeGivenDate: true,
             licenceApprovedAt,
             licenceApprovalWebsite,
@@ -396,7 +439,7 @@ async function seedProducts() {
             productName: "SubDrops™ CBD25",
             categoryId: oil.categoryId,
             licenceCountryCode: helius.countryCode,
-            licencedPartnerId: helius.partnerId,
+            licencedOrganisationId: helius.organisationId,
             licenceApprovedBeforeGivenDate: true,
             licenceApprovedAt,
             licenceApprovalWebsite,
@@ -411,7 +454,7 @@ async function seedProducts() {
             productName: "evalaCann THC ≤1 mg: CBD 20 mg",
             categoryId: oil.categoryId,
             licenceCountryCode: cannasouth.countryCode,
-            licencedPartnerId: cannasouth.partnerId,
+            licencedOrganisationId: cannasouth.organisationId,
             licenceApprovedBeforeGivenDate: true,
             licenceApprovedAt,
             licenceApprovalWebsite,
@@ -427,7 +470,7 @@ async function seedProducts() {
             productName: "evalaCann THC 10 mg: CBD 15 mg",
             categoryId: oil.categoryId,
             licenceCountryCode: cannasouth.countryCode,
-            licencedPartnerId: cannasouth.partnerId,
+            licencedOrganisationId: cannasouth.organisationId,
             licenceApprovedBeforeGivenDate: true,
             licenceApprovedAt,
             licenceApprovalWebsite,
@@ -443,7 +486,7 @@ async function seedProducts() {
             productName: "evalaCann THC 10 mg: CBD  ≤1 mg",
             categoryId: oil.categoryId,
             licenceCountryCode: cannasouth.countryCode,
-            licencedPartnerId: cannasouth.partnerId,
+            licencedOrganisationId: cannasouth.organisationId,
             licenceApprovedBeforeGivenDate: true,
             licenceApprovedAt,
             licenceApprovalWebsite,
@@ -459,7 +502,7 @@ async function seedProducts() {
             productName: "Helius THC25 Full Spectrum",
             categoryId: oil.categoryId,
             licenceCountryCode: helius.countryCode,
-            licencedPartnerId: helius.partnerId,
+            licencedOrganisationId: helius.organisationId,
             licenceApprovedBeforeGivenDate: true,
             licenceApprovedAt,
             licenceApprovalWebsite,
@@ -475,7 +518,7 @@ async function seedProducts() {
             productName: "Helius THC10:CBD10 Full Spectrum",
             categoryId: oil.categoryId,
             licenceCountryCode: helius.countryCode,
-            licencedPartnerId: helius.partnerId,
+            licencedOrganisationId: helius.organisationId,
             licenceApprovedBeforeGivenDate: true,
             licenceApprovedAt,
             licenceApprovalWebsite,
@@ -491,7 +534,7 @@ async function seedProducts() {
             productName: "Tilray FS oral Solution THC 25",
             categoryId: oil.categoryId,
             licenceCountryCode: cdc.countryCode,
-            licencedPartnerId: cdc.partnerId,
+            licencedOrganisationId: cdc.organisationId,
             licenceApprovedBeforeGivenDate: true,
             licenceApprovedAt,
             licenceApprovalWebsite,
@@ -506,7 +549,7 @@ async function seedProducts() {
             productName: "Tilray FS Oral Solution THC 10 CBD 10",
             categoryId: oil.categoryId,
             licenceCountryCode: cdc.countryCode,
-            licencedPartnerId: cdc.partnerId,
+            licencedOrganisationId: cdc.organisationId,
             licenceApprovedBeforeGivenDate: true,
             licenceApprovedAt,
             licenceApprovalWebsite,
@@ -522,7 +565,7 @@ async function seedProducts() {
             productName: "Tilray FS Oral Solution THC 5:  CBD 20",
             categoryId: oil.categoryId,
             licenceCountryCode: cdc.countryCode,
-            licencedPartnerId: cdc.partnerId,
+            licencedOrganisationId: cdc.organisationId,
             licenceApprovedAt: "2023-05-10T02:20:00.000Z",
             licenceApprovalWebsite,
             availableAt: undefined,
@@ -536,7 +579,7 @@ async function seedProducts() {
             productName: "KIKUYA Dune",
             categoryId: flower.categoryId,
             licenceCountryCode: nubu.countryCode,
-            licencedPartnerId: nubu.partnerId,
+            licencedOrganisationId: nubu.organisationId,
             licenceApprovedBeforeGivenDate: true,
             licenceApprovedAt,
             licenceApprovalWebsite,
@@ -552,7 +595,7 @@ async function seedProducts() {
             productName: "KIKUYA Arroyo",
             categoryId: flower.categoryId,
             licenceCountryCode: nubu.countryCode,
-            licencedPartnerId: nubu.partnerId,
+            licencedOrganisationId: nubu.organisationId,
             licenceApprovedBeforeGivenDate: true,
             licenceApprovedAt,
             licenceApprovalWebsite,
@@ -568,7 +611,7 @@ async function seedProducts() {
             productName: "KIKUYA Peak",
             categoryId: flower.categoryId,
             licenceCountryCode: nubu.countryCode,
-            licencedPartnerId: nubu.partnerId,
+            licencedOrganisationId: nubu.organisationId,
             licenceApprovedAt: "2023-05-10T02:20:00.000Z",
             licenceApprovalWebsite,
             availableAt: undefined,
@@ -582,7 +625,7 @@ async function seedProducts() {
             productName: "Medleaf Medium THC Afghan Haze",
             categoryId: flower.categoryId,
             licenceCountryCode: medleaf.countryCode,
-            licencedPartnerId: medleaf.partnerId,
+            licencedOrganisationId: medleaf.organisationId,
             licenceApprovedBeforeGivenDate: true,
             licenceApprovedAt,
             licenceApprovalWebsite,
@@ -598,7 +641,7 @@ async function seedProducts() {
             productName: "Tilray Whole Flower Dried Cannabis THC 22",
             categoryId: flower.categoryId,
             licenceCountryCode: cdc.countryCode,
-            licencedPartnerId: cdc.partnerId,
+            licencedOrganisationId: cdc.organisationId,
             licenceApprovedBeforeGivenDate: true,
             licenceApprovedAt,
             licenceApprovalWebsite,
@@ -614,7 +657,7 @@ async function seedProducts() {
             productName: "Equiposa",
             categoryId: flower.categoryId,
             licenceCountryCode: medReleaf.countryCode,
-            licencedPartnerId: medReleaf.partnerId,
+            licencedOrganisationId: medReleaf.organisationId,
             licenceApprovedBeforeGivenDate: true,
             licenceApprovedAt,
             licenceApprovalWebsite,
@@ -630,7 +673,7 @@ async function seedProducts() {
             productName: "Luminarium",
             categoryId: flower.categoryId,
             licenceCountryCode: medReleaf.countryCode,
-            licencedPartnerId: medReleaf.partnerId,
+            licencedOrganisationId: medReleaf.organisationId,
             licenceApprovedBeforeGivenDate: true,
             licenceApprovedAt,
             licenceApprovalWebsite,
@@ -646,7 +689,7 @@ async function seedProducts() {
             productName: "Sedaprem",
             categoryId: flower.categoryId,
             licenceCountryCode: medReleaf.countryCode,
-            licencedPartnerId: medReleaf.partnerId,
+            licencedOrganisationId: medReleaf.organisationId,
             licenceApprovedBeforeGivenDate: true,
             licenceApprovedAt,
             licenceApprovalWebsite,
@@ -662,7 +705,7 @@ async function seedProducts() {
             productName: "ANTG Eve",
             categoryId: flower.categoryId,
             licenceCountryCode: nubu.countryCode,
-            licencedPartnerId: nubu.partnerId,
+            licencedOrganisationId: nubu.organisationId,
             licenceApprovedBeforeGivenDate: true,
             licenceApprovedAt,
             licenceApprovalWebsite,
@@ -678,7 +721,7 @@ async function seedProducts() {
             productName: "ANTG Mariposa",
             categoryId: flower.categoryId,
             licenceCountryCode: nubu.countryCode,
-            licencedPartnerId: nubu.partnerId,
+            licencedOrganisationId: nubu.partnerId,
             licenceApprovedBeforeGivenDate: true,
             licenceApprovedAt,
             licenceApprovalWebsite,
@@ -694,7 +737,7 @@ async function seedProducts() {
             productName: "ANTG Rocky",
             categoryId: flower.categoryId,
             licenceCountryCode: nubu.countryCode,
-            licencedPartnerId: nubu.partnerId,
+            licencedOrganisationId: nubu.organisationId,
             licenceApprovedBeforeGivenDate: true,
             licenceApprovedAt,
             licenceApprovalWebsite,
@@ -710,7 +753,7 @@ async function seedProducts() {
             productName: "ANTG Solace",
             categoryId: flower.categoryId,
             licenceCountryCode: nubu.countryCode,
-            licencedPartnerId: nubu.partnerId,
+            licencedOrganisationId: nubu.organisationId,
             licenceApprovedBeforeGivenDate: true,
             licenceApprovedAt,
             licenceApprovalWebsite,
@@ -726,7 +769,7 @@ async function seedProducts() {
             productName: "Medleaf Medium THC Shishkaberry",
             categoryId: flower.categoryId,
             licenceCountryCode: medleaf.countryCode,
-            licencedPartnerId: medleaf.partnerId,
+            licencedOrganisationId: medleaf.organisationId,
             licenceApprovedBeforeGivenDate: true,
             licenceApprovedAt,
             licenceApprovalWebsite,
@@ -742,7 +785,7 @@ async function seedProducts() {
             productName: "Medleaf High THC Zour Apple",
             categoryId: flower.categoryId,
             licenceCountryCode: medleaf.countryCode,
-            licencedPartnerId: medleaf.partnerId,
+            licencedOrganisationId: medleaf.organisationId,
             licenceApprovedBeforeGivenDate: true,
             licenceApprovedAt,
             licenceApprovalWebsite,
@@ -758,7 +801,7 @@ async function seedProducts() {
             productName: "Medleaf High THC GG#4",
             categoryId: flower.categoryId,
             licenceCountryCode: medleaf.countryCode,
-            licencedPartnerId: medleaf.partnerId,
+            licencedOrganisationId: medleaf.organisationId,
             licenceApprovedBeforeGivenDate: true,
             licenceApprovedAt,
             licenceApprovalWebsite,
@@ -773,7 +816,7 @@ async function seedProducts() {
         {
             productName: "Sativex oral spray",
             licenceCountryCode: emerge.countryCode,
-            licencedPartnerId: emerge.partnerId,
+            licencedOrganisationId: emerge.organisationId,
             licenceApprovalWebsite,
             // This product is generally available
             availableAt: undefined

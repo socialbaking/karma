@@ -28,7 +28,7 @@ export const productData = {
             type: "string",
             nullable: true
         },
-        licencedPartnerId: {
+        licencedOrganisationId: {
             type: "string",
             nullable: true
         },

@@ -10,7 +10,7 @@ import {
     ReportData,
     Report,
     ReportMetrics,
-    ReportMetricsData, CountryProductMetrics, CalculationSource,
+    ReportMetricsData, CountryProductMetrics, CalculationSource, Organisation,
 } from "./interface.readonly";
 // Client start
 export interface ClientOptions {
@@ -30,6 +30,7 @@ export interface Client {
     getProduct(productId: string): Promise<Product | undefined>;
     getReport(reportId: string): Promise<Report | undefined>
     listPartners(): Promise<Partner[]>;
+    listOrganisations(): Promise<Organisation[]>;
     listSystemLogs(): Promise<SystemLog[]>;
     listProducts(): Promise<Product[]>;
     listReports(): Promise<Report[]>;

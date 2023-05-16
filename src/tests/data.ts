@@ -1,4 +1,4 @@
-import {addReport, listPartners, listProducts, seed, stopData} from "../karma/data";
+import {addReport, listOrganisations, listPartners, listProducts, seed, stopData} from "../karma/data";
 import {ok} from "../is";
 import {background, calculateReportMetrics} from "../karma/background";
 import {getCompleteCalculationConsent, Product, ReportData} from "../karma";
@@ -10,7 +10,7 @@ const calculationConsent = getCompleteCalculationConsent();
 {
 
     const products = await listProducts();
-    const partners = await listPartners();
+    const organisations = await listOrganisations();
 
     function findProduct(name: string) {
         const lower = name.toLowerCase();
@@ -19,11 +19,11 @@ const calculationConsent = getCompleteCalculationConsent();
         return product;
     }
 
-    function findPartner(name: string) {
+    function findOrganisation(name: string) {
         const lower = name.toLowerCase();
-        const partner = partners.find(partner => partner.partnerName.toLowerCase().includes(lower));
-        ok(partner, `Expected to find partner ${name}`);
-        return partner;
+        const organisation = organisations.find(organisation => organisation.organisationName.toLowerCase().includes(lower));
+        ok(organisation, `Expected to find organisation ${name}`);
+        return organisation;
     }
 
     const shishkaberry = findProduct("Shishkaberry");
@@ -31,7 +31,7 @@ const calculationConsent = getCompleteCalculationConsent();
     const eve = findProduct("Eve");
     const equiposa = findProduct("Equiposa");
 
-    const wellworks = findPartner("Wellworks");
+    const wellworks = findOrganisation("Wellworks");
 
     const now = Date.now();
 
@@ -51,8 +51,8 @@ const calculationConsent = getCompleteCalculationConsent();
             productPurchaseFeeCost: "0.00",
             productPurchaseItems: "2",
             productPurchase: true,
-            productPurchasePartnerId: wellworks.partnerId,
-            productPurchasePartnerName: wellworks.partnerName,
+            productPurchaseOrganisationId: wellworks.organisationId,
+            productPurchaseOrganisationName: wellworks.organisationName,
             productSize: product.sizes?.at(0),
             calculationConsent,
             ...data,

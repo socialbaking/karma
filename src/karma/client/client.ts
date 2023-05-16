@@ -7,7 +7,7 @@ import {
     Product,
     ProductData,
     ReportData,
-    Report, MetricsData, ReportMetrics, ReportMetricsData, CalculationSource,
+    Report, MetricsData, ReportMetrics, ReportMetricsData, CalculationSource, Organisation,
 } from "./interface.readonly";
 import {
     Client as ClientInterface,
@@ -86,6 +86,26 @@ export class Client implements ClientInterface {
         );
         ok(response.ok, "addCategory response not ok");
         return await response.json();
+    }
+
+    async listOrganisations(): Promise<Organisation[]> {
+        const {
+            baseUrl,
+            headers,
+            prefix
+        } = this;
+        const response = await fetch(
+            new URL(
+                `${prefix}/organisations`,
+                baseUrl
+            ),
+            {
+                method: "GET",
+                headers
+            }
+        );
+        ok(response.ok, "listOrganisations response not ok");
+        return response.json();
     }
 
     async listPartners(): Promise<Partner[]> {

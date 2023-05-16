@@ -163,15 +163,15 @@ export const reportData = {
                 }
             ]
         },
-        productPurchasePartnerId: {
+        productPurchaseOrganisationId: {
             type: "string",
             nullable: true
         },
-        productPurchasePartnerName: {
+        productPurchaseOrganisationName: {
             type: "string",
             nullable: true
         },
-        productPurchasePartnerText: {
+        productPurchaseOrganisationText: {
             type: "string",
             nullable: true
         },
