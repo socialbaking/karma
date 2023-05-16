@@ -3,6 +3,7 @@ import {FunctionComponent} from "react";
 import {CannabisIcon} from "./cannabis";
 import {EyeDropperIcon} from "./eye-dropper";
 import {WrenchIcon} from "./wrench";
+import {IconProps} from "./types";
 
 export * from "./calendar";
 export * from "./globe";
@@ -18,15 +19,24 @@ export * from "./cannabis-solid";
 export * from "./prescription-bottle";
 export * from "./svg-text";
 
-export function CategoryIcon({ categoryName }: { categoryName: string }) {
+export const BASIC_CATEGORY_FLOWER = "flower" as const;
+export const BASIC_CATEGORY_OIL = "oil" as const;
+export const BASIC_CATEGORY_EQUIPMENT = "equipment" as const;
+export const BASIC_CATEGORIES = [
+    BASIC_CATEGORY_FLOWER,
+    BASIC_CATEGORY_OIL,
+    BASIC_CATEGORY_EQUIPMENT
+]
+
+export function CategoryIcon({ categoryName, ...rest }: { categoryName: string } & IconProps) {
     const Icon = getCategoryIcon();
-    return <Icon />;
+    return <Icon {...rest} />;
 
     function getCategoryIcon(): FunctionComponent | undefined {
         const lower = categoryName.toLowerCase();
-        if (lower === "flower") return CannabisIcon;
-        if (lower === "oil") return EyeDropperIcon;
-        if (lower === "equipment") return WrenchIcon;
+        if (lower === BASIC_CATEGORY_FLOWER) return CannabisIcon;
+        if (lower === BASIC_CATEGORY_OIL) return EyeDropperIcon;
+        if (lower === BASIC_CATEGORY_EQUIPMENT) return WrenchIcon;
         return GlobeIcon;
     }
 }

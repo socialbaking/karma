@@ -2,7 +2,7 @@ import {PropsWithChildren} from "react";
 import {description, namespace, project} from "../../package";
 import {getOrigin} from "../../listen/config";
 import {useQuery} from "./data";
-import {CannabisSolidIcon} from "../client/components/icons";
+import {BASIC_CATEGORY_FLOWER, CategoryIcon} from "../client/components/icons";
 
 export interface LayoutProps {
     title?: string;
@@ -53,7 +53,11 @@ const items = [
 ] as const;
 
 function Logo() {
-    return <CannabisSolidIcon className="h-8 w-auto fill-white" title="Social Baking Karma" />;
+    return (
+        <div className="flex flex-row align-start items-center">
+            <CategoryIcon categoryName={BASIC_CATEGORY_FLOWER} className="h-8 w-auto fill-white" title="Social Baking Karma" />
+        </div>
+    )
 }
 
 export function BaseLayout({ children, title }: PropsWithChildren<LayoutProps>) {
