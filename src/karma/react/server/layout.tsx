@@ -52,6 +52,14 @@ const items = [
 ] as const;
 
 export function BaseLayout({ children, title }: PropsWithChildren<LayoutProps>) {
+    const script = `
+    const { client } = await import("/client/pages/index.js");
+    try {
+        await client();
+    } catch (error) {
+       console.error(error);
+    }
+    `
     return (
         <html lang="en" className="h-full bg-white">
         <head>
@@ -63,7 +71,22 @@ export function BaseLayout({ children, title }: PropsWithChildren<LayoutProps>) 
             <link href="/server.css" rel="stylesheet" />
         </head>
         <body className="h-full">
+        <div className="flex items-center gap-x-6 bg-gray-900 px-6 py-2.5 sm:px-3.5 sm:before:flex-1 sm:after:flex-1 justify-center">
+            <p className="text-sm leading-6 text-white">
+                <span className="flex items-center flex-row justify-center">
+                    <strong className="font-semibold">This software is still being refined</strong>&nbsp;
+                    <svg viewBox="0 0 2 2" className="hidden lg:block mx-2 inline h-0.5 w-0.5 fill-current" aria-hidden="true">
+                        <circle cx="1" cy="1" r="1"/>
+                    </svg>
+                    <span>
+                        Data displayed is not currently verified or checked, and will be removed without further notice.<br />
+                        Data is intended to be used only for user experience testing.
+                    </span>
+                </span>
+            </p>
+        </div>
         {children}
+        <script type="module" dangerouslySetInnerHTML={{ __html: script }} />
         </body>
         </html>
     )
@@ -92,38 +115,6 @@ export function AnonymousLayout(props: PropsWithChildren<LayoutProps>) {
                                     </div>
                                 </div>
                             </div>
-                            <div className="-mr-2 flex md:hidden">
-                                {/* Mobile menu button */}
-                                <button type="button"
-                                        className="inline-flex items-center justify-center rounded-md bg-indigo-600 p-2 text-indigo-200 hover:bg-indigo-500 hover:bg-opacity-75 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600"
-                                        aria-controls="mobile-menu" aria-expanded="false">
-                                    <span className="sr-only">Open main menu</span>
-                                    {/* Menu open: "hidden", Menu closed: "block" */}
-                                    <svg className="block h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5"
-                                         stroke="currentColor" aria-hidden="true">
-                                        <path strokeLinecap="round" strokeLinejoin="round"
-                                              d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/>
-                                    </svg>
-                                    {/* Menu open: "block", Menu closed: "hidden" */}
-                                    <svg className="hidden h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5"
-                                         stroke="currentColor" aria-hidden="true">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/>
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Mobile menu, show/hide based on menu state. */}
-                    <div className="md:hidden" id="mobile-menu">
-                        <div className="space-y-1 px-2 pb-3 pt-2 sm:px-3">
-                            {/* Current: "bg-indigo-700 text-white", Default: "text-white hover:bg-indigo-500 hover:bg-opacity-75" */}
-                            <a href="#"
-                               className="bg-indigo-700 text-white block rounded-md px-3 py-2 text-base font-medium"
-                               aria-current="page">Home</a>
-                        </div>
-                        <div className="border-t border-indigo-700 pb-3 pt-4">
-
                         </div>
                     </div>
                 </nav>
@@ -159,7 +150,7 @@ export function Layout(props: PropsWithChildren<LayoutProps>) {
                         From: "opacity-100"
                         To: "opacity-0"
                     */}
-                    <div className="fixed inset-0 bg-gray-900/80"></div>
+                    <div className="fixed inset-0 bg-gray-900/80" id="sidebar-backdrop"></div>
 
                     <div className="fixed inset-0 flex">
                         {/*
@@ -172,7 +163,7 @@ export function Layout(props: PropsWithChildren<LayoutProps>) {
                             From: "translate-x-0"
                             To: "-translate-x-full"
                         */}
-                        <div className="relative mr-16 flex w-full max-w-xs flex-1">
+                        <div className="relative mr-16 flex w-full max-w-xs flex-1" id="sidebar-menu">
                             {/*
                               Close button, show/hide based on off-canvas menu state.
                     
@@ -184,7 +175,7 @@ export function Layout(props: PropsWithChildren<LayoutProps>) {
                                 To: "opacity-0"
                             */}
                             <div className="absolute left-full top-0 flex w-16 justify-center pt-5">
-                                <button type="button" className="-m-2.5 p-2.5">
+                                <button type="button" id="sidebar-close-button" className="-m-2.5 p-2.5">
                                     <span className="sr-only">Close sidebar</span>
                                     <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" aria-hidden="true">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -264,7 +255,7 @@ export function Layout(props: PropsWithChildren<LayoutProps>) {
 
                 <div className="lg:pl-72">
                     <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
-                        <button type="button" className="-m-2.5 p-2.5 text-gray-700 lg:hidden">
+                        <button type="button" id="sidebar-open-button" className="-m-2.5 p-2.5 text-gray-700 lg:hidden">
                             <span className="sr-only">Open sidebar</span>
                             <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" aria-hidden="true">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
