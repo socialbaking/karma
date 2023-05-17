@@ -83,7 +83,7 @@ export function Calculator() {
             <div className="flex flex-col">
                 <label className={FORM_GROUP_CLASS}>
                     <span className="text-gray-700">Product Name</span>
-                    <input className={FORM_CLASS} type="text" name="productText" placeholder="Product Name" disabled={!!productName} defaultValue={productName ?? body?.productText} />
+                    <input className={FORM_CLASS} type="text" name="productText" placeholder="Product Name" disabled={!!productName} defaultValue={productName ?? body?.productText ?? body?.productName} />
                     {
                         productName ? <input type="hidden" value={productName} name="productName" /> : undefined
                     }
@@ -109,11 +109,11 @@ export function Calculator() {
                 {/*    <input className={FORM_CLASS} type="text" name="productPurchaseOrganisationText" placeholder="Purchased From" defaultValue={body?.productPurchaseOrganisationText} />*/}
                 {/*</label>*/}
             </div>
-            <hr className="my-8" />
-            <div className="flex flex-row">
-                <input type="checkbox" name="anonymous_boolean" id="anonymous_boolean" className="form-checkbox rounded m-1" defaultChecked={body?.anonymous ?? false} />
-                <label htmlFor="anonymous_boolean" className="ml-4 flex">Anonymous</label>
-            </div>
+            {/*<hr className="my-8" />*/}
+            {/*<div className="flex flex-row">*/}
+            {/*    <input type="checkbox" name="anonymous_boolean" id="anonymous_boolean" className="form-checkbox rounded m-1" defaultChecked={body?.anonymous ?? false} />*/}
+            {/*    <label htmlFor="anonymous_boolean" className="ml-4 flex">Anonymous</label>*/}
+            {/*</div>*/}
             <hr className="my-8" />
             <p>
                 I give consent for the above information to be stored and used with the following calculations,
