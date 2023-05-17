@@ -52,7 +52,7 @@ export function Products() {
                                     <span className="mx-4">
                                         This page includes&nbsp;
                                         <a href={contentUrl} target="_blank" className="text-blue-600 hover:bg-white underline hover:underline-offset-2">content published</a>
-                                        &nbsp;under&nbsp;
+                                        &nbsp;by&nbsp;
                                         <a href={copyrightUrl} target="_blank" className="text-blue-600 hover:bg-white underline hover:underline-offset-2">{label}</a>
                                     </span>
                                 </li>
