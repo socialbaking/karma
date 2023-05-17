@@ -7,11 +7,14 @@ import {
     ProductData,
     getProductStore,
     Product,
-    setProduct, PartnerData, Organisation, getOrganisationStore, OrganisationData
-} from "./data";
+    setProduct,
+    Organisation,
+    getOrganisationStore,
+    OrganisationData
+} from "../../data";
 import {v5} from "uuid";
-import {ok} from "../../is";
-import {HEALTH_GOVT_NZ_MINIMUM_PRODUCTS} from "../static";
+import {ok} from "../../../../is";
+import {HEALTH_GOVT_NZ_MINIMUM_PRODUCTS} from "../../../static";
 
 const firstSeedingDate = new Date(1683589864494).toISOString();
 const createdAt = firstSeedingDate;

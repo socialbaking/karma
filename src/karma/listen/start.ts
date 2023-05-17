@@ -11,7 +11,7 @@ import { dirname, join } from "node:path";
 import { bearerAuthentication } from "./authentication";
 import bearerAuthPlugin from "@fastify/bearer-auth";
 import authPlugin from "@fastify/auth";
-import {seed, stopData} from "../data";
+import {autoSeed, seed, stopData} from "../data";
 import {commitAt, commitShort} from "../package";
 import cookie from "@fastify/cookie";
 import {isLike, ok} from "../../is";
@@ -157,9 +157,7 @@ export async function start() {
     const app = await create();
 
     // Before we start, we should seed
-    if (process.env.ENABLE_SEED) {
-        await seed();
-    }
+    await autoSeed();
 
     const port = getPort();
 
