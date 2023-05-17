@@ -8,6 +8,7 @@ export interface OrganisationBaseData extends Record<string, unknown> {
     delivery?: boolean;
     clinic?: boolean;
     website?: string;
+    associatedBrandingTerms?: string[]; // Eg common names used to refer to the organisation by way of brand
 }
 
 export interface OrganisationData extends OrganisationBaseData {

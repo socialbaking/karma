@@ -10,7 +10,7 @@ import {
 import {createContext, useContext, useMemo} from "react";
 import {ok} from "../../../../is";
 import {getMatchingProducts} from "../../../utils";
-import {COPYRIGHT_LINK, COPYRIGHT_SVG_TEXT, COPYRIGHT_TEXT} from "../../../static";
+import {COPYRIGHT_LINK, COPYRIGHT_SVG_TEXT, COPYRIGHT_TEXT, TRUSTED_ROLE} from "../../../static";
 import {SingleProductMetrics} from "../../client/data";
 
 export interface Data {
@@ -88,9 +88,16 @@ export function useSubmitted(): boolean {
     return !!submitted;
 }
 
+
+const DISPLAY_GENERIC_OR_BRANDED_PRODUCTS = false;
+
 export function useProducts() {
     const { products } = useData();
-    return products;
+    const isTrusted = useIsTrusted();
+    return useMemo(() => {
+        if (DISPLAY_GENERIC_OR_BRANDED_PRODUCTS || isTrusted) return products;
+        return products.filter(value => !(value.generic || value.branded));
+    }, [products, isTrusted]);
 }
 
 export function useOrganisations() {
@@ -133,6 +140,8 @@ export function useSortedProducts(isSearch?: boolean) {
     const categories = useCategories();
 
     const search = useQuerySearch();
+
+
     return useMemo(() => {
         const categoryOrder = new Map<string, number | undefined>(
             categories.map(category => [category.categoryId, category.order] as const)
@@ -209,7 +218,7 @@ export function useProductMetrics(duration: CountryProductMetricDuration = "day"
                 .flatMap<string>(value => value.products.map(product => product.productId))
         );
         const results: ProductMetricsRecord = {};
-        let countryCode: string | undefined = undefined;
+        // let countryCode: string | undefined = undefined;
         for (const productId of productIds) {
             let matchingMetrics = durationMetrics
                 .filter(value => value.products.find(product => product.productId === productId));
@@ -223,7 +232,7 @@ export function useProductMetrics(duration: CountryProductMetricDuration = "day"
                 products
             };
         }
-        console.log(results);
+        // console.log(results);
         return results;
     }, [metrics, duration]);
 }
@@ -241,4 +250,33 @@ export function useDailyMetrics() {
 export function useRoles() {
     const { roles } = useData();
     return useMemo(() => roles ?? [], [roles]);
+}
+
+export function useIsRole(role: AuthenticationRole) {
+    const roles = useRoles();
+    return useMemo(() => isRole(roles, role), [roles, role])
+}
+
+function isRole(roles: AuthenticationRole[] | undefined, role: AuthenticationRole) {
+    if (!roles) return false;
+    return roles.includes(role);
+}
+
+export function useIsTrusted() {
+    const roles = useRoles();
+    return useMemo(() => {
+        return !!TRUSTED_ROLE.find(role => isRole(roles, role))
+    }, [roles])
+}
+
+export function useIsModerator() {
+    return useIsRole("moderator");
+}
+
+export function useIsIndustry() {
+    return useIsRole("industry");
+}
+
+export function useIsAdmin() {
+    return useIsRole("admin");
 }

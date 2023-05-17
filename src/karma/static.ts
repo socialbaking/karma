@@ -1,3 +1,5 @@
+import {AuthenticationRole} from "./data";
+
 export const HEALTH_GOVT_NZ = "https://www.health.govt.nz"
 export const HEALTH_GOVT_NZ_MINIMUM_PRODUCTS = `${HEALTH_GOVT_NZ}/our-work/regulation-health-and-disability-system/medicinal-cannabis-agency/medicinal-cannabis-agency-information-health-professionals/medicinal-cannabis-products-meet-minimum-quality-standard`;
 export const SEARCH_NZULM = "https://search.nzulm.org.nz";
@@ -19,3 +21,18 @@ export const COPYRIGHT_LINK: Record<string, string> = {
 export const COPYRIGHT_SVG_TEXT: Record<string, string> = {
 
 }
+
+
+
+//// ==------------==
+
+export const TRUSTED_ROLE: AuthenticationRole[] = [
+    "admin",
+    "industry",
+    "moderator",
+    "owner",
+    "pharmacy",
+    "clinic",
+    "developer",
+    "coordinator"
+]

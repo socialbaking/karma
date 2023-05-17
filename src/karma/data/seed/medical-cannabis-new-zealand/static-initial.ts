@@ -84,7 +84,11 @@ const organisationData: (OrganisationData & { partner?: boolean })[] = [
         approvedAt,
         approved: true,
         countryCode: "NZ",
-        partner: true
+        partner: true,
+        associatedBrandingTerms: [
+            "CC",
+            "CannaClinic"
+        ]
     },
     {
         organisationName: "CannaPlus+",
@@ -95,7 +99,13 @@ const organisationData: (OrganisationData & { partner?: boolean })[] = [
         approvedAt,
         approved: true,
         countryCode: "NZ",
-        partner: true
+        partner: true,
+        associatedBrandingTerms: [
+            "CannaPlus",
+            "Canna Plus",
+            "Canna Plus+",
+            "C+"
+        ]
     },
     {
         organisationName: "The Pain Clinic",
@@ -103,7 +113,10 @@ const organisationData: (OrganisationData & { partner?: boolean })[] = [
         pharmacy: true,
         approvedAt,
         approved: true,
-        countryCode: "NZ"
+        countryCode: "NZ",
+        associatedBrandingTerms: [
+            "Pain Clinic"
+        ]
     },
     {
         organisationName: "Green Doctors",
@@ -113,7 +126,10 @@ const organisationData: (OrganisationData & { partner?: boolean })[] = [
         website: "https://greendoctors.co.nz/",
         approvedAt,
         approved: true,
-        countryCode: "NZ"
+        countryCode: "NZ",
+        associatedBrandingTerms: [
+            "GD"
+        ]
     },
     {
         organisationName: "Dr Gulbransen GP",
@@ -121,7 +137,11 @@ const organisationData: (OrganisationData & { partner?: boolean })[] = [
         website: "https://www.cannabiscare.nz/",
         approvedAt,
         approved: true,
-        countryCode: "NZ"
+        countryCode: "NZ",
+        associatedBrandingTerms: [
+            "CannabisCare",
+            "Cannabis Care"
+        ]
     },
     {
         organisationName: "Koru Medical Clinic",
@@ -129,7 +149,10 @@ const organisationData: (OrganisationData & { partner?: boolean })[] = [
         website: "https://korumedical.co.nz/",
         approvedAt,
         approved: true,
-        countryCode: "NZ"
+        countryCode: "NZ",
+        associatedBrandingTerms: [
+            "Koru"
+        ]
     },
     {
         organisationName: "RestoreMe",
@@ -146,7 +169,10 @@ const organisationData: (OrganisationData & { partner?: boolean })[] = [
         website: "https://www.wellworks.co.nz/",
         approvedAt,
         approved: true,
-        countryCode: "NZ"
+        countryCode: "NZ",
+        associatedBrandingTerms: [
+            "Wellworks"
+        ]
     },
     {
         organisationName: "Nga Hua Pharmacy",
@@ -156,62 +182,95 @@ const organisationData: (OrganisationData & { partner?: boolean })[] = [
         approvedAt,
         approved: true,
         countryCode: "NZ",
-        partner: true
+        partner: true,
+        associatedBrandingTerms: [
+            "Nga Hua"
+        ]
     },
     {
         organisationName: "Medleaf Therapeutics",
         website: "https://medleaf.co.nz/",
         approvedAt,
         approved: true,
-        countryCode: "NZ"
+        countryCode: "NZ",
+        associatedBrandingTerms: [
+            "Medleaf",
+            "JC Logistics"
+        ]
     },
     {
         organisationName: "NUBU Pharmaceuticals",
         website: "https://www.nubupharma.com/",
         approvedAt,
         approved: true,
-        countryCode: "NZ"
+        countryCode: "NZ",
+        associatedBrandingTerms: [
+            "NUBU",
+            "KIKUYA",
+            "ANTG",
+            "MW Pharma"
+        ]
     },
     {
         organisationName: "MedReleaf NZ",
         approvedAt,
         approved: true,
-        countryCode: "NZ"
+        countryCode: "NZ",
+        associatedBrandingTerms: [
+            "Indica Industries"
+        ]
     },
     {
         organisationName: "CDC Pharmaceuticals",
         website: "https://www.cdc.co.nz/",
         approvedAt,
         approved: true,
-        countryCode: "NZ"
+        countryCode: "NZ",
+        associatedBrandingTerms: [
+            "Tilray"
+        ]
     },
     {
         organisationName: "Helius Therapeutics",
         website: "https://www.helius.co.nz/",
         approvedAt,
         approved: true,
-        countryCode: "NZ"
+        countryCode: "NZ",
+        associatedBrandingTerms: [
+            "Helius",
+            "SubDrops"
+        ]
     },
     {
         organisationName: "Cannasouth Bioscience",
         website: "https://www.cannasouth.co.nz/",
         approvedAt,
         approved: true,
-        countryCode: "NZ"
+        countryCode: "NZ",
+        associatedBrandingTerms: [
+            "Cannasouth",
+            "evalaCann"
+        ]
     },
     {
         organisationName: "RUA Bioscience",
         website: "https://www.ruabio.com/",
         approvedAt,
         approved: true,
-        countryCode: "NZ"
+        countryCode: "NZ",
+        associatedBrandingTerms: [
+            "RUA"
+        ]
     },
     {
         organisationName: "Emerge Health New Zealand",
         website: "https://emergeaotearoa.org.nz/",
         approvedAt,
         approved: true,
-        countryCode: "NZ"
+        countryCode: "NZ",
+        associatedBrandingTerms: [
+            "Sativex"
+        ]
     }
 ];
 
@@ -229,7 +288,7 @@ const partners = organisationData
 
 ok(partners.length);
 
-const organisations = organisationData
+export const organisations = organisationData
     .map(({ organisationName, partner, ...data }): Organisation => ({
         ...data,
         organisationName,
@@ -332,7 +391,7 @@ export async function seedPartners() {
 
 }
 
-async function seedProducts() {
+export async function seedProducts() {
     const [
         medleaf,
         nubu,
@@ -353,16 +412,16 @@ async function seedProducts() {
         "Emerge Health New Zealand"
     ].map(getOrganisation);
 
-    console.log({
-        medleaf,
-        nubu,
-        medReleaf,
-        cdc,
-        helius,
-        cannasouth,
-        rua,
-        emerge
-    })
+    // console.log({
+    //     medleaf,
+    //     nubu,
+    //     medReleaf,
+    //     cdc,
+    //     helius,
+    //     cannasouth,
+    //     rua,
+    //     emerge
+    // })
 
     const licenceApprovedAt = createdAt;
     const availableAt = createdAt;
@@ -864,9 +923,9 @@ async function seedProducts() {
         const { productName } = data;
         const productId = v5(productName, namespace);
         const existing = await productStore.get(productId);
-        if (existing && !isChange(data, existing)) {
-            return;
-        }
+        // if (existing && !isChange(data, existing)) {
+        //     return;
+        // }
         const product = await setProduct({
             ...existing,
             ...data,
@@ -877,7 +936,12 @@ async function seedProducts() {
     }
 
     await Promise.all(
-        products.map(putProduct)
+        products
+            .map(data => ({
+                ...data,
+                organisationId: data.organisationId ?? data.licencedOrganisationId
+            }))
+            .map(putProduct)
     );
 
 }

@@ -5,10 +5,18 @@ export interface ProductSizeData extends Record<string, unknown> {
     unit: string;
 }
 
+export interface ProductInfo {
+    title?: string;
+    text: string;
+    url?: string;
+    description?: string;
+}
+
 export interface ProductData extends Record<string, unknown> {
     productName: string;
     order?: number;
     countryCode?: string;
+    organisationId?: string;
     licencedOrganisationId?: string;
     // Flag for products we don't have the exact licence date for
     licenceApprovedBeforeGivenDate?: boolean;
@@ -26,6 +34,13 @@ export interface ProductData extends Record<string, unknown> {
     // Direct text about the active ingredients, not specific values
     activeIngredientDescriptions?: string[];
     categoryId?: string;
+    generic?: boolean;
+    branded?: boolean;
+    genericSearchTerm?: string;
+    genericCategoryNames?: string[];
+    genericAcronym?: string;
+    info?: ProductInfo[];
+    obsoleteAt?: string;
 }
 
 export interface ProductActiveIngredient {

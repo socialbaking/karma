@@ -4,6 +4,9 @@ import {ok} from "../../../is";
 import {toHumanNumberString} from "../../calculations";
 import {isNumberString} from "../../calculations/is";
 
+export const PRODUCT_PERCENTAGE_REGEX = /([≤<]?\s*\d+(?:\.\d+)?\s*%)/;
+export const PRODUCT_UNIT_REGEX = /(?:^|\s|[\[(])([≤<]?\s*(?:\d+\.\d+|\d+)\s*[a-z]{1,2}(?:\s*\/\s*[a-z][A-Za-z]?[a-z]*)?)(?:\s|$|,|[\])])/g;
+
 export async function setProduct(data: ProductData & Pick<Product, "productId"> & Partial<Product>): Promise<Product> {
     const store = await getProductStore();
     const updatedAt = new Date().toISOString();
@@ -24,13 +27,10 @@ export async function setProduct(data: ProductData & Pick<Product, "productId"> 
 
     function getActiveIngredientsFromString(string: string): ProductActiveIngredient[] {
 
-        const percentageRegex = /([≤<]?\s*\d+(?:\.\d+)?\s*%)/;
-        const unitRegex = /(?:^|\s|[\[(])([≤<]?\s*\d+(?:\.\d+)?\s*[a-z]+(?:\s*\/\s*[a-z]+)?)/ig;
-
         const ingredients: ProductActiveIngredient[] = [];
 
-        const percentageMatch = string.match(percentageRegex);
-        const unitMatches = string.matchAll(unitRegex);
+        const percentageMatch = string.match(PRODUCT_PERCENTAGE_REGEX);
+        const unitMatches = string.matchAll(PRODUCT_UNIT_REGEX);
 
         let type = string;
 
@@ -40,14 +40,12 @@ export async function setProduct(data: ProductData & Pick<Product, "productId"> 
             type = split[1];
         }
 
-        let calculated = false;
-
         if (percentageMatch) {
             const match = percentageMatch[1]
                 .replace(/%$/, "")
                 .trim();
 
-            const { value, prefix } = splitPrefix(match);
+            const { value, prefix } = splitValuePrefix(match);
             const unit = "%";
             ingredients.push({
                 type,
@@ -84,13 +82,11 @@ export async function setProduct(data: ProductData & Pick<Product, "productId"> 
         if (unitMatches) {
             for (const [,unitMatch] of unitMatches) {
 
-                const [withoutUnit, ...unitParts] = unitMatch
-                    .replace(/[\[\]()]/g, "")
-                    .trim()
-                    .split(/\s+/)
-
-                const unit = unitParts.join("");
-                const { value, prefix } = splitPrefix(withoutUnit);
+                const {
+                    unit,
+                    value,
+                    prefix
+                } = splitValueUnitPrefix(unitMatch);
 
                 ingredients.push({
                     type,
@@ -133,14 +129,28 @@ export async function setProduct(data: ProductData & Pick<Product, "productId"> 
 
         return ingredients;
 
-        function splitPrefix(value: string) {
-            // Remove any number
-            const prefix = value.replace(/\d+(?:\.\d+)?$/, "").trim();
-            return {
-                prefix: prefix ? prefix : undefined,
-                value: prefix ? value.replace(prefix, "").trim() : value
-            };
-        }
+    }
+}
 
+export function splitValuePrefix(value: string) {
+    // Remove any number
+    const prefix = value.replace(/\d+(?:\.\d+)?$/, "").trim();
+    return {
+        prefix: prefix ? prefix : undefined,
+        value: prefix ? value.replace(prefix, "").trim() : value
+    };
+}
+
+export function splitValueUnitPrefix(value: string) {
+    const [withoutUnit, ...unitParts] = value
+        .replace(/[\[\]()]/g, "")
+        .trim()
+        .split(/\s+/)
+
+    const unit = unitParts.join("");
+
+    return {
+        unit,
+        ...splitValuePrefix(withoutUnit)
     }
 }

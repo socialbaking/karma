@@ -22,7 +22,7 @@ export async function autoSeed() {
     const {
         ENABLE_SEED
     } = process.env;
-    if (!ENABLE_SEED) return;
+    if (!ENABLE_SEED?.length) return;
     if (ENABLE_SEED === "true" || ENABLE_SEED === "1") {
         return await seed();
     }

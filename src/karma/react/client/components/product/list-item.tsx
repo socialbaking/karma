@@ -121,6 +121,27 @@ export function ProductListItem({ product, category, metrics: allMetrics, report
                             ) : undefined
                         )
                     }
+                    {
+                        product.generic ? (
+                            <div className="block">
+                                <Label className="mt-1 text-gray-400">
+                                    Generic {product.genericCategoryNames?.join(", ")}
+                                </Label>
+                            </div>
+                        ) : product.branded ? (
+                            <div className="block">
+                                <Label className="mt-1 text-gray-400">
+                                    Branded {product.genericCategoryNames?.join(", ")}
+                                </Label>
+                            </div>
+                        ) : product.genericCategoryNames?.length ? (
+                            <div className="block">
+                                <Label className="mt-1 text-gray-400">
+                                    {product.genericCategoryNames?.join(", ")}
+                                </Label>
+                            </div>
+                        ) : undefined
+                    }
                 </div>
                 {
                     category ? (
