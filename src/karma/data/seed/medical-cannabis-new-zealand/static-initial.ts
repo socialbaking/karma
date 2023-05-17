@@ -17,15 +17,15 @@ import {ok} from "../../../../is";
 import {HEALTH_GOVT_NZ_MINIMUM_PRODUCTS} from "../../../static";
 
 const firstSeedingDate = new Date(1683589864494).toISOString();
-const createdAt = firstSeedingDate;
-const updatedAt = new Date().toISOString()
+export const createdAt = firstSeedingDate;
+export const updatedAt = new Date().toISOString()
 
 // Stable uuid namespace
-const namespace = "536165e4-aa2a-4d17-ad7e-751251497a11";
+export const namespace = "536165e4-aa2a-4d17-ad7e-751251497a11";
 
-const categories: Category[] = [
+export const categories: Category[] = [
     {
-        categoryName: "Oil"
+        categoryName: "Liquid"
     },
     {
         categoryName: "Flower"
@@ -48,7 +48,7 @@ const categories: Category[] = [
         order: index
     }));
 
-async function seedCategories() {
+export async function seedCategories() {
     const categoryStore = getCategoryStore();
 
     async function putCategory(data: Category) {
@@ -239,25 +239,53 @@ const organisations = organisationData
         updatedAt
     }));
 
-function getPartner(name: string) {
+export function getPartner(name: string): Partner | undefined {
     const found = partners.find(partner => partner.partnerName === name);
+    if (!found && name.includes("t/a")) {
+        const [baseName, tradingAs] = name.split("t/a");
+        try {
+            return getPartner(tradingAs.trim());
+        } catch {
+            return getPartner(baseName.trim());
+        }
+    }
+    if (!found && name.endsWith("Limited")) {
+        return getPartner(name.replace("Limited", "").trim())
+    }
+    if (!found && name.endsWith("Ltd")) {
+        return getPartner(name.replace("Ltd", "").trim())
+    }
     ok(found, `Expected partner ${name}`);
     return found;
 }
 
-function getOrganisation(name: string) {
+export function getOrganisation(name: string): Organisation | undefined {
     const found = organisations.find(organisation => organisation.organisationName === name);
+    if (!found && name.includes("t/a")) {
+        const [baseName, tradingAs] = name.split("t/a");
+        try {
+            return getOrganisation(tradingAs.trim());
+        } catch {
+            return getOrganisation(baseName.trim());
+        }
+    }
+    if (!found && name.endsWith("Limited")) {
+        return getOrganisation(name.replace("Limited", "").trim())
+    }
+    if (!found && name.endsWith("Ltd")) {
+        return getOrganisation(name.replace("Ltd", "").trim())
+    }
     ok(found, `Expected organisation ${name}`);
     return found;
 }
 
-function getCategory(name: string) {
+export function getCategory(name: string) {
     const found = categories.find(category => category.categoryName === name);
     ok(found, `Expected category ${name}`);
     return found;
 }
 
-function getPartnerId(name: string) {
+export function getPartnerId(name: string) {
     return getPartner(name).partnerId;
 }
 
@@ -345,12 +373,12 @@ async function seedProducts() {
     const licenceApprovalWebsite = HEALTH_GOVT_NZ_MINIMUM_PRODUCTS;
 
     const flower = getCategory("Flower");
-    const oil = getCategory("Oil");
+    const liquid = getCategory("Liquid");
 
     const products: ProductData[] = [
         {
             productName: "Helius CBD25 Full Spectrum",
-            categoryId: oil.categoryId,
+            categoryId: liquid.categoryId,
             licenceCountryCode: helius.countryCode,
             licencedOrganisationId: helius.organisationId,
             licenceApprovedBeforeGivenDate: true,
@@ -365,7 +393,7 @@ async function seedProducts() {
         },
         {
             productName: "Helius CBD100 Full Spectrum",
-            categoryId: oil.categoryId,
+            categoryId: liquid.categoryId,
             licenceCountryCode: helius.countryCode,
             licencedOrganisationId: helius.organisationId,
             licenceApprovedBeforeGivenDate: true,
@@ -380,7 +408,7 @@ async function seedProducts() {
         },
         {
             productName: "RUA CBD100",
-            categoryId: oil.categoryId,
+            categoryId: liquid.categoryId,
             licenceCountryCode: rua.countryCode,
             licencedOrganisationId: rua.organisationId,
             licenceApprovedBeforeGivenDate: true,
@@ -395,7 +423,7 @@ async function seedProducts() {
         },
         {
             productName: "Tilray P Oral Solution CBD 100",
-            categoryId: oil.categoryId,
+            categoryId: liquid.categoryId,
             licenceCountryCode: cdc.countryCode,
             licencedOrganisationId: cdc.organisationId,
             licenceApprovedBeforeGivenDate: true,
@@ -410,7 +438,7 @@ async function seedProducts() {
         },
         {
             productName: "Tilray P Oral Solution CBD 25",
-            categoryId: oil.categoryId,
+            categoryId: liquid.categoryId,
             licenceCountryCode: cdc.countryCode,
             licencedOrganisationId: cdc.organisationId,
             licenceApprovedBeforeGivenDate: true,
@@ -425,7 +453,7 @@ async function seedProducts() {
         },
         {
             productName: "SubDrops™ CBD100",
-            categoryId: oil.categoryId,
+            categoryId: liquid.categoryId,
             licenceCountryCode: helius.countryCode,
             licencedOrganisationId: helius.organisationId,
             licenceApprovedBeforeGivenDate: true,
@@ -440,7 +468,7 @@ async function seedProducts() {
         },
         {
             productName: "SubDrops™ CBD25",
-            categoryId: oil.categoryId,
+            categoryId: liquid.categoryId,
             licenceCountryCode: helius.countryCode,
             licencedOrganisationId: helius.organisationId,
             licenceApprovedBeforeGivenDate: true,
@@ -455,7 +483,7 @@ async function seedProducts() {
         },
         {
             productName: "evalaCann THC ≤1 mg: CBD 20 mg",
-            categoryId: oil.categoryId,
+            categoryId: liquid.categoryId,
             licenceCountryCode: cannasouth.countryCode,
             licencedOrganisationId: cannasouth.organisationId,
             licenceApprovedBeforeGivenDate: true,
@@ -471,7 +499,7 @@ async function seedProducts() {
         },
         {
             productName: "evalaCann THC 10 mg: CBD 15 mg",
-            categoryId: oil.categoryId,
+            categoryId: liquid.categoryId,
             licenceCountryCode: cannasouth.countryCode,
             licencedOrganisationId: cannasouth.organisationId,
             licenceApprovedBeforeGivenDate: true,
@@ -487,7 +515,7 @@ async function seedProducts() {
         },
         {
             productName: "evalaCann THC 10 mg: CBD  ≤1 mg",
-            categoryId: oil.categoryId,
+            categoryId: liquid.categoryId,
             licenceCountryCode: cannasouth.countryCode,
             licencedOrganisationId: cannasouth.organisationId,
             licenceApprovedBeforeGivenDate: true,
@@ -503,7 +531,7 @@ async function seedProducts() {
         },
         {
             productName: "Helius THC25 Full Spectrum",
-            categoryId: oil.categoryId,
+            categoryId: liquid.categoryId,
             licenceCountryCode: helius.countryCode,
             licencedOrganisationId: helius.organisationId,
             licenceApprovedBeforeGivenDate: true,
@@ -519,7 +547,7 @@ async function seedProducts() {
         },
         {
             productName: "Helius THC10:CBD10 Full Spectrum",
-            categoryId: oil.categoryId,
+            categoryId: liquid.categoryId,
             licenceCountryCode: helius.countryCode,
             licencedOrganisationId: helius.organisationId,
             licenceApprovedBeforeGivenDate: true,
@@ -535,7 +563,7 @@ async function seedProducts() {
         },
         {
             productName: "Tilray FS oral Solution THC 25",
-            categoryId: oil.categoryId,
+            categoryId: liquid.categoryId,
             licenceCountryCode: cdc.countryCode,
             licencedOrganisationId: cdc.organisationId,
             licenceApprovedBeforeGivenDate: true,
@@ -550,7 +578,7 @@ async function seedProducts() {
         },
         {
             productName: "Tilray FS Oral Solution THC 10 CBD 10",
-            categoryId: oil.categoryId,
+            categoryId: liquid.categoryId,
             licenceCountryCode: cdc.countryCode,
             licencedOrganisationId: cdc.organisationId,
             licenceApprovedBeforeGivenDate: true,
@@ -566,7 +594,7 @@ async function seedProducts() {
         },
         {
             productName: "Tilray FS Oral Solution THC 5:  CBD 20",
-            categoryId: oil.categoryId,
+            categoryId: liquid.categoryId,
             licenceCountryCode: cdc.countryCode,
             licencedOrganisationId: cdc.organisationId,
             licenceApprovedAt: "2023-05-10T02:20:00.000Z",

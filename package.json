@@ -126,7 +126,7 @@
     "c8": "^7.10.0",
     "chance": "^1.1.11",
     "change-case": "^4.1.2",
-    "cheerio": "^1.0.0-rc.10",
+    "cheerio": "^1.0.0-rc.12",
     "dom-lite": "^20.2.0",
     "filehound": "^1.17.4",
     "jest": "^27.1.0",
@@ -157,7 +157,8 @@
     "test:node": "export $(cat .env | xargs) && OTEL_SERVICE_NAME=karma-tests ENABLE_SEED=true node --enable-source-maps esnext/tests/index.js",
     "test:node:inspect": "yarn build && export $(cat .env | xargs) && OTEL_SERVICE_NAME=karma-tests ENABLE_SEED=true node --enable-source-maps --inspect-brk esnext/tests/index.js",
     "coverage": "export $(cat .env | xargs) && OTEL_SERVICE_NAME=karma-tests ENABLE_SEED=true c8 node esnext/tests/index.js && yarn postbuild",
-    "start": "node esnext/karma/listen/main.js",
-    "local": "ENABLE_SEED=true yarn build && yarn start"
+    "start": "node --enable-source-maps esnext/karma/listen/main.js",
+    "local": "yarn build && yarn seed && yarn start",
+    "seed": "node --enable-source-maps esnext/karma/data/seed/main.js"
   }
 }
