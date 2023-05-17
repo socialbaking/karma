@@ -155,9 +155,10 @@ export function ProductListItem({ product, category, metrics: allMetrics, report
             <div className="ml-2 flex-shrink-0 flex flex-col align-start justify-between mb-4">
               <div className="flex flex-row justify-end">
                   {
-                      ingredients.map((value, index) => (
-                          <PercentageLabel key={index} {...value} className="ml-1" />
-                      ))
+                      ingredients
+                          .map((value, index) => (
+                              <PercentageLabel key={index} {...value} className="ml-1" />
+                          ))
                   }
               </div>
               {
@@ -168,10 +169,19 @@ export function ProductListItem({ product, category, metrics: allMetrics, report
                                 aria-hidden="true"
                             />
                             <p>
-                                Available in {product.sizes.map(({ value, unit }, index, array) => {
-                                const isLast = index && array.length === (index + 1);
-                                return `${isLast ? "& " : ""}${value}${unit.length > 2 ? ` ${unit}` : unit}`
-                            }).join(", ")}
+                                Available in {
+                                    [...product.sizes]
+                                        .sort((a, b) => {
+                                            if (a.unit !== b.unit) {
+                                                return a.unit < b.unit ? -1 : 1;
+                                            }
+                                            return a.value > b.value ? -1 : 1;
+                                        })
+                                        .map(({ value, unit }, index, array) => {
+                                            const isLast = index && array.length === (index + 1);
+                                            return `${isLast ? "& " : ""}${value}${unit.length > 2 ? ` ${unit}` : unit}`
+                                        }).join(", ")
+                                }
                             </p>
                         </div>
                     ) : undefined
