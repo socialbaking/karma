@@ -135,7 +135,7 @@ export function useCopyrightInformation(products: Product[]) {
     }, [products]);
 }
 
-export function useSortedProducts(isSearch?: boolean | string) {
+export function useSortedProducts(isSearch?: boolean | string, direct?: boolean) {
     const products = useProducts();
     const categories = useCategories();
 
@@ -206,13 +206,13 @@ export function useSortedProducts(isSearch?: boolean | string) {
             if (!isSearch || !search) {
                 return products;
             }
-            return getMatchingProducts(products, typeof isSearch === "string" ? isSearch : search);
+            return getMatchingProducts(products, typeof isSearch === "string" ? isSearch : search, direct);
         }
-    }, [products, categories, search, isSearch]);
+    }, [products, categories, search, isSearch, direct]);
 }
 
 export function useProductByName(productName?: string): Product | undefined {
-    const products = useSortedProducts(productName);
+    const products = useSortedProducts(productName, true);
     if (!productName) return undefined;
     ok(products.length <= 1, "Given product name not unique, please use complete product name");
     return products[0];

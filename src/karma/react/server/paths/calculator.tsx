@@ -61,6 +61,7 @@ export function Calculator() {
     const category = useCategory(submittedProduct?.categoryId);
     const metrics = useProductMetrics("month");
     const searchedProduct = useProductByName(productName)
+    const searchedProductCategory = useCategory(searchedProduct?.categoryId);
     return (
         <form name="calculator" action="/calculator#action-section" method="post">
             {
@@ -77,13 +78,27 @@ export function Calculator() {
             <input type="hidden" name="countryCode" value={body?.countryCode ?? "NZ"} />
             <input type="hidden" name="timezone" value={body?.timezone ?? "Pacific/Auckland"} />
 
+            {
+                searchedProduct ? (
+                    <ul className="list-none">
+                        <ProductListItem
+                            url="/products"
+                            product={searchedProduct}
+                            category={searchedProductCategory}
+                            metrics={metrics[searchedProduct.productId]}
+                            overrideClassName="block hover:bg-gray-50 -mx-4 py-4 px-4"
+                        />
+                    </ul>
+                ) : undefined
+            }
+
             {/* calculation type */}
             <input type="hidden" value="true" name="productPurchase_boolean" />
 
             <div className="flex flex-col">
                 <label className={FORM_GROUP_CLASS}>
                     <span className="text-gray-700">Product Name</span>
-                    <input className={FORM_CLASS} type="text" name="productText" placeholder="Product Name" disabled={!!productName} defaultValue={productName ?? body?.productText ?? body?.productName} />
+                    <input className={FORM_CLASS} type="text" name="productText" placeholder="Product Name" disabled={!!productName} defaultValue={productName || body?.productText || body?.productName || submittedProduct?.productName} />
                     {
                         productName ? <input type="hidden" value={productName} name="productName" /> : undefined
                     }

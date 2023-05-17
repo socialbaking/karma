@@ -55,7 +55,6 @@ export async function seed() {
 }
 
 export async function seedFromHealthNZ() {
-    await seedFromNZULM();
 
     const response = await fetch(
         HEALTH_GOVT_NZ_MINIMUM_PRODUCTS,
@@ -68,6 +67,13 @@ export async function seedFromHealthNZ() {
     const text = await response.text();
     const $ = load(text);
 
+    // First apply the health nz products as a basis to search from
+    await seedHealthNZProducts($);
+    // Then let NZULM provide some detail
+    await seedFromNZULM();
+    // But ensure that health nz has provided the details directly
+    // and over-writes any defaults that came from nzulm
+    // but retains any new info found using the nzulm process
     await seedHealthNZProducts($);
 
 }
@@ -111,7 +117,7 @@ async function seedHealthNZProducts($: CheerioAPI) {
                     ok(licenceHolder || sponsor);
 
                     const sizes = splitSizes();
-                    console.log({ productName, sizes })
+                    // console.log({ productName, sizes })
 
                     const product: Product = {
                         categoryId,
@@ -416,7 +422,7 @@ async function seedFromNZULM() {
                     .map(value => NZULM_SEARCH_TERM_ACRONYM[value])
                     .filter(Boolean);
 
-                const [productName, ...rest] = row.termText
+                let [productName, ...rest] = row.termText
                     .split(new RegExp(`\\s${row.headerText}(?:[\\s,]|$)`))
                     .filter(value => value)
                     .map(value => {
@@ -439,6 +445,71 @@ async function seedFromNZULM() {
                 //     existingProducts.filter(product => product.organisationId === organisation.organisationId)
                 // ) : [];
 
+                const licencedProducts = organisation ? existingProducts.filter(
+                    value => value.licencedOrganisationId === organisation.organisationId
+                ) : [];
+
+                function alphaNumericOnly(value: string) {
+                    return value.replace(/[^\sa-z0-9]/i, "");
+                }
+
+                let productNameSearch = alphaNumericOnly(productName);
+                let licencedProduct: Product | undefined;
+
+                {
+                    const lowerProductName = productName.toLowerCase();
+                    licencedProduct = licencedProducts.find(
+                        (product) => {
+                            const lower = product.productName.toLowerCase();
+                            return lowerProductName.includes(lower);
+                        }
+                    );
+                }
+
+                if (!licencedProduct) {
+                    licencedProduct = licencedProducts
+                        .find(licencedProduct => {
+                            const nameAlpha = alphaNumericOnly(licencedProduct.productName);
+                            // Easy path
+                            return productNameSearch.startsWith(nameAlpha);
+                        });
+                }
+
+                if (organisation && !licencedProduct && category) {
+                    if (category.associatedTerms) {
+                        for (const term of category.associatedTerms) {
+                            const lowerTerm = term.toLowerCase();
+                            const lowerProduct = productNameSearch.toLowerCase();
+                            if (!lowerProduct.includes(lowerTerm)) continue;
+                            const index = lowerProduct.indexOf(lowerTerm);
+                            const before = productNameSearch.slice(0, index);
+                            const after = productNameSearch.slice(index + term.length);
+                            productNameSearch = [before, after]
+                                .map(value => value?.trim())
+                                .filter(Boolean)
+                                .join(" ");
+                        }
+                    }
+                    // console.log({ productName, productNameSearch, category, p: 1 });
+                    productNameSearch = productNameSearch
+                        .replace(category.categoryName, "")
+                        .replace(/\s{2,}/, " ");
+                    // console.log({ productName, productNameSearch, category, p: 2 });
+                    licencedProduct = licencedProducts
+                        .find(licencedProduct => {
+                            const nameAlpha = alphaNumericOnly(licencedProduct.productName);
+                            // Easy path
+                            return productNameSearch.startsWith(nameAlpha);
+                        })
+                } else if (!licencedProduct) {
+                    console.log({ productName, category });
+                }
+
+                if (licencedProduct) {
+                    console.log({ productName, licencedProduct });
+                    productName = licencedProduct.productName;
+                }
+
                 const product: Product = {
                     categoryId,
                     productId: v5(productName, namespace),
@@ -446,7 +517,9 @@ async function seedFromNZULM() {
                     createdAt,
                     updatedAt,
                     licenceApprovalWebsite: SEARCH_NZULM,
+                    sizes: getSizes(),
                     activeIngredientDescriptions: parseActiveIngredientDescriptions(),
+                    ...licencedProduct,
                     generic: row.flags.includes("generic"),
                     branded: row.flags.includes("branded"),
                     organisationId: organisation?.organisationId,
@@ -455,8 +528,7 @@ async function seedFromNZULM() {
                     genericCategoryNames: [row.headerText],
                     info: [
                         ...row.subsidies
-                    ],
-                    sizes: getSizes()
+                    ]
                 };
 
                 ok(product.generic || product.branded);

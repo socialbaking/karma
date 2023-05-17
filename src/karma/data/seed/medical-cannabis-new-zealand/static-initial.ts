@@ -45,7 +45,8 @@ const categoryData: CategoryData[] = [
         ],
         associatedTerms: [
             "Dried Flower",
-            "Dried Herb"
+            "Dried Herb",
+            "Whole Flower"
         ]
     },
     {

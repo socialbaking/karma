@@ -78,7 +78,7 @@ function toMetricTypeName(value: string): string {
 
 export function ProductListItem({ product, category, metrics: allMetrics, report: isReporting, overrideClassName, className, url }: ProductItemProps) {
   const { productId, sizes, ...attributes } = product;
-  const productUrl = `${url || "calculator"}?productName=${encodeURIComponent(product.productName)}`;
+  const productUrl = `${url || "calculator"}?search=${encodeURIComponent(product.productName)}`;
 
   const ingredients = useActiveIngredients(product);
   const sizeUnit = sizes?.[0]?.unit;

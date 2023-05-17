@@ -4,7 +4,7 @@ const NAME_SPLIT = " ";
 
 export function getMatchingProducts(products: Product[], search: string, direct?: boolean): Product[] {
     const exactMatch = products.filter(product => product.productName === search);
-    if (exactMatch.length) {
+    if (exactMatch.length && direct) {
         return exactMatch;
     }
     const lower = search.toLowerCase();
@@ -43,5 +43,5 @@ export function getMatchingProducts(products: Product[], search: string, direct?
                 })
         );
     }
-    return [...new Set(matching)];
+    return [...new Set<Product>([...exactMatch, ...matching])];
 }
