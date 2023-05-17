@@ -145,23 +145,70 @@ export function useSortedProducts(isSearch?: boolean | string) {
         const categoryOrder = new Map<string, number | undefined>(
             categories.map(category => [category.categoryId, category.order] as const)
         );
-        const sortedProducts = products
+        function isNumber(value: unknown): value is number {
+            return typeof value === "number";
+        }
+        const matchingProducts = filtered();
+
+        const categoryProducts = categories
             .slice()
             .sort((a, b) => {
-                const categoryOrderA = categoryOrder.get(a.categoryId) ?? Number.MAX_SAFE_INTEGER
-                const categoryOrderB = categoryOrder.get(b.categoryId) ?? Number.MAX_SAFE_INTEGER;
-                if (categoryOrderA !== categoryOrderB) {
-                    return categoryOrderA < categoryOrderB ? -1 : 1;
-                }
-                const orderA = a.order ?? Number.MAX_SAFE_INTEGER;
-                const orderB = b.order ?? Number.MAX_SAFE_INTEGER;
-                return orderA < orderB ? -1 : 1;
+                if (isNumber(a.order) && isNumber(b.order)) return a.order < b.order ? -1 : 1;
+                if (isNumber(a.order)) return -1;
+                if (isNumber(b.order)) return 1;
+                return 0;
+            })
+            .flatMap<Product>(({ categoryId }) => {
+                const categoryProducts = matchingProducts.filter(
+                    product => product.categoryId === categoryId
+                );
+
+                const licencedProducts = categoryProducts.filter(
+                    value => value.licencedOrganisationId
+                );
+
+                const otherProducts = categoryProducts.filter(
+                    value => !value.licencedOrganisationId
+                )
+
+                return [
+                    ...sortProductsByOrderAndName(licencedProducts),
+                    ...sortProductsByName(otherProducts)
+                ]
             });
-        if (!isSearch || !search) {
-            return sortedProducts;
+
+        const otherProducts = matchingProducts
+            .filter(product => !categoryProducts.includes(product));
+
+        return [
+            ...categoryProducts,
+            ...otherProducts
+        ];
+
+        function sortProductsByOrderAndName(products: Product[]) {
+            return products
+                .slice()
+                .sort((a, b) => {
+                    if (isNumber(a.order) && isNumber(b.order)) return a.order < b.order ? -1 : 1;
+                    if (isNumber(a.order)) return -1;
+                    if (isNumber(b.order)) return 1;
+                    return a.productName.toLowerCase() < b.productName.toLowerCase() ? -1 : 1
+                })
         }
-        return getMatchingProducts(sortedProducts, typeof isSearch === "string" ? isSearch : search);
-    }, [products, categories, search]);
+
+        function sortProductsByName(products: Product[]) {
+            return products
+                .slice()
+                .sort((a, b) => a.productName.toLowerCase() < b.productName.toLowerCase() ? -1 : 1)
+        }
+
+        function filtered() {
+            if (!isSearch || !search) {
+                return products;
+            }
+            return getMatchingProducts(products, typeof isSearch === "string" ? isSearch : search);
+        }
+    }, [products, categories, search, isSearch]);
 }
 
 export function useProductByName(productName?: string): Product | undefined {

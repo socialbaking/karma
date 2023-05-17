@@ -16,7 +16,6 @@ export function getMatchingProducts(products: Product[], search: string, direct?
     if (matching.length || direct) {
         return matching;
     }
-    const maxOrder = Math.max(0, ...matching.map(value => value.order ?? 0))
     // Second search across for any other matches
     // Direct matches should be first
     return matching.concat(
@@ -26,9 +25,5 @@ export function getMatchingProducts(products: Product[], search: string, direct?
                 const lowerName = product.productName.toLowerCase();
                 return lowerSplit.every(value => lowerName.includes(value));
             })
-            .map((product, index) => ({
-                ...product,
-                order: maxOrder + (product.order ?? (products.length + index))
-            }))
     );
 }
