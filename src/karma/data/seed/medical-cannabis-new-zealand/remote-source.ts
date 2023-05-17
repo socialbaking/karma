@@ -1,6 +1,6 @@
 import {packageIdentifier} from "../../../package";
 import {HEALTH_GOVT_NZ_MINIMUM_PRODUCTS, SEARCH_NZULM} from "../../../static";
-import {AcceptedFilters, AnyNode, Cheerio, CheerioAPI, load, Element} from "cheerio"
+import {AcceptedFilters, AnyNode, Cheerio, CheerioAPI, load, Element, FilterFunction} from "cheerio"
 import {ok} from "../../../../is";
 import {
     seedCategories,
@@ -22,6 +22,7 @@ import {
     getProduct
 } from "../../product";
 import {v5} from "uuid";
+import {Category} from "../../category";
 
 const USER_AGENT = `A Patient Collective, running ${packageIdentifier}`;
 const HEADERS = {
@@ -109,6 +110,9 @@ async function seedHealthNZProducts($: CheerioAPI) {
                     ok(activeIngredients);
                     ok(licenceHolder || sponsor);
 
+                    const sizes = splitSizes();
+                    console.log({ productName, sizes })
+
                     const product: Product = {
                         categoryId,
                         productId: v5(productName, namespace),
@@ -119,7 +123,7 @@ async function seedHealthNZProducts($: CheerioAPI) {
                         licencedOrganisationId: licenceHolder?.organisationId,
                         licenceApprovalWebsite: HEALTH_GOVT_NZ_MINIMUM_PRODUCTS,
                         activeIngredientDescriptions: splitDescriptions(),
-                        sizes: splitSizes(),
+                        sizes,
                         info: [
                             ...Object.entries(row)
                                 .map(([title, text]): ProductInfo => ({
@@ -139,27 +143,31 @@ async function seedHealthNZProducts($: CheerioAPI) {
                         const packSizeKey = Object.keys(row)
                             .find(value => value.toLowerCase().startsWith(searchKey));
                         const value = row[packSizeKey];
-                        if (!packSizeKey) return undefined;
-                        if (!value) return undefined;
+                        if (!packSizeKey) return getDefaultSizes();
+                        if (!value) return getDefaultSizes();
                         const unit = getUnit();
-                        if (!unit) return undefined;
+                        if (!unit) return getDefaultSizes();
                         const valueSplit = value
                             .split(/,\s*/g)
                             .map(value => value.replace(unit, "").trim())
                             .filter(Boolean);
-                        if (!valueSplit.length) return undefined;
+                        if (!valueSplit.length) return getDefaultSizes();
                         return valueSplit
                             .map((value): ProductSizeData => ({
                                 value,
                                 unit
                             }));
                         function getUnit() {
-                            let withoutKey = packSizeKey.toLowerCase().replace(searchKey, "").trim();
+                            let withoutKey = packSizeKey.substring(searchKey.length).trim();
                             if (!withoutKey.startsWith("(")) return undefined;
                             withoutKey = withoutKey.substring(1);
                             if (!withoutKey.endsWith(")")) return undefined;
                             return withoutKey.substring(0, withoutKey.length - 1).trim();
                         }
+                    }
+
+                    function getDefaultSizes() {
+                        return category?.defaultSizes;
                     }
 
                     function splitDescriptions() {
@@ -188,11 +196,11 @@ async function seedHealthNZProducts($: CheerioAPI) {
         });
 
     const products = await Promise.all(productPromises);
-    for (const product of products) {
-        console.log(product.productName);
-        console.log(product.activeIngredientDescriptions?.join("\n"));
-        console.log(product.activeIngredients)
-    }
+    // for (const product of products) {
+    //     console.log(product.productName);
+    //     console.log(product.activeIngredientDescriptions?.join("\n"));
+    //     console.log(product.activeIngredients)
+    // }
     return products;
 
 
@@ -201,18 +209,29 @@ async function seedHealthNZProducts($: CheerioAPI) {
 }
 
 function findCategory(table: Partial<RemoteTableInfo>) {
-    const headerLower = table.headerText?.toLowerCase();
-    const subheaderLower = table.subheaderText?.toLowerCase();
-    const found = categories.find(({ categoryName }) => {
-        const lower = categoryName.toLowerCase();
-        return headerLower?.includes(lower) || subheaderLower?.includes(lower);
-    })
-    if (found) return found;
-    const sectionLower = table.sectionText.toLowerCase();
-    return categories.find(({ categoryName }) => {
-        const lower = categoryName.toLowerCase();
-        return sectionLower.includes(lower);
-    });
+    return (
+        find(table.subheaderText?.toLowerCase()) ??
+        find(table.headerText?.toLowerCase()) ??
+        find(table.sectionText.toLowerCase())
+    );
+
+    function find(value?: string): Category | undefined {
+        if (!value) return undefined;
+        const lower = value.toLowerCase();
+        let found = categories.find(({ categoryName }) => {
+            return lower.includes(categoryName.toLowerCase());
+        })
+        if (found) {
+            return found;
+        }
+        return categories.find(({ associatedTerms }) => {
+            if (!associatedTerms) return false;
+            const termsLower = associatedTerms.map(value => value.toLowerCase());
+            return termsLower.find(term => {
+                return lower.includes(term);
+            })
+        });
+    }
 }
 
 function getHealthNZTables($: CheerioAPI) {
@@ -436,7 +455,8 @@ async function seedFromNZULM() {
                     genericCategoryNames: [row.headerText],
                     info: [
                         ...row.subsidies
-                    ]
+                    ],
+                    sizes: getSizes()
                 };
 
                 ok(product.generic || product.branded);
@@ -473,6 +493,20 @@ async function seedFromNZULM() {
                 // }
 
                 return product;
+
+                function getSizes() {
+                    const sizes = restSplit
+                        .filter(value => /^\d+\s[a-z][A-Z]?[a-z]*$/.test(value));
+                    if (!sizes.length) return getDefaultSizes();
+                    return sizes.map(size => {
+                        const [value, unit] = size.split(/\s/);
+                        return { value, unit }
+                    })
+                }
+
+                function getDefaultSizes() {
+                    return category?.defaultSizes;
+                }
 
                 function parseActiveIngredientDescriptions(): string[] {
 
@@ -579,6 +613,9 @@ async function seedFromNZULM() {
                         if (value.endsWith(" mg") && category?.categoryName.toLowerCase() === "liquid") {
                             return `${value}/mL`; // All liquids in NZ are measured in mL
                         }
+                        if (value.endsWith(" mg") && !row.headerText.includes(" ")) {
+                            return `${value}/${row.headerText}`
+                        }
                         // TODO if not liquid but say, lozenge, it should be per unit type found
                         return value;
                     }
@@ -636,7 +673,15 @@ async function seedFromNZULM() {
                 ...duplicateProducts[0],
                 genericCategoryNames: [...new Set<string>(
                     duplicateProducts.flatMap<string>(product => product.genericCategoryNames)
-                )]
+                )],
+                activeIngredientDescriptions: [...new Set<string>(
+                    duplicateProducts.flatMap<string>(product => product.activeIngredientDescriptions)
+                )],
+                // Using set here will remove the default category size duplicates if we are using them
+                // ...hopefully
+                sizes: [...new Set(
+                    duplicateProducts.flatMap<ProductSizeData>(product => product.sizes ?? [])
+                )],
             };
 
             const categoriesMatching = duplicateProducts.every(
@@ -655,17 +700,6 @@ async function seedFromNZULM() {
             );
 
             ok(brandGenericMatching);
-
-            const everyActiveIngredientMatching = duplicateProducts.every(
-                value => (
-                    value.activeIngredientDescriptions.length === product.activeIngredientDescriptions.length &&
-                    value.activeIngredientDescriptions.every(
-                        description => product.activeIngredientDescriptions.includes(description)
-                    )
-                )
-            );
-
-            ok(everyActiveIngredientMatching);
 
             products = products.filter(value => !duplicateProducts.includes(value));
             products.push(product);
@@ -691,7 +725,7 @@ async function seedFromNZULM() {
             ...await getProduct(product.productId),
             ...product
         });
-        console.log(out.productName, out.activeIngredientDescriptions, out.activeIngredients)
+        // console.log(out.productName, out.activeIngredientDescriptions, out.activeIngredients)
     }
 
 

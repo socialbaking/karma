@@ -7,7 +7,8 @@ import {
     useProduct, useProductMetrics,
     useQuery,
     useSortedProducts,
-    useSubmitted
+    useSubmitted,
+    useProductByName, useQuerySearch
 } from "../data";
 import {calculationSources, hasConsent} from "../../../calculations";
 import {ReportData, Report} from "../../../client";
@@ -55,18 +56,23 @@ export function Calculator() {
     const submitted = useSubmitted();
     const result = useMaybeResult<{ report: Report, metrics?: ReportMetrics }>();
     const error = useError();
-    const { productName } = useQuery();
+    const productName = useQuerySearch();
     const submittedProduct = useProduct(body?.productId);
     const category = useCategory(submittedProduct?.categoryId);
     const metrics = useProductMetrics("month");
+    const searchedProduct = useProductByName(productName)
     return (
         <form name="calculator" action="/calculator#action-section" method="post">
             {
                 result ? (
-                    <script type="application/json" id="result" dangerouslySetInnerHTML={{__html: JSON.stringify(result, undefined, "  ")}} />
+                    <script type="application/json" id="result-json" dangerouslySetInnerHTML={{__html: JSON.stringify(result, undefined, "  ")}} />
                 ) : undefined
             }
-            <script type="application/json" id="products" dangerouslySetInnerHTML={{__html: JSON.stringify(products)}} />
+            {
+                searchedProduct ? (
+                    <script type="application/json" id="product-json" dangerouslySetInnerHTML={{__html: JSON.stringify(searchedProduct)}} />
+                ) : undefined
+            }
 
             <input type="hidden" name="countryCode" value={body?.countryCode ?? "NZ"} />
             <input type="hidden" name="timezone" value={body?.timezone ?? "Pacific/Auckland"} />

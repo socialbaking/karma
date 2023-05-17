@@ -170,7 +170,7 @@ export function ProductListItem({ product, category, metrics: allMetrics, report
                             <p>
                                 Available in {product.sizes.map(({ value, unit }, index, array) => {
                                 const isLast = index && array.length === (index + 1);
-                                return `${isLast ? "& " : ""}${value}${unit}`
+                                return `${isLast ? "& " : ""}${value}${unit.length > 2 ? ` ${unit}` : unit}`
                             }).join(", ")}
                             </p>
                         </div>

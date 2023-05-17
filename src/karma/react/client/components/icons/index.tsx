@@ -20,11 +20,11 @@ export * from "./prescription-bottle";
 export * from "./svg-text";
 
 export const BASIC_CATEGORY_FLOWER = "flower" as const;
-export const BASIC_CATEGORY_OIL = "oil" as const;
+export const BASIC_CATEGORY_LIQUID = "liquid" as const;
 export const BASIC_CATEGORY_EQUIPMENT = "equipment" as const;
 export const BASIC_CATEGORIES = [
     BASIC_CATEGORY_FLOWER,
-    BASIC_CATEGORY_OIL,
+    BASIC_CATEGORY_LIQUID,
     BASIC_CATEGORY_EQUIPMENT
 ]
 
@@ -35,7 +35,7 @@ export function CategoryIcon({ categoryName, ...rest }: { categoryName: string }
     function getCategoryIcon(): FunctionComponent | undefined {
         const lower = categoryName.toLowerCase();
         if (lower === BASIC_CATEGORY_FLOWER) return CannabisIcon;
-        if (lower === BASIC_CATEGORY_OIL) return EyeDropperIcon;
+        if (lower === BASIC_CATEGORY_LIQUID || lower === "oil") return EyeDropperIcon;
         if (lower === BASIC_CATEGORY_EQUIPMENT) return WrenchIcon;
         return GlobeIcon;
     }

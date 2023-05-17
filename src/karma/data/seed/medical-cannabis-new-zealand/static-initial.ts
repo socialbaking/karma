@@ -23,12 +23,30 @@ export const updatedAt = new Date().toISOString()
 // Stable uuid namespace
 export const namespace = "536165e4-aa2a-4d17-ad7e-751251497a11";
 
-export const categories: Category[] = [
+const categoryData: CategoryData[] = [
     {
-        categoryName: "Liquid"
+        categoryName: "Liquid",
+        defaultUnit: "mg/mL",
+        defaultSizes: [{value: "30", unit: "mL"}],
+        associatedTerms: [
+            "Oil",
+            "Dropper",
+            "Drops",
+            "Sublingual Solution"
+        ]
     },
     {
-        categoryName: "Flower"
+        categoryName: "Flower",
+        defaultUnit: "g",
+        defaultSizes: [
+            {value: "10", unit: "g"},
+            {value: "15", unit: "g"},
+            {value: "30", unit: "g"},
+        ],
+        associatedTerms: [
+            "Dried Flower",
+            "Dried Herb"
+        ]
     },
     {
         categoryName: "Equipment"
@@ -39,7 +57,9 @@ export const categories: Category[] = [
     {
         categoryName: "Fee"
     }
-]
+];
+
+export const categories: Category[] = categoryData
     .map((data: CategoryData, index): Category => ({
         ...data,
         categoryId: v5(data.categoryName, namespace),
@@ -55,9 +75,6 @@ export async function seedCategories() {
         const { categoryName } = data;
         const categoryId = v5(categoryName, namespace);
         const existing = await categoryStore.get(categoryId);
-        if (existing && !isChange(data, existing)) {
-            return;
-        }
         const category: Category = {
             ...existing,
             ...data,
@@ -370,9 +387,6 @@ export async function seedPartners() {
     async function putOrganisation(data: Organisation) {
         const { organisationId } = data;
         const existing = await organisationStore.get(organisationId);
-        if (existing && !isChange(data, existing)) {
-            return;
-        }
         const organisation: Organisation = {
             ...existing,
             ...data,
@@ -923,9 +937,6 @@ export async function seedProducts() {
         const { productName } = data;
         const productId = v5(productName, namespace);
         const existing = await productStore.get(productId);
-        // if (existing && !isChange(data, existing)) {
-        //     return;
-        // }
         const product = await setProduct({
             ...existing,
             ...data,

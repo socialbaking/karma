@@ -3,13 +3,17 @@ import {Product} from "./client";
 const NAME_SPLIT = " ";
 
 export function getMatchingProducts(products: Product[], search: string, direct?: boolean) {
+    const exactMatch = products.filter(product => product.productName === search);
+    if (exactMatch.length) {
+        return exactMatch;
+    }
     const lower = search.toLowerCase();
     const lowerSplit = lower.split(NAME_SPLIT);
     const matching = products.filter(product => {
         const lowerName = product.productName.toLowerCase();
         return lowerName.includes(lower);
     });
-    if (matching.length && direct) {
+    if (matching.length || direct) {
         return matching;
     }
     const maxOrder = Math.max(0, ...matching.map(value => value.order ?? 0))
