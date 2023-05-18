@@ -85,11 +85,29 @@ export function getAuthenticationState(): AuthenticationState {
     if (!state) {
         const partner = getMaybePartner();
         if (partner) {
-            throw new Error("Expected to be authenticated as a member");
+            return {
+                type: "partner",
+                stateId: partner.partnerId,
+                stateKey: partner.partnerId,
+                partnerId: partner.partnerId,
+                roles: [
+                    "partner"
+                ],
+                createdAt: partner.createdAt,
+                expiresAt: partner.createdAt
+            }
         }
     }
     ok(state, "Expected to be authenticated");
     return state;
+}
+
+export function getMaybeAuthenticationRoles(): AuthenticationRole[] {
+    try {
+        return getAuthenticationRoles()
+    } catch {
+        return [];
+    }
 }
 
 export function getAuthenticationRoles(): AuthenticationRole[] {

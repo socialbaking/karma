@@ -10,4 +10,5 @@ export type AuthenticationRole = (
     | "booster"
     | "developer"
     | "coordinator"
+    | "partner"
 );

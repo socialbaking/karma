@@ -12,7 +12,8 @@ export const namedRoles: Record<AuthenticationRole, string> = {
     clinic: "Clinic",
     booster: "Discord Server Booster",
     developer: "Software Developer",
-    coordinator: "Coordinator"
+    coordinator: "Coordinator",
+    partner: "Partner"
 };
 
 export const alternativeRoleNames: Partial<Record<AuthenticationRole, string[]>> = {
@@ -61,7 +62,8 @@ export const roles: AuthenticationRole[] = [
     "developer",
     "coordinator",
     "booster",
-    "clinic"
+    "clinic",
+    "partner"
 ];
 const stringRoles: string[] = roles;
 

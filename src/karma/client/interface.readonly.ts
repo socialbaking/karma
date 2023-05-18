@@ -10,6 +10,7 @@ export type AuthenticationRole = (
     | "booster"
     | "developer"
     | "coordinator"
+    | "partner"
 );
 
 export interface CalculationSource {

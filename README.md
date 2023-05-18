@@ -9,7 +9,7 @@
 
 ### Test Coverage
 
- ![75.61%25 lines covered](https://img.shields.io/badge/lines-75.61%25-yellow) ![75.61%25 statements covered](https://img.shields.io/badge/statements-75.61%25-yellow) ![62.53%25 functions covered](https://img.shields.io/badge/functions-62.53%25-yellow) ![84.49%25 branches covered](https://img.shields.io/badge/branches-84.49%25-brightgreen)
+ ![69.23%25 lines covered](https://img.shields.io/badge/lines-69.23%25-yellow) ![69.23%25 statements covered](https://img.shields.io/badge/statements-69.23%25-yellow) ![57.86%25 functions covered](https://img.shields.io/badge/functions-57.86%25-yellow) ![83.57%25 branches covered](https://img.shields.io/badge/branches-83.57%25-brightgreen)
 
 [//]: # (badges)
 
@@ -62,6 +62,7 @@ export type AuthenticationRole = (
     | "booster"
     | "developer"
     | "coordinator"
+    | "partner"
 );
 
 export interface CalculationSource {
