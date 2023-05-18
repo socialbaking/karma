@@ -18,6 +18,7 @@ export const description: string = packageInfo.description || "";
 export const version: string = packageInfo.version;
 export const packageIdentifier = `${name}@${version}`;
 export const homepage: string = packageInfo.homepage;
+export const bugsUrl: string = packageInfo.bugs?.url ?? homepage;
 
 export * from "./package.readonly";
 
