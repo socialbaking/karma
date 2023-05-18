@@ -136,7 +136,7 @@ export function AnonymousLayout(props: PropsWithChildren<LayoutProps>) {
                                 <div className="hidden md:block">
                                     <div className="ml-10 flex items-baseline space-x-4">
                                         {/* Current: "bg-indigo-700 text-white", Default: "text-white hover:bg-indigo-500 hover:bg-opacity-75" */}
-                                        <a href="#"
+                                        <a href="/"
                                            className="bg-indigo-700 text-white rounded-md px-3 py-2 text-sm font-medium"
                                            aria-current="page">Home</a>
                                     </div>
