@@ -450,7 +450,11 @@ async function seedFromNZULM() {
                 ) : [];
 
                 function alphaNumericOnly(value: string) {
-                    return value.replace(/[^\sa-z0-9]/i, "");
+                    return value
+                        .replace(/[^\sa-z0-9]/gi, "")
+                        // Splitting up TYP000TYP000
+                        .replace(/(^|\s)([A-Z]{3})(\d+)($[A-Z]{3}|$|\s)/g, "$1$2 $3 $4")
+                        .replace(/\s{2,}/g, " ")
                 }
 
                 let productNameSearch = alphaNumericOnly(productName);
@@ -490,14 +494,15 @@ async function seedFromNZULM() {
                                 .join(" ");
                         }
                     }
-                    // console.log({ productName, productNameSearch, category, p: 1 });
+                    console.log({ productName, productNameSearch, category, p: 1 });
                     productNameSearch = productNameSearch
                         .replace(category.categoryName, "")
                         .replace(/\s{2,}/, " ");
-                    // console.log({ productName, productNameSearch, category, p: 2 });
+                    console.log({ productName, productNameSearch, category, p: 2 });
                     licencedProduct = licencedProducts
                         .find(licencedProduct => {
                             const nameAlpha = alphaNumericOnly(licencedProduct.productName);
+                            console.log({ nameAlpha });
                             // Easy path
                             return productNameSearch.startsWith(nameAlpha);
                         })
