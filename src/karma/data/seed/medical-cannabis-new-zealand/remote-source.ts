@@ -19,7 +19,7 @@ import {
     setProduct,
     ProductSizeData,
     PRODUCT_UNIT_REGEX,
-    getProduct
+    getProduct, getActiveIngredients
 } from "../../product";
 import {v5} from "uuid";
 import {Category} from "../../category";
@@ -459,11 +459,20 @@ async function seedFromNZULM() {
                 ) : [];
 
                 function alphaNumericOnly(value: string) {
-                    if (row.headerText) {
+                    // If it's a multi-word term, easy to replace
+                    if (row.headerText?.includes(" ")) {
                         value = value.replace(new RegExp(row.headerText, "ig"), "")
                     }
-                    if (category) {
+                    // If it's a multi-word term, easy to replace
+                    if (category?.categoryName.includes(" ")) {
                         value = value.replace(new RegExp(category.categoryName, "ig"), "");
+                    }
+                    if (organisation) {
+                        value = value.replace(new RegExp(organisation.organisationName, "ig"), "");
+                        value = organisation.associatedBrandingTerms?.reduce(
+                            (value, term) => value.replace(new RegExp(term, "ig"), ""),
+                            value
+                        ) ?? value;
                     }
                     for (const term of NZULM_TERMS) {
                         value = value.replace(new RegExp(term, "ig"), NZULM_TERM_ACRONYM[term]);
@@ -480,6 +489,12 @@ async function seedFromNZULM() {
                         .filter(Boolean)
                         .join(" ");
                 }
+
+                const isObsolete = row.flags.includes("obsolete");
+
+                const activeIngredientDescriptions = parseActiveIngredientDescriptions();
+                const sizes = getSizes();
+                const activeIngredients = getActiveIngredients({ sizes }, activeIngredientDescriptions);
 
                 let productNameSearch = alphaNumericOnly(productName);
                 let licencedProduct: Product | undefined;
@@ -510,10 +525,10 @@ async function seedFromNZULM() {
                             // the terms are sometimes used as part of a branded name
                             const lowerTerm = ` ${term.toLowerCase()} `;
                             const lowerProduct = productNameSearch.toLowerCase();
-                            if (!lowerProduct.includes(` ${lowerTerm} `)) continue;
+                            if (!lowerProduct.includes(lowerTerm)) continue;
                             const index = lowerProduct.indexOf(lowerTerm);
                             const before = productNameSearch.slice(0, index);
-                            const after = productNameSearch.slice(index + term.length);
+                            const after = productNameSearch.slice(index + lowerTerm.length);
                             productNameSearch = [before, after]
                                 .map(value => value?.trim())
                                 .filter(Boolean)
@@ -526,28 +541,8 @@ async function seedFromNZULM() {
                             const nameAlpha = alphaNumericOnly(licencedProduct.productName).toLowerCase();
                             return productNameSearch.toLowerCase().startsWith(nameAlpha);
                         })
-                    if (!licencedProduct) {
-                        // Try just the very first word and see if it matches a product
-                        // ... there is one listing that matches this
-                        // Remember, it has to be a branded product anyway
-                        licencedProduct = licencedProducts
-                            .find(licencedProduct => {
-                                const nameAlpha = alphaNumericOnly(licencedProduct.productName)
-                                    .toLowerCase()
-                                    .split(" ")
-                                    // Make sure we aren't just using a brand term or name
-                                    .filter(value => !(
-                                        organisation.organisationName.toLowerCase().includes(value) ||
-                                        organisation.associatedBrandingTerms?.find(
-                                            term => term.toLowerCase().includes(value)
-                                        )
-                                    ))
-                                    .sort((a, b) => a.length > b.length ? -1 : 1)
-                                    [0]
-                                if (!nameAlpha) return false;
-                                // Notice specifically this is includes, not starts with
-                                return productNameSearch.toLowerCase().includes(nameAlpha);
-                            })
+                    if (!licencedProduct && !isObsolete) {
+                        console.log("No licenced product, but branded", { productName, productNameSearch, category })
                     }
                 }
 
@@ -563,8 +558,8 @@ async function seedFromNZULM() {
                     createdAt,
                     updatedAt,
                     licenceApprovalWebsite: SEARCH_NZULM,
-                    sizes: getSizes(),
-                    activeIngredientDescriptions: parseActiveIngredientDescriptions(),
+                    sizes,
+                    activeIngredientDescriptions,
                     ...licencedProduct,
                     generic: row.flags.includes("generic"),
                     branded: row.flags.includes("branded"),
@@ -578,8 +573,6 @@ async function seedFromNZULM() {
                 };
 
                 ok(product.generic || product.branded);
-
-                const isObsolete = row.flags.includes("obsolete");
 
                 if (isObsolete) {
                     const existing = existingProducts.find(value => value.productId === product.productId);

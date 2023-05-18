@@ -235,7 +235,8 @@ const organisationData: (OrganisationData & { partner?: boolean })[] = [
         approved: true,
         countryCode: "NZ",
         associatedBrandingTerms: [
-            "Indica Industries"
+            "Indica Industries",
+            "MedReleaf"
         ]
     },
     {
@@ -286,7 +287,7 @@ const organisationData: (OrganisationData & { partner?: boolean })[] = [
         approved: true,
         countryCode: "NZ",
         associatedBrandingTerms: [
-            "Sativex"
+
         ]
     }
 ];
