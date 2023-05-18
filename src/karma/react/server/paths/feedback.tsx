@@ -17,6 +17,7 @@ export interface FeedbackFormMetaData extends FormMetaData {
     type: "feedback";
     title: string;
     message: string;
+    name?: string;
     locatedInNewZealand?: boolean;
     storageConsent?: boolean;
     externalIssueUrl?: string;
@@ -62,7 +63,8 @@ export async function submit(request: FastifyRequest) {
                     `Form Meta: ${meta.formMetaId}`,
                     `Package: ${packageIdentifier}`,
                     `Commit: ${commit}`,
-                    isAnonymous() ? "Anonymous" : "Authenticated"
+                    isAnonymous() ? "Anonymous" : "Authenticated",
+                    data.name ? `Name: ${data.name}` : "No name given"
                 ].filter(Boolean).join("\n")
             ].join("\n\n-------------\n\n"),
             assignees: [],
@@ -123,6 +125,10 @@ export function Feedback() {
                 <label className={FORM_GROUP_CLASS}>
                     <span className="text-gray-700">Title</span>
                     <input className={FORM_CLASS} type="text" name="title" placeholder="Feedback Title" defaultValue={result?.success ? "" : body?.title || ""} />
+                </label>
+                <label className={FORM_GROUP_CLASS}>
+                    <span className="text-gray-700">Optional Name</span>
+                    <input className={FORM_CLASS} type="text" name="name" placeholder="Optional Name" defaultValue={result?.success ? "" : body?.name || ""} />
                 </label>
                 <label className={FORM_GROUP_CLASS}>
                     <span className="text-gray-700">Message</span>
