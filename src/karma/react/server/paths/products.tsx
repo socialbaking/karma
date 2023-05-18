@@ -29,7 +29,7 @@ export function Products() {
                 </ul>
             </div>
             {search ? (
-                <div>
+                <div className="mx-4">
                     <br />
                     <br />
                     <a href="?">Clear search</a>

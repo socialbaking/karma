@@ -255,8 +255,7 @@ const organisationData: (OrganisationData & { partner?: boolean })[] = [
         approved: true,
         countryCode: "NZ",
         associatedBrandingTerms: [
-            "Helius",
-            "SubDrops"
+            "Helius"
         ]
     },
     {

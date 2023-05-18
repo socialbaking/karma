@@ -41,6 +41,15 @@ const NZULM_SEARCH_TERM_ACRONYM: Record<string, string> = {
     "cannabigerol": "CBG"
 }
 
+const NZULM_TERM_ACRONYM: Record<string, string> = {
+    ...NZULM_SEARCH_TERM_ACRONYM,
+    "purified": "P",
+    "full spectrum": "FS",
+    "broad spectrum": "BS"
+}
+const NZULM_TERMS = Object.keys(NZULM_TERM_ACRONYM);
+const NZULM_TERM_ACRONYMS = Object.values(NZULM_TERM_ACRONYM);
+
 export async function seed() {
 
     // Use the static categories shared between
@@ -450,11 +459,26 @@ async function seedFromNZULM() {
                 ) : [];
 
                 function alphaNumericOnly(value: string) {
+                    if (row.headerText) {
+                        value = value.replace(new RegExp(row.headerText, "ig"), "")
+                    }
+                    if (category) {
+                        value = value.replace(new RegExp(category.categoryName, "ig"), "");
+                    }
+                    for (const term of NZULM_TERMS) {
+                        value = value.replace(new RegExp(term, "ig"), NZULM_TERM_ACRONYM[term]);
+                    }
                     return value
                         .replace(/[^\sa-z0-9]/gi, "")
                         // Splitting up TYP000TYP000
-                        .replace(/(^|\s)([A-Z]{3})(\d+)($[A-Z]{3}|$|\s)/g, "$1$2 $3 $4")
-                        .replace(/\s{2,}/g, " ")
+                        // Add space around the value by default, as we will remove this all in the next step
+                        // to keep all spacing consistent
+                        // nzulm listings aren't spacing consistent anyway
+                        .replace(/([A-Z]{3})(\d+)/g, " $1 $2 ")
+                        .split(/\s/g)
+                        .map(value => value.trim())
+                        .filter(Boolean)
+                        .join(" ");
                 }
 
                 let productNameSearch = alphaNumericOnly(productName);
@@ -482,9 +506,11 @@ async function seedFromNZULM() {
                 if (organisation && !licencedProduct && category) {
                     if (category.associatedTerms) {
                         for (const term of category.associatedTerms) {
-                            const lowerTerm = term.toLowerCase();
+                            // Match only the term by itself
+                            // the terms are sometimes used as part of a branded name
+                            const lowerTerm = ` ${term.toLowerCase()} `;
                             const lowerProduct = productNameSearch.toLowerCase();
-                            if (!lowerProduct.includes(lowerTerm)) continue;
+                            if (!lowerProduct.includes(` ${lowerTerm} `)) continue;
                             const index = lowerProduct.indexOf(lowerTerm);
                             const before = productNameSearch.slice(0, index);
                             const after = productNameSearch.slice(index + term.length);
@@ -494,24 +520,39 @@ async function seedFromNZULM() {
                                 .join(" ");
                         }
                     }
-                    console.log({ productName, productNameSearch, category, p: 1 });
-                    productNameSearch = productNameSearch
-                        .replace(category.categoryName, "")
-                        .replace(/\s{2,}/, " ");
-                    console.log({ productName, productNameSearch, category, p: 2 });
+                    productNameSearch = alphaNumericOnly(productNameSearch)
                     licencedProduct = licencedProducts
                         .find(licencedProduct => {
-                            const nameAlpha = alphaNumericOnly(licencedProduct.productName);
-                            console.log({ nameAlpha });
-                            // Easy path
-                            return productNameSearch.startsWith(nameAlpha);
+                            const nameAlpha = alphaNumericOnly(licencedProduct.productName).toLowerCase();
+                            return productNameSearch.toLowerCase().startsWith(nameAlpha);
                         })
-                } else if (!licencedProduct) {
-                    console.log({ productName, category });
+                    if (!licencedProduct) {
+                        // Try just the very first word and see if it matches a product
+                        // ... there is one listing that matches this
+                        // Remember, it has to be a branded product anyway
+                        licencedProduct = licencedProducts
+                            .find(licencedProduct => {
+                                const nameAlpha = alphaNumericOnly(licencedProduct.productName)
+                                    .toLowerCase()
+                                    .split(" ")
+                                    // Make sure we aren't just using a brand term or name
+                                    .filter(value => !(
+                                        organisation.organisationName.toLowerCase().includes(value) ||
+                                        organisation.associatedBrandingTerms?.find(
+                                            term => term.toLowerCase().includes(value)
+                                        )
+                                    ))
+                                    .sort((a, b) => a.length > b.length ? -1 : 1)
+                                    [0]
+                                if (!nameAlpha) return false;
+                                // Notice specifically this is includes, not starts with
+                                return productNameSearch.toLowerCase().includes(nameAlpha);
+                            })
+                    }
                 }
 
                 if (licencedProduct) {
-                    console.log({ productName, licencedProduct });
+                    // console.log({ productName, licencedProduct });
                     productName = licencedProduct.productName;
                 }
 

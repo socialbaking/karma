@@ -148,7 +148,8 @@ export function useSortedProducts(isSearch?: boolean | string, direct?: boolean)
         function isNumber(value: unknown): value is number {
             return typeof value === "number";
         }
-        const matchingProducts = filtered();
+        const matchingProducts = filtered()
+            .filter(value => !value.obsoleteAt)
 
         const categoryProducts = categories
             .slice()
