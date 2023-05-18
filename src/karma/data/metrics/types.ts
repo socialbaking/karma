@@ -1,4 +1,4 @@
-import {CalculationConsent, CalculationConsentItem, ReportDateData} from "../report";
+import {CalculationConsent, CalculationConsentItem, ReportDateData, ReportRoleData} from "../report";
 import {ProductSizeData} from "../product";
 import {Expiring} from "../expiring";
 
@@ -31,7 +31,7 @@ export interface ReportMetricsData extends MetricsData {
     parentReportId?: string;
 }
 
-export interface ReportMetrics extends ReportMetricsData, Record<string, unknown> {
+export interface ReportMetrics extends ReportMetricsData, ReportRoleData, Record<string, unknown> {
     metricsId: string;
     reportId: string;
     reportedAt: string;

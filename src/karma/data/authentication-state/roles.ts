@@ -1,5 +1,5 @@
-import {AuthenticationRole} from "./types";
 import {isLike, ok} from "../../../is";
+import {AuthenticationRole} from "../authentication-role";
 
 export const namedRoles: Record<AuthenticationRole, string> = {
     admin: "Admin",

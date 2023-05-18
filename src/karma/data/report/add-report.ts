@@ -4,6 +4,7 @@ import {REPORT_EXPIRES_IN_MS, REPORT_REFERENCE_EXPIRES_IN_MS, getReportQueueStor
 import {ReportReference, ReportReferenceData} from "./reference";
 import {getExpiresAt} from "../expiring-kv";
 import {getReportDates} from "../../calculations";
+import {getAuthenticationRoles} from "../../authentication";
 
 
 export interface AddReportInput extends ReportData {
@@ -14,8 +15,10 @@ export async function addReport(data: AddReportInput): Promise<Report> {
     const store = getReportStore();
     const reportId = v4();
     const createdAt = new Date().toISOString();
+    const roles = getAuthenticationRoles();
     const report: Report = {
         ...data,
+        roles,
         reportId,
         createdAt,
         updatedAt: createdAt,

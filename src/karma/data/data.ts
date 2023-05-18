@@ -11,3 +11,4 @@ export * from "./authentication-state";
 export * from "./calculation";
 export * from "./organisation";
 export * from "./form-meta";
+export * from "./authentication-role";

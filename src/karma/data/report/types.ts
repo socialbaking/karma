@@ -1,5 +1,6 @@
 import {ProductSizeData} from "../product";
 import {Expiring} from "../expiring";
+import {AuthenticationRole} from "../authentication-role";
 
 export interface ReportDateData {
     orderedAt?: string;
@@ -18,6 +19,10 @@ export interface CalculationConsentItem extends Record<string, unknown> {
 
 export interface CalculationConsent {
     calculationConsent?: CalculationConsentItem[];
+}
+
+export interface ReportRoleData {
+    roles: AuthenticationRole[]
 }
 
 export interface ReportData extends ReportDateData, Expiring, CalculationConsent, Record<string, unknown> {
@@ -43,7 +48,7 @@ export interface ReportData extends ReportDateData, Expiring, CalculationConsent
     anonymous?: boolean;
 }
 
-export interface Report extends ReportData {
+export interface Report extends ReportData, ReportRoleData {
     reportId: string;
     createdAt: string;
     updatedAt: string;

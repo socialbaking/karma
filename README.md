@@ -50,6 +50,20 @@ export interface Client {
     background(query: Record<string, string> | URLSearchParams): Promise<void>;
 }
 
+export type AuthenticationRole = (
+    | "moderator"
+    | "admin"
+    | "owner"
+    | "patient"
+    | "industry"
+    | "member"
+    | "pharmacy"
+    | "clinic"
+    | "booster"
+    | "developer"
+    | "coordinator"
+);
+
 export interface CalculationSource {
     calculationKey: string;
     title: string;
@@ -114,7 +128,7 @@ export interface ReportMetricsData extends MetricsData {
     parentReportId?: string;
 }
 
-export interface ReportMetrics extends ReportMetricsData, Record<string, unknown> {
+export interface ReportMetrics extends ReportMetricsData, ReportRoleData, Record<string, unknown> {
     metricsId: string;
     reportId: string;
     reportedAt: string;
@@ -262,6 +276,10 @@ export interface CalculationConsent {
     calculationConsent?: CalculationConsentItem[];
 }
 
+export interface ReportRoleData {
+    roles: AuthenticationRole[]
+}
+
 export interface ReportData extends ReportDateData, Expiring, CalculationConsent, Record<string, unknown> {
     countryCode: string; // "NZ"
     currencySymbol?: string; // "$"
@@ -285,7 +303,7 @@ export interface ReportData extends ReportDateData, Expiring, CalculationConsent
     anonymous?: boolean;
 }
 
-export interface Report extends ReportData {
+export interface Report extends ReportData, ReportRoleData {
     reportId: string;
     createdAt: string;
     updatedAt: string;

@@ -31,7 +31,8 @@ export function calculate(report: Report, context: BaseCalculationContext): Repo
         productSize,
         calculationConsent,
         countryCode,
-        timezone
+        timezone,
+        roles
     } = report;
 
     const currencySymbol = report.currencySymbol || context.currencySymbol;
@@ -161,6 +162,7 @@ export function calculate(report: Report, context: BaseCalculationContext): Repo
         currencySymbol,
         timezone,
         products,
-        calculationConsent
+        calculationConsent,
+        roles
     };
 }

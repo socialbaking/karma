@@ -3,6 +3,7 @@ import {MetricsData, ReportMetrics, ReportMetricsData} from "./types";
 import {v4} from "uuid";
 import {getReportDates} from "../../calculations";
 import {addReportReference} from "../report";
+import {getAuthenticationRoles} from "../../authentication";
 
 export const NO_REPORT_PREFIX = "withoutReport_" as const;
 
@@ -21,8 +22,10 @@ export async function addReportMetrics(data: ReportMetricsData) {
     }
 
     const createdAt = new Date().toISOString();
+    const roles = getAuthenticationRoles();
     const metrics: ReportMetrics = {
         ...data,
+        roles,
         metricsId,
         reportedAt: data.reportedAt ?? createdAt,
         updatedAt: createdAt,

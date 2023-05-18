@@ -1,20 +1,7 @@
 import {Expiring} from "../expiring";
+import {AuthenticationRole} from "../authentication-role";
 
 export type AuthenticationStateType = "discord" | "reddit" | "cookie" | "authsignal" | "partner";
-
-export type AuthenticationRole = (
-    | "moderator"
-    | "admin"
-    | "owner"
-    | "patient"
-    | "industry"
-    | "member"
-    | "pharmacy"
-    | "clinic"
-    | "booster"
-    | "developer"
-    | "coordinator"
-);
 
 export interface AuthenticationStateFromData {
     type: AuthenticationStateType | string;
