@@ -159,7 +159,7 @@ export function Calculator() {
             </ul>
             <hr className="my-8" />
             <div id="action-section">
-                <button type="submit" className="bg-sky-500 hover:bg-sky-700 px-5 py-2.5 text-sm leading-5 rounded-md font-semibold text-white">
+                <button type="submit" className="bg-sky-500 hover:bg-sky-700 px-4 py-2.5 text-sm leading-5 rounded-md font-semibold text-white">
                     Submit & Calculate
                 </button>
                 <section id="result-section">
@@ -210,7 +210,7 @@ export function Calculator() {
                                                         metrics: [result.metrics],
                                                         products: result.metrics.products
                                                     }) : metrics[submittedProduct.productId]}
-                                                    overrideClassName="block hover:bg-gray-50 -mx-4 py-4 px-4"
+                                                    overrideClassName="block hover:bg-gray-50 -mx-2 py-2 sm:-mx-4 sm:py-4 px-4"
                                                 />
                                             </ul>
                                         </>

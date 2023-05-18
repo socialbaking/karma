@@ -93,10 +93,10 @@ export function ProductListItem({ product, category, metrics: allMetrics, report
 
   return (
     <li>
-      <a href={productUrl} className={overrideClassName ?? `block hover:bg-gray-50 px-4 py-4 sm:px-6 ${className || ""}`}>
-          <div className="flex justify-between flex-wrap">
-            <div className={`text-sm font-medium text-indigo-600 flex flex-wrap mb-4 flex-col`}>
-                <div className="truncate mr-1">
+      <a href={productUrl} className={overrideClassName ?? `block hover:bg-gray-50 sm:px-4 py-4 sm:px-6 ${className || ""}`}>
+          <div className="flex justify-between flex-wrap flex-col sm:flex-row">
+            <div className={`text-sm font-medium text-indigo-600 flex flex-wrap mb-4 flex-col flex-1`}>
+                <div className="flex flex-wrap mr-1">
                     {attributes?.productName}
                 </div>
                 <div className="flex flex-col">
@@ -152,8 +152,8 @@ export function ProductListItem({ product, category, metrics: allMetrics, report
                     ) : undefined
                 }
             </div>
-            <div className="ml-2 flex-shrink-0 flex flex-col align-start justify-between mb-4">
-              <div className="flex flex-row justify-end">
+            <div className="sm:ml-2 flex-1 flex flex-col-reverse sm:flex-col align-start justify-between mb-4">
+              <div className="flex justify-start sm:justify-end flex-row pt-4 sm:pt-0">
                   {
                       ingredients
                           .map((value, index) => (
@@ -163,13 +163,13 @@ export function ProductListItem({ product, category, metrics: allMetrics, report
               </div>
               {
                     product.sizes?.length ? (
-                        <div className="flex items-center text-sm text-gray-500 justify-end flex-row mt-2">
+                        <div className="flex items-center text-sm text-gray-500 justify-start sm:justify-end flex-row sm:mt-2">
                             <PrescriptionBottleIcon
                                 className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
                                 aria-hidden="true"
                             />
                             <p>
-                                Available in {
+                                {product.generic ? "Typically available" : "Available"} in {
                                     [...product.sizes]
                                         .sort((a, b) => {
                                             if (a.unit !== b.unit) {
