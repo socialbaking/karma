@@ -89,14 +89,14 @@ export function useSubmitted(): boolean {
 }
 
 
-const DISPLAY_GENERIC_OR_BRANDED_PRODUCTS = false;
+const DISPLAY_GENERIC_PRODUCTS = false;
 
 export function useProducts() {
     const { products } = useData();
     const isTrusted = useIsTrusted();
     return useMemo(() => {
-        if (DISPLAY_GENERIC_OR_BRANDED_PRODUCTS || isTrusted) return products;
-        return products.filter(value => !(value.generic || value.branded));
+        if (DISPLAY_GENERIC_PRODUCTS || isTrusted) return products;
+        return products.filter(value => !value.generic);
     }, [products, isTrusted]);
 }
 
