@@ -80,7 +80,7 @@ export function BaseLayout({ children, title }: PropsWithChildren<LayoutProps>) 
             <link href="/server.css" rel="stylesheet" />
         </head>
         <body className="h-full">
-        <div className="flex items-center gap-x-6 bg-gray-900 px-6 py-2.5 sm:px-3.5 sm:before:flex-1 sm:after:flex-1 justify-center">
+        <div className="lg:pl-72 flex items-center gap-x-6 bg-gray-900 px-6 py-2.5 sm:px-3.5 sm:before:flex-1 sm:after:flex-1 justify-center">
             <p className="text-sm leading-6 text-white">
                 <span className="flex items-center flex-row justify-center">
                     <strong className="font-semibold">This software is still being refined</strong>
