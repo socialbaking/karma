@@ -128,7 +128,4 @@ export async function viewRoutes(fastify: FastifyInstance) {
             });
         }
     });
-
-    const handler = createPathHandler("/home");
-    fastify.get("/", handler);
 }

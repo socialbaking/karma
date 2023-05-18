@@ -7,7 +7,7 @@ import {
     addAuthenticationState,
     systemLogSchema,
     addCookieState,
-    AuthenticationRole, getAuthenticationRoles, getAuthenticationRole
+    AuthenticationRole, getAuthenticationRoles, getAuthenticationRole, deleteAuthenticationState
 } from "../../data";
 import {packageIdentifier} from "../../package";
 
@@ -110,6 +110,8 @@ export async function redditAuthenticationRoutes(fastify: FastifyInstance) {
 
                 const { redirectUrl, type } = state;
                 ok(type === "reddit", "Expected type to be reddit");
+
+                await deleteAuthenticationState(state.stateId);
 
                 const {
                     message,

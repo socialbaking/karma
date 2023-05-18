@@ -7,7 +7,7 @@ import {
     addAuthenticationState,
     systemLogSchema,
     addCookieState,
-    AuthenticationRole, getAuthenticationRoles
+    AuthenticationRole, getAuthenticationRoles, deleteAuthenticationState
 } from "../../data";
 
 interface DiscordRole extends Record<string, unknown>  {
@@ -98,6 +98,8 @@ export async function discordAuthenticationRoutes(fastify: FastifyInstance) {
 
                 ok(type === "discord", "Expected type to be discord");
                 ok(scope, "Expected externalScope with discord state");
+
+                await deleteAuthenticationState(state.stateId);
 
                 const { access_token: accessToken } = await oauth.tokenRequest({
                     code,

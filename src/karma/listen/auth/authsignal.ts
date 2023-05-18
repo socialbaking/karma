@@ -4,7 +4,7 @@ import {getOrigin} from "../config";
 import {
     addCookieState,
     setAuthenticationState,
-    getAuthenticationState, DEFAULT_AUTHSIGNAL_STATE_EXPIRES_MS
+    getAuthenticationState, DEFAULT_AUTHSIGNAL_STATE_EXPIRES_MS, deleteAuthenticationState
 } from "../../data";
 import {authsignal, AUTHSIGNAL_REDIRECT_URL, AUTHSIGNAL_TENANT} from "../../authentication/authsignal";
 import {createHash} from "crypto";
@@ -67,6 +67,8 @@ export async function authsignalAuthenticationRoutes(fastify: FastifyInstance) {
                     token,
                     userId
                 });
+
+                await deleteAuthenticationState(state.stateId);
 
                 console.log({ idempotencyKey, userState, success });
 

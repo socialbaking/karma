@@ -11,6 +11,7 @@ import {Login} from "./login";
 import {Logout, handler as logoutHandler} from "./logout";
 
 export const paths: Record<string, FunctionComponent> = {
+    "/": Home,
     "/home": Home,
     "/metrics": Metrics,
     "/products": Products,
@@ -25,6 +26,7 @@ export const paths: Record<string, FunctionComponent> = {
 
 export const pathsAnonymous: Record<string, boolean> = {
     "/home": true,
+    "/": true,
     "/feedback": true,
     "/calculator": true,
     "/login": true
