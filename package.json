@@ -66,6 +66,8 @@
     "@honeycombio/opentelemetry-node": "^0.4.0",
     "@kvs/env": "^2.1.3",
     "@kvs/types": "^2.1.1",
+    "@octokit/request": "6.2.4",
+    "@octokit/rest": "^19.0.8",
     "@opentelemetry/api": "^1.4.1",
     "@opentelemetry/auto-instrumentations-node": "^0.36.6",
     "@opentelemetry/instrumentation-fastify": "^0.31.2",

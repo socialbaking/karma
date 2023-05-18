@@ -1,25 +1,17 @@
 import {
-    useCategory,
     useError,
     useMaybeBody,
     useMaybeResult,
-    useMetrics,
-    useProduct, useProductMetrics,
-    useQuery,
-    useSortedProducts,
     useSubmitted,
-    useProductByName, useQuerySearch
 } from "../data";
-import {calculationSources, hasConsent} from "../../../calculations";
-import {ReportData, Report} from "../../../client";
 import {FastifyRequest} from "fastify";
-import {addReportFromRequest} from "../../../listen/report/add-report";
-import {background} from "../../../background";
-import {ProductListItem} from "../../client/components/product/list-item";
-import {addFormMeta, FormMeta, FormMetaData, getReportMetrics, ReportMetrics} from "../../../data";
+import {addFormMeta, FormMeta, FormMetaData, setFormMeta} from "../../../data";
 import {ok} from "../../../../is";
-import {bugsUrl, homepage} from "../../../package";
+import {bugsUrl, commit, commitShort, homepage, packageIdentifier} from "../../../package";
 import {CC0_URL, MIT_URL, NZCODE_URL} from "../../../static";
+import {Octokit} from "@octokit/rest";
+import {getOrigin} from "../../../listen/config";
+import {isAnonymous} from "../../../authentication";
 
 export interface FeedbackFormMetaData extends FormMetaData {
     type: "feedback";
@@ -27,6 +19,7 @@ export interface FeedbackFormMetaData extends FormMetaData {
     message: string;
     locatedInNewZealand?: boolean;
     storageConsent?: boolean;
+    externalIssueUrl?: string;
 }
 
 function assertFeedback(value: unknown): asserts value is FeedbackFormMetaData {
@@ -42,7 +35,56 @@ export async function submit(request: FastifyRequest) {
     const data = request.body;
     assertFeedback(data);
 
-    const meta = await addFormMeta(data);
+    let meta = await addFormMeta(data);
+
+    const {
+        GITHUB_TOKEN
+    } = process.env;
+
+    if (GITHUB_TOKEN) {
+        const { pathname: repository, origin } = new URL(homepage);
+        ok(origin.includes("github.com"), `Expected homepages origin to include github.com, got ${origin} for ${homepage}`);
+        const split = repository.split("/").filter(Boolean);
+        ok(split.length === 2, `Expected two parts to homepage pathname, got ${split.join(", ")}`);
+        const [owner, repo] = split;
+
+        const octokit = new Octokit({
+            auth: GITHUB_TOKEN
+        });
+        const result = await octokit.request("POST /repos/{owner}/{repo}/issues", {
+            owner,
+            repo,
+            title: data.title,
+            body: [
+                data.message,
+                [
+                    `Origin: ${getOrigin()}`,
+                    `Form Meta: ${meta.formMetaId}`,
+                    `Package: ${packageIdentifier}`,
+                    `Commit: ${commit}`,
+                    isAnonymous() ? "Anonymous" : "Authenticated"
+                ].filter(Boolean).join("\n")
+            ].join("\n\n-------------\n\n"),
+            assignees: [],
+            labels: [
+                "feedback"
+            ],
+            headers: {
+                "X-GitHub-Api-Version": "2022-11-28"
+            }
+        });
+
+        if (result.data?.html_url) {
+            meta = await setFormMeta({
+                ...meta,
+                externalIssueUrl: result.data.html_url
+            });
+            console.log(result.data.html_url)
+        }
+
+
+    }
+
 
     return { success: true, meta }
 }
@@ -66,6 +108,7 @@ export function Feedback() {
     const submitted = useSubmitted();
     const result = useMaybeResult<{ success: boolean, meta: FormMeta }>();
     const error = useError();
+    console.log(error);
 
     return (
         <form name="calculator" action="/feedback#action-section" method="post">
@@ -83,7 +126,7 @@ export function Feedback() {
                 </label>
                 <label className={FORM_GROUP_CLASS}>
                     <span className="text-gray-700">Message</span>
-                    <textarea className={FORM_CLASS} name="message" placeholder="Feedback Message">{result?.success ? "" : body?.message || ""}</textarea>
+                    <textarea className={FORM_CLASS} name="message" placeholder="Feedback Message" defaultValue={result?.success ? "" : body?.message || ""} />
                 </label>
             </div>
             <hr className="my-8" />
