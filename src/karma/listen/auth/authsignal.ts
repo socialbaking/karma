@@ -63,6 +63,24 @@ export async function authsignalAuthenticationRoutes(fastify: FastifyInstance) {
                 ok(type === "authsignal", "Expected type to be authsignal");
                 ok(userId === sub, "Expected token subject to match our given userId");
 
+                const { state: userState, success } = await authsignal.validateChallenge({
+                    token,
+                    userId
+                });
+
+                console.log({ idempotencyKey, userState, success });
+
+                if (!success) {
+                    const { origin } = new URL(state.redirectUrl || getOrigin());
+                    const url = new URL("/login", origin);
+                    const error = "Failed to authenticate";
+                    url.searchParams.set("error", error);
+                    response.header("Location", url.toString());
+                    response.status(302);
+                    response.send(error);
+                    return;
+                }
+
                 const { stateId, expiresAt } = await addCookieState({
                     roles: [
                         // We have no additional roles with this authentication method
