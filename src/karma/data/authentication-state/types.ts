@@ -1,6 +1,6 @@
 import {Expiring} from "../expiring";
 
-export type AuthenticationStateType = "discord" | "reddit" | "cookie" | "partner";
+export type AuthenticationStateType = "discord" | "reddit" | "cookie" | "authsignal" | "partner";
 
 export type AuthenticationRole = (
     | "moderator"
@@ -16,16 +16,26 @@ export type AuthenticationRole = (
     | "coordinator"
 );
 
+export interface AuthenticationStateFromData {
+    type: AuthenticationStateType | string;
+    createdAt: string;
+    from?: AuthenticationStateFromData;
+}
+
 export interface AuthenticationStateData extends Expiring, Record<string, unknown> {
     type: AuthenticationStateType | string;
+    from?: AuthenticationStateFromData;
     userState?: string;
     externalScope?: string;
+    externalState?: string;
+    externalKey?: string;
     roles?: AuthenticationRole[];
     partnerId?: string;
+    userId?: string;
     redirectUrl?: string;
 }
 
-export interface AuthenticationState extends AuthenticationStateData {
+export interface AuthenticationState extends AuthenticationStateData, AuthenticationStateFromData {
     stateId: string;
     stateKey: string;
     createdAt: string;

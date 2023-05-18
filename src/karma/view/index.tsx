@@ -6,7 +6,7 @@ import {
     timeBetweenCommitAndBuild,
     timeBetweenCommitAndTestCompletion
 } from "../package";
-import {paths, pathsAnonymous, pathsSubmit} from "../react/server/paths";
+import {paths, pathsAnonymous, pathsHandler, pathsSubmit} from "../react/server/paths";
 import KarmaServer, {KarmaServerProps} from "../react/server";
 import {renderToStaticMarkup} from "react-dom/server";
 import {listCategories, listMetrics, listOrganisations, listPartners, listProducts} from "../data";
@@ -34,8 +34,16 @@ export async function viewRoutes(fastify: FastifyInstance) {
     });
 
     function createPathHandler(path: string, options?: Partial<KarmaServerProps>) {
+        const baseHandler = pathsHandler[path];
 
         return async function handler(request: FastifyRequest, response: FastifyReply) {
+
+            if (baseHandler) {
+                await baseHandler(request, response);
+
+                if (response.sent) return;
+            }
+
             const isFragment = request.url.includes("fragment");
             response.header("Content-Type", "text/html; charset=utf-8");
             // TODO swap to same host hosted documents
@@ -71,8 +79,9 @@ export async function viewRoutes(fastify: FastifyInstance) {
             if (!isFragment) {
                 html = `<!doctype html>\n${html}`
             }
-
-            response.status(200);
+            if (!response.statusCode) {
+                response.status(200);
+            }
             response.send(html)
         }
     }

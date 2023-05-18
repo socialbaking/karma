@@ -128,7 +128,11 @@ export async function discordAuthenticationRoutes(fastify: FastifyInstance) {
                 });
 
                 const { stateId, expiresAt } = await addCookieState({
-                    roles
+                    roles,
+                    from: {
+                        type: "discord",
+                        createdAt: state.createdAt
+                    }
                 });
 
                 response.setCookie("state", stateId, {

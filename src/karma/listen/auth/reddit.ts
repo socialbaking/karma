@@ -133,7 +133,11 @@ export async function redditAuthenticationRoutes(fastify: FastifyInstance) {
                 console.log({ me: me.name, scope, subscriptions, flairRole, roles });
 
                 const { stateId, expiresAt } = await addCookieState({
-                    roles
+                    roles,
+                    from: {
+                        type: "reddit",
+                        createdAt: state.createdAt
+                    }
                 });
 
                 response.setCookie("state", stateId, {
