@@ -92,7 +92,7 @@ export function Feedback() {
                 <span  className="block ml-4">
                     We adhere to the&nbsp;<a href={NZCODE_URL} target="_blank" rel="noreferrer">New Zealand Code</a>&nbsp;licence.
                     Because of this, we would like to acknowledge and understand if feedback or feature requests are by New Zealanders.<br/>
-                    By ticking this checkbox you are confirming you are located in New Zealand T
+                    By ticking this checkbox you are confirming you are located in New Zealand.
                 </span>
             </label>
             <label htmlFor="storageConsent" className="my-4 flex flex-row items-center">
