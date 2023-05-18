@@ -1,6 +1,6 @@
 {
   "name": "@socialbaking/karma",
-  "version": "1.0.0-alpha.127",
+  "version": "1.0.0-alpha.128",
   "main": "./esnext/index.js",
   "module": "./esnext/index.js",
   "types": "./esnext/index.d.ts",
