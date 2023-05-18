@@ -96,7 +96,7 @@ export function useProducts() {
     const isTrusted = useIsTrusted();
     return useMemo(() => {
         if (DISPLAY_GENERIC_PRODUCTS || isTrusted) return products;
-        return products.filter(value => !value.generic);
+        return products.filter(value => value.licencedOrganisationId && !value.generic);
     }, [products, isTrusted]);
 }
 
