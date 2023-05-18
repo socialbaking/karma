@@ -44,6 +44,9 @@ export const alternativeRoleNames: Partial<Record<AuthenticationRole, string[]>>
         "Community Coordinator",
         "Community Organiser",
         "Community Organizer"
+    ],
+    industry: [
+        "Verified Industry"
     ]
 }
 
