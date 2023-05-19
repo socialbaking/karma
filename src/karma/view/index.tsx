@@ -61,15 +61,15 @@ export async function viewRoutes(fastify: FastifyInstance) {
                     url={path}
                     isAnonymous={anonymous}
                     isFragment={isFragment}
-                    partners={anonymous ? [] : await listPartners({
+                    partners={await listPartners({
                         authorizedPartnerId: getMaybeAuthorizedForPartnerId()
                     })}
-                    organisations={anonymous ? [] : await listOrganisations({
+                    organisations={await listOrganisations({
                         authorizedOrganisationId: getMaybeAuthorizedForOrganisationId()
                     })}
-                    categories={anonymous ? [] : await listCategories()}
+                    categories={await listCategories()}
                     metrics={anonymous ? [] : await listMetrics()}
-                    products={anonymous ? [] : await listProducts()}
+                    products={await listProducts()}
                     roles={state?.roles}
                     query={request.query}
                     body={request.body}
