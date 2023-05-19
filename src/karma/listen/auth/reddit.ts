@@ -7,9 +7,10 @@ import {
     addAuthenticationState,
     systemLogSchema,
     addCookieState,
-    AuthenticationRole, getAuthenticationRoles, getAuthenticationRole, deleteAuthenticationState
+    AuthenticationRole, getAuthenticationRoles, getAuthenticationRole, deleteAuthenticationState, getCached, addExpiring
 } from "../../data";
 import {packageIdentifier} from "../../package";
+import {getExpiresAt, MONTH_MS} from "../../data/expiring-kv";
 
 interface RedditUserContent extends Record<string, unknown> {
     author_flair_text?: string;
@@ -50,13 +51,18 @@ export async function redditAuthenticationRoutes(fastify: FastifyInstance) {
         REDDIT_SCOPE,
         REDDIT_NAME,
         REDDIT_AUTHORIZE_DURATION,
-        REDDIT_FLAIR
+        REDDIT_FLAIR,
+        REDDIT_FLAIR_EXPIRES_IN_MS: givenExpiresIn
     } = process.env;
 
     ok(REDDIT_CLIENT_ID, "Expected REDDIT_CLIENT_ID");
     ok(REDDIT_CLIENT_SECRET, "Expected REDDIT_CLIENT_SECRET");
     ok(REDDIT_NAME, "Expected REDDIT_NAME");
     ok(REDDIT_FLAIR, "Expected REDDIT_FLAIR");
+
+    const REDDIT_FLAIR_EXPIRES_IN_MS = givenExpiresIn ? +givenExpiresIn : 6 * MONTH_MS;
+
+    ok(REDDIT_FLAIR_EXPIRES_IN_MS > 0, "Expected REDDIT_FLAIR_EXPIRES_IN_MS");
 
     const REDDIT_CLIENT_BASIC = `Basic ${Buffer.from(
         `${REDDIT_CLIENT_ID}:${REDDIT_CLIENT_SECRET}`
@@ -206,53 +212,23 @@ export async function redditAuthenticationRoutes(fastify: FastifyInstance) {
                 }
 
                 async function getUserFlairRole(): Promise<AuthenticationRole | undefined> {
-
+                    // In this case we get the remote flair first, and then
+                    // use cached only if we don't find one
                     const flair = await getUserFlair();
+
+                    const cacheKey = `${REDDIT_NAME} ${me.name}: flair`;
                     if (flair) {
                         const role = getAuthenticationRole(flair);
                         if (!role) return undefined; // Don't use cached, just undefined;
-                        await setCache(role);
+                        await addExpiring({
+                            role: false, // Don't cache based on the authentication role
+                            key: cacheKey,
+                            value: role,
+                            expiresAt: getExpiresAt(REDDIT_FLAIR_EXPIRES_IN_MS)
+                        });
                         return role;
                     }
-                    return getCached();
-
-                    async function getCached(): Promise<AuthenticationRole | undefined> {
-                        // const cached = await Promise.all(
-                        //     roles.map(async (role): Promise<AuthenticationRole | undefined> => {
-                        //         // TODO #18, implement get from cache store
-                        //         /*
-                        //         const found = await getCachedAuthenticationRoleForUser(
-                        //             role
-                        //         )
-                        //         if (!found) undefined
-                        //
-                        //         return role;
-                        //          */
-                        //     })
-                        // )
-                        //
-                        // const found = cached.find(Boolean);
-                        // if (!found) return undefined;
-                        // // Set in cache if it is going to be used
-                        // await setCache(role);
-                        // return role;
-                        return undefined;
-                    }
-
-                    /*
-                    async function getCachedAuthenticationRoleForUser(role: AuthenticationRole) {
-                        const name = me.name;
-                        const hash = createHash("sha256");
-                        ...
-                        ...
-
-                    }
-                     */
-
-                    async function setCache(role: AuthenticationRole) {
-                        // TODO #18, implement set in cache store
-                    }
-
+                    return getCached<AuthenticationRole>(cacheKey);
                 }
 
                 async function getUserFlair(): Promise<string | undefined> {

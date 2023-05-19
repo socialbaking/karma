@@ -40,13 +40,23 @@ export async function getCachedPage(url: string) {
     return getCached<string>(fullUrl);
 }
 
+export async function addExpiring(data: Omit<CacheData, "type">) {
+    return addCached({
+        ...data,
+        type: "expiring"
+    })
+}
+
 export async function addCached(data: CacheData) {
     const store = getCacheStore<unknown>();
     const roles = getSortedRoles();
-    const key = getCacheKey(data.key, roles);
+    const key = getCacheKey(data.key, data.role !== false ? roles : []);
     const counter = await getGlobalCount();
+    const type = data.type || "counter";
     const cached: Cached = {
         ...data,
+        role: data.role !== false,
+        type,
         expiresAt: getExpiresAt(DEFAULT_EXPIRES_IN_MS, data.expiresAt),
         createdAt: new Date().toISOString(),
         roles,
@@ -63,15 +73,19 @@ export async function getCached<T = string>(givenKey: string): Promise<T | undef
     const countPromise = getGlobalCount();
     const value = await store.get(key);
     if (!value) return undefined;
-    const counter = await countPromise;
-    if (value.counter !== counter) return undefined;
-    if (value.roles.length !== roles.length) return undefined;
-    const everyRoleSame = roles.every(role => value.roles.includes(role));
-    // Just one last check just to be absolutely sure
-    if (!everyRoleSame) {
-        console.warn("Cache key somehow isn't restricting users to a single role view of objects");
-        console.warn("Users should only be able to access the cache for their exact role set");
-        return undefined;
+    if (!value.type || value.type === "counter") {
+        const counter = await countPromise;
+        if (value.counter !== counter) return undefined;
+    }
+    if (value.role !== false) {
+        if (value.roles.length !== roles.length) return undefined;
+        const everyRoleSame = roles.every(role => value.roles.includes(role));
+        // Just one last check just to be absolutely sure
+        if (!everyRoleSame) {
+            console.warn("Cache key somehow isn't restricting users to a single role view of objects");
+            console.warn("Users should only be able to access the cache for their exact role set");
+            return undefined;
+        }
     }
     return value.value;
 }

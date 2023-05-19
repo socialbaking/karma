@@ -9,7 +9,7 @@
 
 ### Test Coverage
 
- ![69.68%25 lines covered](https://img.shields.io/badge/lines-69.68%25-yellow) ![69.68%25 statements covered](https://img.shields.io/badge/statements-69.68%25-yellow) ![59.8%25 functions covered](https://img.shields.io/badge/functions-59.8%25-yellow) ![84.14%25 branches covered](https://img.shields.io/badge/branches-84.14%25-brightgreen)
+ ![69.31%25 lines covered](https://img.shields.io/badge/lines-69.31%25-yellow) ![69.31%25 statements covered](https://img.shields.io/badge/statements-69.31%25-yellow) ![58.66%25 functions covered](https://img.shields.io/badge/functions-58.66%25-yellow) ![83.66%25 branches covered](https://img.shields.io/badge/branches-83.66%25-brightgreen)
 
 [//]: # (badges)
 
@@ -50,6 +50,10 @@ export interface Client {
     background(query: Record<string, string> | URLSearchParams): Promise<void>;
 }
 
+export type SystemRole = (
+    | "system"
+)
+
 export type AuthenticationRole = (
     | "moderator"
     | "admin"
@@ -63,6 +67,7 @@ export type AuthenticationRole = (
     | "developer"
     | "coordinator"
     | "partner"
+    | SystemRole
 );
 
 export interface CalculationSource {

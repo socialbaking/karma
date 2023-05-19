@@ -1,3 +1,7 @@
+export type SystemRole = (
+    | "system"
+)
+
 export type AuthenticationRole = (
     | "moderator"
     | "admin"
@@ -11,4 +15,5 @@ export type AuthenticationRole = (
     | "developer"
     | "coordinator"
     | "partner"
+    | SystemRole
 );

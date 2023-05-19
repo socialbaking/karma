@@ -1,7 +1,7 @@
-import {isLike, ok} from "../../../is";
-import {AuthenticationRole} from "../authentication-role";
+import {ok} from "../../../is";
+import {AuthenticationRole, SystemRole} from "../authentication-role";
 
-export const namedRoles: Record<AuthenticationRole, string> = {
+export const namedRoles: Record<Exclude<AuthenticationRole, SystemRole>, string> = {
     admin: "Admin",
     industry: "Industry",
     member: "Member",
@@ -77,6 +77,7 @@ export function getAuthenticationRole(name: string): AuthenticationRole | undefi
     const lowerName = name.toLowerCase();
     if (isAuthenticationRole(lowerName)) return lowerName;
     for (const key of roles) {
+        if (key === "system") continue;
         if (name === key || lowerName === key) return key;
         for (const value of [namedRoles[key], ...(alternativeRoleNames[key] ?? [])]) {
             if (name === value) return key;
