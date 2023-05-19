@@ -4,7 +4,12 @@ import {
   getAuthenticationState,
   getPartner as getPartnerDocument,
 } from "../data";
-import { FastifyInstance, FastifyRequest } from "fastify";
+import {
+  DoneFuncWithErrOrRes,
+  FastifyInstance,
+  FastifyReply,
+  FastifyRequest,
+} from "fastify";
 import { FastifyAuthFunction } from "@fastify/auth";
 import {
   AUTHORIZED_ACCESS_TOKEN_KEY,
@@ -12,6 +17,8 @@ import {
   setAuthenticationState,
   setAuthorizedForPartnerId,
 } from "../authentication";
+import { preHandlerHookHandler } from "fastify/types/hooks";
+import accepts from "accepts";
 
 export const NOT_AUTHORIZED_ERROR_MESSAGE = "not authorized";
 export const NOT_ANONYMOUS_ERROR_MESSAGE = "not anonymous";
@@ -121,7 +128,19 @@ export interface AuthInput extends FastifyAuthOptions {
   anonymous?: boolean;
 }
 
-export function authenticate(fastify: FastifyInstance, options?: AuthInput) {
+export function isHTMLResponse(request: FastifyRequest) {
+  const acceptValue = request.headers.accept;
+  if (!acceptValue) return false;
+  // json is the default for server, but if the client prefers html
+  // that is what we are looking for
+  const accept = accepts(request.raw).type(["json", "html"]);
+  return accept === "html";
+}
+
+export function authenticate(
+  fastify: FastifyInstance,
+  options?: AuthInput
+): preHandlerHookHandler {
   const methods: FastifyAuthFunction[] = [
     createCookieAuth(fastify),
     accessToken,
@@ -132,5 +151,30 @@ export function authenticate(fastify: FastifyInstance, options?: AuthInput) {
     methods.unshift(allowAnonymous);
   }
 
-  return getFastifyAuth(fastify)(methods, options);
+  const authHandler = getFastifyAuth(fastify)(methods, options);
+
+  return function (this, request, response, done) {
+    if (!isHTMLResponse(request)) {
+      return authHandler.call(this, request, response, done);
+    }
+
+    return authHandler.call(
+      this,
+      request,
+      response,
+      function (error: unknown) {
+        // console.log({
+        //   error,
+        //   statusCode: response.statusCode,
+        //   args,
+        // });
+        if (!error && response.statusCode === 200) {
+          return done();
+        }
+        response.header("Location", "/?auth=redirected");
+        response.status(302);
+        response.send("Unauthenticated, redirecting...");
+      }
+    );
+  };
 }

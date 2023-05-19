@@ -20,6 +20,7 @@ import formbody from "@fastify/formbody";
 import qs from "qs";
 import { REACT_CLIENT_DIRECTORY } from "../view";
 import files from "@fastify/static";
+import { errorHandler } from "../view/error";
 
 const { pathname } = new URL(import.meta.url);
 const directory = dirname(pathname);
@@ -114,6 +115,14 @@ export async function create() {
     response.header("X-Source-Commit-At", commitAt);
   });
 
+  register(authPlugin);
+  register(bearerAuthPlugin, {
+    keys: new Set<string>(),
+    auth: bearerAuthentication,
+    addHook: false,
+  });
+  app.setErrorHandler(errorHandler);
+
   register(blippPlugin);
   register(corsPlugin);
   register(files, {
@@ -122,13 +131,6 @@ export async function create() {
   });
 
   await setupSwagger(app);
-
-  register(authPlugin);
-  register(bearerAuthPlugin, {
-    keys: new Set<string>(),
-    auth: bearerAuthentication,
-    addHook: false,
-  });
 
   register(routes);
 

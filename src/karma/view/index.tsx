@@ -35,6 +35,7 @@ import {
 import { ok } from "../../is";
 import { join, dirname } from "node:path";
 import { addCachedPage, getCached, getCachedPage } from "../data/cache";
+import { getOrigin } from "../listen/config";
 
 const { pathname } = new URL(import.meta.url);
 const DIRECTORY = dirname(pathname);
@@ -105,7 +106,8 @@ export async function viewRoutes(fastify: FastifyInstance) {
 
         const anonymous = isAnonymous();
         const state = getMaybeAuthenticationState();
-        const isFragment = request.url.includes("fragment");
+        const { pathname } = new URL(request.url, getOrigin());
+        const isFragment = pathname.endsWith("/fragment");
 
         // console.log({ anonymous, state, roles: state?.roles });
 
@@ -167,6 +169,10 @@ export async function viewRoutes(fastify: FastifyInstance) {
 
   Object.keys(paths).forEach((path) => {
     const handler = createPathHandler(path);
+
+    const anonymous = pathsAnonymous[path] || !!ALLOW_ANONYMOUS_VIEWS;
+
+    console.log({ path, anonymous });
 
     const preHandler = authenticate(fastify, {
       anonymous: pathsAnonymous[path] || !!ALLOW_ANONYMOUS_VIEWS,

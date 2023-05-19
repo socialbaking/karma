@@ -9,6 +9,7 @@ import { Organisations } from "./organisations";
 import { Feedback, submit as feedbackSubmit } from "./feedback";
 import { Login } from "./login";
 import { Logout, handler as logoutHandler } from "./logout";
+import { Errors } from "./error";
 
 export const paths: Record<string, FunctionComponent> = {
   "/": Home,
@@ -22,6 +23,7 @@ export const paths: Record<string, FunctionComponent> = {
   "/feedback": Feedback,
   "/login": Login,
   "/logout": Logout,
+  "/error": Errors,
 };
 
 export const pathsAnonymous: Record<string, boolean> = {
