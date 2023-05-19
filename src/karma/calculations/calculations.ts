@@ -13,6 +13,10 @@ interface HandlerObject extends UnknownRecord {
   description: string;
 }
 
+export interface CalculationHandler extends CalculationSource, HandlerObject {
+
+}
+
 function isRecord(value: unknown): value is UnknownRecord {
   return !!(value && typeof value === "object");
 }
@@ -25,12 +29,13 @@ function isHandlerObject(value: UnknownRecord): value is HandlerObject {
   );
 }
 
-function getCalculations(object: unknown, key: string): CalculationSource[] {
+function getCalculations(object: unknown, key: string): CalculationHandler[] {
   if (!isRecord(object)) return [];
 
   if (isHandlerObject(object)) {
     return [
       {
+        handler: object.handler,
         calculationKey: key,
         title: object.title,
         description: object.description,
@@ -44,6 +49,11 @@ function getCalculations(object: unknown, key: string): CalculationSource[] {
 }
 
 export const calculationSources = getCalculations(calculations, "calculations");
+export const calculationsHandlerMap = new Map<Function, CalculationHandler>(
+    calculationSources.map(
+        (value) => [value.handler, value] as const
+    )
+);
 export const calculationKeys = calculationSources.map(
   (value) => value.calculationKey
 );
@@ -60,9 +70,18 @@ export function getCompleteCalculationConsent(): CalculationConsentItem[] {
 
 export function hasConsent(
   consent: CalculationConsentItem[] | undefined,
-  calculationKey: string
-) {
-  if (!consent) return false;
+  calculationKey: string | Function | HandlerObject
+): boolean {
+  if (!consent?.length) return false;
+  if (typeof calculationKey === "function") {
+    const source = calculationsHandlerMap.get(calculationKey);
+    if (!source) return false;
+    return hasConsent(consent, source.calculationKey);
+  }
+  if (typeof calculationKey !== "string") {
+    if (!calculationKey?.handler) return false;
+    return hasConsent(consent, calculationKey.handler);
+  }
   return !!consent.find(
     (value) =>
       value.calculationKey === calculationKey &&

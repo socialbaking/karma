@@ -56,9 +56,10 @@ export async function calculateReportMetrics(
   //     if (category) categories.push(category);
   // }
   if (
-    !hasConsent(report.calculationConsent, "calculations.metrics.costPerUnit")
-  )
+    !hasConsent(report.calculationConsent, calculations.metrics.costPerUnit)
+  ) {
     return undefined;
+  }
 
   return calculations.metrics.costPerUnit.calculate(report, {
     products: [product],
@@ -105,7 +106,12 @@ async function calculateQueuedMetrics(references: ReportReference[]) {
     await Promise.all(
       references.map(({ reportId }) => getReportMetrics(reportId))
     )
-  ).filter(Boolean);
+  )
+      .filter(Boolean)
+      .filter(report => (
+          hasConsent(report.calculationConsent, calculations.metrics.dayCostPerProduct) &&
+          hasConsent(report.calculationConsent, calculations.metrics.monthCostPerProduct)
+      ))
 
   console.log(
     `${reports.length}/${references.length} reports to process into metrics`
