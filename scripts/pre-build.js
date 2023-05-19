@@ -6,7 +6,8 @@ import {
 } from "./replace-between.js";
 
 const PATH = "./src/karma/data";
-const CLIENT_INTERFACE_GENERATED_PATH = "./src/karma/client/interface.readonly.ts";
+const CLIENT_INTERFACE_GENERATED_PATH =
+  "./src/karma/client/interface.readonly.ts";
 const CLIENT_INTERFACE_PATH = "./src/karma/client/client.interface.ts";
 
 const PACKAGE_GENERATED_PATH = "./src/karma/package.readonly.ts";
@@ -43,7 +44,10 @@ const types = (
 
         // Assume all imports are to other types that will be contained in this file
         // If not the build will fail :)
-        return typesFile.replace(/(import|export)\s+{[^}]+}\s+from[^\n]+/gs, "");
+        return typesFile.replace(
+          /(import|export)\s+{[^}]+}\s+from[^\n]+/gs,
+          ""
+        );
       })
   )
 )
