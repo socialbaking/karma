@@ -110,11 +110,14 @@ async function seedHealthNZProducts($: CheerioAPI) {
   console.log(`Have ${tables.length} tables to process`);
   // console.log(tables);
 
-  const productPromises = tables.flatMap((table: RemoteTableInfo) => {
+  const productPromises = tables.flatMap((table: RemoteTableInfo, tableIndex: number, array) => {
     const category = findCategory(table);
     const categoryId = category?.categoryId;
-
-    return table.rows.map(async (row): Promise<Product> => {
+    const rowsBefore = array.slice(0, tableIndex).reduce(
+        (sum, table) => table.rows.length + sum,
+        0
+    );
+    return table.rows.map(async (row, rowIndex): Promise<Product> => {
       const productName = row["Product Name"];
       const activeIngredients = row["Active Ingredients"];
       // const notes = row["Administration notes"];
@@ -151,6 +154,7 @@ async function seedHealthNZProducts($: CheerioAPI) {
             })
           ),
         ],
+        order: rowsBefore + rowIndex
       };
 
       return setProduct({
@@ -217,6 +221,11 @@ async function seedHealthNZProducts($: CheerioAPI) {
   });
 
   const products = await Promise.all(productPromises);
+
+  const order = new Set(products.map(product => product.order));
+
+  ok(order.size === products.length, "Expected orders to be unique");
+
   // for (const product of products) {
   //     console.log(product.productName);
   //     console.log(product.activeIngredientDescriptions?.join("\n"));
