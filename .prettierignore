@@ -2,6 +2,13 @@
 .idea
 node_modules
 esnext
+esnext-workerd
 coverage
-*.md
 .env
+/test-results/
+/playwright-report/
+/playwright/.cache/
+workerd-tests
+workerd-tests.capnp
+.cache
+.vercel
