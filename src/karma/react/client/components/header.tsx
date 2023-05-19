@@ -1,9 +1,9 @@
-import { Logo } from './logo';
+import { Logo } from "./logo";
 
 const navigation = [
-  { name: 'Home', href: '/' },
-  { name: 'Products', href: '/products' },
-  { name: 'About', href: '/about' },
+  { name: "Home", href: "/" },
+  { name: "Products", href: "/products" },
+  { name: "About", href: "/about" },
   // { name: 'Contact', href: '/contact' },
 ];
 

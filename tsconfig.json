@@ -2,7 +2,7 @@
   "compilerOptions": {
     "module": "esnext",
     "lib": ["es2018", "esnext", "dom"],
-    "types": ["jest", "node" ],
+    "types": ["jest", "node"],
     "esModuleInterop": true,
     "target": "esnext",
     "noImplicitAny": true,
@@ -14,8 +14,7 @@
     "baseUrl": "./src",
     "jsx": "react-jsx",
     "allowJs": true,
-    "paths": {
-    }
+    "paths": {}
   },
   "include": ["src/**/*"],
   "typeRoots": ["./node_modules/@types", "src/types"],

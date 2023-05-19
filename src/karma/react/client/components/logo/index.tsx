@@ -5,30 +5,30 @@ export const Logo = ({
   secondary = "",
   size = "1rem",
   fontProps = {},
-  iconOnly = false
+  iconOnly = false,
 }) => {
   const logoStyle = {
     width: `calc(${size} + 20px)`,
-    height: `calc(${size} + 20px)`
+    height: `calc(${size} + 20px)`,
   } as const;
   const primaryStyle = {
     fontWeight: "normal",
     fontFamily: "PT Sans",
     fontSize: size,
     paddingLeft: "10px",
-    ...fontProps
+    ...fontProps,
   } as const;
   const secondaryStyle = {
     fontWeight: "bold",
     fontFamily: "PT Sans",
     fontSize: size,
-    ...fontProps
+    ...fontProps,
   } as const;
   const containerStyle = {
     display: "flex",
-    flexDirection: 'row',
+    flexDirection: "row",
     alignContent: "center",
-    alignItems: "flex-end"
+    alignItems: "flex-end",
   } as const;
   return (
     <div style={containerStyle}>

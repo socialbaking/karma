@@ -1,6 +1,5 @@
-
 export interface CalculationSource {
-    calculationKey: string;
-    title: string;
-    description: string;
+  calculationKey: string;
+  title: string;
+  description: string;
 }

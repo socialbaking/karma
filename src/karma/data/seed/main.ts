@@ -1,10 +1,8 @@
 // This is the main file for running the seed directly as a script
-import {config} from "dotenv";
+import { config } from "dotenv";
 
 config();
 
-import {seed} from "./seed";
+import { seed } from "./seed";
 
-await seed({
-
-})
+await seed({});

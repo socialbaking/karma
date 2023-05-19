@@ -1,38 +1,32 @@
-import {FastifyInstance, FastifyRequest} from "fastify";
-import {listMonthlyMetrics, metricsSchema} from "../../data";
-import {authenticate} from "../authentication";
+import { FastifyInstance, FastifyRequest } from "fastify";
+import { listMonthlyMetrics, metricsSchema } from "../../data";
+import { authenticate } from "../authentication";
 
 export async function listMonthlyMetricsRoutes(fastify: FastifyInstance) {
+  const response = {
+    200: {
+      type: "array",
+      items: metricsSchema.countryMetrics,
+    },
+  };
 
-    const response = {
-        200: {
-            type: "array",
-            items: metricsSchema.countryMetrics
-        }
-    }
+  const schema = {
+    description: "List of daily metrics",
+    tags: ["metrics"],
+    summary: "",
+    response,
+    security: [
+      {
+        apiKey: [] as string[],
+      },
+    ],
+  };
 
-    const schema = {
-        description: "List of daily metrics",
-        tags: ["metrics"],
-        summary: "",
-        response,
-        security: [
-            {
-                apiKey: [] as string[]
-            }
-        ]
-    };
-
-    fastify.get(
-        "/months",
-        {
-            schema,
-            preHandler: authenticate(fastify),
-            async handler(request: FastifyRequest, response) {
-                response.send(
-                    await listMonthlyMetrics()
-                );
-            }
-        }
-    );
+  fastify.get("/months", {
+    schema,
+    preHandler: authenticate(fastify),
+    async handler(request: FastifyRequest, response) {
+      response.send(await listMonthlyMetrics());
+    },
+  });
 }

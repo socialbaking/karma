@@ -1,11 +1,11 @@
-import {Product} from "./types";
-import {getProductStore} from "./store";
+import { Product } from "./types";
+import { getProductStore } from "./store";
 
-export interface ListProductsInput {
+export interface ListProductsInput {}
 
-}
-
-export async function listProducts({  }: ListProductsInput = {}): Promise<Product[]> {
-    const store = getProductStore();
-    return store.values();
+export async function listProducts({}: ListProductsInput = {}): Promise<
+  Product[]
+> {
+  const store = getProductStore();
+  return store.values();
 }

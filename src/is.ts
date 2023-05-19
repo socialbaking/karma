@@ -30,7 +30,7 @@ export function ok(value: unknown, message?: string): asserts value {
 
 export function isAsyncIterable<T>(value: unknown): value is AsyncIterable<T> {
   return !!(
-      isLike<AsyncIterable<unknown>>(value) &&
-      typeof value[Symbol.asyncIterator] === "function"
+    isLike<AsyncIterable<unknown>>(value) &&
+    typeof value[Symbol.asyncIterator] === "function"
   );
 }

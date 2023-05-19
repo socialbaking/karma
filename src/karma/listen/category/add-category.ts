@@ -1,41 +1,35 @@
-import {FastifyInstance} from "fastify";
-import {addCategory, CategoryData, categorySchema} from "../../data";
-import {authenticate} from "../authentication";
+import { FastifyInstance } from "fastify";
+import { addCategory, CategoryData, categorySchema } from "../../data";
+import { authenticate } from "../authentication";
 
 export async function addCategoryRoutes(fastify: FastifyInstance) {
+  type Schema = {
+    Body: CategoryData;
+  };
 
+  const response = {
+    201: {
+      description: "A new Category",
+      ...categorySchema.category,
+    },
+  };
 
-    type Schema = {
-        Body: CategoryData
-    }
+  const schema = {
+    description: "Add a new Category",
+    tags: ["category"],
+    summary: "",
+    body: categorySchema.categoryData,
+    response,
+  };
 
-    const response = {
-        201: {
-            description: "A new Category",
-            ...categorySchema.category
-        }
-    }
+  fastify.post<Schema>("/", {
+    schema,
+    preHandler: authenticate(fastify),
+    async handler(request, response) {
+      const category = await addCategory(request.body);
 
-    const schema = {
-        description: "Add a new Category",
-        tags: ["category"],
-        summary: "",
-        body: categorySchema.categoryData,
-        response
-    }
-
-    fastify.post<Schema>(
-        "/",
-        {
-            schema,
-            preHandler: authenticate(fastify),
-            async handler(request, response)  {
-                const category = await addCategory(request.body);
-
-                response.status(201);
-                response.send(category);
-            }
-        }
-    )
+      response.status(201);
+      response.send(category);
+    },
+  });
 }
-

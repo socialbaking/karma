@@ -1,12 +1,18 @@
 /* c8 ignore start */
-import why, {whyIsNodeStillRunning} from "why-is-node-still-running";
-import {shutdown} from "../tracing";
-import {tracer} from "../trace";
-import {isRedisMemory, seed, startRedisMemory, stopData, stopRedisMemory} from "../karma/data";
+import why, { whyIsNodeStillRunning } from "why-is-node-still-running";
+import { shutdown } from "../tracing";
+import { tracer } from "../trace";
+import {
+  isRedisMemory,
+  seed,
+  startRedisMemory,
+  stopData,
+  stopRedisMemory,
+} from "../karma/data";
 
 try {
   if (isRedisMemory()) {
-    await startRedisMemory()
+    await startRedisMemory();
   }
 
   await seed();
@@ -14,14 +20,14 @@ try {
   await tracer.startActiveSpan("tests", async (span) => {
     await tracer.startActiveSpan("client-tests", async (span) => {
       await import("./client");
-      span.end()
+      span.end();
     });
     await tracer.startActiveSpan("data-tests", async (span) => {
       await import("./data");
-      span.end()
+      span.end();
     });
     span.end();
-  })
+  });
 
   // Ensure any data clients are closed
   await stopData();
@@ -31,7 +37,6 @@ try {
   }
 
   console.log("Tests successful");
-
 } catch (error) {
   console.error(error);
   if (typeof process !== "undefined") {

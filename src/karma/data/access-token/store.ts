@@ -1,8 +1,8 @@
-import {getKeyValueStore} from "../kv";
-import {AccessToken} from "./types";
+import { getKeyValueStore } from "../kv";
+import { AccessToken } from "./types";
 
-const STORE_NAME = "accessToken"
+const STORE_NAME = "accessToken";
 
 export function getAccessTokenStore() {
-    return getKeyValueStore<AccessToken>(STORE_NAME);
+  return getKeyValueStore<AccessToken>(STORE_NAME);
 }

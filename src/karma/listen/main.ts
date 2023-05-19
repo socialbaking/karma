@@ -4,6 +4,6 @@ dotenv.config();
 
 import "../../tracing";
 
-import {start} from "./start";
+import { start } from "./start";
 
 await start();

@@ -1,53 +1,53 @@
-import {ok} from "../../is";
-import {requestContext} from "@fastify/request-context";
+import { ok } from "../../is";
+import { requestContext } from "@fastify/request-context";
 
 export function getPort() {
-    const origin = getEnvironmentOrigin();
-    if (origin) {
-        const { port } = new URL(origin);
-        if (port) {
-            return +port;
-        }
+  const origin = getEnvironmentOrigin();
+  if (origin) {
+    const { port } = new URL(origin);
+    if (port) {
+      return +port;
     }
-    const env = process.env.PORT;
-    if (env && /^\d+$/.test(env)) {
-        return +env;
-    }
-    return 3000;
+  }
+  const env = process.env.PORT;
+  if (env && /^\d+$/.test(env)) {
+    return +env;
+  }
+  return 3000;
 }
 
 function getEnvironmentOrigin() {
-    if (process.env.VERCEL_URL) {
-        return `https://${process.env.VERCEL_URL}`
-    }
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
 
-    if (process.env.API_URL) {
-        return process.env.API_URL;
-    }
+  if (process.env.API_URL) {
+    return process.env.API_URL;
+  }
 
-    if (process.env.SERVER_EXTERNAL_URL_ORIGIN) {
-        return process.env.SERVER_EXTERNAL_URL_ORIGIN;
-    }
+  if (process.env.SERVER_EXTERNAL_URL_ORIGIN) {
+    return process.env.SERVER_EXTERNAL_URL_ORIGIN;
+  }
 
-    const origin = requestContext.get("origin");
+  const origin = requestContext.get("origin");
 
-    if (origin) {
-        return origin;
-    }
+  if (origin) {
+    return origin;
+  }
 
-    return undefined;
+  return undefined;
 }
 
 export function getOrigin() {
-    const origin = getEnvironmentOrigin();
+  const origin = getEnvironmentOrigin();
 
-    if (origin) {
-        return origin;
-    }
+  if (origin) {
+    return origin;
+  }
 
-    const port = getPort();
+  const port = getPort();
 
-    ok(port);
+  ok(port);
 
-    return `http://localhost:${port}`;
+  return `http://localhost:${port}`;
 }

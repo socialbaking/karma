@@ -1,6 +1,6 @@
-import {getDailyMetricsStore} from "./store";
+import { getDailyMetricsStore } from "./store";
 
 export async function listDailyMetrics() {
-    const store = getDailyMetricsStore();
-    return store.values();
+  const store = getDailyMetricsStore();
+  return store.values();
 }

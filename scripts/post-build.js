@@ -1,7 +1,7 @@
 import { promises as fs } from "fs";
 import { dirname, resolve } from "path";
-import {readFile} from "fs/promises";
-import {replaceBetween} from "./replace-between.js";
+import { readFile } from "fs/promises";
+import { replaceBetween } from "./replace-between.js";
 
 // await import("./correct-import-extensions.js");
 // await import("./workerd-tests.js");
@@ -11,8 +11,8 @@ const { pack } = await import("@virtualstate/impack");
 await pack({
   argv: ["--silent"],
   paths: {
-    directory: "esnext"
-  }
+    directory: "esnext",
+  },
 });
 
 // await fs.rmdir("esnext-workerd").catch(() => {});
@@ -35,7 +35,6 @@ await pack({
 // }
 
 {
-
   // const bundle = await rollup({
   //   input: "./esnext/tests/index.js",
   //   plugins: [
@@ -83,9 +82,9 @@ if (!process.env.NO_COVERAGE_BADGE_UPDATE) {
 
   badges.push(
     "### Support\n\n",
-    "![Node.js supported](https://img.shields.io/badge/node-%3E%3D18.7.0-blue)",
-      // "![Deno supported](https://img.shields.io/badge/deno-%3E%3D1.17.0-blue)",
-      // "![Bun supported](https://img.shields.io/badge/bun-%3E%3D0.1.11-blue)"
+    "![Node.js supported](https://img.shields.io/badge/node-%3E%3D18.7.0-blue)"
+    // "![Deno supported](https://img.shields.io/badge/deno-%3E%3D1.17.0-blue)",
+    // "![Bun supported](https://img.shields.io/badge/bun-%3E%3D0.1.11-blue)"
     // "![Chromium supported](https://img.shields.io/badge/chromium-%3E%3D98.0.4695.0-blue)",
     // "![Webkit supported](https://img.shields.io/badge/webkit-%3E%3D15.4-blue)",
     // "![Firefox supported](https://img.shields.io/badge/firefox-%3E%3D94.0.1-blue)"
@@ -125,14 +124,6 @@ if (!process.env.NO_COVERAGE_BADGE_UPDATE) {
     );
   }
 
-  await replaceBetween(
-      "README.md",
-      "badges",
-      badges.join(
-          " "
-      )
-  )
+  await replaceBetween("README.md", "badges", badges.join(" "));
   console.log("Wrote coverage badges!");
 }
-
-

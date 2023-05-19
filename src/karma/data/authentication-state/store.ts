@@ -1,5 +1,5 @@
-import {DAY_MS, getExpiringStore, MINUTE_MS} from "../expiring-kv";
-import {AuthenticationState} from "./types";
+import { DAY_MS, getExpiringStore, MINUTE_MS } from "../expiring-kv";
+import { AuthenticationState } from "./types";
 
 const STORE_NAME = "authenticationState";
 
@@ -11,5 +11,5 @@ export const DEFAULT_AUTHSIGNAL_STATE_EXPIRES_MS = 12 * MINUTE_MS;
 export const EXTERNAL_STATE_ID_SEPARATOR = "::";
 
 export function getAuthenticationStateStore() {
-    return getExpiringStore<AuthenticationState>(STORE_NAME);
+  return getExpiringStore<AuthenticationState>(STORE_NAME);
 }

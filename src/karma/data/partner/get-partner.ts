@@ -1,6 +1,6 @@
-import {getPartnerStore} from "./store";
+import { getPartnerStore } from "./store";
 
 export function getPartner(partnerId: string) {
-    const store = getPartnerStore();
-    return store.get(partnerId);
+  const store = getPartnerStore();
+  return store.get(partnerId);
 }

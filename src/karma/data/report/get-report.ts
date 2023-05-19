@@ -1,6 +1,6 @@
-import {getReportStore} from "./store";
+import { getReportStore } from "./store";
 
 export function getReport(reportId: string) {
-    const store = getReportStore();
-    return store.get(reportId);
+  const store = getReportStore();
+  return store.get(reportId);
 }

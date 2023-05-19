@@ -1,4 +1,3 @@
-
 export interface Expiring {
-    expiresAt?: string;
+  expiresAt?: string;
 }

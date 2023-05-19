@@ -1,7 +1,7 @@
 name: Dispatcher
 on:
   workflow_run:
-    workflows: [ release-actions ]
+    workflows: [release-actions]
     types:
       - completed
 
@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        repo: ['socialbaking/karma-api']
+        repo: ["socialbaking/karma-api"]
     timeout-minutes: 5
     steps:
       - name: Repository Dispatch

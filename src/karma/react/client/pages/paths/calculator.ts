@@ -1,2 +1,1 @@
-export async function calculator() {
-}
+export async function calculator() {}

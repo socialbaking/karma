@@ -1,14 +1,12 @@
-import {FastifyInstance} from "fastify";
-import {listOrganisationsRoutes} from "./list-organisations";
+import { FastifyInstance } from "fastify";
+import { listOrganisationsRoutes } from "./list-organisations";
 
 export async function organisationRoutes(fastify: FastifyInstance) {
+  async function routes(fastify: FastifyInstance) {
+    fastify.register(listOrganisationsRoutes);
+  }
 
-    async function routes(fastify: FastifyInstance) {
-        fastify.register(listOrganisationsRoutes);
-    }
-
-    fastify.register(routes, {
-        prefix: "/organisations"
-    });
-
+  fastify.register(routes, {
+    prefix: "/organisations",
+  });
 }

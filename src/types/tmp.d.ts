@@ -1,3 +1,3 @@
 declare module "tmp" {
-    export type DirResult = any;
+  export type DirResult = any;
 }

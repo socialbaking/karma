@@ -1,6 +1,6 @@
-import {getFormMetaStore} from "./store";
+import { getFormMetaStore } from "./store";
 
 export function listFormMeta() {
-    const store = getFormMetaStore();
-    return store.values();
+  const store = getFormMetaStore();
+  return store.values();
 }
