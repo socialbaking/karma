@@ -1,4 +1,5 @@
 import { Product } from "./client";
+import {ok} from "../is";
 
 const NAME_SPLIT = " ";
 
@@ -7,6 +8,7 @@ export function getMatchingProducts(
   search: string,
   direct?: boolean
 ): Product[] {
+  ok(typeof search === "string", "expected search to be a string");
   const exactMatch = products.filter(
     (product) => product.productName === search
   );

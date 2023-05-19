@@ -21,12 +21,13 @@ import qs from "qs";
 import { REACT_CLIENT_DIRECTORY } from "../view";
 import files from "@fastify/static";
 import { errorHandler } from "../view/error";
+import etag from "@fastify/etag";
 
 const { pathname } = new URL(import.meta.url);
 const directory = dirname(pathname);
 
 export async function create() {
-  const { COOKIE_SECRET } = process.env;
+  const { COOKIE_SECRET, PUBLIC_PATH } = process.env;
 
   ok(COOKIE_SECRET, "Expected COOKIE_SECRET");
 
@@ -125,10 +126,27 @@ export async function create() {
 
   register(blippPlugin);
   register(corsPlugin);
-  register(files, {
-    root: REACT_CLIENT_DIRECTORY,
-    prefix: "/client",
-  });
+
+  app.register(async (instance) => {
+    instance.register(etag);
+    instance.addHook(
+        "onRequest",
+        (request, response, done) => {
+          response.header("Cache-Control", "max-age=1800"); // Give it something
+          done();
+        }
+    );
+    instance.register(files, {
+      root: REACT_CLIENT_DIRECTORY,
+      prefix: "/client",
+    });
+    const publicPath = PUBLIC_PATH || join(directory, "../../../public");
+    instance.register(files, {
+      root: publicPath,
+      decorateReply: false,
+      prefix: "/public"
+    });
+  }, { prefix: "/" })
 
   await setupSwagger(app);
 

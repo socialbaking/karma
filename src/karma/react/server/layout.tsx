@@ -129,10 +129,26 @@ const items = [
 function Logo() {
   return (
     <div className="flex flex-row align-start items-center">
-      <CategoryIcon
-        categoryName={BASIC_CATEGORY_FLOWER}
-        className="h-8 w-auto fill-white"
-        title="Social Baking Karma"
+      <img
+          role="presentation"
+          src="/public/example-1.svg"
+          alt="Brand Image"
+          className="h-8 w-auto fill-white"
+          title="Social Baking Karma"
+      />
+      <img
+          role="presentation"
+          src="/public/example-2.svg"
+          alt="Brand Image"
+          className="h-8 mx-2 w-auto fill-white"
+          title="Social Baking Karma"
+      />
+      <img
+          role="presentation"
+          src="/public/example-3.svg"
+          alt="Brand Image"
+          className="h-8 w-auto fill-white"
+          title="Social Baking Karma"
       />
     </div>
   );

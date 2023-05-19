@@ -151,13 +151,9 @@ export function useSortedProducts(
   const categories = useCategories();
 
   const search = useQuerySearch();
+  const searchValue = typeof isSearch === "string" ? isSearch : search;
 
   return useMemo(() => {
-    const categoryOrder = new Map<string, number | undefined>(
-      categories.map(
-        (category) => [category.categoryId, category.order] as const
-      )
-    );
     function isNumber(value: unknown): value is number {
       return typeof value === "number";
     }
@@ -218,16 +214,16 @@ export function useSortedProducts(
     }
 
     function filtered() {
-      if (!isSearch || !search) {
+      if (typeof searchValue !== "string") {
         return products;
       }
       return getMatchingProducts(
         products,
-        typeof isSearch === "string" ? isSearch : search,
+        searchValue,
         direct
       );
     }
-  }, [products, categories, search, isSearch, direct]);
+  }, [products, categories, searchValue, direct]);
 }
 
 export function useProductByName(productName?: string): Product | undefined {
