@@ -11,5 +11,7 @@ export const DEFAULT_AUTHSIGNAL_STATE_EXPIRES_MS = 12 * MINUTE_MS;
 export const EXTERNAL_STATE_ID_SEPARATOR = "::";
 
 export function getAuthenticationStateStore() {
-  return getExpiringStore<AuthenticationState>(STORE_NAME);
+  return getExpiringStore<AuthenticationState>(STORE_NAME, {
+    counter: false
+  });
 }

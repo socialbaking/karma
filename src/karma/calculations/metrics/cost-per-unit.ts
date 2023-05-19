@@ -15,6 +15,8 @@ export const title = "Product Costs";
 export const description =
   "Calculates the values related to the product, like cost per active ingredient";
 
+export const anonymous = true;
+
 export function handler(context: BaseCalculationContext) {
   return {
     reportMetrics: context.reports

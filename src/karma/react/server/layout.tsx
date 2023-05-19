@@ -1,7 +1,7 @@
 import { PropsWithChildren } from "react";
 import { description, namespace, project } from "../../package";
 import { getOrigin } from "../../listen/config";
-import { useQuery, useQuerySearch } from "./data";
+import {useData, useQuery, useQuerySearch} from "./data";
 import {
   BASIC_CATEGORY_FLOWER,
   CategoryIcon,
@@ -11,6 +11,21 @@ export interface LayoutProps {
   title?: string;
   url: string;
 }
+
+const publicItems = [
+  {
+    path: "/",
+    name: "Home"
+  },
+  {
+    path: "/calculator",
+    name: "Calculator"
+  },
+  {
+    path: "/feedback",
+    name: "Feedback"
+  }
+]
 
 const items = [
   {
@@ -210,6 +225,8 @@ export function BaseLayout({
 
 export function AnonymousLayout(props: PropsWithChildren<LayoutProps>) {
   const { children } = props;
+  const { url } = useData();
+  const { pathname } = new URL(url, getOrigin());
   return (
     <BaseLayout {...props}>
       <div className="min-h-full">
@@ -220,17 +237,25 @@ export function AnonymousLayout(props: PropsWithChildren<LayoutProps>) {
                 <div className="flex-shrink-0">
                   <Logo />
                 </div>
-                <div className="hidden md:block">
-                  <div className="ml-10 flex items-baseline space-x-4">
-                    {/* Current: "bg-indigo-700 text-white", Default: "text-white hover:bg-indigo-500 hover:bg-opacity-75" */}
-                    <a
-                      href="/"
-                      className="bg-indigo-700 text-white rounded-md px-3 py-2 text-sm font-medium"
-                      aria-current="page"
-                    >
-                      Home
-                    </a>
-                  </div>
+                <div className="flex flex-row">
+                  {
+                    publicItems.map(
+                        ({ path, name }, index) => {
+                          const isPath = path === "/" ? (pathname === path || pathname === "/home") : pathname.startsWith(path)
+                          return (
+                              <div className="ml-10 flex items-baseline space-x-4" key={index}>
+                                <a
+                                    href={path}
+                                    className={`${isPath ? "bg-indigo-700" : ""} text-white hover:bg-indigo-500 hover:bg-opacity-75 rounded-md px-3 py-2 text-sm font-medium`}
+                                >
+                                  {name}
+                                </a>
+                              </div>
+                          )
+                        }
+                    )
+                  }
+
                 </div>
               </div>
             </div>

@@ -1,5 +1,6 @@
 import * as metrics from "./metrics";
 import { CalculationConsentItem, CalculationSource } from "../client";
+import {ok} from "../../is";
 
 export const calculations = {
   metrics,
@@ -11,6 +12,8 @@ interface HandlerObject extends UnknownRecord {
   handler: Function;
   title: string;
   description: string;
+  anonymous: boolean;
+  enabled?: boolean;
 }
 
 export interface CalculationHandler extends CalculationSource, HandlerObject {
@@ -25,7 +28,8 @@ function isHandlerObject(value: UnknownRecord): value is HandlerObject {
   return (
     typeof value.handler === "function" &&
     typeof value.title === "string" &&
-    typeof value.description === "string"
+    typeof value.description === "string" &&
+    typeof value.anonymous === "boolean"
   );
 }
 
@@ -39,6 +43,8 @@ function getCalculations(object: unknown, key: string): CalculationHandler[] {
         calculationKey: key,
         title: object.title,
         description: object.description,
+        anonymous: !!object.anonymous,
+        enabled: object.enabled
       },
     ];
   }
@@ -87,4 +93,10 @@ export function hasConsent(
       value.calculationKey === calculationKey &&
       (value.consented || value.consentedAt)
   );
+}
+
+export function isAnonymousCalculation(calculationKey: string) {
+  const source = calculationSources.find(source => source.calculationKey === calculationKey);
+  if (!source) return false;
+  return !!source.anonymous;
 }

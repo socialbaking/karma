@@ -1,18 +1,16 @@
 import {
-  useCategory,
-  useError,
-  useMaybeBody,
-  useMaybeResult,
-  useMetrics,
-  useProduct,
-  useProductMetrics,
-  useQuery,
-  useSortedProducts,
-  useSubmitted,
-  useProductByName,
-  useQuerySearch,
+    useCategory,
+    useError,
+    useMaybeBody,
+    useMaybeResult,
+    useProduct,
+    useProductMetrics,
+    useSortedProducts,
+    useSubmitted,
+    useProductByName,
+    useQuerySearch, useData,
 } from "../data";
-import { calculationSources, hasConsent } from "../../../calculations";
+import {calculationSources, hasConsent, isAnonymousCalculation} from "../../../calculations";
 import { ReportData, Report } from "../../../client";
 import { FastifyRequest } from "fastify";
 import { addReportFromRequest } from "../../../listen/report/add-report";
@@ -64,6 +62,13 @@ export function Calculator() {
   const metrics = useProductMetrics("month");
   const searchedProduct = useProductByName(productName);
   const searchedProductCategory = useCategory(searchedProduct?.categoryId);
+  const { isAnonymous } = useData();
+  let calculations = calculationSources;
+  if (isAnonymous) {
+      calculations = calculations.filter(
+          source => isAnonymousCalculation(source.calculationKey)
+      );
+  }
   return (
     <form name="calculator" action="/calculator#action-section" method="post">
       {result ? (
@@ -177,7 +182,7 @@ export function Calculator() {
         of the information.
       </p>
       <ul className="list-none" id="select-calculations">
-        {calculationSources.map(
+        {calculations.map(
           ({ calculationKey, title, description }, index) => {
             const consented = !!body?.calculationConsent?.find(
               (value) => value.calculationKey === calculationKey

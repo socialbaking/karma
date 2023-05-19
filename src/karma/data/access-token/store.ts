@@ -4,5 +4,7 @@ import { AccessToken } from "./types";
 const STORE_NAME = "accessToken";
 
 export function getAccessTokenStore() {
-  return getKeyValueStore<AccessToken>(STORE_NAME);
+  return getKeyValueStore<AccessToken>(STORE_NAME, {
+    counter: false
+  });
 }

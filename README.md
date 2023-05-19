@@ -70,6 +70,7 @@ export interface CalculationSource {
   calculationKey: string;
   title: string;
   description: string;
+  anonymous: boolean;
 }
 
 export interface CategoryData extends Record<string, unknown> {

@@ -10,6 +10,7 @@ import {
 import { authenticate } from "../authentication";
 import { isAnonymous } from "../../authentication";
 import {
+  isAnonymousCalculation,
   isNumberString,
   isProductReport,
   isProductReportData,
@@ -56,6 +57,8 @@ export async function addReportFromRequest(
     anonymous,
   } = request.body;
 
+  anonymous = anonymous || isAnonymous();
+
   calculationConsent = calculationConsent
     ?.map((value): CalculationConsentItem => {
       const consented =
@@ -71,6 +74,13 @@ export async function addReportFromRequest(
       };
     })
     .filter((value) => value.consented);
+
+  if (anonymous && calculationConsent) {
+    // Only store keys that are related to anonymous users
+    // Ensures they can never use calculations not intended for anonymous users
+    calculationConsent = calculationConsent
+        .filter(value => isAnonymousCalculation(value.calculationKey));
+  }
 
   if (!productPurchaseFeeCost) {
     productPurchaseFeeCost = "0";
@@ -165,7 +175,7 @@ export async function addReportFromRequest(
     reportedAt,
     shippedAt,
     timezone,
-    anonymous: anonymous || isAnonymous(),
+    anonymous,
   };
 
   if (typeof data[REPORTING_DATE_KEY] !== "string") {

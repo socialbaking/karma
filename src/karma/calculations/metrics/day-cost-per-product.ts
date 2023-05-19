@@ -23,6 +23,8 @@ import { v4 } from "uuid";
 export const title = "Daily Average";
 export const description = "Calculates the average values for a day";
 
+export const anonymous = false;
+
 export function handler(context: CalculationContext) {
   return {
     dailyMetrics: calculate(context),

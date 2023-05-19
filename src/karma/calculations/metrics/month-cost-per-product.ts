@@ -5,6 +5,8 @@ import { processReportsForUnit } from "./day-cost-per-product";
 export const title = "Montly Average";
 export const description = "Calculates the average values for a month";
 
+export const anonymous = false;
+
 export function handler(context: CalculationContext) {
   return {
     monthlyMetrics: calculate(context),

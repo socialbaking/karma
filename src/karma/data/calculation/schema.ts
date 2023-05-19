@@ -10,6 +10,9 @@ export const calculationSource = {
     description: {
       type: "string",
     },
+    anonymous: {
+      type: "boolean",
+    },
   },
-  required: ["calculationKey", "title", "description"],
+  required: ["calculationKey", "title", "description", "anonymous"],
 } as const;
