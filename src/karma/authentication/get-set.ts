@@ -77,42 +77,35 @@ export function setAuthenticationState(state: AuthenticationState) {
 }
 
 export function getMaybeAuthenticationState(): AuthenticationState | undefined {
-    return requestContext.get(AUTHENTICATION_STATE);
+    const state = requestContext.get(AUTHENTICATION_STATE);
+    if (state) return state;
+    const partner = getMaybePartner();
+    if (partner) {
+        return {
+            type: "partner",
+            stateId: partner.partnerId,
+            stateKey: partner.partnerId,
+            partnerId: partner.partnerId,
+            roles: [
+                "partner"
+            ],
+            createdAt: partner.createdAt,
+            expiresAt: partner.createdAt
+        }
+    }
+    return undefined;
 }
+
 
 export function getAuthenticationState(): AuthenticationState {
     const state = getMaybeAuthenticationState();
-    if (!state) {
-        const partner = getMaybePartner();
-        if (partner) {
-            return {
-                type: "partner",
-                stateId: partner.partnerId,
-                stateKey: partner.partnerId,
-                partnerId: partner.partnerId,
-                roles: [
-                    "partner"
-                ],
-                createdAt: partner.createdAt,
-                expiresAt: partner.createdAt
-            }
-        }
-    }
     ok(state, "Expected to be authenticated");
     return state;
 }
 
-export function getMaybeAuthenticationRoles(): AuthenticationRole[] {
-    try {
-        return getAuthenticationRoles()
-    } catch {
-        return [];
-    }
-}
-
 export function getAuthenticationRoles(): AuthenticationRole[] {
-    const { roles } = getAuthenticationState();
-    return roles ?? [];
+    const state = getMaybeAuthenticationState();
+    return state?.roles ?? [];
 }
 
 export function isRole(role: AuthenticationRole) {

@@ -1,5 +1,7 @@
 import {KeyValueStore} from "./types";
 import {createClient, RedisClientType} from "redis";
+import {ok} from "../../is";
+import {isNumberString} from "../calculations";
 
 const GLOBAL_CLIENTS = new Map();
 const GLOBAL_CLIENT_CONNECTION_PROMISE = new WeakMap();
@@ -65,6 +67,29 @@ export function getRedisPrefixedKey(name: string, key: string): string {
 export function createRedisKeyValueStore<T>(name: string): KeyValueStore<T> {
     const client = getGlobalRedisClient();
 
+    const isCounter = name.endsWith("Counter");
+
+    function parseValue(value: unknown): T | undefined {
+        if (isCounter) {
+            return parseCounterValue(value);
+        }
+
+        if (typeof value !== "string") {
+            return undefined;
+        }
+
+        return JSON.parse(value);
+
+        function parseCounterValue(value: unknown): T {
+            let returnValue = 0;
+            if (isNumberString(value)) {
+                returnValue = +value;
+            }
+            ok<T>(returnValue);
+            return returnValue;
+        }
+    }
+
     function getPrefix() {
         return getRedisPrefix(name);
     }
@@ -84,11 +109,13 @@ export function createRedisKeyValueStore<T>(name: string): KeyValueStore<T> {
     async function internalGet(actualKey: string): Promise<T | undefined> {
         await connect();
         const value = await client.get(actualKey);
-        if (!value) return undefined;
-        return JSON.parse(value);
+        return parseValue(value);
     }
 
     async function set(key: string, value: T): Promise<void> {
+        if (isCounter) {
+            ok(typeof value === "number", "Expected number value for counter store")
+        }
         await connect();
         const json = JSON.stringify(value);
         await client.set(getKey(key), json);
@@ -137,6 +164,14 @@ export function createRedisKeyValueStore<T>(name: string): KeyValueStore<T> {
         )
     }
 
+    async function increment(key: string): Promise<number> {
+        ok(isCounter, "Expected increment to be used with a counter store only");
+        await connect();
+        const returnedValue = await client.incr(getKey(key));
+        ok(isNumberString(returnedValue), "Expected redis to return number when incrementing");
+        return +returnedValue;
+    }
+
     return {
         name,
         get,
@@ -146,6 +181,7 @@ export function createRedisKeyValueStore<T>(name: string): KeyValueStore<T> {
         has,
         keys,
         clear,
+        increment,
         [Symbol.asyncIterator]() {
             return asyncIterable()[Symbol.asyncIterator]()
         }

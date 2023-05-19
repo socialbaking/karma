@@ -1,117 +1,58 @@
-import { requestContext } from "@fastify/request-context";
-import {KVS, StorageSchema} from "@kvs/types";
-import {kvsEnvStorage} from "@kvs/env";
 import {KeyValueStore} from "./types";
-import {createRedisKeyValueStore, isRedis} from "./redis-client";
+import {getBaseKeyValueStore} from "./kv-base";
+import {ok} from "../../is";
 
-const DATABASE_VERSION = 1;
+export const GLOBAL_STORE_NAME = "global";
+export const GLOBAL_COUNT_NAME = "globalCount";
 
-interface GenericStorageFn {
-    (): Promise<KVS<StorageSchema>>
+export interface KeyValueStoreWithCounter<T> extends KeyValueStore<T> {
+    counters: {
+        store: KeyValueStore<number>
+        global: KeyValueStore<number>
+    };
 }
 
-export const STORE_NAMES = new Set<string>();
-
-export function getKeyValueStore<T>(name: string): KeyValueStore<T> {
-    return getRequestContextKeyValueStoreWithName<T>(name);
+export interface KeyValueStoreOptions {
+    counter?: boolean;  // To disable set to false
 }
 
-function getRequestContextKeyValueStoreWithName<T>(name: string): KeyValueStore<T> {
-    STORE_NAMES.add(name);
-    const key = `kvStore#${name}`;
-    const store = get();
-    if (store) return store;
-    return create();
 
-    function get(): KeyValueStore<T> | undefined {
-        return requestContext.get(key);
-    }
-
-    function create() {
-        let store: Promise<KVS<StorageSchema>>;
-        let kv;
-        if (isRedis()) {
-            kv = createRedisKeyValueStore<T>(name);
-        } else {
-            kv = createKeyValueStore<T>(name, () => {
-                if (store) {
-                    return store;
-                }
-                return store = kvsEnvStorage({
-                    name,
-                    version: DATABASE_VERSION
-                })
-            })
-        }
-        requestContext.set(key, kv);
-        return kv;
-    }
-}
-
-function createKeyValueStore<T>(name: string, storage: GenericStorageFn): KeyValueStore<T> {
-    async function get(key: string): Promise<T | undefined> {
-        const store = await storage();
-        return store.get(key);
-    }
-
-    async function set(key: string, value: T): Promise<void> {
-        const store = await storage();
-        await store.set(key, value)
-    }
-
-    async function values(): Promise<T[]> {
-        const values = [];
-        const store = await storage();
-        for await (const [,value] of store) {
-            values.push(value)
-        }
-        return values;
-    }
-
-    async function *asyncIterable(): AsyncIterable<T> {
-        const store = await storage();
-        for await (const [,value] of store) {
-            yield value;
-        }
-    }
-
-    async function deleteFn(key: string): Promise<void> {
-        const store = await storage();
-        await store.delete(key);
-    }
-
-    async function has(key: string): Promise<boolean> {
-        const store = await storage();
-        return store.has(key);
-    }
-
-    async function keys(): Promise<string[]> {
-        const keys: string[] = [];
-        const store = await storage();
-        for await (const [key] of store) {
-            if (typeof key === "string") {
-                keys.push(key);
-            }
-        }
-        return keys;
-    }
-
-    async function clear(): Promise<void> {
-        const store = await storage();
-        await store.clear();
-    }
-
+export function getKeyValueStore<T>(name: string, options: KeyValueStoreOptions & { counter: false }): KeyValueStore<T>
+export function getKeyValueStore<T>(name: string, options?: KeyValueStoreOptions): KeyValueStoreWithCounter<T>
+export function getKeyValueStore<T>(name: string, options?: KeyValueStoreOptions): KeyValueStore<T> & Partial<KeyValueStoreWithCounter<T>> {
+    const store = getBaseKeyValueStore<T>(name);
+    const counters = options?.counter !== false ? {
+        store: getCounterStore(name),
+        global: getGlobalCounterStore()
+    } : undefined;
     return {
-        name,
-        get,
-        set,
-        values,
-        delete: deleteFn,
-        has,
-        keys,
-        clear,
-        [Symbol.asyncIterator]() {
-            return asyncIterable()[Symbol.asyncIterator]()
+        ...store,
+        counters,
+        async set(key: string, value: T) {
+            await counters?.global.increment(GLOBAL_COUNT_NAME);
+            await counters?.store.increment(key);
+            return store.set(key, value);
         }
     }
+}
+
+export function getCounterStoreName(baseName: string): `${string}Counter` {
+    return `${baseName}Counter`;
+}
+
+export function getCounterStore(name: string): KeyValueStore<number> {
+    return getBaseKeyValueStore<number>(
+        getCounterStoreName(name)
+    );
+}
+
+export function getGlobalCounterStore() {
+    return getCounterStore(GLOBAL_STORE_NAME);
+}
+
+export async function getGlobalCount() {
+    const store = getGlobalCounterStore();
+    const count = await store.get(GLOBAL_COUNT_NAME);
+    ok(typeof count === "number", "Expected global count value");
+    return count;
 }

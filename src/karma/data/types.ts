@@ -8,5 +8,6 @@ export interface KeyValueStore<T> extends AsyncIterable<T> {
     keys(): Promise<string[]>
     delete(key: string): Promise<void>
     has(key: string): Promise<boolean>
-    clear(): Promise<void>;
+    clear(): Promise<void>
+    increment(key: string): Promise<number>
 }

@@ -1,5 +1,5 @@
 import {KeyValueStore} from "./types";
-import {getKeyValueStore} from "./kv";
+import {getKeyValueStore, KeyValueStoreOptions} from "./kv";
 import {connectGlobalRedisClient, getRedisPrefixedKey, isRedis} from "./redis-client";
 import {Expiring} from "./expiring";
 
@@ -25,8 +25,8 @@ export function getExpiresInMilliseconds(expiresAt: string) {
     return expiresAtMs - Date.now();
 }
 
-export function getExpiringStore<T extends Expiring>(name: string): KeyValueStore<T> {
-    const store = getKeyValueStore<T>(name);
+export function getExpiringStore<T extends Expiring>(name: string, options?: KeyValueStoreOptions): KeyValueStore<T> {
+    const store = getKeyValueStore<T>(name, options);
 
     function getKey(key: string): string {
         return getRedisPrefixedKey(name, key);
