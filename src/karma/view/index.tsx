@@ -11,7 +11,7 @@ import {
 } from "../package";
 import {
   paths,
-  pathsAnonymous,
+  pathsAnonymous, pathsCache,
   pathsHandler,
   pathsSubmit,
 } from "../react/server/paths";
@@ -51,7 +51,8 @@ export async function viewRoutes(fastify: FastifyInstance) {
 
   function createPathHandler(
     path: string,
-    options?: Partial<KarmaServerProps>
+    options?: Partial<KarmaServerProps>,
+    isPathCached?: boolean
   ) {
     const baseHandler = pathsHandler[path];
     const submitHandler = pathsSubmit[path];
@@ -83,6 +84,7 @@ export async function viewRoutes(fastify: FastifyInstance) {
 
       async function getHTML() {
         const isCacheUsable = !!(
+          isPathCached &&
           ENABLE_CACHE &&
           !submitHandler &&
           request.method.toLowerCase() === "get"
@@ -164,17 +166,20 @@ export async function viewRoutes(fastify: FastifyInstance) {
         result,
         error,
         submitted: true,
-      });
+      }, false);
       await view(request, response);
     };
   }
 
   Object.keys(paths).forEach((path) => {
-    const handler = createPathHandler(path);
 
     const anonymous = pathsAnonymous[path] || !!ALLOW_ANONYMOUS_VIEWS;
 
-    console.log({ path, anonymous });
+    const isPathCached = pathsCache[path] || false;
+
+    const handler = createPathHandler(path, {}, isPathCached);
+
+    console.log({ path, anonymous, isPathCached });
 
     const preHandler = authenticate(fastify, {
       anonymous: pathsAnonymous[path] || !!ALLOW_ANONYMOUS_VIEWS,

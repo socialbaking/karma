@@ -48,3 +48,18 @@ export const pathsHandler: Record<
 > = {
   "/logout": logoutHandler,
 };
+
+export const pathsCache: Record<string, boolean> = {
+  "/": false,
+  "/home": false,
+  "/metrics": true,
+  "/products": true,
+  "/partners": true,
+  "/calculator": false,
+  "/settings": false,
+  "/organisations": true,
+  "/feedback": false,
+  "/login": false,
+  "/logout": false,
+  "/error": false,
+};
