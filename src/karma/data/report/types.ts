@@ -25,7 +25,7 @@ export interface ReportRoleData {
   roles: AuthenticationRole[];
 }
 
-export type ReportType = "product-purchase" | "product";
+export type ReportType = "purchase" | "product";
 
 export interface ReportData
   extends ReportDateData,
