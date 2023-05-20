@@ -3,6 +3,7 @@ import {
   addReport,
   CalculationConsentItem,
   listProducts,
+  Product,
   Report,
   ReportData,
   reportSchema,
@@ -27,7 +28,21 @@ export async function addReportFromRequest(
   request: FastifyRequest
 ): Promise<Report> {
   ok<FastifyRequest<Schema>>(request);
+  // Replace the body with the updated
+  // report data so that it is consistent
+  request.body = await getReportDataFromRequestBody(
+    request.body,
+    await listProducts()
+  );
+  return addReport(request.body);
+}
+
+export async function getReportDataFromRequestBody(
+  body: ReportData,
+  products: Product[]
+): Promise<ReportData> {
   let {
+    type,
     calculationConsent,
     countryCode,
     createdAt,
@@ -39,15 +54,14 @@ export async function addReportFromRequest(
     parentReportId,
     productId,
     productName,
-    productPurchase,
-    productPurchaseDeliveryCost,
-    productPurchaseItemCost,
-    productPurchaseFeeCost,
-    productPurchaseItems,
-    productPurchaseOrganisationId,
-    productPurchaseOrganisationName,
-    productPurchaseOrganisationText,
-    productPurchaseTotalCost,
+    productDeliveryCost,
+    productItemCost,
+    productFeeCost,
+    productItems,
+    productOrganisationId,
+    productOrganisationName,
+    productOrganisationText,
+    productTotalCost,
     productSize,
     productText,
     receivedAt,
@@ -55,7 +69,7 @@ export async function addReportFromRequest(
     shippedAt,
     timezone,
     anonymous,
-  } = request.body;
+  } = body;
 
   anonymous = anonymous || isAnonymous();
 
@@ -83,37 +97,34 @@ export async function addReportFromRequest(
     );
   }
 
-  if (!productPurchaseFeeCost) {
-    productPurchaseFeeCost = "0";
+  if (!productFeeCost) {
+    productFeeCost = "0";
   }
 
-  if (!productPurchaseDeliveryCost) {
-    productPurchaseDeliveryCost = "0";
+  if (!productDeliveryCost) {
+    productDeliveryCost = "0";
   }
 
-  const withTotal = { ...request.body, productPurchaseTotalCost: "1" };
-  if (!productPurchaseTotalCost && isProductReportData(withTotal)) {
+  const withTotal = { ...body, productTotalCost: "1" };
+  if (!productTotalCost && isProductReportData(withTotal)) {
     const {
-      productPurchaseDeliveryCost,
-      productPurchaseItemCost,
-      productPurchaseFeeCost,
-      productPurchaseItems,
+      productDeliveryCost,
+      productItemCost,
+      productFeeCost,
+      productItems,
     } = withTotal;
 
-    const totalItemCost = +productPurchaseItems * +productPurchaseItemCost;
-    const fee = productPurchaseFeeCost ? +productPurchaseFeeCost : 0;
-    const delivery = productPurchaseDeliveryCost
-      ? +productPurchaseDeliveryCost
-      : 0;
+    const totalItemCost = +productItems * +productItemCost;
+    const fee = productFeeCost ? +productFeeCost : 0;
+    const delivery = productDeliveryCost ? +productDeliveryCost : 0;
     const numeric = totalItemCost + fee + delivery;
 
     if (!isNaN(numeric)) {
-      productPurchaseTotalCost = numeric.toFixed(2);
+      productTotalCost = numeric.toFixed(2);
     }
   }
 
   if ((productText || productName) && !productId) {
-    const products = await listProducts();
     const name = productText || productName;
     const matching = getMatchingProducts(products, name, true);
     if (matching.length > 1) {
@@ -124,13 +135,15 @@ export async function addReportFromRequest(
       );
     }
     const product = matching[0];
-    if (!productText) {
-      productText = product.productName;
-    }
-    productName = product.productName;
-    productId = product.productId;
-    if (product.sizes?.length === 1) {
-      productSize = product.sizes[0];
+    if (product) {
+      if (!productText) {
+        productText = product.productName;
+      }
+      productName = product.productName;
+      productId = product.productId;
+      if (product.sizes?.length === 1 && !productSize) {
+        productSize = product.sizes[0];
+      }
     }
   }
 
@@ -138,20 +151,16 @@ export async function addReportFromRequest(
     throw new Error("No product name provided");
   }
 
-  if (
-    !(
-      isNumberString(productPurchaseItemCost) ||
-      isNumberString(productPurchaseTotalCost)
-    )
-  ) {
+  if (!(isNumberString(productItemCost) || isNumberString(productTotalCost))) {
     throw new Error("Expected item cost");
   }
 
-  if (!isNumberString(productPurchaseItems)) {
+  if (!isNumberString(productItems)) {
     throw new Error("Expected item count");
   }
 
   const data: ReportData = {
+    type,
     calculationConsent,
     countryCode,
     createdAt,
@@ -163,15 +172,14 @@ export async function addReportFromRequest(
     parentReportId,
     productId,
     productName,
-    productPurchase,
-    productPurchaseDeliveryCost,
-    productPurchaseFeeCost,
-    productPurchaseItemCost,
-    productPurchaseItems,
-    productPurchaseOrganisationId,
-    productPurchaseOrganisationName,
-    productPurchaseOrganisationText,
-    productPurchaseTotalCost,
+    productDeliveryCost,
+    productFeeCost,
+    productItemCost,
+    productItems,
+    productOrganisationId,
+    productOrganisationName,
+    productOrganisationText,
+    productTotalCost,
     productSize,
     productText,
     receivedAt,
@@ -188,14 +196,10 @@ export async function addReportFromRequest(
     data[REPORTING_DATE_KEY] = new Date().toISOString();
   }
 
-  // Replace the body with the updated
-  // report data so that it is consistent
-  request.body = {
-    ...request.body,
+  return {
+    ...body,
     ...data,
   };
-
-  return await addReport(data);
 }
 
 export async function addReportRoutes(fastify: FastifyInstance) {

@@ -1,7 +1,7 @@
-import { PropsWithChildren } from "react";
+import { PropsWithChildren, ReactElement } from "react";
 import { description, namespace, project } from "../../package";
 import { getOrigin } from "../../listen/config";
-import { useData, useQuery, useQuerySearch } from "./data";
+import { useData, useIsTrusted, useQuery, useQuerySearch } from "./data";
 import {
   BASIC_CATEGORY_FLOWER,
   CategoryIcon,
@@ -12,7 +12,17 @@ export interface LayoutProps {
   url: string;
 }
 
-const publicItems = [
+interface MenuItem {
+  path: string;
+  name: string;
+}
+
+interface UserMenuItem extends MenuItem {
+  icon: ReactElement;
+  trusted?: boolean;
+}
+
+const publicItems: MenuItem[] = [
   {
     path: "/",
     name: "Home",
@@ -27,7 +37,7 @@ const publicItems = [
   },
 ];
 
-const items = [
+const items: UserMenuItem[] = [
   {
     path: "/home",
     name: "Home",
@@ -89,6 +99,27 @@ const items = [
     ),
   },
   {
+    path: "/upload-report",
+    name: "Upload CSV",
+    icon: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth={1.5}
+        stroke="currentColor"
+        className="w-6 h-6"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"
+        />
+      </svg>
+    ),
+    trusted: true,
+  },
+  {
     path: "/feedback",
     name: "Feedback",
     icon: (
@@ -139,7 +170,7 @@ const items = [
   //         </svg>
   //     )
   // },
-] as const;
+];
 
 function Logo() {
   return (
@@ -278,22 +309,25 @@ export function Layout(props: PropsWithChildren<LayoutProps>) {
   const { children, url } = props;
   const { pathname } = new URL(url, getOrigin());
   const search = useQuerySearch();
+  const isTrusted = useIsTrusted();
   return (
     <BaseLayout {...props}>
       <div>
         <noscript className="lg:hidden">
           <ul role="list" className="-mx-2 space-y-1 list-none">
-            {items.map(({ path, name, icon }, index) => (
-              <li key={index}>
-                <a
-                  href={path}
-                  className="text-blue-600 hover:bg-white underline hover:underline-offset-2 flex flex-row align-center justify-left p-4"
-                >
-                  {icon}
-                  <span className="px-4">{name}</span>
-                </a>
-              </li>
-            ))}
+            {items
+              .filter(({ trusted }) => !trusted || isTrusted)
+              .map(({ path, name, icon }, index) => (
+                <li key={index}>
+                  <a
+                    href={path}
+                    className="text-blue-600 hover:bg-white underline hover:underline-offset-2 flex flex-row align-center justify-left p-4"
+                  >
+                    {icon}
+                    <span className="px-4">{name}</span>
+                  </a>
+                </li>
+              ))}
           </ul>
           <hr />
         </noscript>

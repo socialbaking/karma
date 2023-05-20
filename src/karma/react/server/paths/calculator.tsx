@@ -5,7 +5,6 @@ import {
   useMaybeResult,
   useProduct,
   useProductMetrics,
-  useSortedProducts,
   useSubmitted,
   useProductByName,
   useQuerySearch,
@@ -55,8 +54,51 @@ disabled:bg-slate-300 disabled:cursor-not-allowed
 
 const FORM_GROUP_CLASS = `block py-2`;
 
+export function CalculationConsent() {
+  const body = useMaybeBody<Pick<ReportData, "calculationConsent">>();
+  const { isAnonymous } = useData();
+  let calculations = calculationSources;
+  if (isAnonymous) {
+    calculations = calculations.filter((source) =>
+      isAnonymousCalculation(source.calculationKey)
+    );
+  }
+  return (
+    <ul className="list-none" id="select-calculations">
+      {calculations.map(({ calculationKey, title, description }, index) => {
+        const consented = !!body?.calculationConsent?.find(
+          (value) => value.calculationKey === calculationKey
+        )?.consented;
+        const consentedKey = `calculationConsent[${index}].consented_boolean`;
+        return (
+          <li key={calculationKey} className="my-4 flex flex-row align-start">
+            <input
+              name={`calculationConsent[${index}].calculationKey`}
+              type="hidden"
+              value={calculationKey}
+            />
+            <input
+              name={consentedKey}
+              id={consentedKey}
+              type="checkbox"
+              className="form-checkbox rounded m-1"
+              defaultChecked={consented}
+            />
+            <label htmlFor={consentedKey} className="flex flex-col ml-4">
+              <span>{title}</span>
+              <span>
+                {description}
+                {index > 0 ? " and includes the results in our metrics" : ""}
+              </span>
+            </label>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
 export function Calculator() {
-  const products = useSortedProducts();
   const body = useMaybeBody<ReportData>();
   const submitted = useSubmitted();
   const result = useMaybeResult<{ report: Report; metrics?: ReportMetrics }>();
@@ -67,13 +109,6 @@ export function Calculator() {
   const metrics = useProductMetrics("month");
   const searchedProduct = useProductByName(productName);
   const searchedProductCategory = useCategory(searchedProduct?.categoryId);
-  const { isAnonymous } = useData();
-  let calculations = calculationSources;
-  if (isAnonymous) {
-    calculations = calculations.filter((source) =>
-      isAnonymousCalculation(source.calculationKey)
-    );
-  }
   return (
     <form name="calculator" action="/calculator#action-section" method="post">
       {result ? (
@@ -116,8 +151,8 @@ export function Calculator() {
         </ul>
       ) : undefined}
 
-      {/* calculation type */}
-      <input type="hidden" value="true" name="productPurchase_boolean" />
+      {/* report type */}
+      <input type="hidden" value="product-purchase" name="type" />
 
       <div className="flex flex-col">
         <label className={FORM_GROUP_CLASS}>
@@ -144,10 +179,10 @@ export function Calculator() {
           <input
             className={FORM_CLASS}
             type="number"
-            name="productPurchaseItemCost"
+            name="productItemCost"
             step="0.01"
             placeholder="Item Cost"
-            defaultValue={body?.productPurchaseItemCost}
+            defaultValue={body?.productItemCost}
           />
         </label>
         <label className={FORM_GROUP_CLASS}>
@@ -155,23 +190,23 @@ export function Calculator() {
           <input
             className={FORM_CLASS}
             type="number"
-            name="productPurchaseItems"
+            name="productItems"
             step="1"
             placeholder="Item Count"
-            defaultValue={body?.productPurchaseItems ?? "1"}
+            defaultValue={body?.productItems ?? "1"}
           />
         </label>
         {/*<label className={FORM_GROUP_CLASS}>*/}
         {/*    <span className="text-gray-700">Delivery Cost</span>*/}
-        {/*    <input className={FORM_CLASS} type="number" name="productPurchaseDeliveryCost" step="0.01" placeholder="Delivery Cost" defaultValue={body?.productPurchaseDeliveryCost} />*/}
+        {/*    <input className={FORM_CLASS} type="number" name="productDeliveryCost" step="0.01" placeholder="Delivery Cost" defaultValue={body?.productDeliveryCost} />*/}
         {/*</label>*/}
         {/*<label className={FORM_GROUP_CLASS}>*/}
         {/*    <span className="text-gray-700">Purchase Fees (e.g. Health Now)</span>*/}
-        {/*    <input className={FORM_CLASS} type="number" name="productPurchaseFeeCost" step="0.01" placeholder="Purchase Fees" defaultValue={body?.productPurchaseFeeCost} />*/}
+        {/*    <input className={FORM_CLASS} type="number" name="productFeeCost" step="0.01" placeholder="Purchase Fees" defaultValue={body?.productFeeCost} />*/}
         {/*</label>*/}
         {/*<label className={FORM_GROUP_CLASS}>*/}
         {/*    <span className="text-gray-700">Purchased From (e.g. Pharmacy or Clinic Name)</span>*/}
-        {/*    <input className={FORM_CLASS} type="text" name="productPurchaseOrganisationText" placeholder="Purchased From" defaultValue={body?.productPurchaseOrganisationText} />*/}
+        {/*    <input className={FORM_CLASS} type="text" name="productOrganisationText" placeholder="Purchased From" defaultValue={body?.productOrganisationText} />*/}
         {/*</label>*/}
       </div>
       {/*<hr className="my-8" />*/}
@@ -186,37 +221,7 @@ export function Calculator() {
         results are intended for, including but not limited to public publishing
         of the information.
       </p>
-      <ul className="list-none" id="select-calculations">
-        {calculations.map(({ calculationKey, title, description }, index) => {
-          const consented = !!body?.calculationConsent?.find(
-            (value) => value.calculationKey === calculationKey
-          )?.consented;
-          const consentedKey = `calculationConsent[${index}].consented_boolean`;
-          return (
-            <li key={calculationKey} className="my-4 flex flex-row align-start">
-              <input
-                name={`calculationConsent[${index}].calculationKey`}
-                type="hidden"
-                value={calculationKey}
-              />
-              <input
-                name={consentedKey}
-                id={consentedKey}
-                type="checkbox"
-                className="form-checkbox rounded m-1"
-                defaultChecked={consented}
-              />
-              <label htmlFor={consentedKey} className="flex flex-col ml-4">
-                <span>{title}</span>
-                <span>
-                  {description}
-                  {index > 0 ? " and includes the results in our metrics" : ""}
-                </span>
-              </label>
-            </li>
-          );
-        })}
-      </ul>
+      <CalculationConsent />
       <hr className="my-8" />
       <div id="action-section">
         <button

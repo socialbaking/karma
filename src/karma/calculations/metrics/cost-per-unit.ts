@@ -33,11 +33,11 @@ export function calculate(
 
   const {
     productId,
-    // productPurchaseItems,
-    // productPurchaseTotalCost,
-    productPurchaseItemCost,
-    // productPurchaseDeliveryCost,
-    // productPurchaseFeeCost,
+    // productItems,
+    // productTotalCost,
+    productItemCost,
+    // productDeliveryCost,
+    // productFeeCost,
     productSize,
     calculationConsent,
     countryCode,
@@ -60,14 +60,14 @@ export function calculate(
 
   if (!productActiveIngredients) return undefined;
 
-  // const totalCost = +productPurchaseTotalCost;
-  // const deliveryCost = +productPurchaseDeliveryCost;
-  // const items = Math.max(1, +productPurchaseItems);
-  // const feeCost = +(productPurchaseFeeCost ?? "0");
+  // const totalCost = +productTotalCost;
+  // const deliveryCost = +productDeliveryCost;
+  // const items = Math.max(1, +productItems);
+  // const feeCost = +(productFeeCost ?? "0");
 
   // const productCost = totalCost - deliveryCost - feeCost;
   // const calculatedItemCost = productCost / items;
-  const itemCost = +productPurchaseItemCost;
+  const itemCost = +productItemCost;
 
   const calculated = productActiveIngredients.filter(
     (value) => value.calculated

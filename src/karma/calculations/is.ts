@@ -2,10 +2,10 @@ import { Report, ReportData } from "../client";
 
 export interface ProductReportData {
   // These are the expected field for a completed product report
-  productPurchase: true;
-  productPurchaseTotalCost: `${number}` | number;
-  productPurchaseItems: `${number}` | number;
-  productPurchaseItemCost: `${number}` | number;
+  type: "purchase" | "product";
+  productTotalCost: `${number}` | number;
+  productItems: `${number}` | number;
+  productItemCost: `${number}` | number;
 }
 
 export function isProductReport(
@@ -18,10 +18,10 @@ export function isProductReportData(
   report: ReportData
 ): report is ReportData & ProductReportData {
   return !!(
-    report.productPurchase &&
-    isNumberString(report.productPurchaseTotalCost) &&
-    isNumberString(report.productPurchaseItemCost) &&
-    isNumberString(report.productPurchaseItems)
+    (report.type === "product" || report.type === "purchase") &&
+    isNumberString(report.productTotalCost) &&
+    isNumberString(report.productItemCost) &&
+    isNumberString(report.productItems)
   );
 }
 

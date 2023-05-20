@@ -2,7 +2,7 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import { renderToStaticMarkup } from "react-dom/server";
 import KarmaServer from "../react/server";
 import { getOrigin } from "../listen/config";
-import {getMaybeUser, getUser, isAnonymous} from "../authentication";
+import { getMaybeUser, getUser, isAnonymous } from "../authentication";
 import { isHTMLResponse } from "../listen/authentication";
 
 export function errorHandler(

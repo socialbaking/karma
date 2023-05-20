@@ -61,11 +61,30 @@ export const reportDateData = {
   },
 } as const;
 
+export const reportDataReportKeys: (keyof typeof reportData.properties)[] = [
+  "type",
+  "countryCode",
+  "currencySymbol",
+  "timezone",
+  "note",
+  "productText",
+  "productSize",
+  "productTotalCost",
+  "productItemCost",
+  "productItems",
+  "productDeliveryCost",
+  "productFeeCost",
+  "productOrganisationText",
+];
+
 export const reportData = {
   type: "object",
   properties: {
     ...calculationConsent.properties,
     ...reportDateData.properties,
+    type: {
+      type: "string",
+    },
     countryCode: {
       type: "string",
     },
@@ -97,82 +116,6 @@ export const reportData = {
       type: "string",
       nullable: true,
     },
-    productPurchase: {
-      type: "boolean",
-      nullable: true,
-    },
-    productPurchaseTotalCost: {
-      anyOf: [
-        {
-          type: "string",
-          nullable: true,
-        },
-        {
-          type: "number",
-          nullable: true,
-        },
-      ],
-    },
-    productPurchaseItems: {
-      anyOf: [
-        {
-          type: "string",
-          nullable: true,
-        },
-        {
-          type: "number",
-          nullable: true,
-        },
-      ],
-    },
-    productPurchaseItemCost: {
-      anyOf: [
-        {
-          type: "string",
-          nullable: true,
-        },
-        {
-          type: "number",
-          nullable: true,
-        },
-      ],
-    },
-    productPurchaseDeliveryCost: {
-      anyOf: [
-        {
-          type: "string",
-          nullable: true,
-        },
-        {
-          type: "number",
-          nullable: true,
-        },
-      ],
-    },
-    productPurchaseFeeCost: {
-      anyOf: [
-        {
-          type: "string",
-          nullable: true,
-        },
-        {
-          type: "number",
-          nullable: true,
-        },
-      ],
-    },
-    productPurchaseOrganisationId: {
-      type: "string",
-      nullable: true,
-    },
-    productPurchaseOrganisationName: {
-      type: "string",
-      nullable: true,
-    },
-    productPurchaseOrganisationText: {
-      type: "string",
-      nullable: true,
-    },
     productSize: {
       ...productSizeData,
       nullable: true,
@@ -185,8 +128,172 @@ export const reportData = {
       type: "boolean",
       nullable: true,
     },
+    productTotalCost: {
+      anyOf: [
+        {
+          type: "string",
+          nullable: true,
+        },
+        {
+          type: "number",
+          nullable: true,
+        },
+      ],
+    },
+    productItems: {
+      anyOf: [
+        {
+          type: "string",
+          nullable: true,
+        },
+        {
+          type: "number",
+          nullable: true,
+        },
+      ],
+    },
+    productItemCost: {
+      anyOf: [
+        {
+          type: "string",
+          nullable: true,
+        },
+        {
+          type: "number",
+          nullable: true,
+        },
+      ],
+    },
+    productDeliveryCost: {
+      anyOf: [
+        {
+          type: "string",
+          nullable: true,
+        },
+        {
+          type: "number",
+          nullable: true,
+        },
+      ],
+    },
+    productFeeCost: {
+      anyOf: [
+        {
+          type: "string",
+          nullable: true,
+        },
+        {
+          type: "number",
+          nullable: true,
+        },
+      ],
+    },
+    productOrganisationId: {
+      type: "string",
+      nullable: true,
+    },
+    productOrganisationName: {
+      type: "string",
+      nullable: true,
+    },
+    productOrganisationText: {
+      type: "string",
+      nullable: true,
+    },
+
+    // TODO No longer used fields, but keeping around until v1.0.0
+    productPurchase: {
+      type: "boolean",
+      nullable: true,
+      deprecated: true,
+    },
+    productPurchaseTotalCost: {
+      anyOf: [
+        {
+          type: "string",
+          nullable: true,
+          deprecated: true,
+        },
+        {
+          type: "number",
+          nullable: true,
+          deprecated: true,
+        },
+      ],
+    },
+    productPurchaseItems: {
+      anyOf: [
+        {
+          type: "string",
+          nullable: true,
+          deprecated: true,
+        },
+        {
+          type: "number",
+          nullable: true,
+          deprecated: true,
+        },
+      ],
+    },
+    productPurchaseItemCost: {
+      anyOf: [
+        {
+          type: "string",
+          nullable: true,
+          deprecated: true,
+        },
+        {
+          type: "number",
+          nullable: true,
+          deprecated: true,
+        },
+      ],
+    },
+    productPurchaseDeliveryCost: {
+      anyOf: [
+        {
+          type: "string",
+          nullable: true,
+          deprecated: true,
+        },
+        {
+          type: "number",
+          nullable: true,
+          deprecated: true,
+        },
+      ],
+    },
+    productPurchaseFeeCost: {
+      anyOf: [
+        {
+          type: "string",
+          nullable: true,
+          deprecated: true,
+        },
+        {
+          type: "number",
+          nullable: true,
+          deprecated: true,
+        },
+      ],
+    },
+    productPurchaseOrganisationId: {
+      type: "string",
+      nullable: true,
+      deprecated: true,
+    },
+    productPurchaseOrganisationName: {
+      type: "string",
+      nullable: true,
+      deprecated: true,
+    },
+    productPurchaseOrganisationText: {
+      type: "string",
+      nullable: true,
+      deprecated: true,
+    },
   },
-  required: ["countryCode"],
+  required: ["countryCode", "type"],
 } as const;
 
 export const report = {

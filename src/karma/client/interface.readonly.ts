@@ -234,11 +234,14 @@ export interface ReportRoleData {
   roles: AuthenticationRole[];
 }
 
+export type ReportType = "product-purchase" | "product";
+
 export interface ReportData
   extends ReportDateData,
     Expiring,
     CalculationConsent,
     Record<string, unknown> {
+  type: ReportType | string;
   countryCode: string; // "NZ"
   currencySymbol?: string; // "$"
   timezone?: string; // Pacific/Auckland
@@ -247,6 +250,18 @@ export interface ReportData
   productId?: string;
   productName?: string; // Actual productName, not free text
   productText?: string; // User free text of the product
+  productSize?: ProductSizeData;
+  createdByUserId?: string;
+  anonymous?: boolean;
+  productTotalCost?: string | number; // "908.50", capture the user input raw
+  productItems?: string | number; // "2", capture the user input raw
+  productItemCost?: string | number; // "450", capture the user input raw
+  productDeliveryCost?: string | number; // "8.50", capture the user input raw
+  productFeeCost?: string | number; // "3.50", capture the user input raw
+  productOrganisationId?: string;
+  productOrganisationName?: string; // Actual organisationName, not free text
+  productOrganisationText?: string; // User free text of the organisationName
+  // TODO No longer used fields, but keeping around until v1.0.0
   productPurchase?: boolean;
   productPurchaseTotalCost?: string | number; // "908.50", capture the user input raw
   productPurchaseItems?: string | number; // "2", capture the user input raw
@@ -256,9 +271,6 @@ export interface ReportData
   productPurchaseOrganisationId?: string;
   productPurchaseOrganisationName?: string; // Actual organisationName, not free text
   productPurchaseOrganisationText?: string; // User free text of the organisationName
-  productSize?: ProductSizeData;
-  createdByUserId?: string;
-  anonymous?: boolean;
 }
 
 export interface Report extends ReportData, ReportRoleData {
@@ -266,6 +278,7 @@ export interface Report extends ReportData, ReportRoleData {
   createdAt: string;
   updatedAt: string;
   reportedAt: string;
+  reports?: Report[];
 }
 
 export interface SystemLogData extends Record<string, unknown> {

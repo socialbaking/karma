@@ -11,7 +11,8 @@ import {
 } from "../package";
 import {
   paths,
-  pathsAnonymous, pathsCache,
+  pathsAnonymous,
+  pathsCache,
   pathsHandler,
   pathsSubmit,
 } from "../react/server/paths";
@@ -29,7 +30,9 @@ import ServerCSS from "../react/server/server-css";
 import {
   getMaybeAuthenticationState,
   getMaybeAuthorizedForOrganisationId,
-  getMaybeAuthorizedForPartnerId, getMaybeUser, getUser,
+  getMaybeAuthorizedForPartnerId,
+  getMaybeUser,
+  getUser,
   isAnonymous,
 } from "../authentication";
 import { ok } from "../../is";
@@ -162,17 +165,20 @@ export async function viewRoutes(fastify: FastifyInstance) {
       } catch (caught) {
         error = caught;
       }
-      const view = createPathHandler(path, {
-        result,
-        error,
-        submitted: true,
-      }, false);
+      const view = createPathHandler(
+        path,
+        {
+          result,
+          error,
+          submitted: true,
+        },
+        false
+      );
       await view(request, response);
     };
   }
 
   Object.keys(paths).forEach((path) => {
-
     const anonymous = pathsAnonymous[path] || !!ALLOW_ANONYMOUS_VIEWS;
 
     const isPathCached = pathsCache[path] || false;

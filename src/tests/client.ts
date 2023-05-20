@@ -328,6 +328,7 @@ async function testClient() {
           const prescriptionFeeCost = chance.natural({ min: 0, max: 100 });
 
           const report = await client.addReport({
+            type: "purchase",
             productId: productId,
             productName,
             countryCode,

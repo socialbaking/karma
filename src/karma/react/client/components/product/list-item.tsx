@@ -77,7 +77,9 @@ function toMetricLabel(metric: ActiveIngredientMetrics, rounded = true) {
   if (valueUnit !== type) {
     suffix = `${suffix} of ${type}`;
   }
-  return `${prefix}${rounded ? trimNumber(metric.value) : metric.value} ${suffix}`;
+  return `${prefix}${
+    rounded ? trimNumber(metric.value) : metric.value
+  } ${suffix}`;
 }
 
 function toMetricTypeName(value: string): string {
@@ -107,27 +109,34 @@ export function ProductListItem({
   const ingredients = useActiveIngredients(product);
   const sizeUnit = sizes?.[0]?.unit || "g";
   const unit = (category?.defaultUnit || sizeUnit || "g").split("/")[0];
-  const ingredientUnit = ingredients.find(value => value.unit && (value.unit !== unit && value.unit !== sizeUnit))?.unit || unit;
+  const ingredientUnit =
+    ingredients.find(
+      (value) => value.unit && value.unit !== unit && value.unit !== sizeUnit
+    )?.unit || unit;
   const baseUnitMetrics = useMetrics(allMetrics, {
     unit: `$/${unit}`,
-    numeric: true
-  }).filter(value => !value.proportional);
+    numeric: true,
+  }).filter((value) => !value.proportional);
   const baseSizeMetrics = useMetrics(allMetrics, {
     unit: `$/${sizeUnit}`,
-    numeric: true
-  }).filter(value => !value.proportional);
+    numeric: true,
+  }).filter((value) => !value.proportional);
   const baseIngredientMetrics = useMetrics(allMetrics, {
     unit: `$/${ingredientUnit}`,
-    numeric: true
-  }).filter(value => !value.proportional);
+    numeric: true,
+  }).filter((value) => !value.proportional);
   const numericUnitMetric = useMetricMatch(baseUnitMetrics);
   const numericSizeMetric = useMetricMatch(baseSizeMetrics);
   const metrics = [
-      ...new Set(
-          isReporting ?
-              [...baseUnitMetrics, ...baseSizeMetrics] :
-              [numericUnitMetric, numericSizeMetric, ...baseIngredientMetrics].filter(Boolean)
-      )
+    ...new Set(
+      isReporting
+        ? [...baseUnitMetrics, ...baseSizeMetrics]
+        : [
+            numericUnitMetric,
+            numericSizeMetric,
+            ...baseIngredientMetrics,
+          ].filter(Boolean)
+    ),
   ];
   // console.log({
   //   baseIngredientMetrics,
@@ -156,41 +165,37 @@ export function ProductListItem({
               {/*    It may produce inaccurate data or results*/}
               {/*  </Label>*/}
               {/*) : undefined}*/}
-              {
-                [...new Set(
-                    metrics
-                        .filter((value) => !value.proportional)
-                )]
-                    .map((metric, index) => {
-                      const label = toMetricLabel(metric, !isReporting);
-                      const node = (
-                          <Label
-                              key={index}
-                              className={
-                                isReporting ?
-                                    "mt-1 px-2 leading-5 text-green-800 bg-green-100" :
-                                    "mt-1 text-gray-400"
-                              }
-                              title={toMetricLabel(metric, false)}
-                          >
-                            {label}
-                          </Label>
-                      );
-                      if (isReporting) return [label, node] as const;
-                      return [label, (
-                          <div className="block" key={index}>
-                            {node}
-                          </div>
-                      )] as const
-                    })
-                    // Filter duplicate visual labels
-                    .filter((entry, index, array) => {
-                      const [label] = entry;
-                      const before = array.slice(0, index);
-                      return !before.find(entry => entry[0] === label);
-                    })
-                    .map(entry => entry[1])
-              }
+              {[...new Set(metrics.filter((value) => !value.proportional))]
+                .map((metric, index) => {
+                  const label = toMetricLabel(metric, !isReporting);
+                  const node = (
+                    <Label
+                      key={index}
+                      className={
+                        isReporting
+                          ? "mt-1 px-2 leading-5 text-green-800 bg-green-100"
+                          : "mt-1 text-gray-400"
+                      }
+                      title={toMetricLabel(metric, false)}
+                    >
+                      {label}
+                    </Label>
+                  );
+                  if (isReporting) return [label, node] as const;
+                  return [
+                    label,
+                    <div className="block" key={index}>
+                      {node}
+                    </div>,
+                  ] as const;
+                })
+                // Filter duplicate visual labels
+                .filter((entry, index, array) => {
+                  const [label] = entry;
+                  const before = array.slice(0, index);
+                  return !before.find((entry) => entry[0] === label);
+                })
+                .map((entry) => entry[1])}
               {product.generic ? (
                 <div className="block">
                   <Label className="mt-1 text-gray-400">

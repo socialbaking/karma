@@ -140,6 +140,7 @@ export function splitValuePrefix(value: string) {
 export function splitValueUnitPrefix(value: string) {
   const [withoutUnit, ...unitParts] = value
     .replace(/[\[\]()]/g, "")
+    .replace(/(\d)([a-z])/g, "$1 $2")
     .trim()
     .split(/\s+/);
 

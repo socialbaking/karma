@@ -10,6 +10,7 @@ import { Feedback, submit as feedbackSubmit } from "./feedback";
 import { Login } from "./login";
 import { Logout, handler as logoutHandler } from "./logout";
 import { Errors } from "./error";
+import { UploadReport, submit as uploadSubmit } from "./upload-report";
 
 export const paths: Record<string, FunctionComponent> = {
   "/": Home,
@@ -24,6 +25,7 @@ export const paths: Record<string, FunctionComponent> = {
   "/login": Login,
   "/logout": Logout,
   "/error": Errors,
+  "/upload-report": UploadReport,
 };
 
 export const pathsAnonymous: Record<string, boolean> = {
@@ -40,6 +42,7 @@ export const pathsSubmit: Record<
 > = {
   "/calculator": calculatorSubmit,
   "/feedback": feedbackSubmit,
+  "/upload-report": uploadSubmit,
 };
 
 export const pathsHandler: Record<

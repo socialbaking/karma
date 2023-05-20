@@ -125,7 +125,10 @@ function menu() {
     const sidebar = document.querySelectorAll(".sidebar");
     sidebar.forEach((element) => {
       element.addEventListener("click", (event) => {
-        if (event.target instanceof Element && event.target.matches(".sidebar-contents, .sidebar-contents *")) {
+        if (
+          event.target instanceof Element &&
+          event.target.matches(".sidebar-contents, .sidebar-contents *")
+        ) {
           return;
         }
         return close();

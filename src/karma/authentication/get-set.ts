@@ -1,6 +1,11 @@
 import { requestContext } from "@fastify/request-context";
 import { ok } from "../../is";
-import {AuthenticationRole, AuthenticationState, Partner, User} from "../data";
+import {
+  AuthenticationRole,
+  AuthenticationState,
+  Partner,
+  User,
+} from "../data";
 
 export const AUTHORIZED_PARTNER_ID_KEY = "authorizedForPartnerIds";
 export const AUTHORIZED_ACCESS_TOKEN_KEY = "accessTokenKeyValue";

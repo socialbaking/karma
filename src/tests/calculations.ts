@@ -56,6 +56,7 @@ const countryCode = "NZ";
   console.log(product.activeIngredientDescriptions);
 
   const report: Report = {
+    type: "purchase",
     reportId: v4(),
     createdAt,
     updatedAt,
@@ -63,10 +64,9 @@ const countryCode = "NZ";
     countryCode,
     roles: [],
     productId: product.productId,
-    productPurchase: true,
-    productPurchaseItems: 1,
-    productPurchaseItemCost: 455,
-    productPurchaseTotalCost: 455,
+    productItems: 1,
+    productItemCost: 455,
+    productTotalCost: 455,
     calculationConsent: [],
   };
 

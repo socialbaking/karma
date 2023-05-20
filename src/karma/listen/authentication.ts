@@ -2,7 +2,9 @@ import { ok } from "../../is";
 import {
   getAccessToken as getAccessTokenDocument,
   getAuthenticationState,
-  getPartner as getPartnerDocument, getUser, User,
+  getPartner as getPartnerDocument,
+  getUser,
+  User,
 } from "../data";
 import {
   DoneFuncWithErrOrRes,
@@ -15,7 +17,8 @@ import {
   AUTHORIZED_ACCESS_TOKEN_KEY,
   AUTHORIZED_PARTNER,
   setAuthenticationState,
-  setAuthorizedForPartnerId, setUser,
+  setAuthorizedForPartnerId,
+  setUser,
 } from "../authentication";
 import { preHandlerHookHandler } from "fastify/types/hooks";
 import accepts from "accepts";

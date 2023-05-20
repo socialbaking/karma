@@ -1,0 +1,5 @@
+countryCode,createdAt,currencySymbol,expiresAt,note,productSize,productText,type,productDeliveryCost,productItemCost,productFeeCost,productItems,productOrganisationText,receivedAt,reportedAt,shippedAt,timezone
+NZ,,$,,,30g,Zour,product,0,445,,1,Cannabis Clinic,,,,Pacific/Auckland
+NZ,,$,,,35g,Shish,product,0,475,,1,Cannabis Clinic,,,,Pacific/Auckland
+NZ,,$,,,30g,Medleaf GG,product,0,445,,1,Cannabis Clinic,,,,Pacific/Auckland
+NZ,,$,,,10g,Peak,product,0,204,,1,Cannabis Clinic,,,,Pacific/Auckland

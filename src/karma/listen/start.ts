@@ -22,6 +22,7 @@ import { REACT_CLIENT_DIRECTORY } from "../view";
 import files from "@fastify/static";
 import { errorHandler } from "../view/error";
 import etag from "@fastify/etag";
+import { parseStringFields } from "./body-parser";
 
 const { pathname } = new URL(import.meta.url);
 const directory = dirname(pathname);
@@ -45,43 +46,7 @@ export async function create() {
 
   register(multipart);
   register(formbody, {
-    parser: (string: string) => {
-      const parsed = qs.parse(string, {
-        allowDots: true,
-      });
-
-      return processParsed(parsed);
-
-      function isRecordLike(value: unknown): value is Record<string, unknown> {
-        return typeof value === "object";
-      }
-
-      function processParsed(value: unknown): unknown {
-        if (!value) return value;
-
-        if (Array.isArray(value)) {
-          return value.map((item) => processParsed(item));
-        }
-
-        if (!isRecordLike(value)) {
-          return value;
-        }
-
-        return Object.fromEntries(
-          Object.entries(value).map((entry) => {
-            const [key, value] = entry;
-            if (key.endsWith("_boolean")) {
-              return [key.replace(/_boolean$/, ""), isBooleanLike(value)];
-            }
-            return [key, processParsed(value)];
-          })
-        );
-      }
-
-      function isBooleanLike(value: unknown) {
-        return value === "1" || value === "true" || value === "on";
-      }
-    },
+    parser: parseStringFields,
   });
 
   const packageJSON = await readFile(
