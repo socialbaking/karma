@@ -7,6 +7,7 @@ import {
   getAuthenticationState,
   DEFAULT_AUTHSIGNAL_STATE_EXPIRES_MS,
   deleteAuthenticationState,
+  getExternalUser,
 } from "../../data";
 import {
   authsignal,
@@ -57,8 +58,6 @@ export async function authsignalAuthenticationRoutes(fastify: FastifyInstance) {
           other: { idempotencyKey, tenantId },
         } = decoded;
 
-        console.log({ userId: sub, idempotencyKey });
-
         ok(tenantId === AUTHSIGNAL_TENANT, "Expected tenantId to match");
 
         const state = await getAuthenticationState(idempotencyKey);
@@ -78,8 +77,6 @@ export async function authsignalAuthenticationRoutes(fastify: FastifyInstance) {
 
         await deleteAuthenticationState(state.stateId);
 
-        console.log({ idempotencyKey, userState, success });
-
         if (!success) {
           const { origin } = new URL(state.redirectUrl || getOrigin());
           const url = new URL("/login", origin);
@@ -91,7 +88,10 @@ export async function authsignalAuthenticationRoutes(fastify: FastifyInstance) {
           return;
         }
 
+        const user = await getExternalUser("authsignal", userId);
+
         const { stateId, expiresAt } = await addCookieState({
+          userId: user.userId,
           roles: [
             // We have no additional roles with this authentication method
             // Just give member, no trusted roles
@@ -165,8 +165,6 @@ export async function authsignalAuthenticationRoutes(fastify: FastifyInstance) {
         const stateId = v4();
         const idempotencyKey = stateId;
 
-        console.log({ userId, isEnrolled, actionCode, idempotencyKey });
-
         const {
           state,
           url,
@@ -182,8 +180,6 @@ export async function authsignalAuthenticationRoutes(fastify: FastifyInstance) {
           redirectUrl,
         });
 
-        console.log({ userId, state, returnedIdempotencyKey });
-
         const authenticationState = await setAuthenticationState({
           type: "authsignal",
           stateId,
@@ -194,7 +190,6 @@ export async function authsignalAuthenticationRoutes(fastify: FastifyInstance) {
           authsignalActionCode: actionCode,
           expiresAt: getExpiresAt(DEFAULT_AUTHSIGNAL_STATE_EXPIRES_MS),
         });
-        console.log(authenticationState);
 
         response.header("Location", url);
         if (authenticationState.expiresAt) {

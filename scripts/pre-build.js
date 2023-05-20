@@ -19,6 +19,7 @@ const IGNORE_TYPES = [
   "background",
   "authentication-state",
   "cache",
+  "user",
 ];
 
 const paths = await readdir(PATH);

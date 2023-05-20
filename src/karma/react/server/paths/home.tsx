@@ -8,11 +8,13 @@ import {
   timeBetweenCommitAndBuild,
   timeBetweenCommitAndTestCompletion,
 } from "../../../package";
-import { useData, useRoles } from "../data/provider";
+import {useData, useIsTrusted, useMaybeUser, useRoles} from "../data/provider";
 
 export function Home() {
   const { isAnonymous } = useData();
   const roles = useRoles();
+  const isTrusted = useIsTrusted();
+  const user = useMaybeUser();
   // console.log({
   //     home: {
   //         roles,
@@ -90,6 +92,16 @@ export function Home() {
                 ))}
               </ul>
               <br />
+              {isTrusted && user ? (
+                  <p>
+                    User Id: {user.userId}<br/>
+                    Authenticated With: {user.externalType}
+                  </p>
+              ) : (
+                  isTrusted ? (
+                      "No user associated"
+                  ) : undefined
+              )}
             </>
           )}
         </>

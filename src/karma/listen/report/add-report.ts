@@ -102,7 +102,9 @@ export async function addReportFromRequest(
 
     const totalItemCost = +productPurchaseItems * +productPurchaseItemCost;
     const fee = productPurchaseFeeCost ? +productPurchaseFeeCost : 0;
-    const delivery = productPurchaseDeliveryCost ? +productPurchaseDeliveryCost : 0;
+    const delivery = productPurchaseDeliveryCost
+      ? +productPurchaseDeliveryCost
+      : 0;
     const numeric = totalItemCost + fee + delivery;
 
     if (!isNaN(numeric)) {

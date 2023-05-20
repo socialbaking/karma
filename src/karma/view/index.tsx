@@ -29,7 +29,7 @@ import ServerCSS from "../react/server/server-css";
 import {
   getMaybeAuthenticationState,
   getMaybeAuthorizedForOrganisationId,
-  getMaybeAuthorizedForPartnerId,
+  getMaybeAuthorizedForPartnerId, getMaybeUser, getUser,
   isAnonymous,
 } from "../authentication";
 import { ok } from "../../is";
@@ -60,6 +60,11 @@ export async function viewRoutes(fastify: FastifyInstance) {
       request: FastifyRequest,
       response: FastifyReply
     ) {
+      if (baseHandler) {
+        await baseHandler(request, response);
+        if (response.sent) return;
+      }
+
       const html = await getHTML();
 
       if (response.sent) return;
@@ -99,15 +104,11 @@ export async function viewRoutes(fastify: FastifyInstance) {
       }
 
       async function getRenderedHTML() {
-        if (baseHandler) {
-          await baseHandler(request, response);
-          if (response.sent) return "";
-        }
-
         const anonymous = isAnonymous();
         const state = getMaybeAuthenticationState();
         const { pathname } = new URL(request.url, getOrigin());
         const isFragment = pathname.endsWith("/fragment");
+        const user = getMaybeUser();
 
         // console.log({ anonymous, state, roles: state?.roles });
 
@@ -130,6 +131,7 @@ export async function viewRoutes(fastify: FastifyInstance) {
             roles={state?.roles}
             query={request.query}
             body={request.body}
+            user={user}
           />
         );
 

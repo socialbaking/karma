@@ -7,7 +7,7 @@ import {
   Organisation,
   CountryProductMetricDuration,
   ProductMetricData,
-  ActiveIngredientMetrics,
+  ActiveIngredientMetrics, User,
 } from "../../../data";
 import { createContext, useContext, useMemo } from "react";
 import { ok } from "../../../../is";
@@ -29,6 +29,7 @@ export interface Data {
   url: string;
   isAnonymous: boolean;
   isFragment: boolean;
+  user?: User;
   products: Product[];
   categories: Category[];
   partners: Partner[];
@@ -44,6 +45,17 @@ export function useData(): Data {
   const context = useContext(DataContext);
   ok(context, "Expected DataProvider to be used");
   return context;
+}
+
+export function useMaybeUser(): User | undefined {
+  const { user } = useData();
+  return user;
+}
+
+export function useUser(): User {
+  const user = useMaybeUser();
+  ok(user, "Expected user");
+  return user;
 }
 
 export function useMaybeBody<B>(): B | undefined {

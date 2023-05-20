@@ -1,10 +1,11 @@
 import { requestContext } from "@fastify/request-context";
 import { ok } from "../../is";
-import { AuthenticationRole, AuthenticationState, Partner } from "../data";
+import {AuthenticationRole, AuthenticationState, Partner, User} from "../data";
 
 export const AUTHORIZED_PARTNER_ID_KEY = "authorizedForPartnerIds";
 export const AUTHORIZED_ACCESS_TOKEN_KEY = "accessTokenKeyValue";
 export const AUTHORIZED_PARTNER = "partner";
+export const AUTHORIZED_USER = "user";
 export const AUTHENTICATION_STATE = "authenticationState";
 
 export function setAuthorizedForPartnerId(partnerId: string) {
@@ -62,6 +63,20 @@ export function getPartner(): Partner {
   const partner = getMaybePartner();
   ok(partner, "Expected authorized partner");
   return partner;
+}
+
+export function getMaybeUser(): User | undefined {
+  return requestContext.get(AUTHORIZED_USER);
+}
+
+export function getUser(): User {
+  const user = getMaybeUser();
+  ok(user, "Expected authorized user");
+  return user;
+}
+
+export function setUser(user: User) {
+  requestContext.set(AUTHORIZED_USER, user);
 }
 
 export function getMaybeAccessToken(): string | undefined {

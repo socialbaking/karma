@@ -47,14 +47,16 @@ export function getActiveIngredients(product: Product): ActiveIngredient[] {
         );
         const prefix = unitValues.find((value) => value.prefix)?.prefix;
         const rawValues = [
-          ...new Set(
-            unitValues.map((value) => +value.value)
-          ),
+          ...new Set(unitValues.map((value) => +value.value)),
         ].sort((a, b) => (a > b ? -1 : 1));
-        const values = [...new Set(rawValues.map((value) => {
-            if (prefix) return value;
-            return Math.round(value * 10) / 10;
-        }))]
+        const values = [
+          ...new Set(
+            rawValues.map((value) => {
+              if (prefix) return value;
+              return Math.round(value * 10) / 10;
+            })
+          ),
+        ];
         const max = Math.max(...values);
         const label = getLabel(values);
         const title = getLabel(rawValues);
@@ -63,11 +65,11 @@ export function getActiveIngredients(product: Product): ActiveIngredient[] {
           value: max,
           values,
           label,
-          title: label !== title ? title : undefined
+          title: label !== title ? title : undefined,
         };
 
         function getLabel(values: number[]) {
-            return `${prefix || ""}${values.join("/")}${typeUnit}`
+          return `${prefix || ""}${values.join("/")}${typeUnit}`;
         }
       })
       .sort(({ value: a }, { value: b }) => (a > b ? -1 : 1))

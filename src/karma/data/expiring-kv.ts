@@ -30,10 +30,12 @@ export function getExpiresInMilliseconds(expiresAt: string) {
   return expiresAtMs - Date.now();
 }
 
+export interface ExpiringStore<T extends Expiring> extends KeyValueStore<T> {}
+
 export function getExpiringStore<T extends Expiring>(
   name: string,
   options?: KeyValueStoreOptions
-): KeyValueStore<T> {
+): ExpiringStore<T> {
   const store = getKeyValueStore<T>(name, options);
 
   function getKey(key: string): string {

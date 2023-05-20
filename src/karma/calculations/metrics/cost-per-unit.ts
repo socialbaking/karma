@@ -85,26 +85,26 @@ export function calculate(
 
   console.log({ unitTotals, productActiveIngredients });
 
-  const prefixes = productActiveIngredients.map((value) => value.prefix).filter(Boolean);
+  const prefixes = productActiveIngredients
+    .map((value) => value.prefix)
+    .filter(Boolean);
   const prefix = prefixes[0];
 
   const activeIngredients: ActiveIngredientMetrics[] = [
     ...(productSize ? [productSize] : product.sizes ?? [])
       .filter((size) => isNumberString(size.value))
-      .map(
-        (size): ActiveIngredientMetrics => {
-          const values = calculated.filter((value) => value.unit === size.unit);
-          const prefixes = values.map((value) => value.prefix).filter(Boolean);
-          const prefix = prefixes[0];
-          return {
-            type: `${size.unit}`,
-            unit: `${currencySymbol}/${size.unit}`,
-            value: toHumanNumberString(itemCost / +size.value),
-            size,
-            prefix
-          }
-        }
-      ),
+      .map((size): ActiveIngredientMetrics => {
+        const values = calculated.filter((value) => value.unit === size.unit);
+        const prefixes = values.map((value) => value.prefix).filter(Boolean);
+        const prefix = prefixes[0];
+        return {
+          type: `${size.unit}`,
+          unit: `${currencySymbol}/${size.unit}`,
+          value: toHumanNumberString(itemCost / +size.value),
+          size,
+          prefix,
+        };
+      }),
     ...Object.keys(unitTotals).map((unit): ActiveIngredientMetrics => {
       const values = calculated.filter((value) => value.unit === unit);
       const prefixes = values.map((value) => value.prefix).filter(Boolean);

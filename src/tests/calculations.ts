@@ -91,9 +91,7 @@ const countryCode = "NZ";
   }
 
   function find(unit: string, type: string) {
-    return filter(unit, type)
-        .filter(value => !value.proportional)
-        [0]
+    return filter(unit, type).filter((value) => !value.proportional)[0];
   }
 
   ok(find("$/g", "g").value === "13");

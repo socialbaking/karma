@@ -13,6 +13,7 @@ import {
   deleteAuthenticationState,
   getCached,
   addExpiring,
+  getExternalUser,
 } from "../../data";
 import { packageIdentifier } from "../../package";
 import { getExpiresAt, MONTH_MS } from "../../data/expiring-kv";
@@ -124,11 +125,7 @@ export async function redditAuthenticationRoutes(fastify: FastifyInstance) {
 
         await deleteAuthenticationState(state.stateId);
 
-        const {
-          message,
-          access_token: accessToken,
-          scope,
-        } = await getAccessToken();
+        const { message, access_token: accessToken } = await getAccessToken();
 
         ok(accessToken, message || "Expected access_token to be returned");
 
@@ -143,9 +140,11 @@ export async function redditAuthenticationRoutes(fastify: FastifyInstance) {
             .filter((entry) => entry[1])
             .map((entry) => entry[0]),
         ]);
-        console.log({ me: me.name, scope, subscriptions, flairRole, roles });
+
+        const internalUser = await getExternalUser("reddit", me.name);
 
         const { stateId, expiresAt } = await addCookieState({
+          userId: internalUser.userId,
           roles,
           from: {
             type: "reddit",

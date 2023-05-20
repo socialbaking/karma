@@ -2,7 +2,7 @@ import { ok } from "../../is";
 import {
   getAccessToken as getAccessTokenDocument,
   getAuthenticationState,
-  getPartner as getPartnerDocument,
+  getPartner as getPartnerDocument, getUser, User,
 } from "../data";
 import {
   DoneFuncWithErrOrRes,
@@ -15,7 +15,7 @@ import {
   AUTHORIZED_ACCESS_TOKEN_KEY,
   AUTHORIZED_PARTNER,
   setAuthenticationState,
-  setAuthorizedForPartnerId,
+  setAuthorizedForPartnerId, setUser,
 } from "../authentication";
 import { preHandlerHookHandler } from "fastify/types/hooks";
 import accepts from "accepts";
@@ -101,6 +101,11 @@ function createCookieAuth(fastify: FastifyInstance): FastifyAuthFunction {
     ok(state, NOT_AUTHORIZED_ERROR_MESSAGE);
     ok(state.type === "cookie", NOT_AUTHORIZED_ERROR_MESSAGE);
     setAuthenticationState(state);
+    if (state.userId) {
+      const user: User | undefined = await getUser(state.userId);
+      ok(user, NOT_AUTHORIZED_ERROR_MESSAGE);
+      setUser(user);
+    }
   };
 }
 

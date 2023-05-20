@@ -2,7 +2,7 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import { renderToStaticMarkup } from "react-dom/server";
 import KarmaServer from "../react/server";
 import { getOrigin } from "../listen/config";
-import { isAnonymous } from "../authentication";
+import {getMaybeUser, getUser, isAnonymous} from "../authentication";
 import { isHTMLResponse } from "../listen/authentication";
 
 export function errorHandler(
@@ -17,6 +17,7 @@ export function errorHandler(
   const { pathname } = new URL(request.url, getOrigin());
   const isFragment = pathname.endsWith("/fragment");
   const anonymous = isAnonymous();
+  const user = getMaybeUser();
 
   const html = renderToStaticMarkup(
     <KarmaServer
@@ -29,6 +30,7 @@ export function errorHandler(
       partners={[]}
       categories={[]}
       metrics={[]}
+      user={user}
     />
   );
 

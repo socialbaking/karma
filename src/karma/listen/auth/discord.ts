@@ -10,6 +10,7 @@ import {
   AuthenticationRole,
   getAuthenticationRoles,
   deleteAuthenticationState,
+  getExternalUser,
 } from "../../data";
 
 interface DiscordRole extends Record<string, unknown> {
@@ -124,14 +125,10 @@ export async function discordAuthenticationRoutes(fastify: FastifyInstance) {
 
         const roles = mapRoles();
 
-        console.log({
-          guild,
-          member,
-          isBot,
-          roles,
-        });
+        const internalUser = await getExternalUser("discord", user.id);
 
         const { stateId, expiresAt } = await addCookieState({
+          userId: internalUser.userId,
           roles,
           from: {
             type: "discord",
