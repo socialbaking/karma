@@ -7,6 +7,7 @@ export interface ActiveIngredientData {
   value: number;
   values: number[];
   label: string;
+  title?: string;
 }
 
 export interface ActiveIngredient extends ActiveIngredientData {
@@ -45,22 +46,29 @@ export function getActiveIngredients(product: Product): ActiveIngredient[] {
           (value) => value.unit === typeUnit
         );
         const prefix = unitValues.find((value) => value.prefix)?.prefix;
-        const values = [
+        const rawValues = [
           ...new Set(
-            unitValues.map((value) => {
-              const numeric = +value.value;
-              if (prefix) return numeric;
-              return Math.round(numeric * 10) / 10;
-            })
+            unitValues.map((value) => +value.value)
           ),
         ].sort((a, b) => (a > b ? -1 : 1));
+        const values = [...new Set(rawValues.map((value) => {
+            if (prefix) return value;
+            return Math.round(value * 10) / 10;
+        }))]
         const max = Math.max(...values);
+        const label = getLabel(values);
+        const title = getLabel(rawValues);
         return {
           type: type,
           value: max,
           values,
-          label: `${prefix || ""}${values.join("/")}${typeUnit}`,
+          label,
+          title: label !== title ? title : undefined
         };
+
+        function getLabel(values: number[]) {
+            return `${prefix || ""}${values.join("/")}${typeUnit}`
+        }
       })
       .sort(({ value: a }, { value: b }) => (a > b ? -1 : 1))
       .map((data, index) => ({

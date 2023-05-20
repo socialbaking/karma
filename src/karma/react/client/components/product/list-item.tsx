@@ -29,11 +29,12 @@ export interface PercentageLabelProps extends ActiveIngredient {
 }
 
 const PercentageLabel = React.memo(
-  ({ type, label, sortIndex, className }: PercentageLabelProps) => (
+  ({ type, label, sortIndex, className, title }: PercentageLabelProps) => (
     <Label
       className={`px-2 leading-5 text-green-800 ${
         sortIndex === 0 ? "bg-green-400" : "bg-green-100"
       } ${className || ""}`}
+      title={title}
     >
       {label} {type}
     </Label>
@@ -42,12 +43,14 @@ const PercentageLabel = React.memo(
 
 interface LabelProps {
   className?: string;
+  title?: string;
 }
 
 const Label = React.memo(
-  ({ children, className }: PropsWithChildren<LabelProps>) => (
+  ({ children, className, title }: PropsWithChildren<LabelProps>) => (
     <span
       className={`inline-flex text-xs font-semibold rounded-full ${className}`}
+      title={title}
     >
       {children}
     </span>
@@ -127,13 +130,13 @@ export function ProductListItem({
           >
             <div className="flex flex-wrap mr-1">{attributes?.productName}</div>
             <div className="flex flex-col">
-              {isReporting || unitMetric ? (
-                <Label className="mt-1 px-4 leading-5 text-red-800 bg-red-100">
-                  This software is in beta
-                  <br />
-                  It may produce inaccurate data or results
-                </Label>
-              ) : undefined}
+              {/*{isReporting || unitMetric ? (*/}
+              {/*  <Label className="mt-1 px-4 leading-5 text-red-800 bg-red-100">*/}
+              {/*    This software is in beta*/}
+              {/*    <br />*/}
+              {/*    It may produce inaccurate data or results*/}
+              {/*  </Label>*/}
+              {/*) : undefined}*/}
               {isReporting ? (
                 <>
                   {metrics
