@@ -47,8 +47,16 @@ export function getExpiringStore<T extends Expiring>(
 
       await store.set(key, value);
 
+      const redisKey = getKey(key);
+
       if (!expiresAt) {
         // Not yet expiring
+
+        if (isRedis()) {
+          const client = await connectGlobalRedisClient();
+          await client.persist(redisKey);
+        }
+
         return;
       }
 
@@ -67,7 +75,6 @@ export function getExpiringStore<T extends Expiring>(
       }
       /* c8 ignore stop */
       const expiresInSeconds = Math.ceil(expiresInMs / 1000);
-      const redisKey = getKey(key);
       const client = await connectGlobalRedisClient();
       await client.expire(redisKey, expiresInSeconds);
     },
