@@ -63,7 +63,6 @@ const calculationConsent = getCompleteCalculationConsent();
       productTotalCost: "918.50",
       productFeeCost: "0.00",
       productItems: "2",
-      product: true,
       productOrganisationId: wellworks.organisationId,
       productOrganisationName: wellworks.organisationName,
       productSize: product.sizes?.at(0),
@@ -78,32 +77,32 @@ const calculationConsent = getCompleteCalculationConsent();
   }
 
   await createTestReport(shishkaberry, {
-    productPurchaseItemCost: "455",
-    productPurchaseDeliveryCost: "8.50",
-    productPurchaseTotalCost: "918.50",
-    productPurchaseFeeCost: "0.00",
-    productPurchaseItems: "2",
+    productItemCost: "455",
+    productDeliveryCost: "8.50",
+    productTotalCost: "918.50",
+    productFeeCost: "0.00",
+    productItems: "2",
   });
   await createTestReport(zourApple, {
-    productPurchaseItemCost: "450",
-    productPurchaseDeliveryCost: "0.00",
-    productPurchaseTotalCost: "450",
-    productPurchaseFeeCost: "0.00",
-    productPurchaseItems: "1",
+    productItemCost: "450",
+    productDeliveryCost: "0.00",
+    productTotalCost: "450",
+    productFeeCost: "0.00",
+    productItems: "1",
   });
   await createTestReport(eve, {
-    productPurchaseItemCost: "205",
-    productPurchaseDeliveryCost: "0.00",
-    productPurchaseTotalCost: "205",
-    productPurchaseFeeCost: "0.00",
-    productPurchaseItems: "1",
+    productItemCost: "205",
+    productDeliveryCost: "0.00",
+    productTotalCost: "205",
+    productFeeCost: "0.00",
+    productItems: "1",
   });
   await createTestReport(equiposa, {
-    productPurchaseItemCost: "205",
-    productPurchaseDeliveryCost: "0.00",
-    productPurchaseTotalCost: "205",
-    productPurchaseFeeCost: "0.00",
-    productPurchaseItems: "1",
+    productItemCost: "205",
+    productDeliveryCost: "0.00",
+    productTotalCost: "205",
+    productFeeCost: "0.00",
+    productItems: "1",
   });
 
   // If this env exists, we would have tested the background processing enough by now...

@@ -8,7 +8,7 @@
 
 ### Test Coverage
 
- ![66.2%25 lines covered](https://img.shields.io/badge/lines-66.2%25-yellow) ![66.2%25 statements covered](https://img.shields.io/badge/statements-66.2%25-yellow) ![56.6%25 functions covered](https://img.shields.io/badge/functions-56.6%25-yellow) ![83.44%25 branches covered](https://img.shields.io/badge/branches-83.44%25-brightgreen)
+ ![59.91%25 lines covered](https://img.shields.io/badge/lines-59.91%25-yellow) ![59.91%25 statements covered](https://img.shields.io/badge/statements-59.91%25-yellow) ![47.37%25 functions covered](https://img.shields.io/badge/functions-47.37%25-yellow) ![83.38%25 branches covered](https://img.shields.io/badge/branches-83.38%25-brightgreen)
 
 [//]: # "badges"
 
@@ -285,7 +285,7 @@ export interface ReportRoleData {
   roles: AuthenticationRole[];
 }
 
-export type ReportType = "product-purchase" | "product";
+export type ReportType = "purchase" | "product";
 
 export interface ReportData
   extends ReportDateData,
