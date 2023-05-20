@@ -62,7 +62,7 @@ function trimNumber(value: string | number) {
   return (+value).toFixed(2);
 }
 
-function toMetricLabel(metric: ActiveIngredientMetrics) {
+function toMetricLabel(metric: ActiveIngredientMetrics, rounded = true) {
   const { unit, type } = metric;
   let prefix,
     suffix = toMetricTypeName(unit);
@@ -77,7 +77,7 @@ function toMetricLabel(metric: ActiveIngredientMetrics) {
   if (valueUnit !== type) {
     suffix = `${suffix} of ${type}`;
   }
-  return `${prefix}${trimNumber(metric.value)} ${suffix}`;
+  return `${prefix}${rounded ? trimNumber(metric.value) : metric.value} ${suffix}`;
 }
 
 function toMetricTypeName(value: string): string {
@@ -105,16 +105,36 @@ export function ProductListItem({
   )}`;
 
   const ingredients = useActiveIngredients(product);
-  const sizeUnit = sizes?.[0]?.unit;
-  const unit = sizeUnit || "g";
-  const metrics = useMetrics(allMetrics, {
+  const sizeUnit = sizes?.[0]?.unit || "g";
+  const unit = (category?.defaultUnit || sizeUnit || "g").split("/")[0];
+  const baseUnitMetrics = useMetrics(allMetrics, {
     unit: `$/${unit}`,
-  });
-  const unitMetric = useMetricMatch(metrics, {
+  }).filter(value => !value.proportional);
+  const baseSizeMetrics = useMetrics(allMetrics, {
+    unit: `$/${sizeUnit}`,
+  }).filter(value => !value.proportional);
+  const numericUnitMetric = useMetricMatch(baseUnitMetrics.filter(value => !value.proportional), {
     type: unit,
     numeric: true,
   });
-
+  const numericSizeMetric = useMetricMatch(baseSizeMetrics.filter(value => !value.proportional), {
+    type: unit,
+    numeric: true,
+  });
+  const metrics = [
+      ...new Set(
+          isReporting ?
+              [numericUnitMetric, numericSizeMetric].filter(Boolean) :
+              [...baseUnitMetrics, ...baseSizeMetrics]
+      )
+  ];
+  console.log({
+    unit,
+    sizeUnit,
+    metrics,
+    numericUnitMetric,
+    numericSizeMetric
+  });
   return (
     <li>
       <a
@@ -137,26 +157,33 @@ export function ProductListItem({
               {/*    It may produce inaccurate data or results*/}
               {/*  </Label>*/}
               {/*) : undefined}*/}
-              {isReporting ? (
-                <>
-                  {metrics
-                    .filter((value) => !value.proportional)
-                    .map((metric, index) => (
-                      <Label
-                        key={index}
-                        className="mt-1 px-2 leading-5 text-green-800 bg-green-100"
-                      >
-                        {toMetricLabel(metric)}
-                      </Label>
-                    ))}
-                </>
-              ) : unitMetric ? (
-                <div className="block">
-                  <Label className="mt-1 text-gray-400">
-                    {toMetricLabel(unitMetric)}
-                  </Label>
-                </div>
-              ) : undefined}
+              {
+                [...new Set(
+                    metrics
+                        .filter((value) => !value.proportional)
+                )]
+                    .map((metric, index) => {
+                      const node = (
+                          <Label
+                              key={index}
+                              className={
+                                isReporting ?
+                                    "mt-1 px-2 leading-5 text-green-800 bg-green-100" :
+                                    "mt-1 text-gray-400"
+                              }
+                              title={toMetricLabel(metric, false)}
+                          >
+                            {toMetricLabel(metric, true)}
+                          </Label>
+                      );
+                      if (isReporting) return node;
+                      return (
+                          <div className="block">
+                            {node}
+                          </div>
+                      )
+                    })
+              }
               {product.generic ? (
                 <div className="block">
                   <Label className="mt-1 text-gray-400">
