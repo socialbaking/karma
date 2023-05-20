@@ -4,6 +4,7 @@ import { isNumberString } from "../../../../calculations";
 
 export interface ActiveIngredientData {
   type: string;
+  unit: string;
   value: number;
   values: number[];
   label: string;
@@ -62,6 +63,7 @@ export function getActiveIngredients(product: Product): ActiveIngredient[] {
         const title = getLabel(rawValues);
         return {
           type: type,
+          unit: typeUnit,
           value: max,
           values,
           label,

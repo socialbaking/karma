@@ -107,25 +107,33 @@ export function ProductListItem({
   const ingredients = useActiveIngredients(product);
   const sizeUnit = sizes?.[0]?.unit || "g";
   const unit = (category?.defaultUnit || sizeUnit || "g").split("/")[0];
+  const ingredientUnit = ingredients.find(value => value.unit && (value.unit !== unit && value.unit !== sizeUnit))?.unit || unit;
   const baseUnitMetrics = useMetrics(allMetrics, {
     unit: `$/${unit}`,
+    numeric: true
   }).filter(value => !value.proportional);
   const baseSizeMetrics = useMetrics(allMetrics, {
     unit: `$/${sizeUnit}`,
+    numeric: true
   }).filter(value => !value.proportional);
-  const numericUnitMetric = useMetricMatch(baseUnitMetrics, {
-    numeric: true,
-  });
-  const numericSizeMetric = useMetricMatch(baseSizeMetrics, {
-    numeric: true,
-  });
+  const baseIngredientMetrics = useMetrics(allMetrics, {
+    unit: `$/${ingredientUnit}`,
+    numeric: true
+  }).filter(value => !value.proportional);
+  const numericUnitMetric = useMetricMatch(baseUnitMetrics);
+  const numericSizeMetric = useMetricMatch(baseSizeMetrics);
   const metrics = [
       ...new Set(
           isReporting ?
               [...baseUnitMetrics, ...baseSizeMetrics] :
-              [numericUnitMetric, numericSizeMetric].filter(Boolean)
+              [numericUnitMetric, numericSizeMetric, ...baseIngredientMetrics].filter(Boolean)
       )
   ];
+  // console.log({
+  //   baseIngredientMetrics,
+  //   ingredientUnit,
+  //   metrics
+  // })
   return (
     <li>
       <a
