@@ -126,16 +126,6 @@ export function ProductListItem({
               [numericUnitMetric, numericSizeMetric].filter(Boolean)
       )
   ];
-  console.log({
-    unit,
-    sizeUnit,
-    metrics,
-    baseUnitMetrics,
-    baseSizeMetrics,
-    numericUnitMetric,
-    numericSizeMetric,
-    allMetrics: allMetrics.products[0].activeIngredients
-  });
   return (
     <li>
       <a
@@ -180,7 +170,7 @@ export function ProductListItem({
                       );
                       if (isReporting) return [label, node] as const;
                       return [label, (
-                          <div className="block">
+                          <div className="block" key={index}>
                             {node}
                           </div>
                       )] as const

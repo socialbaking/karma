@@ -75,8 +75,9 @@ type QueryRecord = Record<string, string>;
 
 export function useQuery<Q = QueryRecord>(): Q {
   const { query } = useData();
-  ok<Q>(query, "Expected query");
-  return query;
+  const queryValue = query || {};
+  ok<Q>(queryValue, "Expected query");
+  return queryValue;
 }
 
 export function useQuerySearch() {
