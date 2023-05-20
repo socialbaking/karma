@@ -1,4 +1,4 @@
-import {FastifyInstance, FastifyReply, FastifyRequest} from "fastify";
+import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { getMaybeAuthenticationState, isAnonymous } from "../../authentication";
 import { setAuthenticationState } from "../../data";
 import { authenticate } from "../authentication";

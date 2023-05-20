@@ -1,16 +1,21 @@
 import {
-    useCategory,
-    useError,
-    useMaybeBody,
-    useMaybeResult,
-    useProduct,
-    useProductMetrics,
-    useSortedProducts,
-    useSubmitted,
-    useProductByName,
-    useQuerySearch, useData,
+  useCategory,
+  useError,
+  useMaybeBody,
+  useMaybeResult,
+  useProduct,
+  useProductMetrics,
+  useSortedProducts,
+  useSubmitted,
+  useProductByName,
+  useQuerySearch,
+  useData,
 } from "../data";
-import {calculationSources, hasConsent, isAnonymousCalculation} from "../../../calculations";
+import {
+  calculationSources,
+  hasConsent,
+  isAnonymousCalculation,
+} from "../../../calculations";
 import { ReportData, Report } from "../../../client";
 import { FastifyRequest } from "fastify";
 import { addReportFromRequest } from "../../../listen/report/add-report";
@@ -65,9 +70,9 @@ export function Calculator() {
   const { isAnonymous } = useData();
   let calculations = calculationSources;
   if (isAnonymous) {
-      calculations = calculations.filter(
-          source => isAnonymousCalculation(source.calculationKey)
-      );
+    calculations = calculations.filter((source) =>
+      isAnonymousCalculation(source.calculationKey)
+    );
   }
   return (
     <form name="calculator" action="/calculator#action-section" method="post">
@@ -182,42 +187,35 @@ export function Calculator() {
         of the information.
       </p>
       <ul className="list-none" id="select-calculations">
-        {calculations.map(
-          ({ calculationKey, title, description }, index) => {
-            const consented = !!body?.calculationConsent?.find(
-              (value) => value.calculationKey === calculationKey
-            )?.consented;
-            const consentedKey = `calculationConsent[${index}].consented_boolean`;
-            return (
-              <li
-                key={calculationKey}
-                className="my-4 flex flex-row align-start"
-              >
-                <input
-                  name={`calculationConsent[${index}].calculationKey`}
-                  type="hidden"
-                  value={calculationKey}
-                />
-                <input
-                  name={consentedKey}
-                  id={consentedKey}
-                  type="checkbox"
-                  className="form-checkbox rounded m-1"
-                  defaultChecked={consented}
-                />
-                <label htmlFor={consentedKey} className="flex flex-col ml-4">
-                  <span>{title}</span>
-                  <span>
-                    {description}
-                    {index > 0
-                      ? " and includes the results in our metrics"
-                      : ""}
-                  </span>
-                </label>
-              </li>
-            );
-          }
-        )}
+        {calculations.map(({ calculationKey, title, description }, index) => {
+          const consented = !!body?.calculationConsent?.find(
+            (value) => value.calculationKey === calculationKey
+          )?.consented;
+          const consentedKey = `calculationConsent[${index}].consented_boolean`;
+          return (
+            <li key={calculationKey} className="my-4 flex flex-row align-start">
+              <input
+                name={`calculationConsent[${index}].calculationKey`}
+                type="hidden"
+                value={calculationKey}
+              />
+              <input
+                name={consentedKey}
+                id={consentedKey}
+                type="checkbox"
+                className="form-checkbox rounded m-1"
+                defaultChecked={consented}
+              />
+              <label htmlFor={consentedKey} className="flex flex-col ml-4">
+                <span>{title}</span>
+                <span>
+                  {description}
+                  {index > 0 ? " and includes the results in our metrics" : ""}
+                </span>
+              </label>
+            </li>
+          );
+        })}
       </ul>
       <hr className="my-8" />
       <div id="action-section">

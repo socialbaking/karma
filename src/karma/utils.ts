@@ -1,5 +1,5 @@
 import { Product } from "./client";
-import {ok} from "../is";
+import { ok } from "../is";
 
 const NAME_SPLIT = " ";
 

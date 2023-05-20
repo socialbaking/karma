@@ -3,6 +3,7 @@ import why, { whyIsNodeStillRunning } from "why-is-node-still-running";
 import { shutdown } from "../tracing";
 import { tracer } from "../trace";
 import {
+  autoSeed,
   isRedisMemory,
   seed,
   startRedisMemory,
@@ -15,7 +16,7 @@ try {
     await startRedisMemory();
   }
 
-  await seed();
+  await autoSeed();
 
   await tracer.startActiveSpan("tests", async (span) => {
     await tracer.startActiveSpan("client-tests", async (span) => {
@@ -24,6 +25,10 @@ try {
     });
     await tracer.startActiveSpan("data-tests", async (span) => {
       await import("./data");
+      span.end();
+    });
+    await tracer.startActiveSpan("calculation-tests", async (span) => {
+      await import("./calculations");
       span.end();
     });
     span.end();

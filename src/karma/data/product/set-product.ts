@@ -16,10 +16,7 @@ export async function setProduct(
   const document: Product = {
     createdAt: data.createdAt || updatedAt,
     ...data,
-    activeIngredients: getActiveIngredients(
-      data,
-      data.activeIngredientDescriptions
-    ),
+    activeIngredients: getActiveIngredients(data),
     updatedAt,
   };
   await store.set(data.productId, document);
@@ -28,7 +25,7 @@ export async function setProduct(
 
 export function getActiveIngredients(
   data: Partial<Product>,
-  descriptions?: string[]
+  descriptions: string[] = data.activeIngredientDescriptions
 ): ProductActiveIngredient[] | undefined {
   if (!descriptions) return undefined;
   return descriptions.flatMap((value) =>

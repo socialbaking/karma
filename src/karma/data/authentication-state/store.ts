@@ -12,6 +12,6 @@ export const EXTERNAL_STATE_ID_SEPARATOR = "::";
 
 export function getAuthenticationStateStore() {
   return getExpiringStore<AuthenticationState>(STORE_NAME, {
-    counter: false
+    counter: false,
   });
 }

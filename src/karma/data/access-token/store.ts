@@ -5,6 +5,6 @@ const STORE_NAME = "accessToken";
 
 export function getAccessTokenStore() {
   return getKeyValueStore<AccessToken>(STORE_NAME, {
-    counter: false
+    counter: false,
   });
 }

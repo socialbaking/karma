@@ -110,119 +110,120 @@ async function seedHealthNZProducts($: CheerioAPI) {
   console.log(`Have ${tables.length} tables to process`);
   // console.log(tables);
 
-  const productPromises = tables.flatMap((table: RemoteTableInfo, tableIndex: number, array) => {
-    const category = findCategory(table);
-    const categoryId = category?.categoryId;
-    const rowsBefore = array.slice(0, tableIndex).reduce(
-        (sum, table) => table.rows.length + sum,
-        0
-    );
-    return table.rows.map(async (row, rowIndex): Promise<Product> => {
-      const productName = row["Product Name"];
-      const activeIngredients = row["Active Ingredients"];
-      // const notes = row["Administration notes"];
-      const licenceHolderName = row["Licence holder"];
-      const licenceHolder = licenceHolderName
-        ? getOrganisation(licenceHolderName)
-        : undefined;
-      const sponsorName = row["Sponsor"];
-      const sponsor = sponsorName ? getOrganisation(sponsorName) : undefined;
+  const productPromises = tables.flatMap(
+    (table: RemoteTableInfo, tableIndex: number, array) => {
+      const category = findCategory(table);
+      const categoryId = category?.categoryId;
+      const rowsBefore = array
+        .slice(0, tableIndex)
+        .reduce((sum, table) => table.rows.length + sum, 0);
+      return table.rows.map(async (row, rowIndex): Promise<Product> => {
+        const productName = row["Product Name"];
+        const activeIngredients = row["Active Ingredients"];
+        // const notes = row["Administration notes"];
+        const licenceHolderName = row["Licence holder"];
+        const licenceHolder = licenceHolderName
+          ? getOrganisation(licenceHolderName)
+          : undefined;
+        const sponsorName = row["Sponsor"];
+        const sponsor = sponsorName ? getOrganisation(sponsorName) : undefined;
 
-      ok(productName);
-      ok(activeIngredients);
-      ok(licenceHolder || sponsor);
+        ok(productName);
+        ok(activeIngredients);
+        ok(licenceHolder || sponsor);
 
-      const sizes = splitSizes();
-      // console.log({ productName, sizes })
+        const sizes = splitSizes();
+        // console.log({ productName, sizes })
 
-      const product: Product = {
-        categoryId,
-        productId: v5(productName, namespace),
-        productName,
-        createdAt,
-        updatedAt,
-        licenceCountryCode: licenceHolder?.countryCode,
-        licencedOrganisationId: licenceHolder?.organisationId,
-        licenceApprovalWebsite: HEALTH_GOVT_NZ_MINIMUM_PRODUCTS,
-        activeIngredientDescriptions: splitDescriptions(),
-        sizes,
-        info: [
-          ...Object.entries(row).map(
-            ([title, text]): ProductInfo => ({
-              title,
-              text,
+        const product: Product = {
+          categoryId,
+          productId: v5(productName, namespace),
+          productName,
+          createdAt,
+          updatedAt,
+          licenceCountryCode: licenceHolder?.countryCode,
+          licencedOrganisationId: licenceHolder?.organisationId,
+          licenceApprovalWebsite: HEALTH_GOVT_NZ_MINIMUM_PRODUCTS,
+          activeIngredientDescriptions: splitDescriptions(),
+          sizes,
+          info: [
+            ...Object.entries(row).map(
+              ([title, text]): ProductInfo => ({
+                title,
+                text,
+              })
+            ),
+          ],
+          order: rowsBefore + rowIndex,
+        };
+
+        return setProduct({
+          ...(await getProduct(product.productId)),
+          ...product,
+        });
+
+        function splitSizes(): ProductSizeData[] | undefined {
+          const searchKey = "pack sizes";
+          const packSizeKey = Object.keys(row).find((value) =>
+            value.toLowerCase().startsWith(searchKey)
+          );
+          const value = row[packSizeKey];
+          if (!packSizeKey) return getDefaultSizes();
+          if (!value) return getDefaultSizes();
+          const unit = getUnit();
+          if (!unit) return getDefaultSizes();
+          const valueSplit = value
+            .split(/,\s*/g)
+            .map((value) => value.replace(unit, "").trim())
+            .filter(Boolean);
+          if (!valueSplit.length) return getDefaultSizes();
+          return valueSplit.map(
+            (value): ProductSizeData => ({
+              value,
+              unit,
             })
-          ),
-        ],
-        order: rowsBefore + rowIndex
-      };
-
-      return setProduct({
-        ...(await getProduct(product.productId)),
-        ...product,
-      });
-
-      function splitSizes(): ProductSizeData[] | undefined {
-        const searchKey = "pack sizes";
-        const packSizeKey = Object.keys(row).find((value) =>
-          value.toLowerCase().startsWith(searchKey)
-        );
-        const value = row[packSizeKey];
-        if (!packSizeKey) return getDefaultSizes();
-        if (!value) return getDefaultSizes();
-        const unit = getUnit();
-        if (!unit) return getDefaultSizes();
-        const valueSplit = value
-          .split(/,\s*/g)
-          .map((value) => value.replace(unit, "").trim())
-          .filter(Boolean);
-        if (!valueSplit.length) return getDefaultSizes();
-        return valueSplit.map(
-          (value): ProductSizeData => ({
-            value,
-            unit,
-          })
-        );
-        function getUnit() {
-          let withoutKey = packSizeKey.substring(searchKey.length).trim();
-          if (!withoutKey.startsWith("(")) return undefined;
-          withoutKey = withoutKey.substring(1);
-          if (!withoutKey.endsWith(")")) return undefined;
-          return withoutKey.substring(0, withoutKey.length - 1).trim();
+          );
+          function getUnit() {
+            let withoutKey = packSizeKey.substring(searchKey.length).trim();
+            if (!withoutKey.startsWith("(")) return undefined;
+            withoutKey = withoutKey.substring(1);
+            if (!withoutKey.endsWith(")")) return undefined;
+            return withoutKey.substring(0, withoutKey.length - 1).trim();
+          }
         }
-      }
 
-      function getDefaultSizes() {
-        return category?.defaultSizes;
-      }
+        function getDefaultSizes() {
+          return category?.defaultSizes;
+        }
 
-      function splitDescriptions() {
-        if (!activeIngredients) return undefined;
-        const split = activeIngredients
-          .split("\n")
-          .map((value) => value.trim())
-          .filter(Boolean);
-        // If we get a good split early, it's got good data
-        if (split.length > 1) return split;
-        // If we split at "Total", each item will be a total followed by some details
-        // We should add total back to each value
-        const totalSplitValue = "Total ";
-        const totalSplit = activeIngredients
-          .split(totalSplitValue)
-          .map((value) => value.trim())
-          .filter(Boolean)
-          .map((value) => `${totalSplitValue}${value}`);
-        // If its no different then its just one line anyway, but good to check
-        // We should just use the original provided
-        if (totalSplit.length <= 1) return split;
-        return totalSplit;
-      }
-    });
-  });
+        function splitDescriptions() {
+          if (!activeIngredients) return undefined;
+          const split = activeIngredients
+            .split("\n")
+            .map((value) => value.trim())
+            .filter(Boolean);
+          // If we get a good split early, it's got good data
+          if (split.length > 1) return split;
+          // If we split at "Total", each item will be a total followed by some details
+          // We should add total back to each value
+          const totalSplitValue = "Total ";
+          const totalSplit = activeIngredients
+            .split(totalSplitValue)
+            .map((value) => value.trim())
+            .filter(Boolean)
+            .map((value) => `${totalSplitValue}${value}`);
+          // If its no different then its just one line anyway, but good to check
+          // We should just use the original provided
+          if (totalSplit.length <= 1) return split;
+          return totalSplit;
+        }
+      });
+    }
+  );
 
   const products = await Promise.all(productPromises);
 
-  const order = new Set(products.map(product => product.order));
+  const order = new Set(products.map((product) => product.order));
 
   ok(order.size === products.length, "Expected orders to be unique");
 

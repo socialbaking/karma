@@ -1,7 +1,7 @@
 import { PropsWithChildren } from "react";
 import { description, namespace, project } from "../../package";
 import { getOrigin } from "../../listen/config";
-import {useData, useQuery, useQuerySearch} from "./data";
+import { useData, useQuery, useQuerySearch } from "./data";
 import {
   BASIC_CATEGORY_FLOWER,
   CategoryIcon,
@@ -15,17 +15,17 @@ export interface LayoutProps {
 const publicItems = [
   {
     path: "/",
-    name: "Home"
+    name: "Home",
   },
   {
     path: "/calculator",
-    name: "Calculator"
+    name: "Calculator",
   },
   {
     path: "/feedback",
-    name: "Feedback"
-  }
-]
+    name: "Feedback",
+  },
+];
 
 const items = [
   {
@@ -145,25 +145,25 @@ function Logo() {
   return (
     <div className="flex flex-row align-start items-center">
       <img
-          role="presentation"
-          src="/public/example-1.svg"
-          alt="Brand Image"
-          className="h-8 w-auto fill-white"
-          title="Social Baking Karma"
+        role="presentation"
+        src="/public/example-1.svg"
+        alt="Brand Image"
+        className="h-8 w-auto fill-white"
+        title="Social Baking Karma"
       />
       <img
-          role="presentation"
-          src="/public/example-2.svg"
-          alt="Brand Image"
-          className="h-8 mx-2 w-auto fill-white"
-          title="Social Baking Karma"
+        role="presentation"
+        src="/public/example-2.svg"
+        alt="Brand Image"
+        className="h-8 mx-2 w-auto fill-white"
+        title="Social Baking Karma"
       />
       <img
-          role="presentation"
-          src="/public/example-3.svg"
-          alt="Brand Image"
-          className="h-8 w-auto fill-white"
-          title="Social Baking Karma"
+        role="presentation"
+        src="/public/example-3.svg"
+        alt="Brand Image"
+        className="h-8 w-auto fill-white"
+        title="Social Baking Karma"
       />
     </div>
   );
@@ -238,24 +238,27 @@ export function AnonymousLayout(props: PropsWithChildren<LayoutProps>) {
                   <Logo />
                 </div>
                 <div className="flex flex-row">
-                  {
-                    publicItems.map(
-                        ({ path, name }, index) => {
-                          const isPath = path === "/" ? (pathname === path || pathname === "/home") : pathname.startsWith(path)
-                          return (
-                              <div className="ml-10 flex items-baseline space-x-4" key={index}>
-                                <a
-                                    href={path}
-                                    className={`${isPath ? "bg-indigo-700" : ""} text-white hover:bg-indigo-500 hover:bg-opacity-75 rounded-md px-3 py-2 text-sm font-medium`}
-                                >
-                                  {name}
-                                </a>
-                              </div>
-                          )
-                        }
-                    )
-                  }
-
+                  {publicItems.map(({ path, name }, index) => {
+                    const isPath =
+                      path === "/"
+                        ? pathname === path || pathname === "/home"
+                        : pathname.startsWith(path);
+                    return (
+                      <div
+                        className="ml-10 flex items-baseline space-x-4"
+                        key={index}
+                      >
+                        <a
+                          href={path}
+                          className={`${
+                            isPath ? "bg-indigo-700" : ""
+                          } text-white hover:bg-indigo-500 hover:bg-opacity-75 rounded-md px-3 py-2 text-sm font-medium`}
+                        >
+                          {name}
+                        </a>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>

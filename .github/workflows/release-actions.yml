@@ -29,6 +29,7 @@ jobs:
       REDDIT_CLIENT_SECRET: 1
       REDDIT_NAME: 1
       REDDIT_FLAIR: 1
+      ENABLE_SEED: 1
     services:
       # Label used to access the service container
       redis:

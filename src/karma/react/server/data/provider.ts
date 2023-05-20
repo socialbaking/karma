@@ -217,11 +217,7 @@ export function useSortedProducts(
       if (typeof searchValue !== "string") {
         return products;
       }
-      return getMatchingProducts(
-        products,
-        searchValue,
-        direct
-      );
+      return getMatchingProducts(products, searchValue, direct);
     }
   }, [products, categories, searchValue, direct]);
 }

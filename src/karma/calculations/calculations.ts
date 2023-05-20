@@ -1,6 +1,6 @@
 import * as metrics from "./metrics";
 import { CalculationConsentItem, CalculationSource } from "../client";
-import {ok} from "../../is";
+import { ok } from "../../is";
 
 export const calculations = {
   metrics,
@@ -16,9 +16,7 @@ interface HandlerObject extends UnknownRecord {
   enabled?: boolean;
 }
 
-export interface CalculationHandler extends CalculationSource, HandlerObject {
-
-}
+export interface CalculationHandler extends CalculationSource, HandlerObject {}
 
 function isRecord(value: unknown): value is UnknownRecord {
   return !!(value && typeof value === "object");
@@ -44,7 +42,7 @@ function getCalculations(object: unknown, key: string): CalculationHandler[] {
         title: object.title,
         description: object.description,
         anonymous: !!object.anonymous,
-        enabled: object.enabled
+        enabled: object.enabled,
       },
     ];
   }
@@ -56,9 +54,7 @@ function getCalculations(object: unknown, key: string): CalculationHandler[] {
 
 export const calculationSources = getCalculations(calculations, "calculations");
 export const calculationsHandlerMap = new Map<Function, CalculationHandler>(
-    calculationSources.map(
-        (value) => [value.handler, value] as const
-    )
+  calculationSources.map((value) => [value.handler, value] as const)
 );
 export const calculationKeys = calculationSources.map(
   (value) => value.calculationKey
@@ -96,7 +92,9 @@ export function hasConsent(
 }
 
 export function isAnonymousCalculation(calculationKey: string) {
-  const source = calculationSources.find(source => source.calculationKey === calculationKey);
+  const source = calculationSources.find(
+    (source) => source.calculationKey === calculationKey
+  );
   if (!source) return false;
   return !!source.anonymous;
 }

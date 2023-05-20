@@ -78,8 +78,9 @@ export async function addReportFromRequest(
   if (anonymous && calculationConsent) {
     // Only store keys that are related to anonymous users
     // Ensures they can never use calculations not intended for anonymous users
-    calculationConsent = calculationConsent
-        .filter(value => isAnonymousCalculation(value.calculationKey));
+    calculationConsent = calculationConsent.filter((value) =>
+      isAnonymousCalculation(value.calculationKey)
+    );
   }
 
   if (!productPurchaseFeeCost) {
@@ -99,10 +100,10 @@ export async function addReportFromRequest(
       productPurchaseItems,
     } = withTotal;
 
-    const numeric =
-      +productPurchaseItems * +productPurchaseItemCost +
-      (productPurchaseFeeCost ? +productPurchaseFeeCost : 0) +
-      (productPurchaseDeliveryCost ? +productPurchaseDeliveryCost : 0);
+    const totalItemCost = +productPurchaseItems * +productPurchaseItemCost;
+    const fee = productPurchaseFeeCost ? +productPurchaseFeeCost : 0;
+    const delivery = productPurchaseDeliveryCost ? +productPurchaseDeliveryCost : 0;
+    const numeric = totalItemCost + fee + delivery;
 
     if (!isNaN(numeric)) {
       productPurchaseTotalCost = numeric.toFixed(2);

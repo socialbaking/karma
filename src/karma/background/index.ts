@@ -50,22 +50,14 @@ export async function calculateReportMetrics(
   if (!productId) return undefined;
   const product = await getProduct(productId);
   if (!product) return undefined;
-  // const categories = [];
-  // if (product.categoryId) {
-  //     const category = await getCategory(product.categoryId);
-  //     if (category) categories.push(category);
-  // }
   if (
     !hasConsent(report.calculationConsent, calculations.metrics.costPerUnit)
   ) {
     return undefined;
   }
-
   return calculations.metrics.costPerUnit.calculate(report, {
     products: [product],
-    reports: [report],
-    categories: [],
-    currencySymbol: report.currencySymbol || "$", // TODO make configurable
+    currencySymbol: report.currencySymbol || "$",
   });
 }
 
@@ -107,11 +99,18 @@ async function calculateQueuedMetrics(references: ReportReference[]) {
       references.map(({ reportId }) => getReportMetrics(reportId))
     )
   )
-      .filter(Boolean)
-      .filter(report => (
-          hasConsent(report.calculationConsent, calculations.metrics.dayCostPerProduct) &&
-          hasConsent(report.calculationConsent, calculations.metrics.monthCostPerProduct)
-      ))
+    .filter(Boolean)
+    .filter(
+      (report) =>
+        hasConsent(
+          report.calculationConsent,
+          calculations.metrics.dayCostPerProduct
+        ) &&
+        hasConsent(
+          report.calculationConsent,
+          calculations.metrics.monthCostPerProduct
+        )
+    );
 
   console.log(
     `${reports.length}/${references.length} reports to process into metrics`

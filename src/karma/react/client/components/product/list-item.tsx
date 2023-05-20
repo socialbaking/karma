@@ -127,27 +127,26 @@ export function ProductListItem({
           >
             <div className="flex flex-wrap mr-1">{attributes?.productName}</div>
             <div className="flex flex-col">
-              {(isReporting || unitMetric) ? (
-                  <Label
-                      className="mt-1 px-4 leading-5 text-red-800 bg-red-100"
-                  >
-                    This software is in beta<br/>
-                    It may produce inaccurate data or results
-                  </Label>
+              {isReporting || unitMetric ? (
+                <Label className="mt-1 px-4 leading-5 text-red-800 bg-red-100">
+                  This software is in beta
+                  <br />
+                  It may produce inaccurate data or results
+                </Label>
               ) : undefined}
               {isReporting ? (
-                  <>
-                    {metrics
-                        .filter((value) => !value.proportional)
-                        .map((metric, index) => (
-                            <Label
-                                key={index}
-                                className="mt-1 px-2 leading-5 text-green-800 bg-green-100"
-                            >
-                              {toMetricLabel(metric)}
-                            </Label>
-                        ))}
-                  </>
+                <>
+                  {metrics
+                    .filter((value) => !value.proportional)
+                    .map((metric, index) => (
+                      <Label
+                        key={index}
+                        className="mt-1 px-2 leading-5 text-green-800 bg-green-100"
+                      >
+                        {toMetricLabel(metric)}
+                      </Label>
+                    ))}
+                </>
               ) : unitMetric ? (
                 <div className="block">
                   <Label className="mt-1 text-gray-400">

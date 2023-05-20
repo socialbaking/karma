@@ -127,26 +127,26 @@ export async function create() {
   register(blippPlugin);
   register(corsPlugin);
 
-  app.register(async (instance) => {
-    instance.register(etag);
-    instance.addHook(
-        "onRequest",
-        (request, response, done) => {
-          response.header("Cache-Control", "max-age=1800"); // Give it something
-          done();
-        }
-    );
-    instance.register(files, {
-      root: REACT_CLIENT_DIRECTORY,
-      prefix: "/client",
-    });
-    const publicPath = PUBLIC_PATH || join(directory, "../../../public");
-    instance.register(files, {
-      root: publicPath,
-      decorateReply: false,
-      prefix: "/public"
-    });
-  }, { prefix: "/" })
+  app.register(
+    async (instance) => {
+      instance.register(etag);
+      instance.addHook("onRequest", (request, response, done) => {
+        response.header("Cache-Control", "max-age=1800"); // Give it something
+        done();
+      });
+      instance.register(files, {
+        root: REACT_CLIENT_DIRECTORY,
+        prefix: "/client",
+      });
+      const publicPath = PUBLIC_PATH || join(directory, "../../../public");
+      instance.register(files, {
+        root: publicPath,
+        decorateReply: false,
+        prefix: "/public",
+      });
+    },
+    { prefix: "/" }
+  );
 
   await setupSwagger(app);
 

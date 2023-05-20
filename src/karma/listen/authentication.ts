@@ -19,8 +19,8 @@ import {
 } from "../authentication";
 import { preHandlerHookHandler } from "fastify/types/hooks";
 import accepts from "accepts";
-import {getOrigin} from "./config";
-import {logoutResponse} from "./auth/logout";
+import { getOrigin } from "./config";
+import { logoutResponse } from "./auth/logout";
 
 export const NOT_AUTHORIZED_ERROR_MESSAGE = "not authorized";
 export const NOT_ANONYMOUS_ERROR_MESSAGE = "not anonymous";
@@ -165,27 +165,21 @@ export function authenticate(
       return authHandler.call(this, request, response, done);
     }
 
-    return authHandler.call(
-      this,
-      request,
-      response,
-      function (error: unknown) {
-        // console.log({
-        //   error,
-        //   statusCode: response.statusCode,
-        //   args,
-        // });
-        if (!error && response.statusCode === 200) {
-          return done();
-        }
-
-        logoutResponse(response)
-            .finally(() => {
-                response.header("Location", "/?auth=redirected");
-                response.status(302);
-                response.send("Unauthenticated, redirecting...");
-            });
+    return authHandler.call(this, request, response, function (error: unknown) {
+      // console.log({
+      //   error,
+      //   statusCode: response.statusCode,
+      //   args,
+      // });
+      if (!error && response.statusCode === 200) {
+        return done();
       }
-    );
+
+      logoutResponse(response).finally(() => {
+        response.header("Location", "/?auth=redirected");
+        response.status(302);
+        response.send("Unauthenticated, redirecting...");
+      });
+    });
   };
 }
