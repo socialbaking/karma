@@ -113,27 +113,28 @@ export function ProductListItem({
   const baseSizeMetrics = useMetrics(allMetrics, {
     unit: `$/${sizeUnit}`,
   }).filter(value => !value.proportional);
-  const numericUnitMetric = useMetricMatch(baseUnitMetrics.filter(value => !value.proportional), {
-    type: unit,
+  const numericUnitMetric = useMetricMatch(baseUnitMetrics, {
     numeric: true,
   });
-  const numericSizeMetric = useMetricMatch(baseSizeMetrics.filter(value => !value.proportional), {
-    type: unit,
+  const numericSizeMetric = useMetricMatch(baseSizeMetrics, {
     numeric: true,
   });
   const metrics = [
       ...new Set(
           isReporting ?
-              [numericUnitMetric, numericSizeMetric].filter(Boolean) :
-              [...baseUnitMetrics, ...baseSizeMetrics]
+              [...baseUnitMetrics, ...baseSizeMetrics] :
+              [numericUnitMetric, numericSizeMetric].filter(Boolean)
       )
   ];
   console.log({
     unit,
     sizeUnit,
     metrics,
+    baseUnitMetrics,
+    baseSizeMetrics,
     numericUnitMetric,
-    numericSizeMetric
+    numericSizeMetric,
+    allMetrics: allMetrics.products[0].activeIngredients
   });
   return (
     <li>
@@ -163,6 +164,7 @@ export function ProductListItem({
                         .filter((value) => !value.proportional)
                 )]
                     .map((metric, index) => {
+                      const label = toMetricLabel(metric, !isReporting);
                       const node = (
                           <Label
                               key={index}
@@ -173,16 +175,23 @@ export function ProductListItem({
                               }
                               title={toMetricLabel(metric, false)}
                           >
-                            {toMetricLabel(metric, true)}
+                            {label}
                           </Label>
                       );
-                      if (isReporting) return node;
-                      return (
+                      if (isReporting) return [label, node] as const;
+                      return [label, (
                           <div className="block">
                             {node}
                           </div>
-                      )
+                      )] as const
                     })
+                    // Filter duplicate visual labels
+                    .filter((entry, index, array) => {
+                      const [label] = entry;
+                      const before = array.slice(0, index);
+                      return !before.find(entry => entry[0] === label);
+                    })
+                    .map(entry => entry[1])
               }
               {product.generic ? (
                 <div className="block">
