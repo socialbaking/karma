@@ -122,6 +122,15 @@ function menu() {
     elements.forEach((element) => {
       element.addEventListener("click", close);
     });
+    const sidebar = document.querySelectorAll(".sidebar");
+    sidebar.forEach((element) => {
+      element.addEventListener("click", (event) => {
+        if (event.target instanceof Element && event.target.matches(".sidebar-contents, .sidebar-contents *")) {
+          return;
+        }
+        return close();
+      });
+    });
   }
 
   function open() {
