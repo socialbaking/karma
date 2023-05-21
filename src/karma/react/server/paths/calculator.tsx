@@ -14,6 +14,7 @@ import {
   calculationSources,
   hasConsent,
   isAnonymousCalculation,
+  isProductReport,
 } from "../../../calculations";
 import { ReportData, Report } from "../../../client";
 import { FastifyRequest } from "fastify";
@@ -32,7 +33,9 @@ export async function submit(request: FastifyRequest) {
   // ... it will block the submission until then
   //
   // Later we will do this only on a schedule
-  await background();
+  if (isProductReport(report)) {
+    await background();
+  }
 
   return {
     report,

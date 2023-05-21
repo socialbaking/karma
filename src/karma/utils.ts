@@ -41,13 +41,52 @@ export function getMatchingProducts(
     })
   );
   if (!matching.length && !search.includes(" ")) {
-    matching = matching.concat(
-      products.filter((product) => {
-        if (matching.includes(product)) return;
-        const lowerName = product.productName.split(" ").join("").toLowerCase();
-        return lowerSplit.every((value) => lowerName.includes(value));
-      })
-    );
+    matching = products.filter((product) => {
+      const lowerName = product.productName.split(" ").join("").toLowerCase();
+      return lowerSplit.every((value) => lowerName.includes(value));
+    });
+  }
+  if (!matching.length && !exactMatch.length && search.includes(" ")) {
+    const searchSplit = search.split(" ");
+    const [first, second, ...rest] = searchSplit;
+    if (rest.length) {
+      matching = getMatchingProducts(products, `${first} ${second}`, direct);
+    }
+    if (!matching.length) {
+      // Last ditch effort
+      const secondWord = getMatchingProducts(products, second, false);
+      if (secondWord.length === 1) {
+        matching = secondWord;
+      } else {
+        const firstWord = getMatchingProducts(
+          secondWord.length ? secondWord : products,
+          first,
+          false
+        );
+        if (firstWord.length === 1) {
+          matching = firstWord;
+        } else {
+          matching = secondWord;
+        }
+      }
+      if (matching.length > 1 && rest.length) {
+        const type = rest.find((value) => /^[A-Z]{3}\s*\d+$/.test(value));
+        if (type) {
+          const withoutSpace = type.replace(/\s/g, "");
+          const initial = matching;
+          matching = getMatchingProducts(initial, withoutSpace, false);
+          if (!matching.length) {
+            const typeNumber = withoutSpace.replace(/^[A-Z]{3}/, "").trim();
+            const typeValue = type.replace(typeNumber, "").trim();
+            const withSpace = `${typeValue} ${typeNumber}`;
+            matching = getMatchingProducts(initial, withSpace, false);
+          }
+        }
+      }
+    }
+    if (matching.length > 1) {
+      matching = [];
+    }
   }
   return [...new Set<Product>([...exactMatch, ...matching])];
 }

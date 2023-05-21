@@ -4,11 +4,11 @@
 
 ### Support
 
- ![Node.js supported](https://img.shields.io/badge/node-%3E%3D18.7.0-blue) 
+![Node.js supported](https://img.shields.io/badge/node-%3E%3D18.7.0-blue)
 
 ### Test Coverage
 
- ![59.91%25 lines covered](https://img.shields.io/badge/lines-59.91%25-yellow) ![59.91%25 statements covered](https://img.shields.io/badge/statements-59.91%25-yellow) ![47.37%25 functions covered](https://img.shields.io/badge/functions-47.37%25-yellow) ![83.38%25 branches covered](https://img.shields.io/badge/branches-83.38%25-brightgreen)
+![59.91%25 lines covered](https://img.shields.io/badge/lines-59.91%25-yellow) ![59.91%25 statements covered](https://img.shields.io/badge/statements-59.91%25-yellow) ![47.37%25 functions covered](https://img.shields.io/badge/functions-47.37%25-yellow) ![83.38%25 branches covered](https://img.shields.io/badge/branches-83.38%25-brightgreen)
 
 [//]: # "badges"
 

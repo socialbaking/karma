@@ -2,7 +2,7 @@ import { promises as fs } from "fs";
 import { dirname, resolve } from "path";
 import { readFile } from "fs/promises";
 import { replaceBetween } from "./replace-between.js";
-import {writeFile} from "node:fs/promises";
+import { writeFile } from "node:fs/promises";
 
 // await import("./correct-import-extensions.js");
 // await import("./workerd-tests.js");
@@ -129,8 +129,4 @@ if (!process.env.NO_COVERAGE_BADGE_UPDATE) {
   console.log("Wrote coverage badges!");
 }
 
-await writeFile(
-    "esnext/.builtAt",
-    new Date().toISOString(),
-    "utf-8"
-);
+await writeFile("esnext/.builtAt", new Date().toISOString(), "utf-8");

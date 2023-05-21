@@ -1,22 +1,24 @@
 import { CalculationConsent } from "./calculator";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { uploadReportHandler } from "../../../listen/report/upload-report";
-import {useError, useIsTrusted, useMaybeResult, useSubmitted} from "../data";
+import { useError, useIsTrusted, useMaybeResult, useSubmitted } from "../data";
 import { Report } from "../../../client";
 import { ReportMetrics } from "../../../data";
-import {background} from "../../../background";
-import {ok} from "../../../../is";
+import { background } from "../../../background";
+import { ok } from "../../../../is";
+import { isProductReport } from "../../../calculations";
 
 export async function submit(request: FastifyRequest) {
   const report = await uploadReportHandler(request);
-  await background();
+  if (isProductReport(report) || report.reports.find(isProductReport)) {
+    await background();
+  }
   return {
     report,
   };
 }
 
 //"bg-sky-500 hover:bg-sky-700 px-4 py-2.5 text-sm leading-5 rounded-md font-semibold text-white"
-
 
 const FORM_CLASS = `
 mt-1
@@ -55,16 +57,16 @@ export function UploadReport() {
         action="/upload-report#result-section"
       >
         <label className="flex flex-col" htmlFor="file">
-            <span className="inline-block mr-4 mb-2">CSV Report File</span>
-            <input type="file" name="file" id="file" className={FILE_CLASS} />
+          <span className="inline-block mr-4 mb-2">CSV Report File</span>
+          <input type="file" name="file" id="file" className={FILE_CLASS} />
         </label>
         <hr className="my-8" />
         <CalculationConsent />
         <button
-            type="submit"
-            className="bg-sky-500 hover:bg-sky-700 px-4 py-2.5 text-sm leading-5 rounded-md font-semibold text-white"
+          type="submit"
+          className="bg-sky-500 hover:bg-sky-700 px-4 py-2.5 text-sm leading-5 rounded-md font-semibold text-white"
         >
-            Upload
+          Upload
         </button>
       </form>
       <section id="result-section">
