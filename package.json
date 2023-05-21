@@ -178,7 +178,7 @@
     "quick": "yarn build && yarn start",
     "local": "yarn build && yarn seed && yarn start",
     "seed": "node --enable-source-maps esnext/karma/data/seed/main.js",
-    "watch": "yarn build && concurrently \"yarn start:nodemon\" \"yarn build:watch\" ",
+    "watch": "yarn build && concurrently --raw \"yarn start:nodemon\" \"yarn build:watch\" ",
     "prettier:check": "prettier --check .",
     "prettier": "prettier --write ."
   }
