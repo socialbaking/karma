@@ -108,7 +108,7 @@ export function Calculator() {
   const submitted = useSubmitted();
   const result = useMaybeResult<{ report: Report; metrics?: ReportMetrics }>();
   const error = useError();
-  console.log(error)
+  console.log(error);
   const productName = useQuerySearch();
   const submittedProduct = useProduct(body?.productId);
   const category = useCategory(submittedProduct?.categoryId);

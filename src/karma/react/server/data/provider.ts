@@ -162,6 +162,7 @@ export function useSortedProducts(
   direct?: boolean
 ) {
   const products = useProducts();
+  const organisations = useOrganisations();
   const categories = useCategories();
 
   const search = useQuerySearch();
@@ -231,9 +232,9 @@ export function useSortedProducts(
       if (typeof searchValue !== "string") {
         return products;
       }
-      return getMatchingProducts(products, searchValue, direct);
+      return getMatchingProducts(products, organisations, categories, searchValue, direct);
     }
-  }, [products, categories, searchValue, direct]);
+  }, [products, organisations, categories, searchValue, direct]);
 }
 
 export function useProductByName(productName?: string): Product | undefined {

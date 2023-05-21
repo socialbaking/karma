@@ -1,7 +1,7 @@
 import { CalculationConsent } from "./calculator";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { uploadReportHandler } from "../../../listen/report/upload-report";
-import { useError, useIsTrusted, useMaybeResult, useSubmitted } from "../data";
+import {useError, useIsAdmin, useIsModerator, useIsTrusted, useMaybeResult, useSubmitted} from "../data";
 import { Report } from "../../../client";
 import { ReportMetrics } from "../../../data";
 import { background } from "../../../background";
@@ -44,6 +44,9 @@ focus:outline-none
 `;
 
 export function UploadReport() {
+  const isAdmin = useIsAdmin();
+  const isModerator = useIsModerator();
+  const isMoreTrusted = isAdmin || isModerator;
   const isTrusted = useIsTrusted();
   ok(isTrusted, "Expected trusted user");
   const submitted = useSubmitted();
@@ -84,12 +87,34 @@ export function UploadReport() {
         {submitted && result ? (
           <>
             <hr className="my-8" />
-            <div className="pointer-events-auto flex items-center justify-between gap-x-6 bg-green-400 px-6 py-2.5 sm:rounded-xl sm:py-3 sm:pl-4 sm:pr-3.5">
-              <p className="text-sm leading-6 text-white">
+            <div className="pointer-events-auto flex items-center justify-between gap-x-6 bg-green-200 px-6 py-2.5 sm:rounded-xl sm:py-3 sm:pl-4 sm:pr-3.5">
+              <p className="text-sm leading-6">
                 Upload submitted! {result.report.reports.length} reports added!
               </p>
             </div>
             <hr className="my-8" />
+            {
+              isMoreTrusted ? (
+                  <table className="table">
+                    <thead>
+                    <tr>
+                      <th>Given Text</th>
+                      <th>Product Name</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {result.report.reports.map(
+                        (report, index) => (
+                            <tr key={index} className={report.productName ? "bg-lime-200" : "bg-red-400"}>
+                              <td>{report.productText}</td>
+                              <td>{report.productName}</td>
+                            </tr>
+                        )
+                    )}
+                    </tbody>
+                  </table>
+              ) : undefined
+            }
           </>
         ) : undefined}
       </section>

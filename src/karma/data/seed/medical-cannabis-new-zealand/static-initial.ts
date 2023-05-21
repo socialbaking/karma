@@ -28,7 +28,7 @@ const categoryData: CategoryData[] = [
     categoryName: "Liquid",
     defaultUnit: "mg/mL",
     defaultSizes: [{ value: "30", unit: "mL" }],
-    associatedTerms: ["Oil", "Dropper", "Drops", "Sublingual Solution"],
+    associatedTerms: ["Oil", "Dropper", "Sublingual Solution"],
   },
   {
     categoryName: "Flower",

@@ -6,7 +6,7 @@ import {
   ReportData,
   splitValueUnitPrefix,
   Report,
-  listProducts,
+  listProducts, listOrganisations, listCategories,
 } from "../../data";
 import { ok } from "../../../is";
 import { reportDataReportKeys } from "../../data/report/schema";
@@ -97,6 +97,8 @@ export async function uploadReportHandler(
   const parentReport = await addReport(baseData);
   const reportData: ReportData[] = [];
   const products = await listProducts();
+  const organisations = await listOrganisations();
+  const categories = await listCategories();
 
   for (const row of data) {
     ok(
@@ -151,7 +153,7 @@ export async function uploadReportHandler(
         };
       }
     }
-    reportData.push(await getReportDataFromRequestBody(reportInput, products));
+    reportData.push(await getReportDataFromRequestBody(reportInput, products, organisations, categories));
   }
 
   // addReport shouldn't be throwing

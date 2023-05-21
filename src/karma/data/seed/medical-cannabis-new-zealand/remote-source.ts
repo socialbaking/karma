@@ -33,6 +33,11 @@ import {
 } from "../../product";
 import { v5 } from "uuid";
 import { Category } from "../../category";
+import {
+  NZULM_SEARCH_TERM_ACRONYM,
+  NZULM_TERM_ACRONYM,
+  NZULM_TERMS,
+} from "../../../utils";
 
 const USER_AGENT = `A Patient Collective, running ${packageIdentifier}`;
 const HEADERS = {
@@ -44,21 +49,6 @@ const NZULM_SEARCH_TERMS = [
   "cannabidiol",
   "cannabigerol",
 ];
-
-const NZULM_SEARCH_TERM_ACRONYM: Record<string, string> = {
-  tetrahydrocannabinol: "THC",
-  cannabidiol: "CBD",
-  cannabigerol: "CBG",
-};
-
-const NZULM_TERM_ACRONYM: Record<string, string> = {
-  ...NZULM_SEARCH_TERM_ACRONYM,
-  purified: "P",
-  "full spectrum": "FS",
-  "broad spectrum": "BS",
-};
-const NZULM_TERMS = Object.keys(NZULM_TERM_ACRONYM);
-const NZULM_TERM_ACRONYMS = Object.values(NZULM_TERM_ACRONYM);
 
 export async function seed() {
   // Use the static categories shared between

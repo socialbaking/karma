@@ -18,6 +18,7 @@ try {
 
   await autoSeed();
 
+
   await tracer.startActiveSpan("tests", async (span) => {
     await tracer.startActiveSpan("client-tests", async (span) => {
       await import("./client");
@@ -29,6 +30,10 @@ try {
     });
     await tracer.startActiveSpan("calculation-tests", async (span) => {
       await import("./calculations");
+      span.end();
+    });
+    await tracer.startActiveSpan("search-tests", async (span) => {
+      await import("./search");
       span.end();
     });
     span.end();

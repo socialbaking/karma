@@ -1,8 +1,8 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import {
   addReport,
-  CalculationConsentItem,
-  listProducts,
+  CalculationConsentItem, Category, listCategories, listOrganisations,
+  listProducts, Organisation,
   Product,
   Report,
   ReportData,
@@ -30,16 +30,23 @@ export async function addReportFromRequest(
   ok<FastifyRequest<Schema>>(request);
   // Replace the body with the updated
   // report data so that it is consistent
+  const products = listProducts();
+  const organisations = listOrganisations();
+  const categories = listCategories();
   request.body = await getReportDataFromRequestBody(
     request.body,
-    await listProducts()
+    await products,
+    await organisations,
+    await categories
   );
   return addReport(request.body);
 }
 
 export async function getReportDataFromRequestBody(
   body: ReportData,
-  products: Product[]
+  products: Product[],
+  organisations: Organisation[],
+  categories: Category[]
 ): Promise<ReportData> {
   let {
     type,
@@ -126,7 +133,7 @@ export async function getReportDataFromRequestBody(
 
   if ((productText || productName) && !productId) {
     const name = productText || productName;
-    const matching = getMatchingProducts(products, name, true);
+    const matching = getMatchingProducts(products, organisations, categories, name, true);
     if (matching.length > 1) {
       throw new Error(
         `Name "${name}" matches multiple products: ${matching
