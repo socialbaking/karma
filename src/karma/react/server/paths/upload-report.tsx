@@ -1,10 +1,11 @@
 import { CalculationConsent } from "./calculator";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { uploadReportHandler } from "../../../listen/report/upload-report";
-import { useError, useMaybeResult, useSubmitted } from "../data";
+import {useError, useIsTrusted, useMaybeResult, useSubmitted} from "../data";
 import { Report } from "../../../client";
 import { ReportMetrics } from "../../../data";
 import {background} from "../../../background";
+import {ok} from "../../../../is";
 
 export async function submit(request: FastifyRequest) {
   const report = await uploadReportHandler(request);
@@ -41,6 +42,8 @@ focus:outline-none
 `;
 
 export function UploadReport() {
+  const isTrusted = useIsTrusted();
+  ok(isTrusted, "Expected trusted user");
   const submitted = useSubmitted();
   const result = useMaybeResult<{ report: Report; metrics?: ReportMetrics }>();
   const error = useError();
