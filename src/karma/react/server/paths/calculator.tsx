@@ -35,6 +35,8 @@ export async function submit(request: FastifyRequest) {
   // Later we will do this only on a schedule
   if (isProductReport(report)) {
     await background();
+  } else {
+    console.log("Is not product report", report);
   }
 
   return {
@@ -106,6 +108,7 @@ export function Calculator() {
   const submitted = useSubmitted();
   const result = useMaybeResult<{ report: Report; metrics?: ReportMetrics }>();
   const error = useError();
+  console.log(error)
   const productName = useQuerySearch();
   const submittedProduct = useProduct(body?.productId);
   const category = useCategory(submittedProduct?.categoryId);
@@ -155,7 +158,7 @@ export function Calculator() {
       ) : undefined}
 
       {/* report type */}
-      <input type="hidden" value="product-purchase" name="type" />
+      <input type="hidden" value="purchase" name="type" />
 
       <div className="flex flex-col">
         <label className={FORM_GROUP_CLASS}>

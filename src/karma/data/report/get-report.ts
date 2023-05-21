@@ -14,7 +14,7 @@ export function patchOldReport(report?: Report): Report | undefined {
   if (!report.productPurchase) return undefined;
   return {
     ...report,
-    type: "product-purchase",
+    type: "purchase",
     productDeliveryCost:
       report.productDeliveryCost ?? report.productPurchaseDeliveryCost,
     productFeeCost: report.productFeeCost ?? report.productPurchaseFeeCost,
