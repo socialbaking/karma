@@ -375,7 +375,34 @@ export interface SystemLog extends SystemLogData {
 
 ### Local Development
 
-#### `mkcert`
+#### Dependencies
 
-[`mkcert`](https://github.com/FiloSottile/mkcert) is used
-to setup local https
+You will need to install the dependencies with [yarn](https://yarnpkg.com/)
+
+Once you have yarn installed, use the command:
+
+```bash
+yarn
+```
+
+#### `.env`
+
+First you will need to set up a `.env` file in the same directory as this README.md file
+
+Copy the [`.env.example`](./.env.example) to make your `.env` file
+
+##### Reddit
+
+To setup reddit authentication, you will need to either be provided a client ID if you're working with the 
+socialbaking team, or you will need to create a [new application at the bottom of this screen](https://www.reddit.com/prefs/apps)
+
+Once created, copy the value under "web app" and set that as your `REDDIT_CLIENT_ID` 
+
+Copy the "secret" and set that as `REDDIT_CLIENT_SECRET`
+
+Set the reddit community name, and associated flair, as you see fit:
+
+```
+REDDIT_NAME=MedicalCannabisNZ
+REDDIT_FLAIR="Medical Patient"
+```

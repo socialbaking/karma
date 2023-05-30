@@ -60,6 +60,8 @@ export async function redditAuthenticationRoutes(fastify: FastifyInstance) {
     REDDIT_FLAIR_EXPIRES_IN_MS: givenExpiresIn,
   } = process.env;
 
+  if (!REDDIT_CLIENT_ID) return;
+
   ok(REDDIT_CLIENT_ID, "Expected REDDIT_CLIENT_ID");
   ok(REDDIT_CLIENT_SECRET, "Expected REDDIT_CLIENT_SECRET");
   ok(REDDIT_NAME, "Expected REDDIT_NAME");

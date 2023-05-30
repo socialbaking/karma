@@ -41,6 +41,8 @@ export async function discordAuthenticationRoutes(fastify: FastifyInstance) {
     DISCORD_SERVER_ID,
   } = process.env;
 
+  if (!DISCORD_CLIENT_ID) return;
+
   ok(DISCORD_CLIENT_ID, "Expected DISCORD_CLIENT_ID");
   ok(DISCORD_CLIENT_SECRET, "Expected DISCORD_CLIENT_SECRET");
   ok(DISCORD_SERVER_ID, "Expected DISCORD_SERVER_ID");

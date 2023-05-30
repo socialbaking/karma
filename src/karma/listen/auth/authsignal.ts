@@ -23,6 +23,9 @@ import { getExpiresAt } from "../../data/expiring-kv";
 ok(jsonwebtoken.decode);
 
 export async function authsignalAuthenticationRoutes(fastify: FastifyInstance) {
+
+  if (!AUTHSIGNAL_TENANT) return;
+
   {
     const querystring = {
       type: "object",
