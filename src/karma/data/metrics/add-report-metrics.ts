@@ -1,9 +1,9 @@
 import { getReportMetricsStore } from "./store";
-import { MetricsData, ReportMetrics, ReportMetricsData } from "./types";
+import { ReportMetrics, ReportMetricsData } from "./types";
 import { v4 } from "uuid";
 import { getReportDates } from "../../calculations";
-import { addReportReference } from "../report";
 import { getAuthenticationRoles } from "../../authentication";
+import {setReportReference} from "../report/set-report";
 
 export const NO_REPORT_PREFIX = "withoutReport_" as const;
 
@@ -39,11 +39,12 @@ export async function addReportMetrics(data: ReportMetricsData) {
 
   console.log("addReportMetrics", metricsKey, metrics, store.name);
 
-  await addReportReference({
+  await setReportReference({
     ...getReportDates(metrics),
     // yeah its getting weird...
     reportId: metricsKey,
     countryCode: data.countryCode,
+    type: data.type ?? (metrics.products.find(product => product.activeIngredients) ? "purchase" : "metrics")
   });
 
   return metrics;

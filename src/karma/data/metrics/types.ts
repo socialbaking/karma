@@ -37,12 +37,14 @@ export interface MetricsData
 
 export interface ReportMetricsData extends MetricsData {
   parentReportId?: string;
+  type?: string;
 }
 
 export interface ReportMetrics
   extends ReportMetricsData,
     ReportRoleData,
     Record<string, unknown> {
+  type?: string;
   metricsId: string;
   reportId: string;
   reportedAt: string;

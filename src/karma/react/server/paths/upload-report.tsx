@@ -60,7 +60,7 @@ export function UploadReport() {
         action="/upload-report#result-section"
       >
         <label className="flex flex-col" htmlFor="file">
-          <span className="inline-block mr-4 mb-2">CSV Report File</span>
+          <span className="inline-block mr-4 mb-2">CSV or JSON Report File</span>
           <input type="file" name="file" id="file" className={FILE_CLASS} />
         </label>
         <hr className="my-8" />

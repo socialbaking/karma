@@ -52,8 +52,12 @@ export async function uploadReportHandler(
     if (part.type === "field") {
       fields.push(part);
     } else if (part.type === "file") {
-      ok(!fileParsed, "Expected one CSV file");
-      await pipeline(part.file, parser);
+      ok(!fileParsed, "Expected one file");
+      if (part.filename.endsWith(".json")) {
+        // TODO
+      } else {
+        await pipeline(part.file, parser);
+      }
       fileParsed = true;
     }
   }

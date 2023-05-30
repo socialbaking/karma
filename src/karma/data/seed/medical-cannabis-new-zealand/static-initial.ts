@@ -10,11 +10,20 @@ import {
   setProduct,
   Organisation,
   getOrganisationStore,
-  OrganisationData,
+  OrganisationData, addReport, PollReportData,
 } from "../../data";
 import { v5 } from "uuid";
-import { ok } from "../../../../is";
+import {isArray, ok} from "../../../../is";
 import { HEALTH_GOVT_NZ_MINIMUM_PRODUCTS } from "../../../static";
+import { dirname, join, extname } from "node:path";
+import {readdir, readFile} from "node:fs/promises";
+import {isPollReportData} from "../../../calculations";
+import {ReportData} from "../../../client";
+import {setReport} from "../../report/set-report";
+import {json} from "stream/consumers";
+
+const { pathname } = new URL(import.meta.url);
+const directory = dirname(pathname);
 
 const firstSeedingDate = new Date(1683589864494).toISOString();
 export const createdAt = firstSeedingDate;
@@ -889,7 +898,45 @@ export async function seedProducts() {
   );
 }
 
+export async function seedPolls() {
+
+  const dir = directory.replace("esnext", "src");
+  const paths = await readdir(dir);
+  const jsonFiles = paths.filter(path => extname(path) === ".json");
+
+  console.log(paths.map(value => extname(value)));
+
+  console.log({ jsonFiles: jsonFiles.length, files: paths.length });
+
+  for (const fileName of jsonFiles) {
+    if (!fileName.endsWith("-polls.json")) continue;
+    const path = join(dir, fileName);
+    const file = await readFile(path, "utf-8");
+    const json: unknown = JSON.parse(file);
+    assertPollReportArray(json);
+
+    for (const data of json) {
+      const report = await setReport({
+        countryCode: "NZ",
+        ...data,
+        createdAt,
+        updatedAt,
+        reportId: v5(data.title, namespace)
+      });
+      console.log(report.reportId, report.title);
+    }
+
+    function assertPollReportArray(value: unknown): asserts value is ((ReportData & PollReportData) & { type: "poll" })[] {
+      ok(isArray(json));
+      ok(json.length);
+      ok(json.every(isPollReportData));
+    }
+  }
+
+}
+
 export async function seed() {
+  await seedPolls();
   await seedCategories();
   await seedPartners();
   await seedProducts();

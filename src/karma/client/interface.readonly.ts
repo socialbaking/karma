@@ -79,12 +79,14 @@ export interface MetricsData
 
 export interface ReportMetricsData extends MetricsData {
   parentReportId?: string;
+  type?: string;
 }
 
 export interface ReportMetrics
   extends ReportMetricsData,
     ReportRoleData,
     Record<string, unknown> {
+  type?: string;
   metricsId: string;
   reportId: string;
   reportedAt: string;
@@ -234,33 +236,9 @@ export interface ReportRoleData {
   roles: AuthenticationRole[];
 }
 
-export type ReportType = "purchase" | "product";
+export type ReportType = "purchase" | "product" | "poll";
 
-export interface ReportData
-  extends ReportDateData,
-    Expiring,
-    CalculationConsent,
-    Record<string, unknown> {
-  type: ReportType | string;
-  countryCode: string; // "NZ"
-  currencySymbol?: string; // "$"
-  timezone?: string; // Pacific/Auckland
-  note?: string;
-  parentReportId?: string;
-  productId?: string;
-  productName?: string; // Actual productName, not free text
-  productText?: string; // User free text of the product
-  productSize?: ProductSizeData;
-  createdByUserId?: string;
-  anonymous?: boolean;
-  productTotalCost?: string | number; // "908.50", capture the user input raw
-  productItems?: string | number; // "2", capture the user input raw
-  productItemCost?: string | number; // "450", capture the user input raw
-  productDeliveryCost?: string | number; // "8.50", capture the user input raw
-  productFeeCost?: string | number; // "3.50", capture the user input raw
-  productOrganisationId?: string;
-  productOrganisationName?: string; // Actual organisationName, not free text
-  productOrganisationText?: string; // User free text of the organisationName
+export interface DeprecatedReportData {
   // TODO No longer used fields, but keeping around until v1.0.0
   productPurchase?: boolean;
   productPurchaseTotalCost?: string | number; // "908.50", capture the user input raw
@@ -271,6 +249,52 @@ export interface ReportData
   productPurchaseOrganisationId?: string;
   productPurchaseOrganisationName?: string; // Actual organisationName, not free text
   productPurchaseOrganisationText?: string; // User free text of the organisationName
+}
+
+type StringNumber = `${number}` | number | string;
+
+export interface ProductReportData extends DeprecatedReportData {
+  productId?: string;
+  productName?: string; // Actual productName, not free text
+  productText?: string; // User free text of the product
+  productSize?: ProductSizeData;
+  productTotalCost: StringNumber; // "908.50", capture the user input raw
+  productItems: StringNumber; // "2", capture the user input raw
+  productItemCost: StringNumber; // "450", capture the user input raw
+  productDeliveryCost?: StringNumber; // "8.50", capture the user input raw
+  productFeeCost?: StringNumber; // "3.50", capture the user input raw
+  productOrganisationId?: string;
+  productOrganisationName?: string; // Actual organisationName, not free text
+  productOrganisationText?: string; // User free text of the organisationName
+}
+
+export interface PollReportOptionData extends Partial<ActiveIngredientMetrics> {
+  title: string;
+  votes: `${number}` | string;
+}
+
+export interface PollReportData {
+  title: string;
+  url?: string;
+  options: PollReportOptionData[];
+}
+
+export type PartialReportData = Partial<PollReportData> & Partial<ProductReportData>
+
+export interface ReportData
+  extends ReportDateData,
+    Expiring,
+    CalculationConsent,
+    PartialReportData,
+    Record<string, unknown> {
+  type: ReportType | string;
+  countryCode: string; // "NZ"
+  currencySymbol?: string; // "$"
+  timezone?: string; // Pacific/Auckland
+  note?: string;
+  parentReportId?: string;
+  createdByUserId?: string;
+  anonymous?: boolean;
 }
 
 export interface Report extends ReportData, ReportRoleData {

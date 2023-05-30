@@ -19,7 +19,7 @@ import {
   updatedAt,
   createdAt,
   organisations,
-  seedProducts,
+  seedProducts, seedPolls,
 } from "./static-initial";
 import {
   ProductInfo,
@@ -51,6 +51,8 @@ const NZULM_SEARCH_TERMS = [
 ];
 
 export async function seed() {
+  await seedPolls();
+
   // Use the static categories shared between
   // We will use this to auto categorise into these categories
   // As short names for remote categories
