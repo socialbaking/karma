@@ -396,6 +396,8 @@ Copy the [`.env.example`](./.env.example) to make your `.env` file
 To setup reddit authentication, you will need to either be provided a client ID if you're working with the 
 socialbaking team, or you will need to create a [new application at the bottom of this screen](https://www.reddit.com/prefs/apps)
 
+The local redirect url is http://localhost:3000/api/authentication/reddit/callback 
+
 Once created, copy the value under "web app" and set that as your `REDDIT_CLIENT_ID` 
 
 Copy the "secret" and set that as `REDDIT_CLIENT_SECRET`
