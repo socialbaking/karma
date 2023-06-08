@@ -153,11 +153,16 @@ async function saveAttachments(channel: ProductDiscordChannel, message: DiscordM
                         },
                     }
                 );
-                const blob = await response.blob();
-                update = {
-                    ...((await fn(data, blob)) ?? undefined),
-                    syncedAt: new Date().toISOString()
-                };
+                if (response.ok) {
+                    const blob = await response.blob();
+                    update = {
+                        ...((await fn(data, blob)) ?? undefined),
+                        syncedAt: new Date().toISOString()
+                    };
+                } else if (existing) {
+                    files.push(existing);
+                    continue;
+                }
             }
             const file = await setFile({
                 ...data,
@@ -190,7 +195,8 @@ async function *listMediaMessages(channel: DiscordGuildChannel): AsyncIterable<D
                 },
             }
         );
-        if (response.status === 404) return undefined;
+        if (response.status === 404) return;
+        if (response.status === 429) return; // Finish for now, we can try again later
         ok(response.ok, `listMediaMessages returned ${response.status}`);
         responseMessages = await response.json();
         const messages = responseMessages.filter(message => message.attachments?.length);
