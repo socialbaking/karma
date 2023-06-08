@@ -15,33 +15,53 @@ import {getTimeRemaining} from "../../../signal";
 
 const namespace = "cb541dc3-ffbd-4d9c-923a-d1f4af02fa89";
 
+// All bots can make up to 50 requests per second to our API.
+// If no authorization header is provided, then the limit is applied to the IP address.
+// This is independent of any individual rate limit on a route.
+// If your bot gets big enough, based on its functionality,
+// it may be impossible to stay below 50 requests per second during normal operations.
+
+// We must keep some requests available for auth operations
+const DEFAULT_MAX_REQUESTS = 35;
+
 const {
     R2_ACCESS_KEY_ID,
     R2_ACCESS_KEY_SECRET,
     R2_BUCKET,
     R2_ENDPOINT,
     DISCORD_MEDIA_OFFLINE_STORE,
-    DISCORD_DEBUG_MEDIA
+    DISCORD_MEDIA_PARENT_CHANNEL_NAME,
+    DISCORD_MEDIA_DEBUG,
 } = process.env
+
+interface DiscordContext {
+    requestsRemaining: number;
+}
 
 export async function seedDiscordMedia() {
 
     if (!DISCORD_BOT_TOKEN) return;
 
-    const channels = await listProductChannels();
+    const context: DiscordContext = {
+        requestsRemaining: DEFAULT_MAX_REQUESTS
+    }
+
+    const channels = await listProductChannels(context);
 
     console.log(channels.map(channel => channel.name));
 
     for (const channel of channels) {
-        await downloadMediaFromChannel(channel);
+        console.log(`Requests Remaining: ${context.requestsRemaining}`);
+        await downloadMediaFromChannel(context, channel);
     }
 
+    console.log(`Requests Remaining: ${context.requestsRemaining}`);
 }
 
-async function downloadMediaFromChannel(channel: ProductDiscordChannel) {
-    for await (const messages of listMediaMessages(channel)) {
+async function downloadMediaFromChannel(context: DiscordContext, channel: ProductDiscordChannel) {
+    for await (const messages of listMediaMessages(context, channel)) {
         for (const message of messages) {
-            await saveAttachments(channel, message);
+            await saveAttachments(context, channel, message);
         }
     }
 }
@@ -54,7 +74,7 @@ function getAuthorUsername(message: DiscordMessage) {
     return `${author.username}#${author.discriminator}`;
 }
 
-async function saveAttachments(channel: ProductDiscordChannel, message: DiscordMessage) {
+async function saveAttachments(context: DiscordContext, channel: ProductDiscordChannel, message: DiscordMessage) {
     // console.log(message);
     const { product } = channel
     const path = DISCORD_MEDIA_OFFLINE_STORE;
@@ -128,7 +148,7 @@ async function saveAttachments(channel: ProductDiscordChannel, message: DiscordM
             // Stable file ID
             const fileId = v5(`file:${key}`, namespace);
             const existing = await getFile(fileId);
-            if (existing && (!isTimeRemaining || existing?.syncedAt) && !DISCORD_DEBUG_MEDIA) {
+            if (existing && (!isTimeRemaining || existing?.syncedAt) && !DISCORD_MEDIA_DEBUG) {
                 files.push(existing);
                 continue;
             }
@@ -142,7 +162,8 @@ async function saveAttachments(channel: ProductDiscordChannel, message: DiscordM
                 pinned: !!message.pinned
             }
             let update: Partial<FileData>;
-            if (getTimeRemaining() > 2500) {
+            if (getTimeRemaining() > 2500 && context.requestsRemaining > 0) {
+                context.requestsRemaining -= 1;
                 const response = await fetch(
                     attachment.url,
                     {
@@ -175,17 +196,18 @@ async function saveAttachments(channel: ProductDiscordChannel, message: DiscordM
     }
 }
 
-async function *listMediaMessages(channel: DiscordGuildChannel): AsyncIterable<DiscordMessage[]> {
+async function *listMediaMessages(context: DiscordContext, channel: DiscordGuildChannel): AsyncIterable<DiscordMessage[]> {
     const url = new URL(
         `/api/v10/channels/${channel.id}/messages`,
         "https://discord.com"
     );
     url.searchParams.set("limit", "100");
     let responseMessages: DiscordMessage[] = [];
-    do {
+    while (responseMessages.length && context.requestsRemaining > 0) {
         if (responseMessages.length) {
             url.searchParams.set("before", responseMessages.at(-1).id)
         }
+        context.requestsRemaining -= 1;
         const response = await fetch(
             url,
             {
@@ -203,7 +225,7 @@ async function *listMediaMessages(channel: DiscordGuildChannel): AsyncIterable<D
         if (messages.length) {
             yield messages;
         }
-    } while (responseMessages.length);
+    }
 }
 
 interface DiscordAttachment {
@@ -236,6 +258,8 @@ interface DiscordMessage {
 
 interface DiscordGuildChannel extends Record<string, unknown> {
     id: string;
+    parent_id?: string;
+    parent?: DiscordGuildChannel
     name: string;
     type: string;
 }
@@ -244,12 +268,18 @@ interface ProductDiscordChannel extends DiscordGuildChannel {
     product: Product
 }
 
-async function listProductChannels(): Promise<ProductDiscordChannel[]> {
-    const channels = await listGuildChannels();
+async function listProductChannels(context: DiscordContext): Promise<ProductDiscordChannel[]> {
+    const channels = await listGuildChannels(context);
     const products = await listProducts();
     const organisations = await listOrganisations();
     const categories = await listCategories();
+    ok(DISCORD_MEDIA_PARENT_CHANNEL_NAME, "Expected DISCORD_MEDIA_PARENT_CHANNEL_NAME");
+    const parentName = DISCORD_MEDIA_PARENT_CHANNEL_NAME.toLowerCase();
     return channels
+        .filter(({ parent }) => {
+            if (!parent) return false;
+            return parent.name.toLowerCase() === parentName;
+        })
         .map(channel => {
             const matching = getMatchingProducts(products, organisations, categories, channel.name.replace(/-/g, " "));
             if (matching.length !== 1) return undefined;
@@ -261,7 +291,8 @@ async function listProductChannels(): Promise<ProductDiscordChannel[]> {
         .filter(Boolean);
 }
 
-async function listGuildChannels(): Promise<DiscordGuildChannel[]> {
+async function listGuildChannels(context: DiscordContext): Promise<DiscordGuildChannel[]> {
+    context.requestsRemaining -= 1;
     const response = await fetch(
         new URL(
             `/api/v10/guilds/${DISCORD_SERVER_ID}/channels`,
@@ -276,5 +307,13 @@ async function listGuildChannels(): Promise<DiscordGuildChannel[]> {
     );
     if (response.status === 404) return undefined;
     ok(response.ok, `listGuildChannels returned ${response.status}`);
-    return response.json();
+    const channels: DiscordGuildChannel[] = await response.json();
+    return channels.map(channel => {
+        if (!channel.parent_id) return channel;
+        const parent = channels.find(other => other.id === channel.parent_id);
+        return {
+            ...channel,
+            parent
+        };
+    })
 }
