@@ -92,6 +92,9 @@ export interface Expiring {
   expiresAt?: string;
 }
 
+export type FileUploadedSource = "discord";
+export type FileUploadedSynced = "r2" | "disk";
+
 export interface FileData extends Record<string, unknown> {
   fileName: string;
   contentType: string;
@@ -101,6 +104,8 @@ export interface FileData extends Record<string, unknown> {
   pinned?: boolean;
   uploadedAt?: string;
   uploadedByUsername?: string;
+  source?: FileUploadedSource;
+  synced?: FileUploadedSynced;
   syncedAt?: string;
 }
 

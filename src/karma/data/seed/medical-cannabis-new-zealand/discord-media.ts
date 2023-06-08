@@ -7,17 +7,14 @@ import {listCategories} from "../../category";
 import {v5} from "uuid";
 import {extname, join} from "node:path";
 import {mkdir, writeFile} from "fs/promises";
-import {createWriteStream} from "fs";
-import { pipeline } from "stream/promises";
 import {FileData, getFile, setFile} from "../../file";
-import {S3} from "@aws-sdk/client-s3";
 import {getTimeRemaining} from "../../../signal";
 import {addExpiring, getCached} from "../../cache";
 import {DAY_MS, getExpiresAt} from "../../expiring-kv";
 
 const namespace = "cb541dc3-ffbd-4d9c-923a-d1f4af02fa89";
 
-const CACHE_VERSION = 1;
+const CACHE_VERSION = 3;
 const CACHE_KEY_PREFIX = `discord-media:${CACHE_VERSION}`;
 
 // Allow late expiry to allow for background tasks to be slow
@@ -219,7 +216,7 @@ async function *listMediaMessages(context: DiscordContext, channel: DiscordGuild
     const afterCacheKey = `${CACHE_KEY_PREFIX}:${channel.id}:listMediaMessages:after`;
     const messageAfter = await getCached(afterCacheKey, true);
 
-    // console.log({ messageAfter });
+    console.log({ messageAfter });
 
     type MessageWithMS = DiscordMessage & { milliseconds: number }
     let mostRecentMessage: MessageWithMS | undefined = undefined,
@@ -264,6 +261,7 @@ async function *listMediaMessages(context: DiscordContext, channel: DiscordGuild
             });
         setMostRecent(responseMessages.at(-1));
         setDistantRecent(responseMessages.at(0));
+        console.log({ mostDistantMessage, mostRecentMessage });
         const messages = responseMessages.filter(message => message.attachments?.length);
         if (messages.length) {
             yield messages;
