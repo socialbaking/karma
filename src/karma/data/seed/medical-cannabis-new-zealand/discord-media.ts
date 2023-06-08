@@ -11,6 +11,7 @@ import {createWriteStream} from "fs";
 import { pipeline } from "stream/promises";
 import {FileData, getFile, setFile} from "../../file";
 import {S3} from "@aws-sdk/client-s3";
+import {getTimeRemaining} from "../../../signal";
 
 const namespace = "cb541dc3-ffbd-4d9c-923a-d1f4af02fa89";
 
@@ -122,25 +123,15 @@ async function saveAttachments(channel: ProductDiscordChannel, message: DiscordM
         const uploadedByUsername = getAuthorUsername(message);
         const files: ProductFile[] = [];
         for (const attachment of message.attachments) {
+            const isTimeRemaining = getTimeRemaining() > 2500;
             const key = `${DISCORD_SERVER_ID}:${channel.id}:${message.id}:${attachment.filename}`;
             // Stable file ID
             const fileId = v5(`file:${key}`, namespace);
             const existing = await getFile(fileId);
-            if (existing && !DISCORD_DEBUG_MEDIA) {
+            if (existing && (!isTimeRemaining || existing?.syncedAt) && !DISCORD_DEBUG_MEDIA) {
                 files.push(existing);
                 continue;
             }
-            const response = await fetch(
-                attachment.url,
-                {
-                    method: "GET",
-                    headers: {
-                        Authorization: `Bot ${DISCORD_BOT_TOKEN}`,
-                        Accept: attachment.content_type
-                    },
-                }
-            );
-            const blob = await response.blob();
             const fileName = `${channel.name}-${v5(key, namespace)}${extname(attachment.filename)}`;
             const data: FileData = {
                 fileName,
@@ -150,11 +141,30 @@ async function saveAttachments(channel: ProductDiscordChannel, message: DiscordM
                 uploadedByUsername,
                 pinned: !!message.pinned
             }
-            files.push({
+            let update: Partial<FileData>;
+            if (getTimeRemaining() > 2500) {
+                const response = await fetch(
+                    attachment.url,
+                    {
+                        method: "GET",
+                        headers: {
+                            Authorization: `Bot ${DISCORD_BOT_TOKEN}`,
+                            Accept: attachment.content_type
+                        },
+                    }
+                );
+                const blob = await response.blob();
+                update = {
+                    ...((await fn(data, blob)) ?? undefined),
+                    syncedAt: new Date().toISOString()
+                };
+            }
+            const file = await setFile({
                 ...data,
-                fileId,
-                ...(await fn(data, blob)) ?? undefined
+                ...update,
+                fileId
             });
+            files.push(file);
         }
         return files;
     }

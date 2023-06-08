@@ -7,6 +7,7 @@ export interface FileData extends Record<string, unknown> {
   pinned?: boolean;
   uploadedAt?: string;
   uploadedByUsername?: string;
+  syncedAt?: string;
 }
 
 export interface File extends FileData {

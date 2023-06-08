@@ -14,6 +14,10 @@ export const fileData = {
     url: {
       type: "string",
       nullable: true
+    },
+    syncedAt: {
+      type: "string",
+      nullable: true
     }
   },
   additionalProperties: true,
