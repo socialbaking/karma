@@ -31,6 +31,7 @@ export const paths: Record<string, FunctionComponent> = {
 export const pathsAnonymous: Record<string, boolean> = {
   "/home": true,
   "/": true,
+  "/products": true,
   "/feedback": true,
   "/calculator": true,
   "/login": true,

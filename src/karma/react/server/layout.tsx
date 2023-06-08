@@ -28,6 +28,10 @@ const publicItems: MenuItem[] = [
     name: "Home",
   },
   {
+    path: "/products",
+    name: "Products",
+  },
+  {
     path: "/calculator",
     name: "Calculator",
   },

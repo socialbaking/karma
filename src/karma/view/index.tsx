@@ -132,7 +132,11 @@ export async function viewRoutes(fastify: FastifyInstance) {
             })}
             categories={await listCategories()}
             metrics={anonymous ? [] : await listMetrics()}
-            products={await listProducts()}
+            products={await listProducts({
+              // Making it obvious that if you are anonymous
+              // only public products will be visible
+              public: anonymous
+            })}
             roles={state?.roles}
             query={request.query}
             body={request.body}

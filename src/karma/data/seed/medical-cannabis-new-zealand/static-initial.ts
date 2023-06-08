@@ -871,6 +871,8 @@ export async function seedProducts() {
   ].map((data, index) => ({
     ...data,
     order: index,
+    // All these products are sourced from public knowledge
+    public: true
   }));
 
   const productStore = getProductStore();

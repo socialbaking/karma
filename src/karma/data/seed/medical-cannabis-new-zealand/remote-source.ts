@@ -39,6 +39,10 @@ import {
   NZULM_TERMS,
 } from "../../../utils";
 
+
+// All these products are sourced from public knowledge
+const HEALTH_GOVT_NZ_PRODUCTS_PUBLIC = true;
+
 const USER_AGENT = `A Patient Collective, running ${packageIdentifier}`;
 const HEADERS = {
   "User-Agent": USER_AGENT,
@@ -147,6 +151,7 @@ async function seedHealthNZProducts($: CheerioAPI) {
             ),
           ],
           order: rowsBefore + rowIndex,
+          public: HEALTH_GOVT_NZ_PRODUCTS_PUBLIC
         };
 
         return setProduct({

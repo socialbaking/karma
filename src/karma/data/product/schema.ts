@@ -85,6 +85,18 @@ export const productData = {
       type: "string",
       nullable: true,
     },
+    generic: {
+      type: "boolean",
+      nullable: true,
+    },
+    branded: {
+      type: "boolean",
+      nullable: true,
+    },
+    public: {
+      type: "boolean",
+      nullable: true,
+    },
   },
   required: ["productName"],
 } as const;

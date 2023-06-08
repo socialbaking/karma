@@ -187,6 +187,7 @@ export interface ProductData extends Record<string, unknown> {
   activeIngredientDescriptions?: string[];
   categoryId?: string;
   generic?: boolean;
+  public?: boolean;
   branded?: boolean;
   genericSearchTerm?: string;
   genericCategoryNames?: string[];
