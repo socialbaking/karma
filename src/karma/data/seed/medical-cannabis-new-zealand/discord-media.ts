@@ -66,7 +66,7 @@ async function saveAttachments(channel: ProductDiscordChannel, message: DiscordM
     if (files.length) {
         const existing = await getProduct(product.productId);
         const fileIds = files.map(({ fileId }) => fileId);
-        const existingFiles = existing.files?.filter(file => !fileIds.includes(file.fileId))
+        const existingFiles = existing.files?.filter(file => !fileIds.includes(file.fileId)) ?? []
         await setProduct({
             ...existing,
             files: existingFiles.concat(
