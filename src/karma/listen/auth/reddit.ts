@@ -48,18 +48,18 @@ type RedditSubscriptionType = "moderator" | "subscriber" | "contributor";
 
 type RedditSubscriptions = Record<RedditSubscriptionType, RedditSubscription[]>;
 
-export async function redditAuthenticationRoutes(fastify: FastifyInstance) {
-  const {
-    REDDIT_CLIENT_ID,
-    REDDIT_CLIENT_SECRET,
-    REDDIT_REDIRECT_URL,
-    REDDIT_SCOPE,
-    REDDIT_NAME,
-    REDDIT_AUTHORIZE_DURATION,
-    REDDIT_FLAIR,
-    REDDIT_FLAIR_EXPIRES_IN_MS: givenExpiresIn,
-  } = process.env;
+export const {
+  REDDIT_CLIENT_ID,
+  REDDIT_CLIENT_SECRET,
+  REDDIT_REDIRECT_URL,
+  REDDIT_SCOPE,
+  REDDIT_NAME,
+  REDDIT_AUTHORIZE_DURATION,
+  REDDIT_FLAIR,
+  REDDIT_FLAIR_EXPIRES_IN_MS: givenExpiresIn,
+} = process.env;
 
+export async function redditAuthenticationRoutes(fastify: FastifyInstance) {
   if (!REDDIT_CLIENT_ID) return;
 
   ok(REDDIT_CLIENT_ID, "Expected REDDIT_CLIENT_ID");

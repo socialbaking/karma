@@ -29,17 +29,18 @@ export interface DiscordGuildMember extends Record<string, unknown> {
   roles: string[];
 }
 
+export const {
+  DISCORD_CLIENT_ID,
+  DISCORD_CLIENT_SECRET,
+  // DISCORD_INVITE_URL,
+  DISCORD_REDIRECT_URL,
+  DISCORD_SERVER_NAME,
+  DISCORD_BOT_PERMISSIONS,
+  DISCORD_BOT_TOKEN,
+  DISCORD_SERVER_ID,
+} = process.env;
+
 export async function discordAuthenticationRoutes(fastify: FastifyInstance) {
-  const {
-    DISCORD_CLIENT_ID,
-    DISCORD_CLIENT_SECRET,
-    // DISCORD_INVITE_URL,
-    DISCORD_REDIRECT_URL,
-    DISCORD_SERVER_NAME,
-    DISCORD_BOT_PERMISSIONS,
-    DISCORD_BOT_TOKEN,
-    DISCORD_SERVER_ID,
-  } = process.env;
 
   if (!DISCORD_CLIENT_ID) return;
 
