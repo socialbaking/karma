@@ -60,7 +60,7 @@ export function getMatchingProducts(
 
   if (organisation) {
     const before = search;
-    search = [organisation.organisationName, ...(organisation.associatedBrandingTerms)]
+    search = [organisation.organisationName, ...(organisation.associatedBrandingTerms ?? [])]
         .reduce(
             (search, term) => search.replace(new RegExp(term, "ig"), ""),
             search
@@ -94,7 +94,7 @@ export function getMatchingProducts(
 
   if (category) {
     const before = search;
-    search = [category.categoryName, ...(category.associatedTerms)]
+    search = [category.categoryName, ...(category.associatedTerms ?? [])]
         .reduce(
             (search, term) => search.replace(new RegExp(term, "ig"), ""),
             search
