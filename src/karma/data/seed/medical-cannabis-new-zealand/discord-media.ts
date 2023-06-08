@@ -55,7 +55,7 @@ async function saveAttachments(product: Product, message: DiscordMessage) {
     if (files.length) {
         await setProduct({
             ...(await getProduct(product.productId)),
-            files
+            files: files.map(({ fileId }) => ({ fileId }))
         });
         console.log(`Added ${files.length} files for ${product.productName}`);
     }
