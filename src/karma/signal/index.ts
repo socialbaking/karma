@@ -63,7 +63,9 @@ export function setExecutionTimeout(url: string) {
 
 export function getExecutionEndAt() {
     const ms = requestContext.get(EXECUTION_END_AT_MS);
-    ok(typeof ms === "number", "Expected EXECUTION_END_AT_MS");
+    if (!ms) {
+        return Date.now() - getExecutionTimeout("/");
+    }
     return ms;
 }
 

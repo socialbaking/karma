@@ -53,8 +53,10 @@ export async function addExpiring(data: Omit<CacheData, "type">) {
 
 export async function addCached(data: CacheData) {
   const store = getCacheStore<unknown>();
-  const roles = getSortedRoles();
-  const key = getCacheKey(data.key, data.role !== false ? roles : []);
+  const roles = data.role ? [] : getSortedRoles();
+  const key = data.stable ?
+      data.key :
+      getCacheKey(data.key, roles);
   const counter = await getGlobalCount();
   const type = data.type || "counter";
   const cached: Cached = {
@@ -67,17 +69,20 @@ export async function addCached(data: CacheData) {
     counter,
     counterType: "global",
   };
+  // console.log({ key, cached });
   await store.set(key, cached);
 }
 
 export async function getCached<T = string>(
-  givenKey: string
+  givenKey: string,
+  stable?: boolean
 ): Promise<T | undefined> {
   const store = getCacheStore<T>();
   const roles = getSortedRoles();
-  const key = getCacheKey(givenKey, roles);
+  const key = stable ? givenKey : getCacheKey(givenKey, roles);
   const countPromise = getGlobalCount();
   const value = await store.get(key);
+  // console.log({ key, value })
   if (!value) return undefined;
   if (!value.type || value.type === "counter") {
     const counter = await countPromise;

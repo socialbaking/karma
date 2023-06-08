@@ -12,8 +12,17 @@ import { pipeline } from "stream/promises";
 import {FileData, getFile, setFile} from "../../file";
 import {S3} from "@aws-sdk/client-s3";
 import {getTimeRemaining} from "../../../signal";
+import {addExpiring, getCached} from "../../cache";
+import {DAY_MS, getExpiresAt} from "../../expiring-kv";
 
 const namespace = "cb541dc3-ffbd-4d9c-923a-d1f4af02fa89";
+
+const CACHE_VERSION = 1;
+const CACHE_KEY_PREFIX = `discord-media:${CACHE_VERSION}`;
+
+// Allow late expiry to allow for background tasks to be slow
+// if wanted, should be replaced in this time
+const CACHE_EXPIRES_IN_MS = 3 * DAY_MS;
 
 // All bots can make up to 50 requests per second to our API.
 // If no authorization header is provided, then the limit is applied to the IP address.
@@ -202,10 +211,30 @@ async function *listMediaMessages(context: DiscordContext, channel: DiscordGuild
         "https://discord.com"
     );
     url.searchParams.set("limit", "100");
-    let responseMessages: DiscordMessage[] = [];
-    while (responseMessages.length && context.requestsRemaining > 0) {
-        if (responseMessages.length) {
-            url.searchParams.set("before", responseMessages.at(-1).id)
+    let responseMessages: MessageWithMS[] = [];
+
+    const afterCacheKey = `${CACHE_KEY_PREFIX}:${channel.id}:listMediaMessages:after`;
+    const messageAfter = await getCached(afterCacheKey, true);
+
+    // console.log({ messageAfter });
+
+    type MessageWithMS = DiscordMessage & { milliseconds: number }
+    let mostRecentMessage: MessageWithMS | undefined = undefined,
+        mostDistantMessage: MessageWithMS | undefined = undefined;
+
+    do {
+        if (messageAfter) {
+            // We're going forward
+            if (mostRecentMessage) {
+                url.searchParams.set("after", mostRecentMessage.id);
+            } else {
+                url.searchParams.set("after", messageAfter)
+            }
+        } else {
+            // We're going back
+            if (mostDistantMessage) {
+                url.searchParams.set("before", mostDistantMessage.id);
+            }
         }
         context.requestsRemaining -= 1;
         const response = await fetch(
@@ -217,13 +246,51 @@ async function *listMediaMessages(context: DiscordContext, channel: DiscordGuild
                 },
             }
         );
-        if (response.status === 404) return;
-        if (response.status === 429) return; // Finish for now, we can try again later
+        if (response.status === 404) break;
+        if (response.status === 429) break; // Finish for now, we can try again later
         ok(response.ok, `listMediaMessages returned ${response.status}`);
         responseMessages = await response.json();
+        responseMessages = responseMessages
+            .map(message => ({
+                ...message,
+                milliseconds: new Date(message.timestamp).getTime()
+            }))
+            // I'm not sure how discord sorts, but let's just force consistency
+            .sort(({ milliseconds: a }, { milliseconds: b }) => {
+                return a < b ? -1 : 1
+            });
+        setMostRecent(responseMessages.at(-1));
+        setDistantRecent(responseMessages.at(0));
         const messages = responseMessages.filter(message => message.attachments?.length);
         if (messages.length) {
             yield messages;
+        }
+    } while (responseMessages.length && context.requestsRemaining > 0)
+
+    if (mostRecentMessage) {
+        await addExpiring({
+            key: afterCacheKey,
+            value: mostRecentMessage.id,
+            role: false,
+            stable: true,
+            expiresAt: getExpiresAt(CACHE_EXPIRES_IN_MS)
+        });
+    }
+
+    function setMostRecent(given?: MessageWithMS) {
+        if (!given) return;
+        if (!mostRecentMessage) {
+            mostRecentMessage = given;
+        } else if (mostRecentMessage.milliseconds < given.milliseconds) {
+            mostRecentMessage = given;
+        }
+    }
+    function setDistantRecent(given?: MessageWithMS) {
+        if (!given) return;
+        if (!mostDistantMessage) {
+            mostDistantMessage = given;
+        } else if (mostDistantMessage.milliseconds > given.milliseconds) {
+            mostDistantMessage = given;
         }
     }
 }
