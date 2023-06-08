@@ -2,8 +2,8 @@ import * as dotenv from "dotenv";
 
 dotenv.config();
 
-import "../../tracing";
+await import("../../tracing");
 
-import { start } from "./start";
+const { start } = await import("./start");
 
 await start();

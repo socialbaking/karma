@@ -3,6 +3,6 @@ import { config } from "dotenv";
 
 config();
 
-import { seed } from "./seed";
+const { seed } = await import("./seed");
 
 await seed({});

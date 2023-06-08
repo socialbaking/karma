@@ -41,6 +41,20 @@ export interface Expiring {
   expiresAt?: string;
 }
 
+export interface FileData extends Record<string, unknown> {
+  fileName: string;
+  contentType: string;
+  size?: number;
+  path?: string;
+  url?: string;
+}
+
+export interface File extends FileData {
+  fileId: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface FormMetaData extends Record<string, unknown> {}
 
 export interface FormMeta extends FormMetaData {
@@ -164,6 +178,10 @@ export interface ProductInfo {
   description?: string;
 }
 
+export interface ProductFile extends FileData {
+  fileId: string;
+}
+
 export interface ProductData extends Record<string, unknown> {
   productName: string;
   order?: number;
@@ -193,6 +211,7 @@ export interface ProductData extends Record<string, unknown> {
   genericCategoryNames?: string[];
   genericAcronym?: string;
   info?: ProductInfo[];
+  files?: ProductFile[];
   obsoleteAt?: string;
 }
 

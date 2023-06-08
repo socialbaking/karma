@@ -1,3 +1,6 @@
+import {FileData} from "../file";
+import {File} from "buffer";
+
 export interface ProductSizeData extends Record<string, unknown> {
   value: string;
   unit: string;
@@ -8,6 +11,10 @@ export interface ProductInfo {
   text: string;
   url?: string;
   description?: string;
+}
+
+export interface ProductFile extends FileData {
+  fileId: string;
 }
 
 export interface ProductData extends Record<string, unknown> {
@@ -39,6 +46,7 @@ export interface ProductData extends Record<string, unknown> {
   genericCategoryNames?: string[];
   genericAcronym?: string;
   info?: ProductInfo[];
+  files?: ProductFile[];
   obsoleteAt?: string;
 }
 
