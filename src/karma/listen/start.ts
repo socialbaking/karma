@@ -23,6 +23,7 @@ import files from "@fastify/static";
 import { errorHandler } from "../view/error";
 import etag from "@fastify/etag";
 import { parseStringFields } from "./body-parser";
+import {signalMiddleware} from "../signal";
 
 const { pathname } = new URL(import.meta.url);
 const directory = dirname(pathname);
@@ -37,6 +38,8 @@ export async function create() {
   });
 
   const register: (...args: unknown[]) => void = app.register.bind(fastify);
+
+  register(signalMiddleware);
 
   register(cookie, {
     secret: COOKIE_SECRET,
