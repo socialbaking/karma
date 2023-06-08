@@ -1,6 +1,6 @@
 import {
   useCategory,
-  useCopyrightInformation,
+  useCopyrightInformation, useData,
   useMetrics,
   useProductMetrics,
   useQuery,
@@ -11,10 +11,12 @@ import ClientProductListItem, {
   ProductProps,
 } from "../../client/components/product/list-item";
 import { SvgTextIcon } from "../../client/components/icons";
+import {COPYRIGHT_PUBLIC_LABEL} from "../../../static";
 
 function ProductListItem(props: ProductProps) {
   const category = useCategory(props.product.categoryId);
-  return <ClientProductListItem {...props} category={category} />;
+  const { isAnonymous } = useData();
+  return <ClientProductListItem {...props} category={category} isAnonymous={isAnonymous} />;
 }
 
 export function Products() {
@@ -22,6 +24,7 @@ export function Products() {
   const copyright = useCopyrightInformation(products);
   const metrics = useProductMetrics("month");
   const search = useQuerySearch();
+  const { isAnonymous } = useData();
   return (
     <>
       <div className="bg-white shadow overflow-hidden sm:rounded-md">
@@ -50,15 +53,15 @@ export function Products() {
             <li key={index} className="flex flex-row items-center my-4">
               {svg ? <img role="presentation" src={svg} /> : undefined}
               <span className="mx-4">
-                This page includes&nbsp;
+                This page includes details derived or about&nbsp;
                 <a
                   href={contentUrl}
                   target="_blank"
                   className="text-blue-600 hover:bg-white underline hover:underline-offset-2"
                 >
-                  content published
+                  {(isAnonymous ? COPYRIGHT_PUBLIC_LABEL[contentUrl] : undefined) || "content"}
                 </a>
-                &nbsp;by&nbsp;
+                &nbsp;published by&nbsp;
                 <a
                   href={copyrightUrl}
                   target="_blank"

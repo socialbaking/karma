@@ -18,6 +18,10 @@ export const COPYRIGHT_LINK: Record<string, string> = {
   [SEARCH_NZULM]: SEARCH_NZULM,
 };
 
+export const COPYRIGHT_PUBLIC_LABEL: Record<string, string> = {
+  [HEALTH_GOVT_NZ_MINIMUM_PRODUCTS]: "Medicinal cannabis products that meet the minimum quality standard",
+}
+
 export const COPYRIGHT_SVG_TEXT: Record<string, string> = {};
 
 export const NZCODE_URL = "https://www.nzcode.com/";

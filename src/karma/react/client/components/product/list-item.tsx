@@ -22,6 +22,7 @@ export interface ProductItemProps extends ProductProps {
   className?: string;
   overrideClassName?: string;
   url?: string; // search path for product
+  isAnonymous?: boolean
 }
 
 export interface PercentageLabelProps extends ActiveIngredient {
@@ -100,6 +101,7 @@ export function ProductListItem({
   overrideClassName,
   className,
   url,
+  isAnonymous,
 }: ProductItemProps) {
   const { productId, sizes, ...attributes } = product;
   const productUrl = `${url || "calculator"}?search=${encodeURIComponent(
@@ -236,7 +238,7 @@ export function ProductListItem({
                   aria-hidden="true"
                 />
                 <p>
-                  {product.generic ? "Typically available" : "Available"} in{" "}
+                  {(product.generic || isAnonymous) ? "Typically available" : "Available"} in{" "}
                   {[...product.sizes]
                     .sort((a, b) => {
                       if (a.unit !== b.unit) {
