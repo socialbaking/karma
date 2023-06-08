@@ -15,6 +15,14 @@ export const fileData = {
       type: "string",
       nullable: true
     },
+    source: {
+      type: "string",
+      nullable: true
+    },
+    synced: {
+      type: "string",
+      nullable: true
+    },
     syncedAt: {
       type: "string",
       nullable: true

@@ -116,7 +116,7 @@ async function saveAttachments(context: DiscordContext, channel: ProductDiscordC
             endpoint: R2_ENDPOINT,
             region: "auto"
         })
-        return saveFiles(async (file, blob) => {
+        return saveFiles(async (file, blob): Promise<Partial<FileData>> => {
             const externalKey = `discord/${file.fileName}`;
             const command = new PutObjectCommand({
                 Key: externalKey,
@@ -126,6 +126,7 @@ async function saveAttachments(context: DiscordContext, channel: ProductDiscordC
             });
             await client.send(command);
             return {
+                synced: "r2",
                 url: new URL(
                     `/${R2_BUCKET}/${externalKey}`,
                     R2_ENDPOINT
@@ -138,17 +139,18 @@ async function saveAttachments(context: DiscordContext, channel: ProductDiscordC
         await mkdir(path, {
             recursive: true
         });
-        return saveFiles(async (file, blob) => {
+        return saveFiles(async (file, blob): Promise<Partial<FileData>> => {
             await writeFile(
                 join(path, file.fileName),
                 Buffer.from(
                     await blob.arrayBuffer()
                 )
             );
+            return { synced: "disk" }
         })
     }
 
-    async function saveFiles(fn: (file: FileData, blob: Blob) => Promise<Partial<FileData> | undefined | void>): Promise<ProductFile[]> {
+    async function saveFiles(fn: (file: FileData, blob: Blob) => Promise<Partial<FileData>>): Promise<ProductFile[]> {
         const uploadedByUsername = getAuthorUsername(message);
         const files: ProductFile[] = [];
         for (const attachment of message.attachments) {
@@ -168,7 +170,8 @@ async function saveAttachments(context: DiscordContext, channel: ProductDiscordC
                 contentType: attachment.content_type,
                 uploadedAt: new Date(message.timestamp).toISOString(),
                 uploadedByUsername,
-                pinned: !!message.pinned
+                pinned: !!message.pinned,
+                source: "discord"
             }
             let update: Partial<FileData>;
             if (getTimeRemaining() > 2500 && context.requestsRemaining > 0) {
