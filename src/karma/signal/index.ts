@@ -4,6 +4,8 @@ import {FastifyPluginAsync} from "fastify";
 
 const ABORT_CONTROLLER = "abortController";
 const ABORT_CONTROLLER_CLEAR_TIMEOUT = "abortControllerClearTimeout";
+const EXECUTION_START_AT_MS = "executionStartAtMilliseconds";
+const EXECUTION_END_AT_MS = "executionEndAtMilliseconds";
 
 export const {
     EXECUTION_TIMEOUT_MS: EXECUTION_TIMEOUT_MS_STRING = "10000"
@@ -36,6 +38,24 @@ export function setExecutionTimeout() {
     requestContext.set(ABORT_CONTROLLER_CLEAR_TIMEOUT, () => {
         clearTimeout(timeout);
     });
+    const now = Date.now()
+    requestContext.set(EXECUTION_START_AT_MS, now);
+    requestContext.set(EXECUTION_END_AT_MS, now + EXECUTION_TIMEOUT_MS);
+}
+
+export function getExecutionEndAt() {
+    const ms = requestContext.get(EXECUTION_END_AT_MS);
+    ok(typeof ms === "number", "Expected EXECUTION_END_AT_MS");
+    return ms;
+}
+
+export function getTimeRemaining() {
+    const now = Date.now();
+    const endAt = getExecutionEndAt();
+    if (now < endAt) {
+        return 0;
+    }
+    return now - endAt;
 }
 
 export function signalExecutionFinish() {
