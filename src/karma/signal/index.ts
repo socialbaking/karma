@@ -1,6 +1,8 @@
 import {requestContext} from "@fastify/request-context";
 import {ok} from "../../is";
 import {FastifyPluginAsync} from "fastify";
+import {isNumberString} from "../calculations";
+import {getOrigin} from "../listen/config";
 
 const ABORT_CONTROLLER = "abortController";
 const ABORT_CONTROLLER_CLEAR_TIMEOUT = "abortControllerClearTimeout";
@@ -11,14 +13,14 @@ export const {
     EXECUTION_TIMEOUT_MS: EXECUTION_TIMEOUT_MS_STRING = "10000"
 } = process.env;
 
-ok(/^\d+$/.test(EXECUTION_TIMEOUT_MS_STRING), "Expected EXECUTION_TIMEOUT_MS to be a number");
+ok(isNumberString(EXECUTION_TIMEOUT_MS_STRING), "Expected EXECUTION_TIMEOUT_MS to be a number");
 const EXECUTION_TIMEOUT_MS = +EXECUTION_TIMEOUT_MS_STRING;
 
 export const EXECUTION_TIMEOUT_REASON = "Execution Timeout";
 
 export const signalMiddleware: FastifyPluginAsync = async (instance) => {
     instance.addHook("onRequest", (request, response, done) => {
-        setExecutionTimeout();
+        setExecutionTimeout(request.url);
         if (response.raw) {
             response.raw.once("close", signalExecutionFinish);
         }
@@ -30,17 +32,33 @@ export const signalMiddleware: FastifyPluginAsync = async (instance) => {
     });
 }
 
-export function setExecutionTimeout() {
+function getExecutionTimeout(url: string) {
+    const { pathname } = new URL(url, getOrigin());
+    const key = pathname
+        .replace(/^\/+/, "")
+        .replace(/\//g, "_")
+        .toUpperCase();
+    const envKey = `EXECUTION_TIMEOUT_MS_${key}`
+    const value = process.env[envKey];
+    if (isNumberString(value)) {
+        console.log(`Using timeout ${value} from ${envKey}`);
+        return +value;
+    }
+    return EXECUTION_TIMEOUT_MS;
+}
+
+export function setExecutionTimeout(url: string) {
+    const timeout = getExecutionTimeout(url);
     const controller = setAbortController();
-    const timeout = setTimeout(() => {
+    const timeoutReference = setTimeout(() => {
         controller.abort(EXECUTION_TIMEOUT_REASON)
-    }, EXECUTION_TIMEOUT_MS);
+    }, timeout);
     requestContext.set(ABORT_CONTROLLER_CLEAR_TIMEOUT, () => {
-        clearTimeout(timeout);
+        clearTimeout(timeoutReference);
     });
     const now = Date.now()
     requestContext.set(EXECUTION_START_AT_MS, now);
-    requestContext.set(EXECUTION_END_AT_MS, now + EXECUTION_TIMEOUT_MS);
+    requestContext.set(EXECUTION_END_AT_MS, now + timeout);
 }
 
 export function getExecutionEndAt() {
