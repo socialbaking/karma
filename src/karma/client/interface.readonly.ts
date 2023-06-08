@@ -178,7 +178,7 @@ export interface ProductInfo {
   description?: string;
 }
 
-export interface ProductFile extends FileData {
+export interface ProductFile extends Partial<FileData> {
   fileId: string;
 }
 

@@ -40,11 +40,12 @@ export async function seedDiscordMedia() {
 async function downloadMediaFromChannel(channel: ProductDiscordChannel) {
     const messages = await listMediaMessages(channel);
     for (const message of messages) {
-        await saveAttachments(channel.product, message);
+        await saveAttachments(channel, message);
     }
 }
 
-async function saveAttachments(product: Product, message: DiscordMessage) {
+async function saveAttachments(channel: ProductDiscordChannel, message: DiscordMessage) {
+    const { product } = channel
     const path = DISCORD_MEDIA_OFFLINE_STORE;
     let files: ProductFile[] = [];
     if (R2_ACCESS_KEY_ID && R2_ACCESS_KEY_SECRET && R2_BUCKET && R2_ENDPOINT) {
@@ -105,7 +106,7 @@ async function saveAttachments(product: Product, message: DiscordMessage) {
     async function saveFiles(fn: (file: FileData, blob: Blob) => Promise<Partial<FileData> | undefined | void>): Promise<ProductFile[]> {
         const files: ProductFile[] = [];
         for (const attachment of message.attachments) {
-            const key = `${DISCORD_SERVER_ID}:${message.id}:${attachment.filename}`;
+            const key = `${DISCORD_SERVER_ID}:${channel.id}:${message.id}:${attachment.filename}`;
             // Stable file ID
             const fileId = v5(`file:${key}`, namespace);
             const existing = await getFile(fileId);
@@ -124,7 +125,7 @@ async function saveAttachments(product: Product, message: DiscordMessage) {
                 }
             );
             const blob = await response.blob();
-            const fileName = `${v5(key, namespace)}${extname(attachment.filename)}`;
+            const fileName = `${channel.name}-${v5(key, namespace)}${extname(attachment.filename)}`;
             const data: FileData = {
                 fileName,
                 size: attachment.size,
