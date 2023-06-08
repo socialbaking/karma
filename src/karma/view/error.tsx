@@ -31,6 +31,7 @@ export function errorHandler(
       categories={[]}
       metrics={[]}
       user={user}
+      isAuthenticatedTrusted={!!process.env.AUTHENTICATED_IS_TRUSTED}
     />
   );
 

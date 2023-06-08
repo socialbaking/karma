@@ -37,6 +37,7 @@ export interface Data {
   organisations: Organisation[];
   metrics: CountryProductMetrics[];
   roles?: AuthenticationRole[];
+  isAuthenticatedTrusted?: boolean;
 }
 
 export const DataContext = createContext<Data | undefined>(undefined);
@@ -367,10 +368,14 @@ function isRole(
 }
 
 export function useIsTrusted() {
+  const { isAuthenticatedTrusted } = useData();
   const roles = useRoles();
   return useMemo(() => {
+    if (isAuthenticatedTrusted) {
+      return !!roles.length;
+    }
     return !!TRUSTED_ROLE.find((role) => isRole(roles, role));
-  }, [roles]);
+  }, [roles, isAuthenticatedTrusted]);
 }
 
 export function useIsModerator() {

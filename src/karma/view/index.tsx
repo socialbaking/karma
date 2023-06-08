@@ -141,6 +141,7 @@ export async function viewRoutes(fastify: FastifyInstance) {
             query={request.query}
             body={request.body}
             user={user}
+            isAuthenticatedTrusted={!!process.env.AUTHENTICATED_IS_TRUSTED}
           />
         );
 
