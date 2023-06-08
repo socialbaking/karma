@@ -903,7 +903,7 @@ export async function seedProducts() {
 export async function seedPolls() {
 
   const dir = directory.replace("esnext", "src");
-  const paths = await readdir(dir);
+  const paths = await readdir(dir).catch((): string[] => []);
   const jsonFiles = paths.filter(path => extname(path) === ".json");
 
   console.log(paths.map(value => extname(value)));
