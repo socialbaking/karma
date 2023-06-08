@@ -12,6 +12,7 @@ export async function setFile(
     updatedAt: createdAt,
     createdAt,
     ...data,
+    uploadedAt: data.uploadedAt || createdAt,
     fileId,
   };
   await store.set(fileId, meta);

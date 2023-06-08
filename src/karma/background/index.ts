@@ -213,12 +213,13 @@ export async function background(input: BackgroundInput = {}) {
 
   if (isQueryInput(input) && input.query.seed) {
     await seed();
+  } else {
+    const queue = getReportQueueStore();
+    const references = await queue.values();
+    await calculateQueuedReportMetrics(references);
+    await calculateQueuedMetrics(references);
   }
 
-  const queue = getReportQueueStore();
-  const references = await queue.values();
-  await calculateQueuedReportMetrics(references);
-  await calculateQueuedMetrics(references);
 
   await complete({
     // someCompletedData: "complete"

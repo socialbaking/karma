@@ -38,13 +38,23 @@ export async function seedDiscordMedia() {
 }
 
 async function downloadMediaFromChannel(channel: ProductDiscordChannel) {
-    const messages = await listMediaMessages(channel);
-    for (const message of messages) {
-        await saveAttachments(channel, message);
+    for await (const messages of listMediaMessages(channel)) {
+        for (const message of messages) {
+            await saveAttachments(channel, message);
+        }
     }
 }
 
+function getAuthorUsername(message: DiscordMessage) {
+    const { author } = message;
+    if (!author.discriminator || author.discriminator === "0" || author.discriminator === "0000") {
+        return author.username;
+    }
+    return `${author.username}#${author.discriminator}`;
+}
+
 async function saveAttachments(channel: ProductDiscordChannel, message: DiscordMessage) {
+    // console.log(message);
     const { product } = channel
     const path = DISCORD_MEDIA_OFFLINE_STORE;
     let files: ProductFile[] = [];
@@ -54,9 +64,14 @@ async function saveAttachments(channel: ProductDiscordChannel, message: DiscordM
         files = await saveLocal();
     }
     if (files.length) {
+        const existing = await getProduct(product.productId);
+        const fileIds = files.map(({ fileId }) => fileId);
+        const existingFiles = existing.files?.filter(file => !fileIds.includes(file.fileId))
         await setProduct({
-            ...(await getProduct(product.productId)),
-            files: files.map(({ fileId }) => ({ fileId }))
+            ...existing,
+            files: existingFiles.concat(
+                files.map(({ fileId, pinned }) => ({ fileId, pinned }))
+            )
         });
         console.log(`Added ${files.length} files for ${product.productName}`);
     }
@@ -77,7 +92,7 @@ async function saveAttachments(channel: ProductDiscordChannel, message: DiscordM
                 Key: externalKey,
                 Bucket: R2_BUCKET,
                 Body: Buffer.from(await blob.arrayBuffer()),
-                ContentType: file.contentType
+                ContentType: file.contentType,
             });
             await client.send(command);
             return {
@@ -104,6 +119,7 @@ async function saveAttachments(channel: ProductDiscordChannel, message: DiscordM
     }
 
     async function saveFiles(fn: (file: FileData, blob: Blob) => Promise<Partial<FileData> | undefined | void>): Promise<ProductFile[]> {
+        const uploadedByUsername = getAuthorUsername(message);
         const files: ProductFile[] = [];
         for (const attachment of message.attachments) {
             const key = `${DISCORD_SERVER_ID}:${channel.id}:${message.id}:${attachment.filename}`;
@@ -130,6 +146,9 @@ async function saveAttachments(channel: ProductDiscordChannel, message: DiscordM
                 fileName,
                 size: attachment.size,
                 contentType: attachment.content_type,
+                uploadedAt: new Date(message.timestamp).toISOString(),
+                uploadedByUsername,
+                pinned: !!message.pinned
             }
             files.push({
                 ...data,
@@ -141,13 +160,12 @@ async function saveAttachments(channel: ProductDiscordChannel, message: DiscordM
     }
 }
 
-async function listMediaMessages(channel: DiscordGuildChannel): Promise<DiscordMessage[]> {
+async function *listMediaMessages(channel: DiscordGuildChannel): AsyncIterable<DiscordMessage[]> {
     const url = new URL(
         `/api/v10/channels/${channel.id}/messages`,
         "https://discord.com"
     );
     url.searchParams.set("limit", "100");
-    const messages: DiscordMessage[] = [];
     let responseMessages: DiscordMessage[] = [];
     do {
         if (responseMessages.length) {
@@ -165,10 +183,11 @@ async function listMediaMessages(channel: DiscordGuildChannel): Promise<DiscordM
         if (response.status === 404) return undefined;
         ok(response.ok, `listMediaMessages returned ${response.status}`);
         responseMessages = await response.json();
-        const mediaMessages = responseMessages.filter(message => message.attachments?.length);
-        messages.push(...mediaMessages);
+        const messages = responseMessages.filter(message => message.attachments?.length);
+        if (messages.length) {
+            yield messages;
+        }
     } while (responseMessages.length);
-    return messages;
 }
 
 interface DiscordAttachment {
