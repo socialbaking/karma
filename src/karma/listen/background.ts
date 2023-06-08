@@ -4,6 +4,8 @@ import { background } from "../background";
 export async function backgroundRoutes(fastify: FastifyInstance) {
   fastify.get("/background", {
     async handler(request, response) {
+      console.log(request.headers);
+
       await background({
         query: request.query,
       });
