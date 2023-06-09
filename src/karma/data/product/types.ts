@@ -1,5 +1,4 @@
 import {FileData} from "../file";
-import {File} from "buffer";
 
 export interface ProductSizeData extends Record<string, unknown> {
   value: string;

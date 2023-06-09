@@ -190,7 +190,7 @@ export async function viewRoutes(fastify: FastifyInstance) {
 
     const handler = createPathHandler(path, {}, isPathCached);
 
-    console.log({ path, anonymous, isPathCached });
+    // console.log({ path, anonymous, isPathCached });
 
     const preHandler = authenticate(fastify, {
       anonymous: pathsAnonymous[path] || !!ALLOW_ANONYMOUS_VIEWS,

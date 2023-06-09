@@ -1,8 +1,6 @@
-import { getKeyValueStore } from "../storage";
+import { getProductStore as getStore } from "@opennetwork/logistics";
 import { Product } from "./types";
 
-const STORE_NAME = "product" as const;
-
 export function getProductStore<P extends Product = Product>() {
-  return getKeyValueStore<P>(STORE_NAME);
+  return getStore<P>();
 }

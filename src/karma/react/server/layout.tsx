@@ -337,7 +337,7 @@ export function Layout(props: PropsWithChildren<LayoutProps>) {
   const search = useQuerySearch();
   const isTrusted = useIsTrusted();
   const userMenuItems = items.filter(({ trusted }) => !trusted || isTrusted);
-  console.log(userMenuItems.map((value) => value.path));
+  // console.log(userMenuItems.map((value) => value.path));
   return (
     <BaseLayout {...props}>
       <div>
