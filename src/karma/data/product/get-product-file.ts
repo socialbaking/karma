@@ -39,9 +39,10 @@ export interface GetProductFileOptions extends GetProductFileListOptions {
     fileId?: string;
     accept?: string;
     index?: number;
+    public?: boolean;
 }
 
-export async function getProductFile(productId: string, { fileId, accept, index }: GetProductFileOptions = {}): Promise<File | undefined> {
+export async function getProductFile(productId: string, { fileId, accept, index, public: isPublic }: GetProductFileOptions = {}): Promise<File | undefined> {
     if (fileId) {
         const file = await getNamedFile("product", productId, fileId);
         // Must be synced already to be able to get it
@@ -53,6 +54,7 @@ export async function getProductFile(productId: string, { fileId, accept, index 
     console.log({ files, pinned });
     if (pinned.length === 1) return getResolvedFile(pinned[0]);
     if (pinned.length) return getResolvedFile(pinned[index ?? pickIndex(pinned.length)])
+    if (isPublic) return undefined;
     return getResolvedFile(files[index ?? pickIndex(files.length)]);
 
     function pickIndex(length: number) {

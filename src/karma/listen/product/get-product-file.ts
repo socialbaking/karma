@@ -9,7 +9,8 @@ export async function getProductFileRoutes(fastify: FastifyInstance) {
 
     async function handleProductId(productId: string, response: FastifyReply) {
         const image = await getProductFile(productId, {
-            accept: "image"
+            accept: "image",
+            public: isAnonymous()
         });
         if (!image) {
             response.status(404);
