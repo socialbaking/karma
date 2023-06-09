@@ -66,7 +66,7 @@ export async function seedDiscordMedia() {
     if (!channels.length) {
         console.log("No channels matching product names");
     } else {
-        console.log(channels.map(channel => channel.name));
+        console.log(channels.map(channel => `${channel.name}: ${channel.product.productName}`));
     }
 
     const sortOrder = new Map(
@@ -89,6 +89,7 @@ export async function seedDiscordMedia() {
         };
         console.log(`Requests Remaining: ${context.requestsRemaining}`);
         await downloadMediaFromChannel(nextContext, channel);
+        if (!isRequiredTimeRemaining(TIMEOUT_BUFFER_MS)) break;
         if (context.requestsRemaining <= 0) break;
         const used = givenRemaining - Math.max(0, nextContext.requestsRemaining);
         context.requestsRemaining -= used;
@@ -380,8 +381,7 @@ async function *listMediaMessages(context: DiscordContext, channel: DiscordGuild
         if (messages.length) {
             yield messages;
         }
-    } while (responseMessages.length >= MESSAGE_LIMIT_PER_REQUEST && (context.requestsRemaining > 0));
-
+    } while (responseMessages.length >= MESSAGE_LIMIT_PER_REQUEST && (context.requestsRemaining > 0) && isRequiredTimeRemaining(TIMEOUT_BUFFER_MS));
 
     if (mostRecentMessage) {
         await addExpiring({

@@ -106,12 +106,15 @@ export function setAbortController() {
     return controller;
 }
 
+function getMaybeAbortController(): AbortController | undefined {
+    return requestContext.get(ABORT_CONTROLLER);
+}
 function getAbortController() {
-    const controller = requestContext.get(ABORT_CONTROLLER);
+    const controller = getMaybeAbortController();
     ok(controller, "Expected AbortController to be available");
     return controller;
 }
 
 export function getSignal() {
-    return getAbortController().signal;
+    return getMaybeAbortController()?.signal;
 }
