@@ -12,11 +12,16 @@ import {getTimeRemaining, isRequiredTimeRemaining, getSignal} from "../../../sig
 import {addExpiring, getCached} from "../../cache";
 import {DAY_MS, getExpiresAt, MONTH_MS} from "../../storage";
 import {R2_ACCESS_KEY_SECRET, R2_ACCESS_KEY_ID, R2_ENDPOINT, R2_BUCKET, r2Config} from "../../file/r2";
-import {DISCORD_MEDIA_OFFLINE_STORE, DISCORD_MEDIA_DEBUG, DISCORD_MEDIA_PARENT_CHANNEL_NAME} from "../../file/discord";
+import {
+    DISCORD_MEDIA_OFFLINE_STORE,
+    DISCORD_MEDIA_DEBUG,
+    DISCORD_MEDIA_PARENT_CHANNEL_NAME,
+    DISCORD_MEDIA_VERSION
+} from "../../file/discord";
 
 const namespace = "cb541dc3-ffbd-4d9c-923a-d1f4af02fa89";
 
-const VERSION = 11;
+const VERSION = DISCORD_MEDIA_VERSION || "12";
 const CACHE_KEY_PREFIX = `discord-media:${VERSION}`;
 
 const MATCH_CONTENT_TYPE = ["image", "video"];
