@@ -1,6 +1,5 @@
 import { Product } from "./types";
 import { getProductStore } from "./store";
-import {listNamedFiles} from "../file";
 
 export interface ListProductsInput {
   // Only return generic products
@@ -13,7 +12,7 @@ export async function listProducts<P extends Product = Product>(options: ListPro
     P[]
 > {
   const store = getProductStore<P>();
-  let products = await store.values();
+  let products: P[] = await store.values();
   if (options.public) {
     // Force public only
     products = products.filter(value => value.public);

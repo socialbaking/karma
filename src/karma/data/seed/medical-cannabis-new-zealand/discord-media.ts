@@ -21,7 +21,7 @@ import {
 
 const namespace = "cb541dc3-ffbd-4d9c-923a-d1f4af02fa89";
 
-const VERSION = +(DISCORD_MEDIA_VERSION || "12");
+const VERSION = +(DISCORD_MEDIA_VERSION || "13");
 const CACHE_KEY_PREFIX = `discord-media:${VERSION}`;
 
 const MATCH_CONTENT_TYPE = ["image", "video"];
@@ -152,7 +152,14 @@ function getFileData(channel: ProductDiscordChannel, message: DiscordMessage) {
     const { product } = channel;
     return message.attachments.map((attachment): IdFileData => {
 
-        const key = `${DISCORD_SERVER_ID}:${channel.id}:${attachment.filename}`;
+        const key = [
+            DISCORD_SERVER_ID,
+            channel.id,
+            message.id,
+            attachment.id,
+            attachment.filename
+        ].join(":");
+
         // Stable file ID
         const fileId = v5(`file:${key}`, namespace);
         const fileName = `${channel.name}-${v5(key, namespace)}${extname(attachment.filename)}`;
