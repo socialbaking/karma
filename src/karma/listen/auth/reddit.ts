@@ -16,7 +16,7 @@ import {
   getExternalUser,
 } from "../../data";
 import { packageIdentifier } from "../../package";
-import { getExpiresAt, MONTH_MS } from "../../data/expiring-kv";
+import { getExpiresAt, MONTH_MS } from "../../data/storage";
 
 interface RedditUserContent extends Record<string, unknown> {
   author_flair_text?: string;

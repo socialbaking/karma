@@ -10,7 +10,7 @@ import {
   EXTERNAL_STATE_ID_SEPARATOR,
   getAuthenticationStateStore,
 } from "./store";
-import { getExpiresAt } from "../expiring-kv";
+import { getExpiresAt } from "../storage";
 import { setAuthenticationState } from "./set-authentication-state";
 
 export async function addCookieState(data: Partial<AuthenticationStateData>) {

@@ -12,8 +12,8 @@ import {
   getBackgroundStore,
   getReportQueueStore,
 } from "../karma/data";
-import { KeyValueStore } from "../karma/data/types";
-import { isRedis } from "../karma/data/redis-client";
+import { KeyValueStore } from "../karma/data/storage";
+import { isRedis } from "../karma/data/storage";
 
 // Default full consent for calculations
 const calculationConsent = getCompleteCalculationConsent();

@@ -1,4 +1,4 @@
-import { getExpiringStore, MONTH_MS } from "../expiring-kv";
+import { getExpiringStore, MONTH_MS } from "../storage";
 import { ExternalUserReference, User } from "./types";
 import { AuthenticationStateType } from "../authentication-state";
 import { createHash } from "crypto";

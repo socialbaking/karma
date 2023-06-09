@@ -4,7 +4,7 @@ import {
   DEFAULT_AUTHENTICATION_STATE_EXPIRES_MS,
   getAuthenticationStateStore,
 } from "./store";
-import { getExpiresAt } from "../expiring-kv";
+import { getExpiresAt } from "../storage";
 
 export async function setAuthenticationState(
   data: AuthenticationStateData & Partial<AuthenticationState>

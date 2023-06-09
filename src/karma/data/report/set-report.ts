@@ -7,7 +7,7 @@ import {
     getReportStore,
 } from "./store";
 import { ReportReference, ReportReferenceData } from "./reference";
-import { getExpiresAt } from "../expiring-kv";
+import { getExpiresAt } from "../storage";
 import { getReportDates } from "../../calculations";
 import { getAuthenticationRoles } from "../../authentication";
 

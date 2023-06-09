@@ -1,4 +1,4 @@
-import { getExpiringStore } from "../expiring-kv";
+import { getExpiringStore } from "../storage";
 import { ReportMetrics, CountryProductMetrics } from "./types";
 import { Expiring } from "../expiring";
 

@@ -26,6 +26,10 @@ export const fileData = {
     syncedAt: {
       type: "string",
       nullable: true
+    },
+    version: {
+      type: "number",
+      nullable: true
     }
   },
   additionalProperties: true,

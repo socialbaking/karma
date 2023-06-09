@@ -5,10 +5,10 @@ import {
   getCacheStore,
   PAGE_EXPIRES_IN_MS,
 } from "./store";
-import { getGlobalCount } from "../kv";
+import { getGlobalCount } from "../storage";
 import { Cached, CacheData } from "./types";
 import { getOrigin } from "../../listen/config";
-import { getExpiresAt } from "../expiring-kv";
+import { getExpiresAt } from "../storage";
 import { commit, packageIdentifier } from "../../package";
 
 function getSortedRoles() {

@@ -1,4 +1,4 @@
-import { DAY_MS, getExpiringStore, MINUTE_MS } from "../expiring-kv";
+import { DAY_MS, getExpiringStore, MINUTE_MS } from "../storage";
 import { AuthenticationState } from "./types";
 
 const STORE_NAME = "authenticationState";

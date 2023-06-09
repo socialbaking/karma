@@ -1,6 +1,6 @@
 import { Report } from "./types";
 import { ReportReference } from "./reference";
-import { getExpiringStore, MONTH_MS } from "../expiring-kv";
+import { getExpiringStore, MONTH_MS } from "../storage";
 
 // We want the report to stay around a little longer than the
 // reference in the queue

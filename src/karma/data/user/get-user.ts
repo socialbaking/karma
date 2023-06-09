@@ -6,7 +6,7 @@ import {
 } from "./store";
 import { AuthenticationStateType } from "../authentication-state";
 import { ok } from "../../../is";
-import { getExpiresAt } from "../expiring-kv";
+import { getExpiresAt } from "../storage";
 import { addExternalUser } from "./add-user";
 import { User } from "./types";
 

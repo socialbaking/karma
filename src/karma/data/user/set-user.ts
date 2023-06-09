@@ -1,6 +1,6 @@
 import { User, UserData } from "./types";
 import { v4 } from "uuid";
-import { getExpiresAt } from "../expiring-kv";
+import { getExpiresAt } from "../storage";
 import { DEFAULT_USER_EXPIRES_IN_MS, getUserStore } from "./store";
 
 export async function setUser(data: UserData & Partial<User>) {

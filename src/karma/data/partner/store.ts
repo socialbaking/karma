@@ -1,4 +1,4 @@
-import { getKeyValueStore } from "../kv";
+import { getKeyValueStore } from "../storage";
 import { Partner } from "./types";
 
 const STORE_NAME = "partner" as const;

@@ -1,4 +1,4 @@
-import { getKeyValueStore } from "../kv";
+import { getKeyValueStore } from "../storage";
 import { Category } from "./types";
 const STORE_NAME = "category";
 

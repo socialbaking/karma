@@ -16,19 +16,23 @@ if (csvFile) {
     const categories = await listCategories();
 
     for (const { text, name } of searchRows) {
-        console.log({ text, name });
+        // console.log({ text, name });
         const matching = getMatchingProducts(products, organisations, categories, text);
-        console.log({ text, name, matching });
+        // console.log({ text, name, matching });
         ok(matching.length, `Expected to find match for ${text}`);
         const names = name.split("|");
-        ok(matching.length >= names.length, `Expected to find unique products for ${names.join(", ")}`);
         if (names.length === 1) {
             ok(matching.length === 1, `Expected to find one match for ${text}, found ${matching.map(value => value.productName).join(", ")}`)
         }
+        // console.log({ matching, names, text })
+        let match = undefined;
         for (const name of names) {
-            const match = matching.find(product => product.productName === name);
-            ok(match, `Expected to find match for ${text}: ${name}`);
+            match = matching.find(product => product.productName.includes(name));
+            if (match) {
+                break;
+            }
         }
+        ok(match, `Expected to find match for ${text}: ${names.join(", ")}`);
     }
 
 

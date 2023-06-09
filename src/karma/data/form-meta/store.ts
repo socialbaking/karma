@@ -1,4 +1,4 @@
-import { getKeyValueStore } from "../kv";
+import { getKeyValueStore } from "../storage";
 import { FormMeta } from "./types";
 
 const STORE_NAME = "formMeta";

@@ -1,4 +1,4 @@
-import { getKeyValueStore } from "../kv";
+import { getKeyValueStore } from "../storage";
 import { SystemLog } from "./types";
 
 const STORE_NAME = "systemLog" as const;

@@ -22,7 +22,7 @@ import { isLike, ok } from "../../is";
 import { mean } from "simple-statistics";
 import { getCountry } from "countries-and-timezones";
 import { DateTime } from "luxon";
-import { KeyValueStore } from "../data/types";
+import { KeyValueStore } from "../data/storage";
 import {
   CalculationConfig,
   CalculationContext,
@@ -31,7 +31,7 @@ import {
   isNumberString,
   toHumanNumberString,
 } from "../calculations";
-import { DAY_MS, getExpiresAt, MONTH_MS } from "../data/expiring-kv";
+import { DAY_MS, getExpiresAt, MONTH_MS } from "../data/storage";
 
 export const REPORTING_DATE_KEY: keyof ReportDateData = "orderedAt";
 

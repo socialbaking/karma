@@ -1,4 +1,4 @@
-import { getKeyValueStore } from "../kv";
+import { getKeyValueStore } from "../storage";
 import { AccessToken } from "./types";
 
 const STORE_NAME = "accessToken";

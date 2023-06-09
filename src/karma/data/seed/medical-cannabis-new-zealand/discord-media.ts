@@ -10,12 +10,12 @@ import {mkdir, writeFile} from "fs/promises";
 import {FileData, getFile, setFile} from "../../file";
 import {getTimeRemaining} from "../../../signal";
 import {addExpiring, getCached} from "../../cache";
-import {DAY_MS, getExpiresAt} from "../../expiring-kv";
+import {DAY_MS, getExpiresAt} from "../../storage";
 
 const namespace = "cb541dc3-ffbd-4d9c-923a-d1f4af02fa89";
 
-const CACHE_VERSION = 3;
-const CACHE_KEY_PREFIX = `discord-media:${CACHE_VERSION}`;
+const VERSION = 4;
+const CACHE_KEY_PREFIX = `discord-media:${VERSION}`;
 
 // Allow late expiry to allow for background tasks to be slow
 // if wanted, should be replaced in this time
@@ -97,7 +97,10 @@ async function saveAttachments(context: DiscordContext, channel: ProductDiscordC
         await setProduct({
             ...existing,
             files: existingFiles.concat(
-                files.map(({ fileId, pinned }) => ({ fileId, pinned }))
+                files.map(({ fileId, pinned, source }) => {
+                    const found = existing.files?.find(file => file.fileId === fileId);
+                    return { ...found, fileId, pinned: pinned || found.pinned, source };
+                })
             )
         });
         console.log(`Added ${files.length} files for ${product.productName}`);
@@ -157,19 +160,26 @@ async function saveAttachments(context: DiscordContext, channel: ProductDiscordC
             const fileId = v5(`file:${key}`, namespace);
             const existing = await getFile(fileId);
             if (existing && (!isTimeRemaining || existing?.syncedAt) && !DISCORD_MEDIA_DEBUG) {
-                files.push(existing);
-                continue;
+                // Only use if version matches
+                // Allows re-fetching
+                if (existing.version === VERSION) {
+                    files.push(existing);
+                    continue;
+                }
             }
             const fileName = `${channel.name}-${v5(key, namespace)}${extname(attachment.filename)}`;
             const data: FileData = {
+                type: "product",
+                productId: product.productId,
                 fileName,
                 size: attachment.size,
                 contentType: attachment.content_type,
                 uploadedAt: new Date(message.timestamp).toISOString(),
                 uploadedByUsername,
                 pinned: !!message.pinned,
-                source: "discord"
-            }
+                source: "discord",
+                version: VERSION
+            };
             let update: Partial<FileData>;
             if (getTimeRemaining() > 2500 && context.requestsRemaining > 0) {
                 context.requestsRemaining -= 1;
@@ -216,7 +226,7 @@ async function *listMediaMessages(context: DiscordContext, channel: DiscordGuild
     const afterCacheKey = `${CACHE_KEY_PREFIX}:${channel.id}:listMediaMessages:after`;
     const messageAfter = await getCached(afterCacheKey, true);
 
-    console.log({ messageAfter });
+    // console.log({ messageAfter });
 
     type MessageWithMS = DiscordMessage & { milliseconds: number }
     let mostRecentMessage: MessageWithMS | undefined = undefined,
@@ -261,7 +271,7 @@ async function *listMediaMessages(context: DiscordContext, channel: DiscordGuild
             });
         setMostRecent(responseMessages.at(-1));
         setDistantRecent(responseMessages.at(0));
-        console.log({ mostDistantMessage, mostRecentMessage });
+        // console.log({ mostDistantMessage, mostRecentMessage });
         const messages = responseMessages.filter(message => message.attachments?.length);
         if (messages.length) {
             yield messages;

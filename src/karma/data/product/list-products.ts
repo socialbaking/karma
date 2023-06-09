@@ -1,6 +1,5 @@
 import { Product } from "./types";
 import { getProductStore } from "./store";
-import {isAnonymous} from "../../authentication";
 
 export interface ListProductsInput {
   // Only return generic products
@@ -14,7 +13,7 @@ export async function listProducts<P extends Product = Product>(options: ListPro
 > {
   const store = getProductStore<P>();
   let products = await store.values();
-  if (isAnonymous() || options.public) {
+  if (options.public) {
     // Force public only
     products = products.filter(value => value.public);
   }

@@ -18,7 +18,7 @@ import { createHash } from "crypto";
 import { getClientIp } from "request-ip";
 import { v4 } from "uuid";
 import jsonwebtoken from "jsonwebtoken";
-import { getExpiresAt } from "../../data/expiring-kv";
+import { getExpiresAt } from "../../data/storage";
 
 ok(jsonwebtoken.decode);
 
