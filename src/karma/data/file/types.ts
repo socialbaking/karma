@@ -24,3 +24,8 @@ export interface File extends FileData {
   updatedAt: string;
   uploadedAt: string;
 }
+
+export interface ResolvedFile extends File {
+  url: string;
+  synced: FileUploadedSynced;
+}

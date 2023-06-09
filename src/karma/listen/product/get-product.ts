@@ -1,6 +1,7 @@
 import { FastifyInstance } from "fastify";
 import { getProduct, productSchema } from "../../data";
 import { authenticate } from "../authentication";
+import {isAnonymous} from "../../authentication";
 
 export async function getProductRoutes(fastify: FastifyInstance) {
   const params = {
@@ -41,11 +42,15 @@ export async function getProductRoutes(fastify: FastifyInstance) {
 
   fastify.get<Schema>("/:productId", {
     schema,
-    preHandler: authenticate(fastify),
+    preHandler: authenticate(fastify, { anonymous: true }),
     async handler(request, response) {
       const product = await getProduct(request.params.productId);
-      if (!product) response.status(404);
-      response.send(product);
+      if (!product || (isAnonymous() && !product.public)) {
+        response.status(404);
+        response.send();
+      }  else {
+        response.send(product);
+      }
     },
   });
 }

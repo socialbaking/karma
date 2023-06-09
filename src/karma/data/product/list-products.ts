@@ -23,7 +23,3 @@ export async function listProducts<P extends Product = Product>(options: ListPro
   }
   return products;
 }
-
-export function listProductFiles(productId: string) {
-  return listNamedFiles("product", productId);
-}

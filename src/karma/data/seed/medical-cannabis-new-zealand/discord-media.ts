@@ -11,6 +11,8 @@ import {FileData, getFile, getNamedFile, setFile} from "../../file";
 import {getTimeRemaining} from "../../../signal";
 import {addExpiring, getCached} from "../../cache";
 import {DAY_MS, getExpiresAt} from "../../storage";
+import {R2_ACCESS_KEY_SECRET, R2_ACCESS_KEY_ID, R2_ENDPOINT, R2_BUCKET, r2Config} from "../../file/r2";
+import {DISCORD_MEDIA_OFFLINE_STORE, DISCORD_MEDIA_DEBUG, DISCORD_MEDIA_PARENT_CHANNEL_NAME} from "../../file/discord";
 
 const namespace = "cb541dc3-ffbd-4d9c-923a-d1f4af02fa89";
 
@@ -29,16 +31,6 @@ const CACHE_EXPIRES_IN_MS = 3 * DAY_MS;
 
 // We must keep some requests available for auth operations
 const DEFAULT_MAX_REQUESTS = 35;
-
-const {
-    R2_ACCESS_KEY_ID,
-    R2_ACCESS_KEY_SECRET,
-    R2_BUCKET,
-    R2_ENDPOINT,
-    DISCORD_MEDIA_OFFLINE_STORE,
-    DISCORD_MEDIA_PARENT_CHANNEL_NAME,
-    DISCORD_MEDIA_DEBUG,
-} = process.env
 
 interface DiscordContext {
     requestsRemaining: number;
@@ -92,14 +84,7 @@ async function saveAttachments(context: DiscordContext, channel: ProductDiscordC
 
     async function saveR2() {
         const { S3Client, PutObjectCommand } = await import("@aws-sdk/client-s3");
-        const client = new S3Client({
-            credentials: {
-                accessKeyId: R2_ACCESS_KEY_ID,
-                secretAccessKey: R2_ACCESS_KEY_SECRET,
-            },
-            endpoint: R2_ENDPOINT,
-            region: "auto"
-        })
+        const client = new S3Client(r2Config);
         return saveFiles(async (file, blob): Promise<Partial<FileData>> => {
             const externalKey = `discord/${file.fileName}`;
             const command = new PutObjectCommand({
@@ -112,7 +97,7 @@ async function saveAttachments(context: DiscordContext, channel: ProductDiscordC
             return {
                 synced: "r2",
                 url: new URL(
-                    `/${R2_BUCKET}/${externalKey}`,
+                    `/${externalKey}`,
                     R2_ENDPOINT
                 ).toString()
             }

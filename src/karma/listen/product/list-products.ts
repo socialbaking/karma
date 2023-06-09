@@ -1,6 +1,7 @@
 import { FastifyInstance, FastifyRequest } from "fastify";
 import { listProducts, productSchema } from "../../data";
 import { authenticate } from "../authentication";
+import {isAnonymous} from "../../authentication";
 
 export async function listProductRoutes(fastify: FastifyInstance) {
   const response = {
@@ -24,9 +25,11 @@ export async function listProductRoutes(fastify: FastifyInstance) {
 
   fastify.get("/", {
     schema,
-    preHandler: authenticate(fastify),
+    preHandler: authenticate(fastify, { anonymous: true }),
     async handler(request: FastifyRequest, response) {
-      response.send(await listProducts());
+      response.send(await listProducts({
+        public: isAnonymous()
+      }));
     },
   });
 }

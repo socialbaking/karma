@@ -6,3 +6,4 @@ export * from "./add-product";
 export * from "./set-product";
 export * as productSchema from "./schema";
 export * from "./is";
+export * from "./get-product-file";

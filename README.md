@@ -119,6 +119,11 @@ export interface File extends FileData {
   uploadedAt: string;
 }
 
+export interface ResolvedFile extends File {
+  url: string;
+  synced: FileUploadedSynced;
+}
+
 export interface FormMetaData extends Record<string, unknown> {}
 
 export interface FormMeta extends FormMetaData {

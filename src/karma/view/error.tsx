@@ -19,6 +19,8 @@ export function errorHandler(
   const anonymous = isAnonymous();
   const user = getMaybeUser();
 
+  console.error(error);
+
   const html = renderToStaticMarkup(
     <KarmaServer
       isFragment={isFragment}
