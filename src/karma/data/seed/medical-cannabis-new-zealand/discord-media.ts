@@ -21,7 +21,7 @@ import {
 
 const namespace = "cb541dc3-ffbd-4d9c-923a-d1f4af02fa89";
 
-const VERSION = DISCORD_MEDIA_VERSION || "12";
+const VERSION = +(DISCORD_MEDIA_VERSION || "12");
 const CACHE_KEY_PREFIX = `discord-media:${VERSION}`;
 
 const MATCH_CONTENT_TYPE = ["image", "video"];
