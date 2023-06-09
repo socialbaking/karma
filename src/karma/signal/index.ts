@@ -93,7 +93,8 @@ export function getTimeRemaining() {
 }
 
 export function signalExecutionFinish() {
-    const controller = getAbortController();
+    const controller = getMaybeAbortController();
+    if (!controller) return;
     controller.abort();
     const clearTimeout = requestContext.get(ABORT_CONTROLLER_CLEAR_TIMEOUT);
     ok(typeof clearTimeout === "function", "Expected ABORT_CONTROLLER_CLEAR_TIMEOUT");

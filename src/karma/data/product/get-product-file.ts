@@ -20,6 +20,7 @@ export async function listProductFiles(options?: ListProductFilesOptions): Promi
 
 export async function getProductFiles(productId: string, { accept }: GetProductFileListOptions = {}): Promise<File[]> {
     let files = await listNamedFiles("product", productId);
+    console.log({ productId, files });
     files = files
         .filter(file => file.synced)
         .sort((a, b) => {
@@ -49,6 +50,7 @@ export async function getProductFile(productId: string, { fileId, accept, index 
     const files = await getProductFiles(productId, { accept })
     if (!files.length) return undefined;
     const pinned = files.filter(file => file.pinned);
+    console.log({ files, pinned });
     if (pinned.length === 1) return getResolvedFile(pinned[0]);
     if (pinned.length) return getResolvedFile(pinned[index ?? pickIndex(pinned.length)])
     return getResolvedFile(files[index ?? pickIndex(files.length)]);

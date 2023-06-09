@@ -18,10 +18,11 @@ import {
     DISCORD_MEDIA_PARENT_CHANNEL_NAME,
     DISCORD_MEDIA_VERSION
 } from "../../file/discord";
+import {createHash} from "crypto";
 
 const namespace = "cb541dc3-ffbd-4d9c-923a-d1f4af02fa89";
 
-const VERSION = +(DISCORD_MEDIA_VERSION || "13");
+const VERSION = +(DISCORD_MEDIA_VERSION || "14");
 const CACHE_KEY_PREFIX = `discord-media:${VERSION}`;
 
 const MATCH_CONTENT_TYPE = ["image", "video"];
@@ -109,9 +110,9 @@ async function downloadMediaFromChannel(context: DiscordContext, channel: Produc
             console.log(`${pending.length} pending files for ${channel.name}`);
             anyProcessed = await saveFileData(context, pending);
             if (anyProcessed) {
-                console.log(`Files processed for ${channel.name} from previous list`, context);
+                console.log(`Files processed for ${channel.name} from previous list`, context.requestsRemaining);
             } else {
-                console.log(`Files not processed for ${channel.name} from previous list`, context);
+                console.log(`Files not processed for ${channel.name} from previous list`, context.requestsRemaining);
             }
         }
     }
@@ -152,18 +153,17 @@ function getFileData(channel: ProductDiscordChannel, message: DiscordMessage) {
     const uploadedByUsername = getAuthorUsername(message);
     const { product } = channel;
     return message.attachments.map((attachment): IdFileData => {
-
-        const key = [
+        // Stable file ID
+        const hash = createHash("sha512");
+        [
             DISCORD_SERVER_ID,
             channel.id,
             message.id,
             attachment.id,
             attachment.filename
-        ].join(":");
-
-        // Stable file ID
-        const fileId = v5(`file:${key}`, namespace);
-        const fileName = `${channel.name}-${v5(key, namespace)}${extname(attachment.filename)}`;
+        ].forEach(value => hash.update(value));
+        const fileId = hash.digest().toString("hex");
+        const fileName = `${channel.name}-${v5(fileId, namespace)}${extname(attachment.filename)}`;
 
         return {
             fileId,
@@ -251,7 +251,7 @@ async function saveFileData(context: DiscordContext, fileData: IdFileData[]): Pr
             ok(typeof productId === "string", "Expected file data to have productId");
             ok(typeof externalUrl === "string", "Expected file data to have externalUrl");
             const existing = await getNamedFile("product", productId, fileId);
-            if (existing && (!isTimeRemaining || existing?.syncedAt) && !DISCORD_MEDIA_DEBUG) {
+            if (existing?.synced) {
                 // Only use if version matches
                 // Allows re-fetching
                 if (existing.version === VERSION) {
@@ -296,6 +296,36 @@ async function saveFileData(context: DiscordContext, fileData: IdFileData[]): Pr
 }
 
 async function *listMediaMessages(context: DiscordContext, channel: DiscordGuildChannel): AsyncIterable<DiscordMessage[]> {
+    let yielded: string[] = [];
+
+    try {
+        const pinsUrl = new URL(
+            `/api/v10/channels/${channel.id}/pins`,
+            "https://discord.com"
+        );
+        const pinsResponse = await fetch(
+            pinsUrl,
+            {
+                method: "GET",
+                headers: {
+                    Authorization: `Bot ${DISCORD_BOT_TOKEN}`,
+                },
+            }
+        )
+        console.log("listMediaMessages pins status:", pinsResponse.status);
+        if (pinsResponse.ok) {
+            const pins: DiscordMessage[] = await pinsResponse.json();
+            console.log({ pins: pins.length });
+            if (pins.length) {
+                const attachmentPins = pins.filter(message => message.attachments?.length);
+                if (attachmentPins.length) {
+                    yield attachmentPins;
+                    yielded.push(...attachmentPins.map(message => message.id));
+                }
+            }
+        }
+    } catch {}
+
     const url = new URL(
         `/api/v10/channels/${channel.id}/messages`,
         "https://discord.com"
@@ -354,6 +384,8 @@ async function *listMediaMessages(context: DiscordContext, channel: DiscordGuild
         ok(response.ok, `listMediaMessages returned ${response.status}`);
         responseMessages = await response.json();
         responseMessages = responseMessages
+            // Ensure no pinned messages are re-downloaded
+            .filter(message => !yielded.includes(message.id))
             .map(message => ({
                 ...message,
                 milliseconds: new Date(message.timestamp).getTime()
