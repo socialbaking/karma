@@ -41,6 +41,9 @@ const DEFAULT_MAX_REQUESTS_PER_CHANNEL = 30;
 // This is the default for the discord API, but we need to be able to reference this
 const MESSAGE_LIMIT_PER_REQUEST = 100;
 
+// How much time we should give ourselves before finishing up
+const TIMEOUT_BUFFER_MS = 5000;
+
 interface DiscordContext {
     requestsRemaining: number;
 }
@@ -229,7 +232,7 @@ async function saveFileData(context: DiscordContext, fileData: IdFileData[]): Pr
                 }
             }
 
-            const isTimeRemaining = isRequiredTimeRemaining(2500);
+            const isTimeRemaining = isRequiredTimeRemaining(TIMEOUT_BUFFER_MS);
             console.log(`Time remaining: ${getTimeRemaining()}, ${isTimeRemaining}`);
             const { productId, fileId, externalUrl } = data;
             ok(typeof productId === "string", "Expected file data to have productId");
