@@ -16,6 +16,7 @@ export interface FileData extends Record<string, unknown> {
   syncedAt?: string;
   version?: number;
   type?: FileType | string;
+  externalUrl?: string;
 }
 
 export interface File extends FileData {

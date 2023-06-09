@@ -69,6 +69,12 @@ export function getExecutionEndAt() {
     return Date.now() + ms;
 }
 
+export function isRequiredTimeRemaining(requiredMs: number) {
+    const remainingMs = getTimeRemaining();
+    if (!remainingMs) return false;
+    return remainingMs >= requiredMs;
+}
+
 export function getTimeRemaining() {
     const now = Date.now();
     const endAt = getExecutionEndAt();

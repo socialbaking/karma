@@ -7,21 +7,26 @@ import {listCategories} from "../../category";
 import {v5} from "uuid";
 import {extname, join} from "node:path";
 import {mkdir, writeFile} from "fs/promises";
-import {FileData, getFile, getNamedFile, setFile} from "../../file";
-import {getTimeRemaining} from "../../../signal";
+import {FileData, getFile, getNamedFile, listNamedFiles, setFile} from "../../file";
+import {getTimeRemaining, isRequiredTimeRemaining} from "../../../signal";
 import {addExpiring, getCached} from "../../cache";
-import {DAY_MS, getExpiresAt} from "../../storage";
+import {DAY_MS, getExpiresAt, MONTH_MS} from "../../storage";
 import {R2_ACCESS_KEY_SECRET, R2_ACCESS_KEY_ID, R2_ENDPOINT, R2_BUCKET, r2Config} from "../../file/r2";
 import {DISCORD_MEDIA_OFFLINE_STORE, DISCORD_MEDIA_DEBUG, DISCORD_MEDIA_PARENT_CHANNEL_NAME} from "../../file/discord";
 
 const namespace = "cb541dc3-ffbd-4d9c-923a-d1f4af02fa89";
 
-const VERSION = 7;
+const VERSION = 10;
 const CACHE_KEY_PREFIX = `discord-media:${VERSION}`;
+
+const MATCH_CONTENT_TYPE = ["image", "video"];
 
 // Allow late expiry to allow for background tasks to be slow
 // if wanted, should be replaced in this time
 const CACHE_EXPIRES_IN_MS = 3 * DAY_MS;
+// We should try rolling backwards every week or so just to make sure we
+// Have the correctly pinned messages
+const CACHE_DIRECTION_EXPIRES_IN_MS = 7 * DAY_MS;
 
 // All bots can make up to 50 requests per second to our API.
 // If no authorization header is provided, then the limit is applied to the IP address.
@@ -30,8 +35,11 @@ const CACHE_EXPIRES_IN_MS = 3 * DAY_MS;
 // it may be impossible to stay below 50 requests per second during normal operations.
 
 // We must keep some requests available for auth operations
-const DEFAULT_MAX_REQUESTS = 35;
-const DEFAULT_MAX_REQUESTS_PER_CHANNEL = 5;
+const DEFAULT_MAX_REQUESTS = 40;
+const DEFAULT_MAX_REQUESTS_PER_CHANNEL = 15;
+
+// This is the default for the discord API, but we need to be able to reference this
+const MESSAGE_LIMIT_PER_REQUEST = 100;
 
 interface DiscordContext {
     requestsRemaining: number;
@@ -83,14 +91,38 @@ export async function seedDiscordMedia() {
 }
 
 async function downloadMediaFromChannel(context: DiscordContext, channel: ProductDiscordChannel) {
-    for await (const messages of listMediaMessages(context, channel)) {
-        for (const message of messages) {
-            await saveAttachments(context, channel, message);
+    let anyProcessed = false;
+
+    const files = await listNamedFiles("product", channel.product.productId);
+
+    if (files.length) {
+        const pending = files.filter(file => !file.synced && file.externalUrl);
+        if (pending.length) {
+            anyProcessed = await saveFileData(context, pending);
+            if (anyProcessed) {
+                console.log(`Files processed for ${channel.name} from previous list`, context);
+            } else {
+                console.log(`Files not processed for ${channel.name} from previous list`, context);
+            }
         }
+    }
+
+    if (context.requestsRemaining) {
+        for await (const messages of listMediaMessages(context, channel)) {
+            // Fetch pinned messages with priority
+            for (const message of messages.sort((a, b) => a.pinned ? (b.pinned ? 0 : -1) : 1)) {
+                anyProcessed = true;
+                await saveAttachments(context, channel, message);
+            }
+        }
+    }
+
+    if (!anyProcessed) {
+        console.log(`Did not process any messages for channel ${channel.name}`);
     }
 }
 
-function getAuthorUsername(message: DiscordMessage) {
+function getAuthorUsername(message: Pick<DiscordMessage, "author">) {
     const { author } = message;
     if (!author.discriminator || author.discriminator === "0" || author.discriminator === "0000") {
         return author.username;
@@ -98,15 +130,50 @@ function getAuthorUsername(message: DiscordMessage) {
     return `${author.username}#${author.discriminator}`;
 }
 
+type IdFileData = FileData & { fileId: string };
+
+function getFileData(channel: ProductDiscordChannel, message: DiscordMessage) {
+    const uploadedByUsername = getAuthorUsername(message);
+    const { product } = channel;
+    return message.attachments.map((attachment): IdFileData => {
+
+        const key = `${DISCORD_SERVER_ID}:${channel.id}:${attachment.filename}`;
+        // Stable file ID
+        const fileId = v5(`file:${key}`, namespace);
+        const fileName = `${channel.name}-${v5(key, namespace)}${extname(attachment.filename)}`;
+
+        return {
+            fileId,
+            type: "product",
+            productId: product.productId,
+            fileName,
+            size: attachment.size,
+            contentType: attachment.content_type,
+            uploadedAt: new Date(message.timestamp).toISOString(),
+            uploadedByUsername,
+            pinned: !!message.pinned,
+            source: "discord",
+            version: VERSION,
+            externalUrl: attachment.url
+        }
+    })
+}
+
 async function saveAttachments(context: DiscordContext, channel: ProductDiscordChannel, message: DiscordMessage) {
-    // console.log(message);
-    const { product } = channel
+    return saveFileData(
+        context,
+        getFileData(channel, message)
+    );
+}
+
+async function saveFileData(context: DiscordContext, fileData: IdFileData[]): Promise<boolean> {
     const path = DISCORD_MEDIA_OFFLINE_STORE;
     if (R2_ACCESS_KEY_ID && R2_ACCESS_KEY_SECRET && R2_BUCKET && R2_ENDPOINT) {
-        await saveR2();
+        return await saveR2();
     } else if (path) {
-        await saveLocal();
+        return await saveLocal();
     }
+    return false;
 
     async function saveR2() {
         const { S3Client, PutObjectCommand } = await import("@aws-sdk/client-s3");
@@ -145,14 +212,21 @@ async function saveAttachments(context: DiscordContext, channel: ProductDiscordC
         })
     }
 
-    async function saveFiles(fn: (file: FileData, blob: Blob) => Promise<Partial<FileData>>): Promise<void> {
-        const uploadedByUsername = getAuthorUsername(message);
-        for (const attachment of message.attachments) {
-            const isTimeRemaining = getTimeRemaining() > 2500;
-            const key = `${DISCORD_SERVER_ID}:${channel.id}:${message.id}:${attachment.filename}`;
-            // Stable file ID
-            const fileId = v5(`file:${key}`, namespace);
-            const existing = await getNamedFile("product", product.productId, fileId);
+    async function saveFiles(fn: (file: FileData, blob: Blob) => Promise<Partial<FileData>>): Promise<boolean> {
+        let anyUpdates = false;
+        for (const data of fileData) {
+            if (MATCH_CONTENT_TYPE.length) {
+                const found = MATCH_CONTENT_TYPE.find(type => data.contentType.startsWith(type));
+                if (!found) {
+                    continue;
+                }
+            }
+
+            const isTimeRemaining = isRequiredTimeRemaining(2500);
+            const { productId, fileId, externalUrl } = data;
+            ok(typeof productId === "string", "Expected file data to have productId");
+            ok(typeof externalUrl === "string", "Expected file data to have externalUrl");
+            const existing = await getNamedFile("product", productId, fileId);
             if (existing && (!isTimeRemaining || existing?.syncedAt) && !DISCORD_MEDIA_DEBUG) {
                 // Only use if version matches
                 // Allows re-fetching
@@ -160,33 +234,27 @@ async function saveAttachments(context: DiscordContext, channel: ProductDiscordC
                     continue;
                 }
             }
-            const fileName = `${channel.name}-${v5(key, namespace)}${extname(attachment.filename)}`;
-            const data: FileData = {
-                type: "product",
-                productId: product.productId,
-                fileName,
-                size: attachment.size,
-                contentType: attachment.content_type,
-                uploadedAt: new Date(message.timestamp).toISOString(),
-                uploadedByUsername,
-                pinned: !!message.pinned,
-                source: "discord",
-                version: VERSION
-            };
             let update: Partial<FileData>;
             console.log(`Time remaining: ${getTimeRemaining()}`);
-            if (getTimeRemaining() > 2500 && context.requestsRemaining > 0) {
-                context.requestsRemaining -= 1;
+            if (isRequiredTimeRemaining(2500) && (context.requestsRemaining > 0)) {
+                // It appears that the discord image urls are not rate limited
+                // As requesting multiple files results in 200s with no problems.
+                //
+                // If we get one 429 request though we will stop fetching these
+                // external files immediately
+                //
+                // context.requestsRemaining -= 1;
                 const response = await fetch(
-                    attachment.url,
+                    externalUrl,
                     {
                         method: "GET",
                         headers: {
                             Authorization: `Bot ${DISCORD_BOT_TOKEN}`,
-                            Accept: attachment.content_type
+                            Accept: data.contentType
                         },
                     }
                 );
+                console.log(`saveAttachments status for ${data.fileName}:`, response.status);
                 if (response.status === 429) {
                     context.requestsRemaining = 0;
                 }
@@ -196,7 +264,10 @@ async function saveAttachments(context: DiscordContext, channel: ProductDiscordC
                         ...((await fn(data, blob)) ?? undefined),
                         syncedAt: new Date().toISOString()
                     };
+                    anyUpdates = true;
                 }
+            } else {
+                console.log(`Not fetching for ${data.fileName}`)
             }
             await setFile({
                 ...data,
@@ -204,6 +275,7 @@ async function saveAttachments(context: DiscordContext, channel: ProductDiscordC
                 fileId
             });
         }
+        return anyUpdates;
     }
 }
 
@@ -216,7 +288,12 @@ async function *listMediaMessages(context: DiscordContext, channel: DiscordGuild
     let responseMessages: MessageWithMS[] = [];
 
     const afterCacheKey = `${CACHE_KEY_PREFIX}:${channel.id}:listMediaMessages:after`;
+    const beforeCacheKey = `${CACHE_KEY_PREFIX}:${channel.id}:listMediaMessages:before`;
+    const directionCacheKey = `${CACHE_KEY_PREFIX}:${channel.id}:listMediaMessages:direction`;
     const messageAfter = await getCached(afterCacheKey, true);
+    const messageBefore = await getCached(beforeCacheKey, true);
+
+    let direction = (await getCached(directionCacheKey, true)) ?? "back";
 
     // console.log({ messageAfter });
 
@@ -224,18 +301,22 @@ async function *listMediaMessages(context: DiscordContext, channel: DiscordGuild
     let mostRecentMessage: MessageWithMS | undefined = undefined,
         mostDistantMessage: MessageWithMS | undefined = undefined;
 
+    url.searchParams.set("limit", MESSAGE_LIMIT_PER_REQUEST.toString());
+
     do {
-        if (messageAfter) {
+        if (direction === "forward") {
             // We're going forward
             if (mostRecentMessage) {
                 url.searchParams.set("after", mostRecentMessage.id);
-            } else {
-                url.searchParams.set("after", messageAfter)
+            } else if (messageAfter) {
+                url.searchParams.set("after", messageAfter);
             }
         } else {
             // We're going back
             if (mostDistantMessage) {
                 url.searchParams.set("before", mostDistantMessage.id);
+            } else if (messageBefore) {
+                url.searchParams.set("before", messageBefore);
             }
         }
         context.requestsRemaining -= 1;
@@ -250,7 +331,10 @@ async function *listMediaMessages(context: DiscordContext, channel: DiscordGuild
         );
         console.log("listMediaMessages status:", response.status);
         if (response.status === 404) break;
-        if (response.status === 429) break; // Finish for now, we can try again later
+        if (response.status === 429) {
+            context.requestsRemaining = 0;
+            break;
+        }
         ok(response.ok, `listMediaMessages returned ${response.status}`);
         responseMessages = await response.json();
         responseMessages = responseMessages
@@ -262,19 +346,41 @@ async function *listMediaMessages(context: DiscordContext, channel: DiscordGuild
             .sort(({ milliseconds: a }, { milliseconds: b }) => {
                 return a < b ? -1 : 1
             });
-        setMostRecent(responseMessages.at(-1));
-        setDistantRecent(responseMessages.at(0));
+        if (!responseMessages.length && direction !== "forward") {
+            direction = "forward";
+            console.log(`Have reached the end of the messages for ${channel.name}, switching direction to ${direction}`);
+            await addExpiring({
+                key: directionCacheKey,
+                value: direction,
+                expiresAt: getExpiresAt(CACHE_DIRECTION_EXPIRES_IN_MS),
+                stable: true,
+                role: false
+            });
+        } else {
+            setMostRecent(responseMessages.at(-1));
+            setDistantRecent(responseMessages.at(0));
+        }
         // console.log({ mostDistantMessage, mostRecentMessage });
         const messages = responseMessages.filter(message => message.attachments?.length);
         if (messages.length) {
             yield messages;
         }
-    } while (responseMessages.length && (context.requestsRemaining > 0))
+    } while (responseMessages.length >= MESSAGE_LIMIT_PER_REQUEST && (context.requestsRemaining > 0));
+
 
     if (mostRecentMessage) {
         await addExpiring({
             key: afterCacheKey,
             value: mostRecentMessage.id,
+            role: false,
+            stable: true,
+            expiresAt: getExpiresAt(CACHE_EXPIRES_IN_MS)
+        });
+    }
+    if (mostDistantMessage) {
+        await addExpiring({
+            key: beforeCacheKey,
+            value: mostDistantMessage.id,
             role: false,
             stable: true,
             expiresAt: getExpiresAt(CACHE_EXPIRES_IN_MS)
