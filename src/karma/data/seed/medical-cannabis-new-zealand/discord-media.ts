@@ -16,7 +16,7 @@ import {DISCORD_MEDIA_OFFLINE_STORE, DISCORD_MEDIA_DEBUG, DISCORD_MEDIA_PARENT_C
 
 const namespace = "cb541dc3-ffbd-4d9c-923a-d1f4af02fa89";
 
-const VERSION = 6;
+const VERSION = 7;
 const CACHE_KEY_PREFIX = `discord-media:${VERSION}`;
 
 // Allow late expiry to allow for background tasks to be slow
@@ -31,6 +31,7 @@ const CACHE_EXPIRES_IN_MS = 3 * DAY_MS;
 
 // We must keep some requests available for auth operations
 const DEFAULT_MAX_REQUESTS = 35;
+const DEFAULT_MAX_REQUESTS_PER_CHANNEL = 5;
 
 interface DiscordContext {
     requestsRemaining: number;
@@ -44,13 +45,38 @@ export async function seedDiscordMedia() {
         requestsRemaining: DEFAULT_MAX_REQUESTS
     }
 
-    const channels = await listProductChannels(context);
+    let channels = await listProductChannels(context);
 
-    console.log(channels.map(channel => channel.name));
 
+    if (!channels.length) {
+        console.log("No channels matching product names");
+    } else {
+        console.log(channels.map(channel => channel.name));
+    }
+
+    const sortOrder = new Map(
+        channels.map((channel) => [channel, Math.random()] as const)
+    );
+    // Give a random sort to allow for all channels to have a chance to be fully seeded with images
+    // Over time all the images will be resolved and this won't matter
+    //
+    // But when doing initial seeding it does
+    channels = channels.sort(
+        (a, b) => sortOrder.get(a) < sortOrder.get(b) ?  -1 : 1
+    );
     for (const channel of channels) {
+        console.log(`Seeding files for Discord channel ${channel.name}`);
+        const initial = context.requestsRemaining;
+        const givenRemaining = Math.min(initial, DEFAULT_MAX_REQUESTS_PER_CHANNEL);
+        const nextContext = {
+            ...context,
+            requestsRemaining: givenRemaining
+        };
         console.log(`Requests Remaining: ${context.requestsRemaining}`);
-        await downloadMediaFromChannel(context, channel);
+        await downloadMediaFromChannel(nextContext, channel);
+        if (context.requestsRemaining <= 0) break;
+        const used = givenRemaining - Math.max(0, nextContext.requestsRemaining);
+        context.requestsRemaining -= used;
     }
 
     console.log(`Requests Remaining: ${context.requestsRemaining}`);
@@ -222,6 +248,7 @@ async function *listMediaMessages(context: DiscordContext, channel: DiscordGuild
                 },
             }
         );
+        console.log("listMediaMessages status:", response.status);
         if (response.status === 404) break;
         if (response.status === 429) break; // Finish for now, we can try again later
         ok(response.ok, `listMediaMessages returned ${response.status}`);
@@ -242,7 +269,7 @@ async function *listMediaMessages(context: DiscordContext, channel: DiscordGuild
         if (messages.length) {
             yield messages;
         }
-    } while (responseMessages.length && context.requestsRemaining > 0)
+    } while (responseMessages.length && (context.requestsRemaining > 0))
 
     if (mostRecentMessage) {
         await addExpiring({

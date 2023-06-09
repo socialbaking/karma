@@ -5,6 +5,8 @@ esnext
 esnext-workerd
 coverage
 .env
+!.env.example
+.env.*
 /test-results/
 /playwright-report/
 /playwright/.cache/
