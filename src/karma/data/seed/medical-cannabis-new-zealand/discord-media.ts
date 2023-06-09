@@ -14,7 +14,7 @@ import {DAY_MS, getExpiresAt} from "../../storage";
 
 const namespace = "cb541dc3-ffbd-4d9c-923a-d1f4af02fa89";
 
-const VERSION = 5;
+const VERSION = 6;
 const CACHE_KEY_PREFIX = `discord-media:${VERSION}`;
 
 // Allow late expiry to allow for background tasks to be slow
