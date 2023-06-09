@@ -62,20 +62,20 @@ export function setExecutionTimeout(url: string) {
 }
 
 export function getExecutionEndAt() {
-    const ms = requestContext.get(EXECUTION_END_AT_MS);
+    let ms = requestContext.get(EXECUTION_END_AT_MS);
     if (!ms) {
-        return Date.now() - getExecutionTimeout("/");
+        ms = getExecutionTimeout("/");
     }
-    return ms;
+    return Date.now() + ms;
 }
 
 export function getTimeRemaining() {
     const now = Date.now();
     const endAt = getExecutionEndAt();
-    if (now < endAt) {
+    if (now > endAt) {
         return 0;
     }
-    return now - endAt;
+    return endAt - now;
 }
 
 export function signalExecutionFinish() {

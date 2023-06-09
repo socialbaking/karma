@@ -163,6 +163,7 @@ async function saveAttachments(context: DiscordContext, channel: ProductDiscordC
                 version: VERSION
             };
             let update: Partial<FileData>;
+            console.log(`Time remaining: ${getTimeRemaining()}`);
             if (getTimeRemaining() > 2500 && context.requestsRemaining > 0) {
                 context.requestsRemaining -= 1;
                 const response = await fetch(
@@ -184,8 +185,6 @@ async function saveAttachments(context: DiscordContext, channel: ProductDiscordC
                         ...((await fn(data, blob)) ?? undefined),
                         syncedAt: new Date().toISOString()
                     };
-                } else if (existing) {
-                    continue;
                 }
             }
             await setFile({
