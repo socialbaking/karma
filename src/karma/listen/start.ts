@@ -1,4 +1,4 @@
-import fastify from "fastify";
+import fastify, {FastifyInstance} from "fastify";
 import { routes } from "./routes";
 import { setupSwagger } from "./swagger";
 import blippPlugin from "fastify-blipp";
@@ -38,8 +38,6 @@ export async function create() {
   });
 
   const register: (...args: unknown[]) => void = app.register.bind(fastify);
-
-  register(signalMiddleware);
 
   register(cookie, {
     secret: COOKIE_SECRET,
@@ -83,6 +81,8 @@ export async function create() {
     response.header("X-Source-Commit", commitShort);
     response.header("X-Source-Commit-At", commitAt);
   });
+
+  signalMiddleware(app as FastifyInstance);
 
   register(authPlugin);
   register(bearerAuthPlugin, {

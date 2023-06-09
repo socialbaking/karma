@@ -16,7 +16,7 @@ import {DISCORD_MEDIA_OFFLINE_STORE, DISCORD_MEDIA_DEBUG, DISCORD_MEDIA_PARENT_C
 
 const namespace = "cb541dc3-ffbd-4d9c-923a-d1f4af02fa89";
 
-const VERSION = 10;
+const VERSION = 11;
 const CACHE_KEY_PREFIX = `discord-media:${VERSION}`;
 
 const MATCH_CONTENT_TYPE = ["image", "video"];
@@ -35,8 +35,8 @@ const CACHE_DIRECTION_EXPIRES_IN_MS = 7 * DAY_MS;
 // it may be impossible to stay below 50 requests per second during normal operations.
 
 // We must keep some requests available for auth operations
-const DEFAULT_MAX_REQUESTS = 40;
-const DEFAULT_MAX_REQUESTS_PER_CHANNEL = 15;
+const DEFAULT_MAX_REQUESTS = 45;
+const DEFAULT_MAX_REQUESTS_PER_CHANNEL = 30;
 
 // This is the default for the discord API, but we need to be able to reference this
 const MESSAGE_LIMIT_PER_REQUEST = 100;
@@ -54,7 +54,6 @@ export async function seedDiscordMedia() {
     }
 
     let channels = await listProductChannels(context);
-
 
     if (!channels.length) {
         console.log("No channels matching product names");
@@ -98,6 +97,7 @@ async function downloadMediaFromChannel(context: DiscordContext, channel: Produc
     if (files.length) {
         const pending = files.filter(file => !file.synced && file.externalUrl);
         if (pending.length) {
+            console.log(`${pending.length} pending files for ${channel.name}`);
             anyProcessed = await saveFileData(context, pending);
             if (anyProcessed) {
                 console.log(`Files processed for ${channel.name} from previous list`, context);
@@ -108,6 +108,7 @@ async function downloadMediaFromChannel(context: DiscordContext, channel: Produc
     }
 
     if (context.requestsRemaining) {
+        console.log(`Listing messages for channel ${channel.name}`);
         for await (const messages of listMediaMessages(context, channel)) {
             // Fetch pinned messages with priority
             for (const message of messages.sort((a, b) => a.pinned ? (b.pinned ? 0 : -1) : 1)) {
@@ -115,11 +116,17 @@ async function downloadMediaFromChannel(context: DiscordContext, channel: Produc
                 await saveAttachments(context, channel, message);
             }
         }
+    } else {
+        console.log("No requests remaining, not trying listing additional messages for channel", channel.name);
     }
 
     if (!anyProcessed) {
         console.log(`Did not process any messages for channel ${channel.name}`);
     }
+
+    const finalFiles = await listNamedFiles("product", channel.product.productId);
+    const finalPending = finalFiles.filter(file => !file.synced && file.externalUrl);
+    console.log(`Final count, ${finalPending.length} pending files for ${channel.name}`);
 }
 
 function getAuthorUsername(message: Pick<DiscordMessage, "author">) {
@@ -223,6 +230,7 @@ async function saveFileData(context: DiscordContext, fileData: IdFileData[]): Pr
             }
 
             const isTimeRemaining = isRequiredTimeRemaining(2500);
+            console.log(`Time remaining: ${getTimeRemaining()}, ${isTimeRemaining}`);
             const { productId, fileId, externalUrl } = data;
             ok(typeof productId === "string", "Expected file data to have productId");
             ok(typeof externalUrl === "string", "Expected file data to have externalUrl");
@@ -235,8 +243,7 @@ async function saveFileData(context: DiscordContext, fileData: IdFileData[]): Pr
                 }
             }
             let update: Partial<FileData>;
-            console.log(`Time remaining: ${getTimeRemaining()}`);
-            if (isRequiredTimeRemaining(2500) && (context.requestsRemaining > 0)) {
+            if (isTimeRemaining && (context.requestsRemaining > 0)) {
                 // It appears that the discord image urls are not rate limited
                 // As requesting multiple files results in 200s with no problems.
                 //

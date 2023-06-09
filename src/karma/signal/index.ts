@@ -1,6 +1,6 @@
 import {requestContext} from "@fastify/request-context";
 import {ok} from "../../is";
-import {FastifyPluginAsync} from "fastify";
+import {FastifyInstance, FastifyPluginAsync} from "fastify";
 import {isNumberString} from "../calculations";
 import {getOrigin} from "../listen/config";
 
@@ -18,17 +18,25 @@ const EXECUTION_TIMEOUT_MS = +EXECUTION_TIMEOUT_MS_STRING;
 
 export const EXECUTION_TIMEOUT_REASON = "Execution Timeout";
 
-export const signalMiddleware: FastifyPluginAsync = async (instance) => {
-    instance.addHook("onRequest", (request, response, done) => {
-        setExecutionTimeout(request.url);
-        if (response.raw) {
-            response.raw.once("close", signalExecutionFinish);
+export function signalMiddleware(instance: FastifyInstance) {
+    instance.addHook("preValidation", (request, response, done) => {
+        try {
+            setExecutionTimeout(request.url);
+            if (response.raw) {
+                response.raw.once("close", signalExecutionFinish);
+            }
+            done();
+        } catch (error) {
+            done(error);
         }
-        done();
     });
     instance.addHook("onRequestAbort", (request, done) => {
-        signalExecutionFinish();
-        done();
+        try {
+            signalExecutionFinish();
+            done();
+        } catch {
+            done();
+        }
     });
 }
 
