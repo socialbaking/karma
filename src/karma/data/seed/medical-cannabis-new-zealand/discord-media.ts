@@ -246,14 +246,9 @@ async function saveFileData(context: DiscordContext, fileData: IdFileData[]): Pr
                 }
             }
             let update: Partial<FileData>;
-            if (isTimeRemaining && (context.requestsRemaining > 0)) {
+            if (isTimeRemaining) {
                 // It appears that the discord image urls are not rate limited
                 // As requesting multiple files results in 200s with no problems.
-                //
-                // If we get one 429 request though we will stop fetching these
-                // external files immediately
-                //
-                // context.requestsRemaining -= 1;
                 const response = await fetch(
                     externalUrl,
                     {
@@ -266,9 +261,6 @@ async function saveFileData(context: DiscordContext, fileData: IdFileData[]): Pr
                     }
                 );
                 console.log(`saveAttachments status for ${data.fileName}:`, response.status);
-                if (response.status === 429) {
-                    context.requestsRemaining = 0;
-                }
                 if (response.ok) {
                     const blob = await response.blob();
                     update = {
