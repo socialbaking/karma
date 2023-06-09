@@ -1,9 +1,33 @@
-import {FastifyInstance} from "fastify";
-import {getProductFile} from "../../data";
+import {FastifyInstance, FastifyReply} from "fastify";
+import {getProductFile, listCategories, listOrganisations, listProducts} from "../../data";
 import {authenticate} from "../authentication";
 import {readFile} from "node:fs/promises";
+import {isAnonymous} from "../../authentication";
+import {getMatchingProducts} from "../../utils";
 
 export async function getProductFileRoutes(fastify: FastifyInstance) {
+
+    async function handleProductId(productId: string, response: FastifyReply) {
+        const image = await getProductFile(productId, {
+            accept: "image"
+        });
+        if (!image) {
+            response.status(404);
+            response.send();
+            return;
+        }
+        const { url } = image;
+        if (url.startsWith("file://")) {
+            const { pathname } = new URL(url);
+            const contents = await readFile(pathname);
+            response.header("Content-Type", image.contentType);
+            response.send(contents);
+            return;
+        }
+        response.header("Location", url);
+        response.status(302);
+        response.send();
+    }
 
     {
         const params = {
@@ -39,25 +63,58 @@ export async function getProductFileRoutes(fastify: FastifyInstance) {
             schema,
             preHandler: authenticate(fastify, { anonymous: true }),
             async handler(request, response) {
-                const image = await getProductFile(request.params.productId, {
-                    accept: "image"
+                await handleProductId(request.params.productId, response);
+            },
+        });
+
+    }
+
+    {
+        const params = {
+            type: "object",
+            properties: {
+                search: {
+                    type: "string",
+                },
+            },
+            required: ["search"],
+        };
+
+        const schema = {
+            description: "Get a product image by name",
+            tags: ["product"],
+            summary: "",
+            params,
+            security: [
+                {
+                    apiKey: [] as string[],
+                },
+            ],
+        };
+
+
+        type Schema = {
+            Params: {
+                search: string;
+            };
+        };
+
+        fastify.get<Schema>("/image/search/:search", {
+            schema,
+            preHandler: authenticate(fastify, { anonymous: true }),
+            async handler(request, response) {
+                const products = await listProducts({
+                    public: isAnonymous()
                 });
-                if (!image) {
+                const organisations = await listOrganisations();
+                const categories = await listCategories()
+                const matched = getMatchingProducts(products, organisations, categories, request.params.search);
+                if (!matched.length) {
                     response.status(404);
                     response.send();
                     return;
                 }
-                const { url } = image;
-                if (url.startsWith("file://")) {
-                    const { pathname } = new URL(url);
-                    const contents = await readFile(pathname);
-                    response.header("Content-Type", image.contentType);
-                    response.send(contents);
-                    return;
-                }
-                response.header("Location", url);
-                response.status(302);
-                response.send();
+                await handleProductId(matched[0].productId, response);
             },
         });
 
