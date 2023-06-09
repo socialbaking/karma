@@ -7,14 +7,14 @@ import {listCategories} from "../../category";
 import {v5} from "uuid";
 import {extname, join} from "node:path";
 import {mkdir, writeFile} from "fs/promises";
-import {FileData, getFile, setFile} from "../../file";
+import {FileData, getFile, getNamedFile, setFile} from "../../file";
 import {getTimeRemaining} from "../../../signal";
 import {addExpiring, getCached} from "../../cache";
 import {DAY_MS, getExpiresAt} from "../../storage";
 
 const namespace = "cb541dc3-ffbd-4d9c-923a-d1f4af02fa89";
 
-const VERSION = 4;
+const VERSION = 5;
 const CACHE_KEY_PREFIX = `discord-media:${VERSION}`;
 
 // Allow late expiry to allow for background tasks to be slow
@@ -84,29 +84,13 @@ async function saveAttachments(context: DiscordContext, channel: ProductDiscordC
     // console.log(message);
     const { product } = channel
     const path = DISCORD_MEDIA_OFFLINE_STORE;
-    let files: ProductFile[] = [];
     if (R2_ACCESS_KEY_ID && R2_ACCESS_KEY_SECRET && R2_BUCKET && R2_ENDPOINT) {
-        files = await saveR2();
+        await saveR2();
     } else if (path) {
-        files = await saveLocal();
-    }
-    if (files.length) {
-        const existing = await getProduct(product.productId);
-        const fileIds = files.map(({ fileId }) => fileId);
-        const existingFiles = existing.files?.filter(file => !fileIds.includes(file.fileId)) ?? []
-        await setProduct({
-            ...existing,
-            files: existingFiles.concat(
-                files.map(({ fileId, pinned, source }) => {
-                    const found = existing.files?.find(file => file.fileId === fileId);
-                    return { ...found, fileId, pinned: pinned || found.pinned, source };
-                })
-            )
-        });
-        console.log(`Added ${files.length} files for ${product.productName}`);
+        await saveLocal();
     }
 
-    async function saveR2(): Promise<ProductFile[]> {
+    async function saveR2() {
         const { S3Client, PutObjectCommand } = await import("@aws-sdk/client-s3");
         const client = new S3Client({
             credentials: {
@@ -135,7 +119,7 @@ async function saveAttachments(context: DiscordContext, channel: ProductDiscordC
         })
     }
 
-    async function saveLocal(): Promise<ProductFile[]> {
+    async function saveLocal() {
         await mkdir(path, {
             recursive: true
         });
@@ -150,20 +134,18 @@ async function saveAttachments(context: DiscordContext, channel: ProductDiscordC
         })
     }
 
-    async function saveFiles(fn: (file: FileData, blob: Blob) => Promise<Partial<FileData>>): Promise<ProductFile[]> {
+    async function saveFiles(fn: (file: FileData, blob: Blob) => Promise<Partial<FileData>>): Promise<void> {
         const uploadedByUsername = getAuthorUsername(message);
-        const files: ProductFile[] = [];
         for (const attachment of message.attachments) {
             const isTimeRemaining = getTimeRemaining() > 2500;
             const key = `${DISCORD_SERVER_ID}:${channel.id}:${message.id}:${attachment.filename}`;
             // Stable file ID
             const fileId = v5(`file:${key}`, namespace);
-            const existing = await getFile(fileId);
+            const existing = await getNamedFile("product", product.productId, fileId);
             if (existing && (!isTimeRemaining || existing?.syncedAt) && !DISCORD_MEDIA_DEBUG) {
                 // Only use if version matches
                 // Allows re-fetching
                 if (existing.version === VERSION) {
-                    files.push(existing);
                     continue;
                 }
             }
@@ -193,6 +175,9 @@ async function saveAttachments(context: DiscordContext, channel: ProductDiscordC
                         },
                     }
                 );
+                if (response.status === 429) {
+                    context.requestsRemaining = 0;
+                }
                 if (response.ok) {
                     const blob = await response.blob();
                     update = {
@@ -200,18 +185,15 @@ async function saveAttachments(context: DiscordContext, channel: ProductDiscordC
                         syncedAt: new Date().toISOString()
                     };
                 } else if (existing) {
-                    files.push(existing);
                     continue;
                 }
             }
-            const file = await setFile({
+            await setFile({
                 ...data,
                 ...update,
                 fileId
             });
-            files.push(file);
         }
-        return files;
     }
 }
 

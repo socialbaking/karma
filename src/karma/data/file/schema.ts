@@ -30,7 +30,11 @@ export const fileData = {
     version: {
       type: "number",
       nullable: true
-    }
+    },
+    type: {
+      type: "string",
+      nullable: true
+    },
   },
   additionalProperties: true,
   required: [

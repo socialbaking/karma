@@ -1,5 +1,6 @@
 import { Product } from "./types";
 import { getProductStore } from "./store";
+import {listNamedFiles} from "../file";
 
 export interface ListProductsInput {
   // Only return generic products
@@ -21,4 +22,8 @@ export async function listProducts<P extends Product = Product>(options: ListPro
     products = products.filter(value => value.generic);
   }
   return products;
+}
+
+export function listProductFiles(productId: string) {
+  return listNamedFiles("product", productId);
 }

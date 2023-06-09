@@ -15,15 +15,14 @@ export async function setFile(
     uploadedAt: data.uploadedAt || createdAt,
     fileId,
   };
-  await store.set(fileId, meta);
   if (isNamedFileType(meta.type)) {
     const typedId = meta[`${meta.type}Id`];
     if (typedId && typeof typedId === "string") {
       const namedStore = getNamedFileStore(meta.type, typedId);
-      // Dupe the information, yes, this isn't the best, but
-      // ... its okay
       await namedStore.set(fileId, meta);
+      return meta;
     }
   }
+  await store.set(fileId, meta);
   return meta;
 }
