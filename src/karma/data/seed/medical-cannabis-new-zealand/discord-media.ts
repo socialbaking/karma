@@ -8,7 +8,7 @@ import {v5} from "uuid";
 import {extname, join} from "node:path";
 import {mkdir, writeFile} from "fs/promises";
 import {FileData, getFile, getNamedFile, listNamedFiles, setFile} from "../../file";
-import {getTimeRemaining, isRequiredTimeRemaining} from "../../../signal";
+import {getTimeRemaining, isRequiredTimeRemaining, getSignal} from "../../../signal";
 import {addExpiring, getCached} from "../../cache";
 import {DAY_MS, getExpiresAt, MONTH_MS} from "../../storage";
 import {R2_ACCESS_KEY_SECRET, R2_ACCESS_KEY_ID, R2_ENDPOINT, R2_BUCKET, r2Config} from "../../file/r2";
@@ -259,6 +259,7 @@ async function saveFileData(context: DiscordContext, fileData: IdFileData[]): Pr
                             Authorization: `Bot ${DISCORD_BOT_TOKEN}`,
                             Accept: data.contentType
                         },
+                        signal: getSignal()
                     }
                 );
                 console.log(`saveAttachments status for ${data.fileName}:`, response.status);
@@ -487,6 +488,7 @@ async function listGuildChannels(context: DiscordContext): Promise<DiscordGuildC
             headers: {
                 Authorization: `Bot ${DISCORD_BOT_TOKEN}`,
             },
+            signal: getSignal()
         }
     );
     if (response.status === 404) return undefined;

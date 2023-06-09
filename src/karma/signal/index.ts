@@ -14,7 +14,7 @@ export const {
 } = process.env;
 
 ok(isNumberString(EXECUTION_TIMEOUT_MS_STRING), "Expected EXECUTION_TIMEOUT_MS to be a number");
-const EXECUTION_TIMEOUT_MS = +EXECUTION_TIMEOUT_MS_STRING;
+const EXECUTION_TIMEOUT_MS: number = +EXECUTION_TIMEOUT_MS_STRING;
 
 export const EXECUTION_TIMEOUT_REASON = "Execution Timeout";
 
@@ -40,7 +40,7 @@ export function signalMiddleware(instance: FastifyInstance) {
     });
 }
 
-function getExecutionTimeout(url: string) {
+function getExecutionTimeout(url: string): number {
     const { pathname } = new URL(url, getOrigin());
     const key = pathname
         .replace(/^\/+/, "")
@@ -72,15 +72,15 @@ export function setExecutionTimeout(url: string) {
 export function getExecutionEndAt() {
     let ms = requestContext.get(EXECUTION_END_AT_MS);
     if (!ms) {
-        ms = getExecutionTimeout("/");
+        ms = Date.now() + getExecutionTimeout("/");
     }
-    return Date.now() + ms;
+    return ms;
 }
 
-export function isRequiredTimeRemaining(requiredMs: number) {
+export function isRequiredTimeRemaining(requiredMs: number = 1) {
     const remainingMs = getTimeRemaining();
     if (!remainingMs) return false;
-    return remainingMs >= requiredMs;
+    return remainingMs >= Math.max(1, requiredMs);
 }
 
 export function getTimeRemaining() {
@@ -112,6 +112,6 @@ function getAbortController() {
     return controller;
 }
 
-function getSignal() {
+export function getSignal() {
     return getAbortController().signal;
 }
