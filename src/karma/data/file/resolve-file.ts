@@ -7,7 +7,8 @@ import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 
 import {ok} from "../../../is";
 
-export async function getMaybeResolvedFile(file: File): Promise<ResolvedFile | undefined> {
+export async function getMaybeResolvedFile(file?: File): Promise<ResolvedFile | undefined> {
+    if (!file) return undefined;
     const { synced } = file;
     if (!synced) return undefined;
     const url = await getResolvedUrl(file);
@@ -19,7 +20,7 @@ export async function getMaybeResolvedFile(file: File): Promise<ResolvedFile | u
     }
 }
 
-export async function getResolvedFile(file: File): Promise<ResolvedFile> {
+export async function getResolvedFile(file?: File): Promise<ResolvedFile> {
     const resolved = await getMaybeResolvedFile(file);
     ok(resolved, `Expected file to be already resolved ${file.fileId}`)
     return resolved;

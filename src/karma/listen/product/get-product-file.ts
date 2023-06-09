@@ -7,8 +7,23 @@ import {getMatchingProducts} from "../../utils";
 
 export async function getProductFileRoutes(fastify: FastifyInstance) {
 
-    async function handleProductId(productId: string, response: FastifyReply) {
+    interface Query {
+        index?: number
+    }
+
+    const querystring = {
+        type: "object",
+        properties: {
+            index: {
+                type: "number",
+                nullable: true
+            },
+        }
+    };
+
+    async function handleProductId(productId: string, query: Query, response: FastifyReply) {
         const image = await getProductFile(productId, {
+            ...query,
             accept: "image",
             public: isAnonymous()
         });
@@ -46,6 +61,7 @@ export async function getProductFileRoutes(fastify: FastifyInstance) {
             tags: ["product"],
             summary: "",
             params,
+            querystring,
             security: [
                 {
                     apiKey: [] as string[],
@@ -53,18 +69,20 @@ export async function getProductFileRoutes(fastify: FastifyInstance) {
             ],
         };
 
+        interface Params {
+            productId: string;
+        }
 
         type Schema = {
-            Params: {
-                productId: string;
-            };
+            Params: Params,
+            Querystring: Query
         };
 
         fastify.get<Schema>("/:productId/image", {
             schema,
             preHandler: authenticate(fastify, { anonymous: true }),
             async handler(request, response) {
-                await handleProductId(request.params.productId, response);
+                await handleProductId(request.params.productId, request.query, response);
             },
         });
 
@@ -86,6 +104,7 @@ export async function getProductFileRoutes(fastify: FastifyInstance) {
             tags: ["product"],
             summary: "",
             params,
+            querystring,
             security: [
                 {
                     apiKey: [] as string[],
@@ -93,11 +112,11 @@ export async function getProductFileRoutes(fastify: FastifyInstance) {
             ],
         };
 
-
         type Schema = {
             Params: {
                 search: string;
             };
+            Querystring: Query
         };
 
         fastify.get<Schema>("/image/search/:search", {
@@ -115,7 +134,7 @@ export async function getProductFileRoutes(fastify: FastifyInstance) {
                     response.send();
                     return;
                 }
-                await handleProductId(matched[0].productId, response);
+                await handleProductId(matched[0].productId, request.query, response);
             },
         });
 
