@@ -21,17 +21,24 @@ export default {
         // Copy parameters from query string to request options.
         // You can implement various different parameters here.
         if (url.searchParams.has("fit")) options.cf.image.fit = url.searchParams.get("fit")
-        if (url.searchParams.has("width")) options.cf.image.width = url.searchParams.get("width")
-        if (url.searchParams.has("height")) options.cf.image.height = url.searchParams.get("height")
+        if (url.searchParams.has("width")) options.cf.image.width = +url.searchParams.get("width")
+        if (url.searchParams.has("height")) options.cf.image.height = +url.searchParams.get("height")
         if (url.searchParams.has("quality")) options.cf.image.quality = url.searchParams.get("quality")
 
-        // Your Worker is responsible for automatic format negotiation. Check the Accept header.
-        const accept = request.headers.get("Accept");
-        if (/image\/avif/.test(accept)) {
-            options.cf.image.format = 'avif';
-        } else if (/image\/webp/.test(accept)) {
-            options.cf.image.format = 'webp';
+        if (url.searchParams.has("draw")) {
+            const draw = JSON.parse(url.searchParams.get("draw"));
+            if (Array.isArray(draw)) {
+                options.cf.image.draw = draw;
+            }
         }
+
+        // Your Worker is responsible for automatic format negotiation. Check the Accept header.
+        // const accept = request.headers.get("Accept");
+        // if (/image\/avif/.test(accept)) {
+        //     options.cf.image.format = 'avif';
+        // } else if (/image\/webp/.test(accept)) {
+        //     options.cf.image.format = 'webp';
+        // }
 
         // Get URL of the original (full size) image to resize.
         // You could adjust the URL here, e.g., prefix it with a fixed address of your server,
@@ -63,6 +70,8 @@ export default {
         const imageRequest = new Request(imageURL, {
             headers: request.headers
         })
+
+        console.log(options.cf);
 
         // Returning fetch() with resizing options will pass through response with the resized image.
         return fetch(imageRequest, options)

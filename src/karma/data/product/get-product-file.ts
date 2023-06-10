@@ -46,12 +46,16 @@ export async function getProductFile(productId: string, { fileId, accept, index,
     if (fileId) {
         const file = await getNamedFile("product", productId, fileId);
         // Must be synced already to be able to get it
-        return getMaybeResolvedFile(file);
+        return getMaybeResolvedFile(file, {
+            public: isPublic
+        });
     }
     const files = await getProductFiles(productId, { accept })
     const file = pick();
     if (!file) return undefined;
-    return getResolvedFile(file);
+    return getResolvedFile(file, {
+        public: isPublic
+    });
 
     function pick() {
         if (!files.length) return undefined;

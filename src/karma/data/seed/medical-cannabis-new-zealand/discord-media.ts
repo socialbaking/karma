@@ -14,9 +14,9 @@ import {DAY_MS, getExpiresAt, MONTH_MS} from "../../storage";
 import {R2_ACCESS_KEY_SECRET, R2_ACCESS_KEY_ID, R2_ENDPOINT, R2_BUCKET, r2Config} from "../../file/r2";
 import {
     DISCORD_MEDIA_OFFLINE_STORE,
-    DISCORD_MEDIA_DEBUG,
     DISCORD_MEDIA_PARENT_CHANNEL_NAME,
-    DISCORD_MEDIA_VERSION
+    DISCORD_MEDIA_VERSION,
+    DISCORD_MEDIA_PINNED_ONLY
 } from "../../file/discord";
 import {createHash} from "crypto";
 
@@ -158,9 +158,6 @@ async function downloadMediaFromChannel(context: DiscordContext, channel: Produc
     const finalPending = finalFiles.filter(file => !file.synced && file.externalUrl);
     const finalSynced = finalFiles.filter(file => file.synced && file.externalUrl);
     console.log(`Final count, ${finalPending.length} pending files, ${finalSynced.length} synced files for ${channel.name}`);
-
-    await resizeImages(context, finalSynced);
-
 }
 
 function getAuthorUsername(message: Pick<DiscordMessage, "author">) {
@@ -262,6 +259,10 @@ async function saveFileData(context: DiscordContext, fileData: IdFileData[]): Pr
     async function saveFiles(fn: (file: FileData, blob: Blob) => Promise<Partial<FileData>>): Promise<boolean> {
         let anyUpdates = false;
         for (const data of fileData) {
+            if (DISCORD_MEDIA_PINNED_ONLY && !data.pinned) {
+                continue;
+            }
+
             if (MATCH_CONTENT_TYPE.length) {
                 const found = MATCH_CONTENT_TYPE.find(type => data.contentType.startsWith(type));
                 if (!found) {
@@ -349,6 +350,9 @@ async function *listMediaMessages(context: DiscordContext, channel: DiscordGuild
             }
         }
     } catch {}
+
+    // Done if only pins
+    if (DISCORD_MEDIA_PINNED_ONLY) return;
 
     const url = new URL(
         `/api/v10/channels/${channel.id}/messages`,
@@ -565,31 +569,4 @@ async function listGuildChannels(context: DiscordContext): Promise<DiscordGuildC
             parent
         };
     })
-}
-
-async function resizeImages(context: DiscordContext, files: File[]) {
-
-    let remainingFiles = [...files];
-
-    while (remainingFiles.length && isRequiredTimeRemaining(TIMEOUT_BUFFER_MS)){
-        const nextFile = remainingFiles.shift();
-
-        const missingSizes = SIZES.filter(size => {
-            const found = nextFile.sizes?.find(
-                other => other.watermark === size.watermark && (other.width === size.width || other.height === size.height)
-            );
-            return !found;
-        });
-
-        // Already sized all expected
-        if (!missingSizes.length) continue;
-
-
-
-
-
-
-    }
-
-
 }
