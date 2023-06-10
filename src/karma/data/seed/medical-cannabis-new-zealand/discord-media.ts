@@ -11,7 +11,7 @@ import {File, FileData, FileImageSize, FileSize, getFile, getNamedFile, listName
 import {getTimeRemaining, isRequiredTimeRemaining, getSignal} from "../../../signal";
 import {addExpiring, getCached} from "../../cache";
 import {DAY_MS, getExpiresAt, MONTH_MS} from "../../storage";
-import {R2_ACCESS_KEY_SECRET, R2_ACCESS_KEY_ID, R2_ENDPOINT, R2_BUCKET, r2Config} from "../../file/r2";
+import {R2_ACCESS_KEY_SECRET, R2_ACCESS_KEY_ID, R2_ENDPOINT, R2_BUCKET, r2Config, getR2, isR2} from "../../file/r2";
 import {
     DISCORD_MEDIA_OFFLINE_STORE,
     DISCORD_MEDIA_PARENT_CHANNEL_NAME,
@@ -19,10 +19,14 @@ import {
     DISCORD_MEDIA_PINNED_ONLY
 } from "../../file/discord";
 import {createHash} from "crypto";
+import {getResolvedUrl, getSize} from "../../file/resolve-file";
+import {PutObjectCommand} from "@aws-sdk/client-s3";
 
 const namespace = "cb541dc3-ffbd-4d9c-923a-d1f4af02fa89";
 
 const VERSION = +(DISCORD_MEDIA_VERSION || "14");
+const WATERMARK_VERSION = 3;
+
 const CACHE_KEY_PREFIX = `discord-media:${VERSION}`;
 
 const MATCH_CONTENT_TYPE = ["image", "video"];
@@ -158,6 +162,9 @@ async function downloadMediaFromChannel(context: DiscordContext, channel: Produc
     const finalPending = finalFiles.filter(file => !file.synced && file.externalUrl);
     const finalSynced = finalFiles.filter(file => file.synced && file.externalUrl);
     console.log(`Final count, ${finalPending.length} pending files, ${finalSynced.length} synced files for ${channel.name}`);
+
+    await watermarkFiles(finalSynced);
+
 }
 
 function getAuthorUsername(message: Pick<DiscordMessage, "author">) {
@@ -210,9 +217,30 @@ async function saveAttachments(context: DiscordContext, channel: ProductDiscordC
     );
 }
 
+
+
+async function saveToR2(file: Pick<FileData, "fileName" | "contentType">, blob: Blob): Promise<Partial<FileData>> {
+    const client = await getR2()
+    const externalKey = `discord/${file.fileName}`;
+    const command = new PutObjectCommand({
+        Key: externalKey,
+        Bucket: R2_BUCKET,
+        Body: Buffer.from(await blob.arrayBuffer()),
+        ContentType: file.contentType,
+    });
+    await client.send(command);
+    return {
+        synced: "r2",
+        url: new URL(
+            `/${externalKey}`,
+            R2_ENDPOINT
+        ).toString()
+    }
+}
+
 async function saveFileData(context: DiscordContext, fileData: IdFileData[]): Promise<boolean> {
     const path = DISCORD_MEDIA_OFFLINE_STORE;
-    if (R2_ACCESS_KEY_ID && R2_ACCESS_KEY_SECRET && R2_BUCKET && R2_ENDPOINT) {
+    if (isR2()) {
         return await saveR2();
     } else if (path) {
         return await saveLocal();
@@ -220,25 +248,7 @@ async function saveFileData(context: DiscordContext, fileData: IdFileData[]): Pr
     return false;
 
     async function saveR2() {
-        const { S3Client, PutObjectCommand } = await import("@aws-sdk/client-s3");
-        const client = new S3Client(r2Config);
-        return saveFiles(async (file, blob): Promise<Partial<FileData>> => {
-            const externalKey = `discord/${file.fileName}`;
-            const command = new PutObjectCommand({
-                Key: externalKey,
-                Bucket: R2_BUCKET,
-                Body: Buffer.from(await blob.arrayBuffer()),
-                ContentType: file.contentType,
-            });
-            await client.send(command);
-            return {
-                synced: "r2",
-                url: new URL(
-                    `/${externalKey}`,
-                    R2_ENDPOINT
-                ).toString()
-            }
-        })
+        return saveFiles(saveToR2)
     }
 
     async function saveLocal() {
@@ -569,4 +579,56 @@ async function listGuildChannels(context: DiscordContext): Promise<DiscordGuildC
             parent
         };
     })
+}
+
+async function watermarkFiles(files: File[]) {
+    if (!isR2()) return; // Only watermark with R2
+    const pinned = files.filter(file => file.pinned && file.contentType.startsWith("image"));
+    if (!pinned.length) return;
+    const pending = pinned.filter(file => file.synced && !file.sizes?.find(size => size.watermark && size.version === WATERMARK_VERSION));
+    while (isRequiredTimeRemaining(TIMEOUT_BUFFER_MS) && pending.length) {
+        const next = pending.shift();
+        const size = getSize();
+        console.log(`Fetching watermark image for ${next.fileName}`);
+        const watermarkedUrl = await getResolvedUrl(
+            next,
+            {
+                public: true,
+                size
+            }
+        );
+        const response = await fetch(watermarkedUrl, {
+            method: "GET",
+            headers: {
+                Accept: next.contentType
+            }
+        });
+        console.log(`watermarkFiles status:`, response.status);
+        if (!response.ok) continue;
+        const nextFileData = {
+            contentType: next.contentType,
+            fileName: `watermark-${next.fileName}`
+        };
+        const { synced, url } = await saveToR2(nextFileData, await response.blob());
+        const nextFileSize: FileSize = {
+            // Either width or height will match
+            height: size,
+            width: size,
+            synced,
+            syncedAt: new Date().toISOString(),
+            url,
+            version: WATERMARK_VERSION,
+            watermark: true
+        };
+
+        const updatedFile: File = {
+            ...next,
+            sizes: [
+                // Allow updating the watermark image
+                ...(next.sizes ?? []).filter(value => !value.watermark),
+                nextFileSize
+            ]
+        };
+        await setFile(updatedFile);
+    }
 }

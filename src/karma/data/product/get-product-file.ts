@@ -61,7 +61,14 @@ export async function getProductFile(productId: string, { fileId, accept, index,
         if (!files.length) return undefined;
         // Allow picking directly from the sorted list if authenticated
         if (!isPublic && index) return files[index];
-        const pinned = files.filter(file => file.pinned);
+        let pinned = files.filter(file => file.pinned);
+        if (isPublic) {
+            const synced = pinned.find(file => file.synced);
+            if (pinned.length && synced.synced !== "disk") {
+                // If is public, only allow pre watermarked files
+                pinned = pinned.filter(file => !!file.sizes?.find(size => size.watermark))
+            }
+        }
         if (pinned.length === 1) return pinned[0];
         if (pinned.length) return pinned[index ?? pickIndex(pinned.length)]
         // Only allow viewing the pinned images if public

@@ -7,16 +7,27 @@ import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 
 import {ok} from "../../../is";
 import {getOrigin} from "../../listen/config";
+import {isNumberString} from "../../calculations";
 
 const {
     IMAGE_RESIZING_URL,
-    IMAGE_RESIZING_DEFAULT_VARIANT,
+    IMAGE_RESIZING_DEFAULT_SIZE,
     IMAGE_RESIZING_WATERMARK_ORIGIN
 } = process.env;
 
+const DEFAULT_SIZE = 800;
+const DEFAULT_QUALITY = 0.9;
+
+export function getSize(given?: number): number {
+    if (given) return given;
+    if (isNumberString(IMAGE_RESIZING_DEFAULT_SIZE)) return +IMAGE_RESIZING_DEFAULT_SIZE;
+    return DEFAULT_SIZE;
+}
+
 export interface ResolveFileOptions {
     public?: boolean
-    variant?: string;
+    size?: number;
+    quality?: number;
 }
 
 export async function getMaybeResolvedFile(file?: File, options?: ResolveFileOptions): Promise<ResolvedFile | undefined> {
@@ -39,22 +50,24 @@ export async function getResolvedFile(file?: File, options?: ResolveFileOptions)
 }
 
 export async function getResolvedUrl(file: File, options?: ResolveFileOptions) {
-    const directURL = await getDirectURL();
-    if (!options) return directURL;
-    if (!options.public && !options.variant) return directURL;
-    if (!file.contentType?.startsWith("image")) return directURL;
-    if (directURL.startsWith("file://")) return directURL;
+    if (!options || (!options.public && !options.size)) return getDirectURL();
+    if (!file.contentType?.startsWith("image")) return getDirectURL();
+    if (file.synced === "disk") return getDirectURL();
+    const watermarked = file.sizes?.find(size => size.watermark);
     const url = new URL(IMAGE_RESIZING_URL, getOrigin());
-    url.searchParams.set("image", directURL);
-    const variant = options.variant || IMAGE_RESIZING_DEFAULT_VARIANT || "512";
-    // &width=120&height=120&fit=contain&quality=0.2
-    url.searchParams.set("width", variant);
-    url.searchParams.set("height", variant);
-    url.searchParams.set("fit", "contain");
-    url.searchParams.set("quality", "0.8");
-    url.searchParams.set("variant", variant);
+    if (watermarked) {
+        url.searchParams.set("image", await getR2URL(watermarked.url));
+    } else {
+        url.searchParams.set("image", await getDirectURL());
+    }
+    const size = getSize(options.size).toString();
 
-    if (options.public) {
+    url.searchParams.set("width", size);
+    url.searchParams.set("height", size);
+    url.searchParams.set("fit", "contain");
+    url.searchParams.set("quality", (options.quality || DEFAULT_QUALITY).toString());
+
+    if (options.public && !watermarked) {
         url.searchParams.set("draw", JSON.stringify([
             {
                 url: new URL("/public/watermark.png?cacheBust=5", IMAGE_RESIZING_WATERMARK_ORIGIN || getOrigin()).toString(),
@@ -65,6 +78,23 @@ export async function getResolvedUrl(file: File, options?: ResolveFileOptions) {
     }
 
     return url.toString();
+
+    async function getR2URL(url: string) {
+        const { pathname } = new URL(url);
+        const client = new S3Client(r2Config);
+        let key = pathname.replace(/^\//, "");
+        if (key.startsWith(`${R2_BUCKET}/`)) {
+            // TODO remove, this was a bug 👀
+            key = key.replace(`${R2_BUCKET}/`, "")
+        }
+        const command = new GetObjectCommand({
+            Bucket: R2_BUCKET,
+            Key: key
+        });
+        // Specify a custom expiry for the presigned URL, in seconds
+        const expiresIn = 3600;
+        return await getSignedUrl(client, command, { expiresIn });
+    }
 
     async function getDirectURL() {
         if (file.synced === "disk") {
@@ -78,20 +108,7 @@ export async function getResolvedUrl(file: File, options?: ResolveFileOptions) {
                 // Cannot get key if no key or secret
                 return undefined;
             }
-            const { pathname } = new URL(file.url);
-            const client = new S3Client(r2Config);
-            let key = pathname.replace(/^\//, "");
-            if (key.startsWith(`${R2_BUCKET}/`)) {
-                // TODO remove, this was a bug 👀
-                key = key.replace(`${R2_BUCKET}/`, "")
-            }
-            const command = new GetObjectCommand({
-                Bucket: R2_BUCKET,
-                Key: key
-            });
-            // Specify a custom expiry for the presigned URL, in seconds
-            const expiresIn = 3600;
-            return await getSignedUrl(client, command, { expiresIn });
+            return getR2URL(file.url);
         }
         return undefined;
     }

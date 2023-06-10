@@ -29,7 +29,7 @@ export async function getIdentifiedBackground(
   async function get() {
     const existing = await store.get(backgroundId);
 
-    if (existing && !isExpired(existing) && !isLocking()) {
+    if (existing && !isExpired(existing) && !isLocking() && !process.env.IS_LOCAL) {
       throw new Error(
         `Background task scheduled and not yet expired, please try again at ${existing.expiresAt}`
       );
