@@ -8,6 +8,7 @@ import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import {ok} from "../../../is";
 import {getOrigin} from "../../listen/config";
 import {isNumberString} from "../../calculations";
+import {packageIdentifier} from "../../package";
 
 const {
     IMAGE_RESIZING_URL,
@@ -17,6 +18,8 @@ const {
 
 const DEFAULT_SIZE = 800;
 const DEFAULT_QUALITY = 0.9;
+
+const WATERMARK_CACHE_BUST = `4.${packageIdentifier}`;
 
 export function getSize(given?: number): number {
     if (given) return given;
@@ -70,7 +73,7 @@ export async function getResolvedUrl(file: File, options?: ResolveFileOptions) {
     if (options.public && !watermarked) {
         url.searchParams.set("draw", JSON.stringify([
             {
-                url: new URL("/public/watermark.png?cacheBust=5", IMAGE_RESIZING_WATERMARK_ORIGIN || getOrigin()).toString(),
+                url: new URL(`/public/watermark.png?cacheBust=${WATERMARK_CACHE_BUST}`, IMAGE_RESIZING_WATERMARK_ORIGIN || getOrigin()).toString(),
                 repeat: true,
                 opacity: 0.5
             }
