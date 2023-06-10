@@ -2,7 +2,7 @@
   "compilerOptions": {
     "module": "esnext",
     "lib": ["es2018", "esnext", "dom"],
-    "types": ["jest", "node"],
+    "types": ["jest", "node", "@cloudflare/workers-types"],
     "esModuleInterop": true,
     "target": "esnext",
     "noImplicitAny": true,

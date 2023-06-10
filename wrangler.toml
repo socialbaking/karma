@@ -1,0 +1,8 @@
+name = "karma"
+main = "src/karma/listen/workers/image-resizing.ts"
+compatibility_date = "2023-06-10"
+
+routes = [
+    # This is hard coded... probably shouldn't be, maybe its just an example instead
+    { pattern = "karma.patient.nz/image-resizing/*", zone_name = "patient.nz" }
+]
