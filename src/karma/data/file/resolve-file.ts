@@ -19,7 +19,7 @@ const {
 const DEFAULT_SIZE = 800;
 const DEFAULT_QUALITY = 0.9;
 
-const WATERMARK_CACHE_BUST = `4.${packageIdentifier}`;
+const WATERMARK_CACHE_BUST = `4.${packageIdentifier}.${DISCORD_MEDIA_COMMUNITY_NAME}`;
 
 export function getSize(given?: number): number {
     if (given) return given;
@@ -97,7 +97,7 @@ export async function getResolvedUrl(file: File, options?: ResolveFileOptions) {
                 gravity: "left"
             });
         }
-        console.log(file, draw);
+        // console.log(file, draw);
         url.searchParams.set("draw", JSON.stringify(draw))
 
 

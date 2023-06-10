@@ -25,7 +25,7 @@ import {PutObjectCommand} from "@aws-sdk/client-s3";
 const namespace = "cb541dc3-ffbd-4d9c-923a-d1f4af02fa89";
 
 const VERSION = +(DISCORD_MEDIA_VERSION || "14");
-const WATERMARK_VERSION = 6;
+const WATERMARK_VERSION = 7;
 
 const CACHE_KEY_PREFIX = `discord-media:${VERSION}`;
 

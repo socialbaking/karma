@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 640 90" stroke-width="1.5" stroke="none" class="w-6 h-6">
     <defs>
         <clipPath id="round-corner-author">
-            <rect x="-10" y="0" width="430" height="40" rx="6" ry="6"/>
+            <rect x="-10" y="0" width="650" height="40" rx="6" ry="6"/>
         </clipPath>
         <clipPath id="round-corner-community">
             <rect x="-10" y="50" width="650" height="40" rx="6" ry="6"/>
@@ -12,7 +12,7 @@
     <rect
         x="0"
         y="0"
-        width="420"
+        width="650"
         height="40"
         id="author-rect"
         clip-path="url(#round-corner-author)"
@@ -21,7 +21,7 @@
         style="opacity: 0.8"
     />
 
-    <text id="author" x="5" y="30" font-size="30" font-family="sans-serif" fill="rgb(54, 54, 54)" stroke="rgb(54, 54, 54)">AuthorName#0000</text>
+    <text id="author" x="5" y="30" font-size="30" font-family="sans-serif" fill="rgb(54, 54, 54)" stroke="rgb(54, 54, 54)">Uploaded by AuthorNameThatIsLong#0000</text>
 
     <rect
             x="0"

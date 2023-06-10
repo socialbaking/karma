@@ -49,7 +49,7 @@ export async function getProductImageWatermarkRoutes(fastify: FastifyInstance) {
             const community = doc.getElementById("community");
             const communityRect = doc.getElementById("community-rect");
 
-            author.textContent = query.name;
+            author.textContent = query.name.substring(0, author.textContent.length);
 
             if (query.community) {
                 community.textContent = query.community;
