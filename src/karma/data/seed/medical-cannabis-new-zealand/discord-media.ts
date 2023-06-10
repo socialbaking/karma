@@ -25,7 +25,7 @@ import {PutObjectCommand} from "@aws-sdk/client-s3";
 const namespace = "cb541dc3-ffbd-4d9c-923a-d1f4af02fa89";
 
 const VERSION = +(DISCORD_MEDIA_VERSION || "14");
-const WATERMARK_VERSION = 3;
+const WATERMARK_VERSION = 6;
 
 const CACHE_KEY_PREFIX = `discord-media:${VERSION}`;
 
@@ -591,7 +591,11 @@ async function watermarkFiles(files: File[]) {
         const size = getSize();
         console.log(`Fetching watermark image for ${next.fileName}`);
         const watermarkedUrl = await getResolvedUrl(
-            next,
+            {
+                ...next,
+                // Remove any available sizes, to ensure previous watermarked isn't used
+                sizes: undefined
+            },
             {
                 public: true,
                 size

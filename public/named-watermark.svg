@@ -35,5 +35,5 @@
             style="opacity: 0.8"
     />
 
-    <text id="community" x="5" y="80" font-size="30" font-family="sans-serif" fill="rgb(54, 54, 54)" stroke="rgb(54, 54, 54)">Medical Cannabis Aotearoa New Zealand</text>
+    <text id="community" x="5" y="80" font-size="20" font-family="sans-serif" fill="rgb(54, 54, 54)" stroke="rgb(54, 54, 54)">Medical Cannabis Aotearoa New Zealand Discord Community</text>
 </svg>

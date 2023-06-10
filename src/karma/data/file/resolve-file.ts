@@ -1,6 +1,6 @@
 import {File, ResolvedFile} from "./types";
 import {join} from "node:path";
-import {DISCORD_MEDIA_OFFLINE_STORE} from "./discord";
+import {DISCORD_MEDIA_OFFLINE_STORE, DISCORD_MEDIA_COMMUNITY_NAME} from "./discord";
 import {R2_ACCESS_KEY_ID, R2_ACCESS_KEY_SECRET, R2_BUCKET, r2Config} from "./r2";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
@@ -71,13 +71,36 @@ export async function getResolvedUrl(file: File, options?: ResolveFileOptions) {
     url.searchParams.set("quality", (options.quality || DEFAULT_QUALITY).toString());
 
     if (options.public && !watermarked) {
-        url.searchParams.set("draw", JSON.stringify([
+        const draw: Record<string, unknown>[] = [
             {
                 url: new URL(`/public/watermark.png?cacheBust=${WATERMARK_CACHE_BUST}`, IMAGE_RESIZING_WATERMARK_ORIGIN || getOrigin()).toString(),
                 repeat: true,
                 opacity: 0.5
             }
-        ]))
+        ];
+        if (file.uploadedByUsername) {
+            const url = new URL(`/api/version/1/products/watermark/named.png`, IMAGE_RESIZING_WATERMARK_ORIGIN || getOrigin());
+            url.searchParams.set("cacheBust", WATERMARK_CACHE_BUST);
+            url.searchParams.set("name", `Uploaded by ${file.uploadedByUsername}`);
+            if (file.source === "discord" && DISCORD_MEDIA_COMMUNITY_NAME) {
+                url.searchParams.set("community", DISCORD_MEDIA_COMMUNITY_NAME);
+            }
+            draw.push({
+                url: url.toString(),
+                bottom: 5,
+                left: 0,
+                // "0 0 630 90"
+                // 630*(50/90) = 350
+                height: 50,
+                width: 350,
+                fit: "contain",
+                gravity: "left"
+            });
+        }
+        console.log(file, draw);
+        url.searchParams.set("draw", JSON.stringify(draw))
+
+
     }
 
     return url.toString();
