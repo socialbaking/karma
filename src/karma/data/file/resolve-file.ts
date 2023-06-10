@@ -52,6 +52,17 @@ export async function getResolvedUrl(file: File, options?: ResolveFileOptions) {
     url.searchParams.set("fit", "contain");
     url.searchParams.set("quality", "0.8");
     url.searchParams.set("variant", variant);
+
+    if (options.public) {
+        url.searchParams.set("draw", JSON.stringify([
+            {
+                url: new URL("/public/watermark.png?cacheBust=5", getOrigin()).toString(),
+                repeat: true,
+                opacity: 0.5
+            }
+        ]))
+    }
+
     return url.toString();
 
     async function getDirectURL() {
