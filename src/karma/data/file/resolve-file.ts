@@ -10,7 +10,8 @@ import {getOrigin} from "../../listen/config";
 
 const {
     IMAGE_RESIZING_URL,
-    IMAGE_RESIZING_DEFAULT_VARIANT
+    IMAGE_RESIZING_DEFAULT_VARIANT,
+    IMAGE_RESIZING_WATERMARK_ORIGIN
 } = process.env;
 
 export interface ResolveFileOptions {
@@ -56,7 +57,7 @@ export async function getResolvedUrl(file: File, options?: ResolveFileOptions) {
     if (options.public) {
         url.searchParams.set("draw", JSON.stringify([
             {
-                url: new URL("/public/watermark.png?cacheBust=5", getOrigin()).toString(),
+                url: new URL("/public/watermark.png?cacheBust=5", IMAGE_RESIZING_WATERMARK_ORIGIN || getOrigin()).toString(),
                 repeat: true,
                 opacity: 0.5
             }
