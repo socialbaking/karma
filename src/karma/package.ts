@@ -12,8 +12,10 @@ import { ok } from "../is";
 const { pathname } = new URL(import.meta.url);
 const directory = dirname(pathname);
 
+export const root = join(directory, "../../")
+
 const packageJSON = await readFile(
-  join(directory, "../../package.json"),
+  join(root, "./package.json"),
   "utf-8"
 );
 const packageInfo = JSON.parse(packageJSON);

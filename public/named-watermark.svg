@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 630 90" stroke-width="1.5" stroke="none" class="w-6 h-6">
+    <defs>
+        <clipPath id="round-corner-author">
+            <rect x="-10" y="0" width="420" height="40" rx="6" ry="6"/>
+        </clipPath>
+        <clipPath id="round-corner-community">
+            <rect x="-10" y="50" width="630" height="40" rx="6" ry="6"/>
+        </clipPath>
+    </defs>
+
+    <!-- if you want to use x="35" y="-135" put clip-path on a `g` element -->
+    <rect
+        x="0"
+        y="0"
+        width="420"
+        height="40"
+        id="author-rect"
+        clip-path="url(#round-corner-author)"
+        stroke="#32DCDC"
+        fill="#32DCDC"
+        style="opacity: 0.8"
+    />
+
+    <text id="author" x="5" y="30" font-size="30" font-family="sans-serif" fill="rgb(54, 54, 54)" stroke="rgb(54, 54, 54)">AuthorName#0000</text>
+
+    <rect
+            x="0"
+            y="50"
+            width="630"
+            height="40"
+            id="community-rect"
+            clip-path="url(#round-corner-community)"
+            stroke="#32DCDC"
+            fill="#32DCDC"
+            style="opacity: 0.8"
+    />
+
+    <text id="community" x="5" y="80" font-size="30" font-family="sans-serif" fill="rgb(54, 54, 54)" stroke="rgb(54, 54, 54)">Medical Cannabis Aotearoa New Zealand</text>
+</svg>
