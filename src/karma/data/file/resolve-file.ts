@@ -55,7 +55,7 @@ export async function getResolvedUrl(file: File, options?: ResolveFileOptions) {
     if (file.synced === "disk") return getDirectURL();
     const watermarked = file.sizes?.find(size => size.watermark);
     const url = new URL(IMAGE_RESIZING_URL, getOrigin());
-    if (watermarked) {
+    if (options.public && watermarked) {
         url.searchParams.set("image", await getR2URL(watermarked.url));
     } else {
         url.searchParams.set("image", await getDirectURL());
