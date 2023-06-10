@@ -8,7 +8,7 @@
 
 ### Test Coverage
 
-
+ ![59.91%25 lines covered](https://img.shields.io/badge/lines-59.91%25-yellow) ![59.91%25 statements covered](https://img.shields.io/badge/statements-59.91%25-yellow) ![47.37%25 functions covered](https://img.shields.io/badge/functions-47.37%25-yellow) ![83.38%25 branches covered](https://img.shields.io/badge/branches-83.38%25-brightgreen)
 
 [//]: # "badges"
 
@@ -96,7 +96,22 @@ export type FileUploadedSource = "discord";
 export type FileUploadedSynced = "r2" | "disk";
 export type FileType = "product";
 
-export interface FileData extends Record<string, unknown> {
+export interface FileImageSize {
+  width: number;
+  height: number;
+}
+
+export interface FileSize extends FileImageSize {
+  url: string;
+  synced: FileUploadedSynced;
+  syncedAt: string;
+  version: number;
+  watermark?: boolean;
+  copyright?: string;
+  license?: string;
+}
+
+export interface FileData extends Record<string, unknown>, Partial<FileImageSize> {
   fileName: string;
   contentType: string;
   size?: number;
@@ -110,6 +125,7 @@ export interface FileData extends Record<string, unknown> {
   syncedAt?: string;
   version?: number;
   type?: FileType | string;
+  sizes?: FileSize[];
   externalUrl?: string;
 }
 

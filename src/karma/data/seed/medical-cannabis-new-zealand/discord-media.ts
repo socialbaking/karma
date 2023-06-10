@@ -7,7 +7,7 @@ import {listCategories} from "../../category";
 import {v5} from "uuid";
 import {extname, join} from "node:path";
 import {mkdir, writeFile} from "fs/promises";
-import {FileData, getFile, getNamedFile, listNamedFiles, setFile} from "../../file";
+import {File, FileData, FileImageSize, FileSize, getFile, getNamedFile, listNamedFiles, setFile} from "../../file";
 import {getTimeRemaining, isRequiredTimeRemaining, getSignal} from "../../../signal";
 import {addExpiring, getCached} from "../../cache";
 import {DAY_MS, getExpiresAt, MONTH_MS} from "../../storage";
@@ -49,6 +49,26 @@ const MESSAGE_LIMIT_PER_REQUEST = 100;
 
 // How much time we should give ourselves before finishing up
 const TIMEOUT_BUFFER_MS = 5000;
+
+const SIZES: FileSizeOptions[] = [
+    {
+        width: 256,
+        height: 256
+    },
+    {
+        width: 512,
+        height: 512
+    },
+    {
+        width: 512,
+        height: 512,
+        watermark: true
+    }
+]
+
+interface FileSizeOptions extends FileImageSize {
+    watermark?: boolean;
+}
 
 interface DiscordContext {
     requestsRemaining: number;
@@ -136,7 +156,11 @@ async function downloadMediaFromChannel(context: DiscordContext, channel: Produc
 
     const finalFiles = await listNamedFiles("product", channel.product.productId);
     const finalPending = finalFiles.filter(file => !file.synced && file.externalUrl);
-    console.log(`Final count, ${finalPending.length} pending files for ${channel.name}`);
+    const finalSynced = finalFiles.filter(file => file.synced && file.externalUrl);
+    console.log(`Final count, ${finalPending.length} pending files, ${finalSynced.length} synced files for ${channel.name}`);
+
+    await resizeImages(context, finalSynced);
+
 }
 
 function getAuthorUsername(message: Pick<DiscordMessage, "author">) {
@@ -541,4 +565,31 @@ async function listGuildChannels(context: DiscordContext): Promise<DiscordGuildC
             parent
         };
     })
+}
+
+async function resizeImages(context: DiscordContext, files: File[]) {
+
+    let remainingFiles = [...files];
+
+    while (remainingFiles.length && isRequiredTimeRemaining(TIMEOUT_BUFFER_MS)){
+        const nextFile = remainingFiles.shift();
+
+        const missingSizes = SIZES.filter(size => {
+            const found = nextFile.sizes?.find(
+                other => other.watermark === size.watermark && (other.width === size.width || other.height === size.height)
+            );
+            return !found;
+        });
+
+        // Already sized all expected
+        if (!missingSizes.length) continue;
+
+
+
+
+
+
+    }
+
+
 }
