@@ -86,7 +86,7 @@ export async function getProductFile(productId: string, { fileId, accept, index,
             const totalReactions = Object.values(file.reactionCounts || {})
                 .reduce((sum, value) => sum + value, 0);
             if (!totalReactions) return [file];
-            return Array.from({ length: totalReactions }, () => file);
+            return Array.from({ length: totalReactions + 1 }, () => file);
         });
         // if (weighted.length !== files.length) {
         //     console.log("Weighted files", files);
