@@ -70,12 +70,15 @@ export interface FileData extends Record<string, unknown>, Partial<FileImageSize
   uploadedAt?: string;
   uploadedByUsername?: string;
   source?: FileUploadedSource;
+  sourceId?: string;
   synced?: FileUploadedSynced;
   syncedAt?: string;
   version?: number;
   type?: FileType | string;
   sizes?: FileSize[];
   externalUrl?: string;
+  reactionCounts?: Record<string, number>;
+  reactionCountsUpdatedAt?: string;
 }
 
 export interface File extends FileData {

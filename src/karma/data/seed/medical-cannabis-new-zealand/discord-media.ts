@@ -16,7 +16,8 @@ import {
     DISCORD_MEDIA_OFFLINE_STORE,
     DISCORD_MEDIA_PARENT_CHANNEL_NAME,
     DISCORD_MEDIA_VERSION,
-    DISCORD_MEDIA_PINNED_ONLY
+    DISCORD_MEDIA_PINNED_ONLY,
+    DISCORD_MEDIA_EMOJI_NAME
 } from "../../file/discord";
 import {createHash} from "crypto";
 import {getResolvedUrl, getSize} from "../../file/resolve-file";
@@ -24,8 +25,8 @@ import {PutObjectCommand} from "@aws-sdk/client-s3";
 
 const namespace = "cb541dc3-ffbd-4d9c-923a-d1f4af02fa89";
 
-const VERSION = +(DISCORD_MEDIA_VERSION || "14");
-const WATERMARK_VERSION = 7;
+const VERSION = +(DISCORD_MEDIA_VERSION || "15");
+const WATERMARK_VERSION = 8;
 
 const CACHE_KEY_PREFIX = `discord-media:${VERSION}`;
 
@@ -54,25 +55,8 @@ const MESSAGE_LIMIT_PER_REQUEST = 100;
 // How much time we should give ourselves before finishing up
 const TIMEOUT_BUFFER_MS = 5000;
 
-const SIZES: FileSizeOptions[] = [
-    {
-        width: 256,
-        height: 256
-    },
-    {
-        width: 512,
-        height: 512
-    },
-    {
-        width: 512,
-        height: 512,
-        watermark: true
-    }
-]
-
-interface FileSizeOptions extends FileImageSize {
-    watermark?: boolean;
-}
+// The reaction names that will be searched for
+const DISCORD_MEDIA_EMOJI_NAMES = DISCORD_MEDIA_EMOJI_NAME?.split("/") ?? ["❤️", "🔥"];
 
 interface DiscordContext {
     requestsRemaining: number;
@@ -200,6 +184,7 @@ async function downloadMediaFromChannel(context: DiscordContext, channel: Produc
     console.log(`Final count, ${finalPending.length} pending files, ${finalSynced.length} synced files for ${channel.name}`);
 
     await watermarkFiles(finalSynced);
+    await fileReactions(context, finalSynced);
 
 }
 
@@ -240,6 +225,7 @@ function getFileData(channel: ProductDiscordChannel, message: DiscordMessage) {
             uploadedByUsername,
             pinned: !!message.pinned,
             source: "discord",
+            sourceId: `${channel.id}:${message.id}:${attachment.id}`,
             version: VERSION,
             externalUrl: attachment.url
         }
@@ -683,4 +669,87 @@ async function watermarkFiles(files: File[]) {
         };
         await setFile(updatedFile);
     }
+}
+
+async function getReactionCount(context: DiscordContext, channelId: string, messageId: string, emoji: string) {
+    // console.log({ emoji, messageId, channelId });
+    context.requestsRemaining -= 1;
+    const response = await fetch(
+        new URL(
+            // /channels/{channel.id}/messages/{message.id}/reactions/{emoji}
+            `/api/v10/channels/${channelId}/messages/${messageId}/reactions/${encodeURIComponent(emoji)}`,
+            "https://discord.com"
+        ),
+        {
+            method: "GET",
+            headers: {
+                Authorization: `Bot ${DISCORD_BOT_TOKEN}`,
+            },
+            signal: getSignal()
+        }
+    );
+    console.log(`getReactionCount status:`, response.status);
+    if (response.status === 404) return undefined;
+    if (response.status === 429) {
+        context.requestsRemaining = 0;
+        return undefined;
+    }
+    if (!response.ok) {
+        console.log(await response.text());
+    }
+    ok(response.ok, `listReactions returned ${response.status}`);
+    const reactions: unknown[] = await response.json();
+    if (reactions.length) {
+        console.log({ [emoji]: reactions.length });
+    }
+    return reactions.length;
+}
+
+async function getFileReactionCount(context: DiscordContext, file: File, emoji: string) {
+    if (!file.sourceId) return undefined;
+    if (file.source !== "discord") return undefined;
+    const [channelId, messageId] = file.sourceId.split(":");
+    return getReactionCount(context, channelId, messageId, emoji);
+}
+
+async function fileReactions(context: DiscordContext, files: File[]) {
+
+    for (const file of files) {
+        if (!file.pinned) continue; // Only pinned files should get reaction counts checked
+        if (!file.sourceId) continue;
+        if (!context.requestsRemaining) break;
+        if (!isRequiredTimeRemaining(TIMEOUT_BUFFER_MS)) break;
+        const remainingReactions = DISCORD_MEDIA_EMOJI_NAMES.filter(
+            name => typeof file.reactionCounts?.[name] !== "number"
+        );
+        if (!remainingReactions.length) continue;
+
+        const reactionCounts = Object.fromEntries(
+            await Promise.all(
+                remainingReactions.map(
+                    async emoji => [emoji, await getFileReactionCount(context, file, emoji)] as const
+                )
+            )
+        );
+
+        const foundIndex = Object.values(reactionCounts).findIndex(value => typeof value === "number");
+        if (foundIndex === -1) continue;
+
+        // console.log(reactionCounts)
+
+        const nextFile = {
+            ...file,
+            reactionCounts: {
+                ...file.reactionCounts,
+                ...reactionCounts
+            },
+            reactionCountsUpdatedAt: new Date().toISOString()
+        };
+        // console.log(nextFile);
+        await setFile(nextFile);
+
+
+    }
+
+
 }
