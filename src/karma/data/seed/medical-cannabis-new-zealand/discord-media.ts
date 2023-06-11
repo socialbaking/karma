@@ -143,9 +143,45 @@ async function downloadMediaFromChannel(context: DiscordContext, channel: Produc
 
     if (context.requestsRemaining) {
         console.log(`Listing messages for channel ${channel.name}`);
+
+        const pinnedMessages = await listPinnedMediaMessages(context, channel);
+
+        let pinnedFileIds: string[] = [];
+        for (const message of pinnedMessages) {
+            anyProcessed = true;
+
+            const data = getFileData(channel, message);
+
+            pinnedFileIds.push(...data.map(data => data.fileId));
+
+            await saveFileData(
+                context,
+                data
+            )
+
+            await saveAttachments(context, channel, message);
+        }
+
+        const currentFiles = await listNamedFiles("product", channel.product.productId);
+        const currentPinnedFiles = currentFiles.filter(file => file.pinned);
+        const unpinnedFiles = currentPinnedFiles.filter(
+            file => !pinnedFileIds.includes(file.fileId)
+        );
+
+        if (unpinnedFiles.length) {
+            console.log(`Unpinning ${unpinnedFiles.length} files for ${channel.name}`);
+            for (const file of unpinnedFiles) {
+                await setFile({
+                    ...file,
+                    pinned: false
+                });
+            }
+        }
+
         for await (const messages of listMediaMessages(context, channel)) {
             // Fetch pinned messages with priority
             for (const message of messages.sort((a, b) => a.pinned ? (b.pinned ? 0 : -1) : 1)) {
+                if (message.pinned) continue;
                 anyProcessed = true;
                 await saveAttachments(context, channel, message);
             }
@@ -216,8 +252,6 @@ async function saveAttachments(context: DiscordContext, channel: ProductDiscordC
         getFileData(channel, message)
     );
 }
-
-
 
 async function saveToR2(file: Pick<FileData, "fileName" | "contentType">, blob: Blob): Promise<Partial<FileData>> {
     const client = await getR2()
@@ -330,37 +364,30 @@ async function saveFileData(context: DiscordContext, fileData: IdFileData[]): Pr
     }
 }
 
-async function *listMediaMessages(context: DiscordContext, channel: DiscordGuildChannel): AsyncIterable<DiscordMessage[]> {
-    let yielded: string[] = [];
-
-    try {
-        const pinsUrl = new URL(
-            `/api/v10/channels/${channel.id}/pins`,
-            "https://discord.com"
-        );
-        const pinsResponse = await fetch(
-            pinsUrl,
-            {
-                method: "GET",
-                headers: {
-                    Authorization: `Bot ${DISCORD_BOT_TOKEN}`,
-                },
-            }
-        )
-        console.log("listMediaMessages pins status:", pinsResponse.status);
-        if (pinsResponse.ok) {
-            const pins: DiscordMessage[] = await pinsResponse.json();
-            console.log({ pins: pins.length });
-            if (pins.length) {
-                const attachmentPins = pins.filter(message => message.attachments?.length);
-                if (attachmentPins.length) {
-                    yield attachmentPins;
-                    yielded.push(...attachmentPins.map(message => message.id));
-                }
-            }
+async function listPinnedMediaMessages(context: DiscordContext, channel: DiscordGuildChannel): Promise<DiscordMessage[]> {
+    const pinsUrl = new URL(
+        `/api/v10/channels/${channel.id}/pins`,
+        "https://discord.com"
+    );
+    const pinsResponse = await fetch(
+        pinsUrl,
+        {
+            method: "GET",
+            headers: {
+                Authorization: `Bot ${DISCORD_BOT_TOKEN}`,
+            },
         }
-    } catch {}
+    )
+    console.log("listMediaMessages pins status:", pinsResponse.status);
+    if (!pinsResponse.ok) {
+        return [];
+    }
+    const pins: DiscordMessage[] = await pinsResponse.json();
+    console.log({ pins: pins.length });
+    return pins.filter(message => message.attachments?.length);
+}
 
+async function *listMediaMessages(context: DiscordContext, channel: DiscordGuildChannel): AsyncIterable<DiscordMessage[]> {
     // Done if only pins
     if (DISCORD_MEDIA_PINNED_ONLY) return;
 
@@ -422,8 +449,6 @@ async function *listMediaMessages(context: DiscordContext, channel: DiscordGuild
         ok(response.ok, `listMediaMessages returned ${response.status}`);
         responseMessages = await response.json();
         responseMessages = responseMessages
-            // Ensure no pinned messages are re-downloaded
-            .filter(message => !yielded.includes(message.id))
             .map(message => ({
                 ...message,
                 milliseconds: new Date(message.timestamp).getTime()
