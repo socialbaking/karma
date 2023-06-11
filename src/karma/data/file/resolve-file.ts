@@ -13,13 +13,14 @@ import {packageIdentifier} from "../../package";
 const {
     IMAGE_RESIZING_URL,
     IMAGE_RESIZING_DEFAULT_SIZE,
+    IMAGE_RESIZING_DEFAULT_QUALITY,
     IMAGE_RESIZING_WATERMARK_ORIGIN
 } = process.env;
 
 // https://developers.cloudflare.com/images/image-resizing/url-format/#recommended-image-sizes
 const DEFAULT_SIZE = 1920;
 // From 1 to 100, default with Cloudflare is 85
-const DEFAULT_QUALITY = 85;
+const DEFAULT_QUALITY = 100;
 
 const BASE_SIZE = 600;
 
@@ -30,6 +31,12 @@ export function getSize(given?: number): number {
     if (given) return given;
     if (isNumberString(IMAGE_RESIZING_DEFAULT_SIZE)) return +IMAGE_RESIZING_DEFAULT_SIZE;
     return DEFAULT_SIZE;
+}
+
+export function getQuality(given?: number): number {
+    if (given) return given;
+    if (isNumberString(IMAGE_RESIZING_DEFAULT_QUALITY)) return +IMAGE_RESIZING_DEFAULT_QUALITY;
+    return DEFAULT_QUALITY;
 }
 
 export interface ResolveFileOptions {
@@ -77,7 +84,7 @@ export async function getResolvedUrl(file: File, options?: ResolveFileOptions) {
     url.searchParams.set("width", size.toString());
     url.searchParams.set("height", size.toString());
     url.searchParams.set("fit", "scale-down");
-    url.searchParams.set("quality", (options.quality || DEFAULT_QUALITY).toString());
+    url.searchParams.set("quality", getQuality(options.quality).toString());
 
     if (options.public && !watermarked) {
         const ratio = size / BASE_SIZE;
