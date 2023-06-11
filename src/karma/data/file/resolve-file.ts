@@ -16,9 +16,13 @@ const {
     IMAGE_RESIZING_WATERMARK_ORIGIN
 } = process.env;
 
-const DEFAULT_SIZE = 800;
+// https://developers.cloudflare.com/images/image-resizing/url-format/#recommended-image-sizes
+const DEFAULT_SIZE = 1920;
 // From 1 to 100, default with Cloudflare is 85
 const DEFAULT_QUALITY = 85;
+
+const BASE_SIZE = 600;
+
 
 const WATERMARK_CACHE_BUST = `4.${packageIdentifier}.${DISCORD_MEDIA_COMMUNITY_NAME}`;
 
@@ -59,24 +63,31 @@ export async function getResolvedUrl(file: File, options?: ResolveFileOptions) {
     if (file.synced === "disk") return getDirectURL();
     const watermarked = file.sizes?.find(size => size.watermark);
     const url = new URL(IMAGE_RESIZING_URL, getOrigin());
+    const size = getSize(options.size);
     if (options.public && watermarked) {
-        url.searchParams.set("image", await getR2URL(watermarked.url));
+        const watermarkedUrl = await getR2URL(watermarked.url);
+        if (watermarked.width === size || watermarked.height === size) {
+            return watermarkedUrl;
+        }
+        url.searchParams.set("image", watermarkedUrl);
     } else {
         url.searchParams.set("image", await getDirectURL());
     }
-    const size = getSize(options.size).toString();
 
-    url.searchParams.set("width", size);
-    url.searchParams.set("height", size);
-    url.searchParams.set("fit", "contain");
+    url.searchParams.set("width", size.toString());
+    url.searchParams.set("height", size.toString());
+    url.searchParams.set("fit", "scale-down");
     url.searchParams.set("quality", (options.quality || DEFAULT_QUALITY).toString());
 
     if (options.public && !watermarked) {
+        const ratio = size / BASE_SIZE;
         const draw: Record<string, unknown>[] = [
             {
                 url: new URL(`/public/watermark.png?cacheBust=${WATERMARK_CACHE_BUST}`, IMAGE_RESIZING_WATERMARK_ORIGIN || getOrigin()).toString(),
                 repeat: true,
-                opacity: 0.5
+                opacity: 0.5,
+                fit: "contain",
+                width: 170 * ratio,
             }
         ];
         if (file.uploadedByUsername) {
@@ -92,8 +103,7 @@ export async function getResolvedUrl(file: File, options?: ResolveFileOptions) {
                 left: 0,
                 // "0 0 630 90"
                 // 630*(50/90) = 350
-                height: 50,
-                width: 350,
+                width: 350 * ratio,
                 fit: "contain",
                 gravity: "left"
             });
