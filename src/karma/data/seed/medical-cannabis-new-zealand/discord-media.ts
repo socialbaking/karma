@@ -548,6 +548,7 @@ interface DiscordGuildChannel extends Record<string, unknown> {
     parent_id?: string;
     parent?: DiscordGuildChannel
     name: string;
+    topic?: string;
     type: string;
 }
 
@@ -562,11 +563,13 @@ async function listProductChannels(context: DiscordContext): Promise<ProductDisc
     const categories = await listCategories();
     ok(DISCORD_MEDIA_PARENT_CHANNEL_NAME, "Expected DISCORD_MEDIA_PARENT_CHANNEL_NAME");
     const parentName = DISCORD_MEDIA_PARENT_CHANNEL_NAME.toLowerCase();
-    return channels
+    const groupedChannels = channels
         .filter(({ parent }) => {
             if (!parent) return false;
             return parent.name.toLowerCase() === parentName;
-        })
+        });
+
+    const matchingChannels = groupedChannels
         .map(channel => {
             const matching = getMatchingProducts(products, organisations, categories, channel.name.replace(/-/g, " "));
             if (matching.length !== 1) return undefined;
@@ -576,6 +579,26 @@ async function listProductChannels(context: DiscordContext): Promise<ProductDisc
             }
         })
         .filter(Boolean);
+    const remainingProducts = products.filter(product => {
+        const found = matchingChannels.find(channel => channel.product.productId === product.productId);
+        return !found;
+    });
+    const remainingChannels = groupedChannels.filter(channel => {
+        const found = matchingChannels.find(other => other.id === channel.id);
+        return !found;
+    });
+    const matchingTopics = remainingProducts
+        .map(product => {
+            // Find the topic where the product name matches in full
+            const matchingTopic = remainingChannels.find(({ topic }) => topic?.includes(product.productName));
+            if (!matchingTopic) return undefined;
+            return {
+                ...matchingTopic,
+                product
+            };
+        })
+        .filter(Boolean);
+    return [...matchingChannels, ...matchingTopics];
 }
 
 async function listGuildChannels(context: DiscordContext): Promise<DiscordGuildChannel[]> {
