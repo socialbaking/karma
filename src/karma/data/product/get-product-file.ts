@@ -70,10 +70,35 @@ export async function getProductFile(productId: string, { fileId, accept, index,
             }
         }
         if (pinned.length === 1) return pinned[0];
-        if (pinned.length) return pinned[index ?? pickIndex(pinned.length)]
+        if (pinned.length) {
+            if (typeof index === "number") {
+                return pinned[index];
+            }
+            return pickWeightedFiles(pinned);
+        }
         // Only allow viewing the pinned images if public
         if (isPublic) return undefined;
         return files[index ?? pickIndex(files.length)];
+    }
+
+    function pickWeightedFiles(files: File[]) {
+        const weighted = files.flatMap(file => {
+            const totalReactions = Object.values(file.reactionCounts || {})
+                .reduce((sum, value) => sum + value, 0);
+            if (!totalReactions) return [file];
+            return Array.from({ length: totalReactions }, () => file);
+        });
+        // if (weighted.length !== files.length) {
+        //     console.log("Weighted files", files);
+        // }
+        // Mix them up
+        const randomOrder = weighted.map(() => Math.random());
+        // Order based on random index given above
+        const randomlyOrdered = weighted.sort(
+            (a, b) => randomOrder[weighted.indexOf(a)] < randomOrder[weighted.indexOf(b)] ? -1 : 1
+        )
+        // Pick from the randomly ordered files
+        return randomlyOrdered[pickIndex(randomlyOrdered.length)];
     }
 
     function pickIndex(length: number) {
