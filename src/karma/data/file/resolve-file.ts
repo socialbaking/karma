@@ -17,7 +17,8 @@ const {
 } = process.env;
 
 const DEFAULT_SIZE = 800;
-const DEFAULT_QUALITY = 0.9;
+// From 1 to 100, default with Cloudflare is 85
+const DEFAULT_QUALITY = 85;
 
 const WATERMARK_CACHE_BUST = `4.${packageIdentifier}.${DISCORD_MEDIA_COMMUNITY_NAME}`;
 
