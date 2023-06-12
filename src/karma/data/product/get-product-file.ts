@@ -21,15 +21,18 @@ export async function listProductFiles(options?: ListProductFilesOptions): Promi
 
 export async function getProductFiles(productId: string, options: GetProductFileOptions = {}): Promise<File[]> {
     const files = await getUnresolvedProductFiles(productId, options);
-    const resolved = await Promise.all(
+    let resolved = await Promise.all(
         files.map(
             file => getMaybeResolvedFile(file, options)
         )
     );
+    if (options.public) {
+        resolved = resolved.filter(file => file.pinned && !!file.sizes?.find(size => size.watermark));
+    }
     return resolved.filter(Boolean);
 }
 
-export async function getUnresolvedProductFiles(productId: string, { accept, public: isPublic }: GetProductFileListOptions = {}): Promise<File[]> {
+export async function getUnresolvedProductFiles(productId: string, { accept }: GetProductFileListOptions = {}): Promise<File[]> {
     let files = await listNamedFiles("product", productId);
     files = files
         .filter(file => file.synced)
@@ -39,9 +42,6 @@ export async function getUnresolvedProductFiles(productId: string, { accept, pub
             // Use the most recent first, updated images please :)
             return a.uploadedAt > b.uploadedAt ? -1 : 1
         });
-    if (isPublic) {
-        files = files.filter(file => file.pinned && !!file.sizes?.find(size => size.watermark));
-    }
     if (accept) {
         // "image" will match "image/jpeg"
         files = files.filter(file => file.contentType?.startsWith(accept))
