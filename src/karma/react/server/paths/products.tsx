@@ -12,6 +12,8 @@ import ClientProductListItem, {
 } from "../../client/components/product/list-item";
 import { SvgTextIcon } from "../../client/components/icons";
 import {COPYRIGHT_PUBLIC_LABEL} from "../../../static";
+import {Product} from "../../../data";
+import {useMemo} from "react";
 
 function ProductListItem(props: ProductProps) {
   const category = useCategory(props.product.categoryId);
@@ -19,8 +21,14 @@ function ProductListItem(props: ProductProps) {
   return <ClientProductListItem {...props} category={category} isAnonymous={isAnonymous} />;
 }
 
-function CopyrightInfo() {
-  const products = useSortedProducts(true);
+export interface CopyrightInfoProps {
+  product?: Product
+  margin?: boolean
+}
+
+export function CopyrightInfo({ product, margin }: CopyrightInfoProps) {
+  const allProducts = useSortedProducts(true);
+  const products = useMemo(() => product ? [product] : allProducts, [allProducts]);
   const copyright = useCopyrightInformation(products);
   const { isAnonymous } = useData();
   if (!copyright.length) return null;
@@ -29,7 +37,7 @@ function CopyrightInfo() {
         {copyright.map(({ contentUrl, copyrightUrl, label, svg }, index) => (
             <li key={index} className="flex flex-row items-center my-4">
               {svg ? <img alt="" role="presentation" src={svg} /> : undefined}
-              <span className="mx-4">
+              <span className={margin === false ? "" : "mx-4"}>
                 This page includes details derived or about&nbsp;
                 <a
                     href={contentUrl}

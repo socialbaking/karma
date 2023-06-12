@@ -4,6 +4,7 @@ import {useParams, useProduct, useInput} from "../data";
 import {ok} from "../../../../is";
 import {isAnonymous} from "../../../authentication";
 import {getImageResizingUrl} from "../../../data/file/resolve-file";
+import {CopyrightInfo} from "./products";
 
 interface ProductInfo {
     images: File[]
@@ -99,6 +100,7 @@ export function ProductPage() {
     ok(product, `Could not find product ${productId}`);
     return (
         <div>
+            {isAnonymous ? <CopyrightInfo product={product} margin={false} /> : undefined}
             <h1>{product.productName}</h1><br />
             <a
                 href={`/calculator?search=${encodeURIComponent(product.productName)}`}
@@ -107,6 +109,7 @@ export function ProductPage() {
                 Calculate Metrics
             </a><br /><br />
             <ProductImages />
+            <CopyrightInfo product={product} margin={false} />
         </div>
     )
 }
