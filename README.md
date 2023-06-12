@@ -109,6 +109,7 @@ export interface FileSize extends FileImageSize {
   watermark?: boolean;
   copyright?: string;
   license?: string;
+  fileName?: string;
 }
 
 export interface FileData extends Record<string, unknown>, Partial<FileImageSize> {

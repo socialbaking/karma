@@ -7,7 +7,8 @@ import {getImageResizingUrl} from "../../../data/file/resolve-file";
 import {CopyrightInfo} from "./products";
 
 interface ProductInfo {
-    images: File[]
+    images100: File[]
+    images600: File[]
 }
 
 type Params = {
@@ -20,15 +21,21 @@ type Schema = {
 
 export async function handler(request: FastifyRequest<Schema>): Promise<ProductInfo> {
     const { productId } = request.params;
-    const images = await getProductFiles(productId, {
+    const images100 = await getProductFiles(productId, {
         accept: "image",
-        public: isAnonymous()
+        public: isAnonymous(),
+        size: 100
     });
-    return { images };
+    const images600 = await getProductFiles(productId, {
+        accept: "image",
+        public: isAnonymous(),
+        size: 600
+    });
+    return { images100, images600 };
 }
 
 function ProductImages() {
-    const { images } = useInput<ProductInfo>()
+    const { images100, images600 } = useInput<ProductInfo>()
     return (
         <div className="product-gallery">
             <style dangerouslySetInnerHTML={{ __html: `
@@ -72,21 +79,21 @@ function ProductImages() {
 }
             `.trim()}} />
             <ul className="product-gallery-navigation">
-                {images.map(
-                    ({ url, uploadedByUsername, fileName }, index: number) => (
+                {images100.map(
+                    ({ url, uploadedByUsername, fileId }, index: number) => (
                         <li key={index} className="product-gallery-navigation-item">
-                            <a href={`#image-${fileName}`}>
-                                <img src={getImageResizingUrl(url, { size: 100 }).toString()} alt={`View product image ${index + 1}`} />
+                            <a href={`#image-${fileId}`}>
+                                <img src={url} alt={`View product image ${index + 1}`} />
                             </a>
                         </li>
                     )
                 )}
             </ul>
             <div className="product-gallery-view">
-                {images.map(
-                    ({ url, uploadedByUsername, fileName }, index: number) => (
+                {images600.map(
+                    ({ url, uploadedByUsername, fileId }, index: number) => (
                         <div key={index} className="product-gallery-item">
-                            <img id={`image-${fileName}`} src={getImageResizingUrl(url, { size: 600 }).toString()} alt={`Product image ${index + 1}${uploadedByUsername ? ` uploaded by ${uploadedByUsername}` : ""}`} />
+                            <img id={`image-${fileId}`} src={url} alt={`Product image ${index + 1}${uploadedByUsername ? ` uploaded by ${uploadedByUsername}` : ""}`} />
                         </div>
                     )
                 )}

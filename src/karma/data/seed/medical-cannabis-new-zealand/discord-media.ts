@@ -20,13 +20,14 @@ import {
     DISCORD_MEDIA_EMOJI_NAME
 } from "../../file/discord";
 import {createHash} from "crypto";
-import {getResolvedUrl, getSize} from "../../file/resolve-file";
+import {DEFAULT_IMAGE_SIZE, getResolvedUrl, getSize, ResolveFileOptions} from "../../file/resolve-file";
 import {PutObjectCommand} from "@aws-sdk/client-s3";
+import {basename} from "discord.js";
 
 const namespace = "cb541dc3-ffbd-4d9c-923a-d1f4af02fa89";
 
-const VERSION = +(DISCORD_MEDIA_VERSION || "15");
-const WATERMARK_VERSION = 14;
+const VERSION = +(DISCORD_MEDIA_VERSION || "17");
+const RESIZE_VERSION = 20;
 
 const CACHE_KEY_PREFIX = `discord-media:${VERSION}`;
 
@@ -39,6 +40,10 @@ const CACHE_EXPIRES_IN_MS = 3 * DAY_MS;
 // Have the correctly pinned messages
 const CACHE_DIRECTION_EXPIRES_IN_MS = 7 * DAY_MS;
 
+const {
+    IS_LOCAL
+} = process.env
+
 // All bots can make up to 50 requests per second to our API.
 // If no authorization header is provided, then the limit is applied to the IP address.
 // This is independent of any individual rate limit on a route.
@@ -46,8 +51,8 @@ const CACHE_DIRECTION_EXPIRES_IN_MS = 7 * DAY_MS;
 // it may be impossible to stay below 50 requests per second during normal operations.
 
 // We must keep some requests available for auth operations
-const DEFAULT_MAX_REQUESTS = 45;
-const DEFAULT_MAX_REQUESTS_PER_CHANNEL = 30;
+const DEFAULT_MAX_REQUESTS = IS_LOCAL ? 1000 : 45;
+const DEFAULT_MAX_REQUESTS_PER_CHANNEL = IS_LOCAL ? 1000 : 35;
 
 // This is the default for the discord API, but we need to be able to reference this
 const MESSAGE_LIMIT_PER_REQUEST = 100;
@@ -57,6 +62,13 @@ const TIMEOUT_BUFFER_MS = 5000;
 
 // The reaction names that will be searched for
 const DISCORD_MEDIA_EMOJI_NAMES = DISCORD_MEDIA_EMOJI_NAME?.split("/") ?? ["❤️", "🔥"];
+
+const DISCORD_MEDIA_SIZES = [
+  100,
+  600,
+  DEFAULT_IMAGE_SIZE
+];
+
 
 interface DiscordContext {
     requestsRemaining: number;
@@ -178,13 +190,27 @@ async function downloadMediaFromChannel(context: DiscordContext, channel: Produc
         console.log(`Did not process any messages for channel ${channel.name}`);
     }
 
-    const finalFiles = await listNamedFiles("product", channel.product.productId);
+    let { finalSynced, finalFiles } = await listFiles();
     const finalPending = finalFiles.filter(file => !file.synced && file.externalUrl);
-    const finalSynced = finalFiles.filter(file => file.synced && file.externalUrl);
     console.log(`Final count, ${finalPending.length} pending files, ${finalSynced.length} synced files for ${channel.name}`);
 
     await watermarkFiles(finalSynced);
+
+    // HAVE MAKE SURE TO UPDATE OUR LIST IN BETWEEN!
+    ({ finalSynced, finalFiles } = await listFiles());
+
     await fileReactions(context, finalSynced);
+
+    // HAVE MAKE SURE TO UPDATE OUR LIST IN BETWEEN!
+    ({ finalSynced, finalFiles } = await listFiles());
+
+    await resizeFiles(finalSynced);
+
+    async function listFiles() {
+        const finalFiles = await listNamedFiles("product", channel.product.productId);
+        const finalSynced = finalFiles.filter(file => file.synced && file.externalUrl);
+        return { finalFiles, finalSynced }
+    }
 
 }
 
@@ -619,55 +645,38 @@ async function watermarkFiles(files: File[]) {
     if (!isR2()) return; // Only watermark with R2
     const pinned = files.filter(file => file.pinned && file.contentType.startsWith("image"));
     if (!pinned.length) return;
-    const pending = pinned.filter(file => file.synced && !file.sizes?.find(size => size.watermark && size.version === WATERMARK_VERSION));
+    const DEFAULT_SIZE = getSize();
+    const pending = pinned.filter(file => file.synced && !file.sizes?.filter(Boolean).find(size => (
+        size.width === DEFAULT_SIZE &&
+        size.watermark &&
+        size.version === RESIZE_VERSION
+    )));
     while (isRequiredTimeRemaining(TIMEOUT_BUFFER_MS) && pending.length) {
-        const next = pending.shift();
-        const size = getSize();
-        console.log(`Fetching watermark image for ${next.fileName}`);
-        const watermarkedUrl = await getResolvedUrl(
-            {
-                ...next,
-                // Remove any available sizes, to ensure previous watermarked isn't used
-                sizes: undefined
-            },
-            {
-                public: true,
-                size
-            }
-        );
-        const response = await fetch(watermarkedUrl, {
-            method: "GET",
-            headers: {
-                Accept: next.contentType
-            }
+        const file = pending.shift();
+        console.log(`Fetching watermark image for ${file.fileName}`);
+        const interim: File = {
+            ...file,
+            fileName: `watermark-${basename(file.fileName)}`,
+            sizes: undefined
+        }
+        const resized = await resizeFile(interim, {
+            public: true,
+            size: DEFAULT_SIZE
         });
-        console.log(`watermarkFiles status:`, response.status);
-        if (!response.ok) continue;
-        const nextFileData = {
-            contentType: next.contentType,
-            fileName: `watermark-${next.fileName}`
-        };
-        const { synced, url } = await saveToR2(nextFileData, await response.blob());
-        const nextFileSize: FileSize = {
-            // Either width or height will match
-            height: size,
-            width: size,
-            synced,
-            syncedAt: new Date().toISOString(),
-            url,
-            version: WATERMARK_VERSION,
-            watermark: true
-        };
-
-        const updatedFile: File = {
-            ...next,
+        if (!resized) {
+            console.log("Could not resize for", file.fileName)
+            continue;
+        }
+        console.log({ resized });
+        const nextFile: File = {
+            ...file,
             sizes: [
                 // Allow updating the watermark image
-                ...(next.sizes ?? []).filter(value => !value.watermark),
-                nextFileSize
+                ...(file.sizes ?? []).filter(Boolean).filter(value => !value.watermark),
+                resized
             ]
         };
-        await setFile(updatedFile);
+        await setFile(nextFile);
     }
 }
 
@@ -747,9 +756,132 @@ async function fileReactions(context: DiscordContext, files: File[]) {
         };
         // console.log(nextFile);
         await setFile(nextFile);
+    }
+}
 
+async function resizeFiles(files: File[]) {
+    const pinned = files.filter(file => file.pinned && file.contentType.startsWith("image"));
+    for (let file of pinned) {
+        if (!isRequiredTimeRemaining(TIMEOUT_BUFFER_MS * 2)) break;
+        if (file.synced !== "r2") continue;
 
+        // console.log({ before: file.sizes, version: RESIZE_VERSION });
+        file = {
+            ...file,
+            sizes: (file.sizes ?? [])
+                .filter(Boolean)
+                .filter(value => value.version === RESIZE_VERSION)
+        }
+        // console.log({ after: file.sizes });
+
+        const base = await resize(file);
+        const watermarked = await resize(file, true);
+        const updates = [
+            ...base,
+            ...watermarked
+        ].filter(Boolean);
+
+        console.log({ updates });
+
+        if (updates.length) {
+            await setFile({
+                ...file,
+                sizes: [
+                    ...file.sizes,
+                    ...updates
+                ]
+            });
+        }
     }
 
+    async function resize(file: File, watermark?: boolean) {
+        console.log(`Resizing ${watermark ? "watermark" : "base"} images for ${file.fileName}`);
+        const sizes = DISCORD_MEDIA_SIZES.filter(
+            size => !file.sizes?.filter(Boolean).find(value => value.width === size && (watermark ? value.watermark : !value.watermark))
+        );
+        if (!sizes.length) return [];
+        console.log({ sizes, file: file.sizes, watermark });
+        const defaultSize = getSize();
+        let url = file.url,
+            fileName = file.fileName;
+        if (watermark) {
+            const watermarkSize = file.sizes
+                ?.filter(Boolean)
+                .find(value => value.width === defaultSize && value.watermark);
+            if (!watermarkSize) return [];
+            url = watermarkSize.url;
+            fileName = watermarkSize.fileName ?? fileName;
+        }
+        if (!url) return [];
+        return await Promise.all(
+            sizes.map(
+                async size => {
+                    const resized = await resizeFile(
+                        {
+                            ...file,
+                            url,
+                            fileName
+                        },
+                        // No need to indicate public to the resizing process
+                        { size }
+                    );
+                    if (!resized) return undefined;
+                    if (watermark) {
+                        resized.watermark = true;
+                    }
+                    return resized;
+                }
+            )
+        );
+    }
 
+}
+
+async function resizeFile(file: File, options: ResolveFileOptions) {
+    const size = options.size;
+    ok(size, "Expected size");
+    const extension = extname(file.fileName);
+    const withoutExtension = basename(file.fileName, extension)
+    const withoutSize = withoutExtension.replace(/-\d+$/, "");
+    const fileName = `${withoutSize}-${size}${extension}`;
+    console.log(`Fetching resized image for ${fileName} to size ${size} (public: ${options.public || false})`);
+    const returnedUrl = await getResolvedUrl(
+        {
+            ...file,
+            // Remove any available sizes, to ensure previous sized isn't used
+            sizes: undefined
+        },
+        options
+    );
+    const response = await fetch(returnedUrl, {
+        method: "GET",
+        headers: {
+            Accept: file.contentType
+        }
+    });
+    console.log(`resizeFile status for ${fileName}:`, response.status);
+    if (!response.ok) {
+        console.log(response.headers.get("Cf-Resized"));
+        console.log(response.headers);
+        return undefined;
+    }
+    const fileData: FileData = {
+        contentType: file.contentType,
+        fileName
+    };
+    const { synced, url } = await saveToR2(fileData, await response.blob());
+    const nextFileSize: FileSize = {
+        // Either width or height will match
+        height: size,
+        width: size,
+        synced,
+        syncedAt: new Date().toISOString(),
+        url,
+        version: RESIZE_VERSION,
+        fileName
+    };
+    if (options.public) {
+        nextFileSize.watermark = true;
+    }
+    return nextFileSize;
 }

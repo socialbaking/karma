@@ -20,15 +20,15 @@ export async function listProductFiles(options?: ListProductFilesOptions): Promi
 }
 
 export async function getProductFiles(productId: string, options: GetProductFileOptions = {}): Promise<File[]> {
-    const files = await getUnresolvedProductFiles(productId, options);
-    let resolved = await Promise.all(
+    let files = await getUnresolvedProductFiles(productId, options);
+    if (options.public) {
+        files = files.filter(file => file.pinned && !!file.sizes?.find(size => size.watermark));
+    }
+    const resolved = await Promise.all(
         files.map(
             file => getMaybeResolvedFile(file, options)
         )
     );
-    if (options.public) {
-        resolved = resolved.filter(file => file.pinned && !!file.sizes?.find(size => size.watermark));
-    }
     return resolved.filter(Boolean);
 }
 
@@ -53,21 +53,24 @@ export interface GetProductFileOptions extends GetProductFileListOptions {
     fileId?: string;
     accept?: string;
     index?: number;
+    size?: number
 }
 
-export async function getProductFile(productId: string, { fileId, accept, index, public: isPublic }: GetProductFileOptions = {}): Promise<File | undefined> {
+export async function getProductFile(productId: string, { fileId, accept, index, public: isPublic, size }: GetProductFileOptions = {}): Promise<File | undefined> {
     if (fileId) {
         const file = await getNamedFile("product", productId, fileId);
         // Must be synced already to be able to get it
         return getMaybeResolvedFile(file, {
-            public: isPublic
+            public: isPublic,
+            size
         });
     }
     const files = await getUnresolvedProductFiles(productId, { accept })
     const file = pick();
     if (!file) return undefined;
     return getResolvedFile(file, {
-        public: isPublic
+        public: isPublic,
+        size
     });
 
     function pick() {

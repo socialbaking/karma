@@ -18,9 +18,15 @@ const {
 } = process.env;
 
 // https://developers.cloudflare.com/images/image-resizing/url-format/#recommended-image-sizes
-const DEFAULT_SIZE = 1920;
+export const DEFAULT_IMAGE_SIZE = 1920;
 // From 1 to 100, default with Cloudflare is 85
-const DEFAULT_QUALITY = 100;
+const DEFAULT_IMAGE_QUALITY = 100;
+
+const SIZE_QUALITY: Record<number, number> = {
+    1920: 95,
+    600: 85,
+    100: 50
+}
 
 const BASE_SIZE = 600;
 
@@ -30,13 +36,19 @@ const WATERMARK_CACHE_BUST = `4.${packageIdentifier}.${DISCORD_MEDIA_COMMUNITY_N
 export function getSize(given?: number): number {
     if (given) return given;
     if (isNumberString(IMAGE_RESIZING_DEFAULT_SIZE)) return +IMAGE_RESIZING_DEFAULT_SIZE;
-    return DEFAULT_SIZE;
+    return DEFAULT_IMAGE_SIZE;
 }
 
-export function getQuality(given?: number): number {
+export function getQuality(given?: number, size?: number): number {
     if (given) return given;
+    if (typeof size === "number") {
+        const found = SIZE_QUALITY[size];
+        if (found) {
+            return found;
+        }
+    }
     if (isNumberString(IMAGE_RESIZING_DEFAULT_QUALITY)) return +IMAGE_RESIZING_DEFAULT_QUALITY;
-    return DEFAULT_QUALITY;
+    return DEFAULT_IMAGE_QUALITY;
 }
 
 export interface ResolveFileOptions {
@@ -81,7 +93,7 @@ export function getImageResizingUrl(input: string, options: ResolveFileOptions) 
     url.searchParams.set("width", size.toString());
     url.searchParams.set("height", size.toString());
     url.searchParams.set("fit", "scale-down");
-    url.searchParams.set("quality", getQuality(options.quality).toString());
+    url.searchParams.set("quality", getQuality(options.quality, size).toString());
     return url;
 }
 
@@ -89,8 +101,17 @@ export async function getResolvedUrl(file: File, options?: ResolveFileOptions) {
     if (!options || (!options.public && !options.size)) return getDirectURL();
     if (!file.contentType?.startsWith("image")) return getDirectURL();
     if (file.synced === "disk") return getDirectURL();
-    const watermarked = file.sizes?.find(size => size.watermark);
     const size = getSize(options.size);
+    const defaultSize = getSize()
+    const watermarked = (
+        file.sizes?.find(value => value.width === size && value.watermark) ??
+        file.sizes?.find(value => value.width === defaultSize && value.watermark)
+    );
+    const matching = (
+        file.sizes?.find(value => value.width === size && !value.watermark) ??
+        file.sizes?.find(value => value.width === defaultSize && !value.watermark)
+    );
+    console.log({ watermarked, matching, size, defaultSize });
     let input: string;
     if (options.public && watermarked) {
         const watermarkedUrl = await getR2URL(watermarked.url);
@@ -99,7 +120,15 @@ export async function getResolvedUrl(file: File, options?: ResolveFileOptions) {
         }
         input = watermarkedUrl;
     } else {
-        input = await getDirectURL()
+        if (matching) {
+            const matchingUrl = await getR2URL(matching.url);
+            if ((matching.width === size || matching.height === size) && !watermarked) {
+                return matchingUrl;
+            }
+            input = matchingUrl;
+        } else {
+            input = await getDirectURL()
+        }
     }
     const url = getImageResizingUrl(input, options);
 
