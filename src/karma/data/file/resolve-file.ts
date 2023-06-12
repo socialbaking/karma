@@ -64,27 +64,44 @@ export async function getResolvedFile(file?: File, options?: ResolveFileOptions)
     return resolved;
 }
 
+export function getImageResizingUrl(input: string, options: ResolveFileOptions) {
+    const url = new URL(IMAGE_RESIZING_URL, getOrigin());
+    if (input.includes(IMAGE_RESIZING_URL) && !options.public) {
+        const inputUrl = new URL(input);
+        if (inputUrl.searchParams.has("image")) {
+            url.searchParams.set("image", inputUrl.searchParams.get("image"))
+        } else {
+            url.searchParams.set("image", input);
+        }
+    } else {
+        url.searchParams.set("image", input);
+    }
+
+    const size = getSize(options.size);
+    url.searchParams.set("width", size.toString());
+    url.searchParams.set("height", size.toString());
+    url.searchParams.set("fit", "scale-down");
+    url.searchParams.set("quality", getQuality(options.quality).toString());
+    return url;
+}
+
 export async function getResolvedUrl(file: File, options?: ResolveFileOptions) {
     if (!options || (!options.public && !options.size)) return getDirectURL();
     if (!file.contentType?.startsWith("image")) return getDirectURL();
     if (file.synced === "disk") return getDirectURL();
     const watermarked = file.sizes?.find(size => size.watermark);
-    const url = new URL(IMAGE_RESIZING_URL, getOrigin());
     const size = getSize(options.size);
+    let input: string;
     if (options.public && watermarked) {
         const watermarkedUrl = await getR2URL(watermarked.url);
         if (watermarked.width === size || watermarked.height === size) {
             return watermarkedUrl;
         }
-        url.searchParams.set("image", watermarkedUrl);
+        input = watermarkedUrl;
     } else {
-        url.searchParams.set("image", await getDirectURL());
+        input = await getDirectURL()
     }
-
-    url.searchParams.set("width", size.toString());
-    url.searchParams.set("height", size.toString());
-    url.searchParams.set("fit", "scale-down");
-    url.searchParams.set("quality", getQuality(options.quality).toString());
+    const url = getImageResizingUrl(input, options);
 
     if (options.public && !watermarked) {
         const ratio = size / BASE_SIZE;
@@ -116,9 +133,7 @@ export async function getResolvedUrl(file: File, options?: ResolveFileOptions) {
             });
         }
         // console.log(file, draw);
-        url.searchParams.set("draw", JSON.stringify(draw))
-
-
+        url.searchParams.set("draw", JSON.stringify(draw));
     }
 
     return url.toString();

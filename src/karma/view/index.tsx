@@ -64,8 +64,9 @@ export async function viewRoutes(fastify: FastifyInstance) {
       request: FastifyRequest,
       response: FastifyReply
     ) {
+      let baseResult: unknown = undefined;
       if (baseHandler) {
-        await baseHandler(request, response);
+        baseResult = await baseHandler(request, response);
         if (response.sent) return;
       }
 
@@ -121,6 +122,7 @@ export async function viewRoutes(fastify: FastifyInstance) {
         let html = renderToStaticMarkup(
           <KarmaServer
             {...options}
+            input={baseResult}
             url={path}
             isAnonymous={anonymous}
             isFragment={isFragment}
@@ -139,6 +141,7 @@ export async function viewRoutes(fastify: FastifyInstance) {
             })}
             roles={state?.roles}
             query={request.query}
+            params={request.params}
             body={request.body}
             user={user}
             isAuthenticatedTrusted={!!process.env.AUTHENTICATED_IS_TRUSTED}

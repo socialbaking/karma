@@ -26,6 +26,8 @@ export interface Data {
   result?: unknown;
   error?: unknown;
   query?: unknown;
+  params?: unknown;
+  input?: unknown;
   submitted?: true;
   url: string;
   isAnonymous: boolean;
@@ -73,6 +75,19 @@ export function useBody<B>(): B {
   return body;
 }
 
+export function useMaybeInput<I>(): I | undefined {
+  const { input } = useData();
+  if (!input) return undefined;
+  ok<I>(input);
+  return input;
+}
+
+export function useInput<I>(): I {
+  const input = useMaybeInput<I>();
+  ok(input, "Expected input");
+  return input;
+}
+
 type QueryRecord = Record<string, string>;
 
 export function useQuery<Q = QueryRecord>(): Q {
@@ -80,6 +95,13 @@ export function useQuery<Q = QueryRecord>(): Q {
   const queryValue = query || {};
   ok<Q>(queryValue, "Expected query");
   return queryValue;
+}
+
+export function useParams<P = QueryRecord>(): P {
+  const { params } = useData();
+  const paramsValue = params || {};
+  ok<P>(paramsValue, "Expected params");
+  return paramsValue;
 }
 
 export function useQuerySearch() {

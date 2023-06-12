@@ -104,9 +104,12 @@ export function ProductListItem({
   isAnonymous,
 }: ProductItemProps) {
   const { productId, sizes, ...attributes } = product;
-  const productUrl = `${url || "calculator"}?search=${encodeURIComponent(
-    product.productName
-  )}`;
+  // const productUrl = `${url || "calculator"}?search=${encodeURIComponent(
+  //   product.productName
+  // )}`;
+  const productUrl = url ?
+      `${url}?search=${encodeURIComponent(product.productName)}` :
+      `/product/${productId}`;
 
   const ingredients = useActiveIngredients(product);
   const sizeUnit = sizes?.[0]?.unit || "g";

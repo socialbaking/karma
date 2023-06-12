@@ -3,7 +3,8 @@ import {getMaybeResolvedFile, getResolvedFile} from "../file/resolve-file";
 import {listProducts, ListProductsInput} from "./list-products";
 
 export interface GetProductFileListOptions {
-    accept?: string
+    accept?: string;
+    public?: boolean;
 }
 
 export interface ListProductFilesOptions extends GetProductFileListOptions, ListProductsInput {
@@ -18,7 +19,17 @@ export async function listProductFiles(options?: ListProductFilesOptions): Promi
     return productFiles.filter(Boolean);
 }
 
-export async function getProductFiles(productId: string, { accept }: GetProductFileListOptions = {}): Promise<File[]> {
+export async function getProductFiles(productId: string, options: GetProductFileOptions = {}): Promise<File[]> {
+    const files = await getUnresolvedProductFiles(productId, options);
+    const resolved = await Promise.all(
+        files.map(
+            file => getMaybeResolvedFile(file, options)
+        )
+    );
+    return resolved.filter(Boolean);
+}
+
+export async function getUnresolvedProductFiles(productId: string, { accept, public: isPublic }: GetProductFileListOptions = {}): Promise<File[]> {
     let files = await listNamedFiles("product", productId);
     files = files
         .filter(file => file.synced)
@@ -28,6 +39,9 @@ export async function getProductFiles(productId: string, { accept }: GetProductF
             // Use the most recent first, updated images please :)
             return a.uploadedAt > b.uploadedAt ? -1 : 1
         });
+    if (isPublic) {
+        files = files.filter(file => file.pinned && !!file.sizes?.find(size => size.watermark));
+    }
     if (accept) {
         // "image" will match "image/jpeg"
         files = files.filter(file => file.contentType?.startsWith(accept))
@@ -39,7 +53,6 @@ export interface GetProductFileOptions extends GetProductFileListOptions {
     fileId?: string;
     accept?: string;
     index?: number;
-    public?: boolean;
 }
 
 export async function getProductFile(productId: string, { fileId, accept, index, public: isPublic }: GetProductFileOptions = {}): Promise<File | undefined> {
@@ -50,7 +63,7 @@ export async function getProductFile(productId: string, { fileId, accept, index,
             public: isPublic
         });
     }
-    const files = await getProductFiles(productId, { accept })
+    const files = await getUnresolvedProductFiles(productId, { accept })
     const file = pick();
     if (!file) return undefined;
     return getResolvedFile(file, {

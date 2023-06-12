@@ -11,12 +11,14 @@ import { Login } from "./login";
 import { Logout, handler as logoutHandler } from "./logout";
 import { Errors } from "./error";
 import { UploadReport, submit as uploadSubmit } from "./upload-report";
+import { ProductPage, handler as productHandler } from "./product";
 
 export const paths: Record<string, FunctionComponent> = {
   "/": Home,
   "/home": Home,
   "/metrics": Metrics,
   "/products": Products,
+  "/product/:productId": ProductPage,
   "/partners": Partners,
   "/calculator": Calculator,
   "/settings": Settings,
@@ -35,6 +37,7 @@ export const pathsAnonymous: Record<string, boolean> = {
   "/feedback": true,
   "/calculator": true,
   "/login": true,
+  "/product/:productId": true
 };
 
 export const pathsSubmit: Record<
@@ -51,6 +54,7 @@ export const pathsHandler: Record<
   (...args: unknown[]) => Promise<unknown | void> | unknown | void
 > = {
   "/logout": logoutHandler,
+  "/product/:productId": productHandler,
 };
 
 export const pathsCache: Record<string, boolean> = {
