@@ -66,7 +66,8 @@ export async function getMaybeResolvedFile(file?: File, options?: ResolveFileOpt
     return {
         ...file,
         synced,
-        url
+        url,
+        sizes: undefined
     }
 }
 

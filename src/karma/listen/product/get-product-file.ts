@@ -1,5 +1,13 @@
 import {FastifyInstance, FastifyReply} from "fastify";
-import {getProductFile, listCategories, listOrganisations, listProducts} from "../../data";
+import {
+    getProductFile,
+    getProductFiles,
+    listCategories,
+    listOrganisations,
+    listProductFiles,
+    listProducts,
+    fileSchema
+} from "../../data";
 import {authenticate} from "../authentication";
 import {readFile} from "node:fs/promises";
 import {isAnonymous} from "../../authentication";
@@ -138,6 +146,59 @@ export async function getProductFileRoutes(fastify: FastifyInstance) {
             },
         });
 
+    }
+
+    {
+        const params = {
+            type: "object",
+            properties: {
+                productId: {
+                    type: "string",
+                },
+            },
+            required: ["productId"],
+        };
+
+        const response = {
+            200: {
+                description: "List of files",
+                type: "array",
+                items: fileSchema.file
+            },
+        };
+
+        const schema = {
+            description: "List product files",
+            tags: ["product"],
+            summary: "",
+            params,
+            response,
+            security: [
+                {
+                    apiKey: [] as string[],
+                },
+            ],
+        };
+
+        interface Params {
+            productId: string;
+        }
+
+        type Schema = {
+            Params: Params
+        };
+
+        fastify.get<Schema>("/:productId/files", {
+            schema,
+            preHandler: authenticate(fastify, { anonymous: true }),
+            async handler(request, response) {
+                const files = await getProductFiles(request.params.productId, {
+                    public: isAnonymous(),
+                    accept: "image",
+                });
+                response.send(files);
+            },
+        });
     }
 
 }

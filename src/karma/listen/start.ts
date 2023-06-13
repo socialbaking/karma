@@ -24,6 +24,7 @@ import { errorHandler } from "../view/error";
 import etag from "@fastify/etag";
 import { parseStringFields } from "./body-parser";
 import {signalMiddleware} from "../signal";
+import Ajv from "ajv";
 
 const { pathname } = new URL(import.meta.url);
 const directory = dirname(pathname);
@@ -34,8 +35,25 @@ export async function create() {
   ok(COOKIE_SECRET, "Expected COOKIE_SECRET");
 
   const app = fastify({
-    logger: true,
+    logger: true
   });
+
+  // const ajv = new Ajv({
+  //   coerceTypes: true,
+  //   useDefaults: true,
+  //   removeAdditional: true
+  // })
+  // app.setValidatorCompiler(({ schema, method, url, httpPart }) => {
+  //   return ajv.compile(schema)
+  // })
+  // app.setSerializerCompiler(({ schema, method, url, httpStatus, contentType }) => {
+  //   const validate = ajv.compile(schema);
+  //   return data => {
+  //     console.log(data);
+  //     validate(data);
+  //     return JSON.stringify(data);
+  //   }
+  // })
 
   const register: (...args: unknown[]) => void = app.register.bind(fastify);
 

@@ -1,3 +1,28 @@
+export const fileSize = {
+  type: "object",
+  properties: {
+    width: {
+      type: "number"
+    },
+    height: {
+      type: "number"
+    },
+    url: {
+      type: "string"
+    },
+    watermark: {
+      type: "boolean",
+      nullable: true
+    }
+  },
+  additionalProperties: false,
+  required: [
+      "width",
+      "height",
+      "url"
+  ]
+}
+
 export const fileData = {
   type: "object",
   properties: {
@@ -35,8 +60,25 @@ export const fileData = {
       type: "string",
       nullable: true
     },
+    pinned: {
+      type: "boolean",
+      nullable: true
+    },
+    sizes: {
+      type: "array",
+      nullable: true,
+      items: fileSize
+    },
+    uploadedAt: {
+      type: "string",
+      nullable: true
+    },
+    uploadedByUsername: {
+      type: "string",
+      nullable: true
+    },
   },
-  additionalProperties: true,
+  additionalProperties: false,
   required: [
       "fileName",
       "contentType"
@@ -57,5 +99,6 @@ export const file = {
       type: "string",
     },
   },
+  additionalProperties: false,
   required: [...fileData.required, "fileId", "createdAt", "updatedAt"],
 } as const;
