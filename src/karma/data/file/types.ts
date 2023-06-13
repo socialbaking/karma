@@ -16,6 +16,7 @@ export interface FileSize extends FileImageSize {
   copyright?: string;
   license?: string;
   fileName?: string;
+  signed?: boolean;
 }
 
 export interface FileData extends Record<string, unknown>, Partial<FileImageSize> {
@@ -24,6 +25,7 @@ export interface FileData extends Record<string, unknown>, Partial<FileImageSize
   size?: number;
   path?: string;
   url?: string;
+  signed?: boolean;
   pinned?: boolean;
   uploadedAt?: string;
   uploadedByUsername?: string;
@@ -34,7 +36,9 @@ export interface FileData extends Record<string, unknown>, Partial<FileImageSize
   version?: number;
   type?: FileType | string;
   sizes?: FileSize[];
+  /** @deprecated */
   externalUrl?: string;
+  remoteUrl?: string;
   reactionCounts?: Record<string, number>;
   reactionCountsUpdatedAt?: string;
 }

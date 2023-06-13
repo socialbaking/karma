@@ -67,6 +67,7 @@ export async function getMaybeResolvedFile(file?: File, options?: ResolveFileOpt
         ...file,
         synced,
         url,
+        signed: true,
         sizes: undefined
     }
 }

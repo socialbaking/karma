@@ -125,7 +125,7 @@ async function downloadMediaFromChannel(context: DiscordContext, channel: Produc
     const files = await listNamedFiles("product", channel.product.productId);
 
     if (files.length) {
-        const pending = files.filter(file => !file.synced && file.externalUrl);
+        const pending = files.filter(file => !file.synced && (file.externalUrl || file.remoteUrl));
         if (pending.length) {
             console.log(`${pending.length} pending files for ${channel.name}`);
             anyProcessed = await saveFileData(context, pending);
@@ -191,7 +191,7 @@ async function downloadMediaFromChannel(context: DiscordContext, channel: Produc
     }
 
     let { finalSynced, finalFiles } = await listFiles();
-    const finalPending = finalFiles.filter(file => !file.synced && file.externalUrl);
+    const finalPending = finalFiles.filter(file => !file.synced && (file.remoteUrl || file.externalUrl));
     console.log(`Final count, ${finalPending.length} pending files, ${finalSynced.length} synced files for ${channel.name}`);
 
     await watermarkFiles(finalSynced);
@@ -208,7 +208,7 @@ async function downloadMediaFromChannel(context: DiscordContext, channel: Produc
 
     async function listFiles() {
         const finalFiles = await listNamedFiles("product", channel.product.productId);
-        const finalSynced = finalFiles.filter(file => file.synced && file.externalUrl);
+        const finalSynced = finalFiles.filter(file => file.synced && (file.remoteUrl || file.externalUrl));
         return { finalFiles, finalSynced }
     }
 
@@ -253,7 +253,7 @@ function getFileData(channel: ProductDiscordChannel, message: DiscordMessage) {
             source: "discord",
             sourceId: `${channel.id}:${message.id}:${attachment.id}`,
             version: VERSION,
-            externalUrl: attachment.url
+            remoteUrl: attachment.url
         }
     })
 }
@@ -328,9 +328,10 @@ async function saveFileData(context: DiscordContext, fileData: IdFileData[]): Pr
 
             const isTimeRemaining = isRequiredTimeRemaining(TIMEOUT_BUFFER_MS);
             console.log(`Time remaining: ${getTimeRemaining()}, ${isTimeRemaining}`);
-            const { productId, fileId, externalUrl } = data;
+            const { productId, fileId, externalUrl, remoteUrl } = data;
+            const resolvedUrl = remoteUrl || externalUrl;
             ok(typeof productId === "string", "Expected file data to have productId");
-            ok(typeof externalUrl === "string", "Expected file data to have externalUrl");
+            ok(typeof resolvedUrl === "string", "Expected file data to have externalUrl");
             const existing = await getNamedFile("product", productId, fileId);
             if (existing?.synced) {
                 // Only use if version matches
@@ -344,7 +345,7 @@ async function saveFileData(context: DiscordContext, fileData: IdFileData[]): Pr
                 // It appears that the discord image urls are not rate limited
                 // As requesting multiple files results in 200s with no problems.
                 const response = await fetch(
-                    externalUrl,
+                    resolvedUrl,
                     {
                         method: "GET",
                         headers: {
