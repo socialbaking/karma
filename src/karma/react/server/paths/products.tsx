@@ -1,6 +1,7 @@
 import {
   useCategory,
-  useCopyrightInformation, useData,
+  useCopyrightInformation,
+  useData,
   useMetrics,
   useProductMetrics,
   useQuery,
@@ -11,53 +12,63 @@ import ClientProductListItem, {
   ProductProps,
 } from "../../client/components/product/list-item";
 import { SvgTextIcon } from "../../client/components/icons";
-import {COPYRIGHT_PUBLIC_LABEL} from "../../../static";
-import {Product} from "../../../data";
-import {useMemo} from "react";
+import { COPYRIGHT_PUBLIC_LABEL } from "../../../static";
+import { Product } from "../../../data";
+import { useMemo } from "react";
 
 function ProductListItem(props: ProductProps) {
   const category = useCategory(props.product.categoryId);
   const { isAnonymous } = useData();
-  return <ClientProductListItem {...props} category={category} isAnonymous={isAnonymous} />;
+  return (
+    <ClientProductListItem
+      {...props}
+      category={category}
+      isAnonymous={isAnonymous}
+    />
+  );
 }
 
 export interface CopyrightInfoProps {
-  product?: Product
-  margin?: boolean
+  product?: Product;
+  margin?: boolean;
 }
 
 export function CopyrightInfo({ product, margin }: CopyrightInfoProps) {
   const allProducts = useSortedProducts(true);
-  const products = useMemo(() => product ? [product] : allProducts, [allProducts]);
+  const products = useMemo(
+    () => (product ? [product] : allProducts),
+    [allProducts]
+  );
   const copyright = useCopyrightInformation(products);
   const { isAnonymous } = useData();
   if (!copyright.length) return null;
   return (
-      <ul className="list-none">
-        {copyright.map(({ contentUrl, copyrightUrl, label, svg }, index) => (
-            <li key={index} className="flex flex-row items-center my-4">
-              {svg ? <img alt="" role="presentation" src={svg} /> : undefined}
-              <span className={margin === false ? "" : "mx-4"}>
-                This page includes details derived or about&nbsp;
-                <a
-                    href={contentUrl}
-                    target="_blank"
-                    className="text-blue-600 hover:bg-white underline hover:underline-offset-2"
-                >
-                  {(isAnonymous ? COPYRIGHT_PUBLIC_LABEL[contentUrl] : undefined) || "content"}
-                </a>
-                &nbsp;published by&nbsp;
-                <a
-                    href={copyrightUrl}
-                    target="_blank"
-                    className="text-blue-600 hover:bg-white underline hover:underline-offset-2"
-                >
-                  {label}
-                </a>
-              </span>
-            </li>
-        ))}
-      </ul>
+    <ul className="list-none">
+      {copyright.map(({ contentUrl, copyrightUrl, label, svg }, index) => (
+        <li key={index} className="flex flex-row items-center my-4">
+          {svg ? <img alt="" role="presentation" src={svg} /> : undefined}
+          <span className={margin === false ? "" : "mx-4"}>
+            This page includes details derived or about&nbsp;
+            <a
+              href={contentUrl}
+              target="_blank"
+              className="text-blue-600 hover:bg-white underline hover:underline-offset-2"
+            >
+              {(isAnonymous ? COPYRIGHT_PUBLIC_LABEL[contentUrl] : undefined) ||
+                "content"}
+            </a>
+            &nbsp;published by&nbsp;
+            <a
+              href={copyrightUrl}
+              target="_blank"
+              className="text-blue-600 hover:bg-white underline hover:underline-offset-2"
+            >
+              {label}
+            </a>
+          </span>
+        </li>
+      ))}
+    </ul>
   );
 }
 
@@ -84,7 +95,12 @@ export function Products() {
         <div className="mx-4">
           <br />
           <br />
-          <a href="?">Clear search</a>
+          <a
+            href="?"
+            className="text-blue-600 hover:bg-white underline hover:underline-offset-2"
+          >
+            Clear search
+          </a>
           <br />
           <br />
         </div>
