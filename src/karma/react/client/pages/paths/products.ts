@@ -20,7 +20,7 @@ export async function products() {
             productId: item.getAttribute("data-product-id"),
             productName: item.getAttribute("data-product"),
             categoryId: item.getAttribute("data-category-id"),
-            genericCategoryNames: (item.getAttribute("data-category-geneircs") || "")
+            genericCategoryNames: (item.getAttribute("data-category-generics") || "")
                 .split("|")
                 .filter(Boolean),
             createdAt: "",
