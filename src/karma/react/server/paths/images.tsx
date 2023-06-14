@@ -87,8 +87,6 @@ export function ImagesPage() {
             
             .product-gallery-view .image-container img {
                 max-width: 100%;
-                width: minmax(600px, 80vw);
-                height: minmax(600px, 80vw);
                 object-fit: contain;
                 padding: 0 15px 15px;
             }
