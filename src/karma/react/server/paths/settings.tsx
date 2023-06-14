@@ -52,13 +52,7 @@ function Admin() {
 
     return <pre>
         {JSON.stringify(
-            readdirRecursive(process.env.IS_LOCAL ? process.cwd() : "/"),
-            undefined,
-            "  "
-        )}
-
-        {JSON.stringify(
-            readdirRecursive("node_modules/@socialbaking/karma"),
+            readdirRecursive("node_modules/@socialbaking/karma") ?? readdirRecursive(process.env.IS_LOCAL ? process.cwd() : "/var"),
             undefined,
             "  "
         )}
