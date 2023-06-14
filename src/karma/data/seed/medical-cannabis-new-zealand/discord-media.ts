@@ -236,35 +236,37 @@ async function downloadMediaFromChannel(context: DiscordContext, channel: Produc
 
         const pinnedMessages = await listPinnedMediaMessages(context, channel);
 
-        let pinnedFileIds: string[] = [];
-        for (const message of pinnedMessages) {
-            anyProcessed = true;
+        if (pinnedMessages) {
+            let pinnedFileIds: string[] = [];
+            for (const message of pinnedMessages) {
+                anyProcessed = true;
 
-            const data = getFileData(channel, message);
+                const data = getFileData(channel, message);
 
-            pinnedFileIds.push(...data.map(data => data.fileId));
+                pinnedFileIds.push(...data.map(data => data.fileId));
 
-            await saveFileData(
-                context,
-                data
-            )
+                await saveFileData(
+                    context,
+                    data
+                )
 
-            await saveAttachments(context, channel, message);
-        }
+                await saveAttachments(context, channel, message);
+            }
 
-        const currentFiles = await listNamedFiles("product", channel.product.productId);
-        const currentPinnedFiles = currentFiles.filter(file => file.pinned);
-        const unpinnedFiles = currentPinnedFiles.filter(
-            file => !pinnedFileIds.includes(file.fileId)
-        );
+            const currentFiles = await listNamedFiles("product", channel.product.productId);
+            const currentPinnedFiles = currentFiles.filter(file => file.pinned);
+            const unpinnedFiles = currentPinnedFiles.filter(
+                file => !pinnedFileIds.includes(file.fileId)
+            );
 
-        if (unpinnedFiles.length) {
-            console.log(`Unpinning ${unpinnedFiles.length} files for ${channel.name}`);
-            for (const file of unpinnedFiles) {
-                await setFile({
-                    ...file,
-                    pinned: false
-                });
+            if (unpinnedFiles.length) {
+                console.log(`Unpinning ${unpinnedFiles.length} files for ${channel.name}`);
+                for (const file of unpinnedFiles) {
+                    await setFile({
+                        ...file,
+                        pinned: false
+                    });
+                }
             }
         }
 
@@ -492,6 +494,10 @@ async function saveFileData(context: DiscordContext, fileData: IdFileData[]): Pr
             ok(typeof resolvedUrl === "string", "Expected file data to have externalUrl");
             const existing = await getNamedFile("product", productId, fileId);
             if (existing?.syncedAt) {
+                await setFile({
+                    ...existing,
+                    ...data,
+                })
                 // Only use if version matches
                 // Allows re-fetching
                 if (existing.version === VERSION) {
@@ -554,7 +560,7 @@ async function listPinnedMediaMessages(context: DiscordContext, channel: Discord
     )
     console.log("listMediaMessages pins status:", pinsResponse.status);
     if (!pinsResponse.ok) {
-        return [];
+        return undefined;
     }
     const pins: DiscordMessage[] = await pinsResponse.json();
     console.log({ pins: pins.length });
