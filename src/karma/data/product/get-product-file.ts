@@ -54,15 +54,19 @@ export interface GetProductFileOptions extends GetProductFileListOptions {
     accept?: string;
     index?: number;
     size?: number
+    sizes?: boolean;
+    expiresInSeconds?: number
 }
 
-export async function getProductFile(productId: string, { fileId, accept, index, public: isPublic, size }: GetProductFileOptions = {}): Promise<File | undefined> {
+export async function getProductFile(productId: string, { fileId, accept, index, public: isPublic, size, sizes, expiresInSeconds }: GetProductFileOptions = {}): Promise<File | undefined> {
     if (fileId) {
         const file = await getNamedFile("product", productId, fileId);
         // Must be synced already to be able to get it
         return getMaybeResolvedFile(file, {
             public: isPublic,
-            size
+            size,
+            sizes,
+            expiresInSeconds
         });
     }
     const files = await getUnresolvedProductFiles(productId, { accept })
@@ -70,7 +74,9 @@ export async function getProductFile(productId: string, { fileId, accept, index,
     if (!file) return undefined;
     return getResolvedFile(file, {
         public: isPublic,
-        size
+        size,
+        sizes,
+        expiresInSeconds
     });
 
     function pick() {

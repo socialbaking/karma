@@ -13,6 +13,18 @@ export const fileSize = {
     watermark: {
       type: "boolean",
       nullable: true
+    },
+    signed: {
+      type: "boolean",
+      nullable: true
+    },
+    expiresAt: {
+      type: "string",
+      nullable: true
+    },
+    fileName: {
+      type: "string",
+      nullable: true
     }
   },
   additionalProperties: false,
@@ -77,6 +89,14 @@ export const fileData = {
       type: "string",
       nullable: true
     },
+    signed: {
+      type: "boolean",
+      nullable: true
+    },
+    expiresAt: {
+      type: "string",
+      nullable: true
+    }
   },
   additionalProperties: false,
   required: [

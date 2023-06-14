@@ -10,8 +10,13 @@ import {
 } from "../../data";
 import {authenticate} from "../authentication";
 import {readFile} from "node:fs/promises";
-import {isAnonymous} from "../../authentication";
+import {isAnonymous, getMaybePartner} from "../../authentication";
 import {getMatchingProducts} from "../../utils";
+
+// 7 days
+const DEFAULT_PARTNER_EXPIRES_IN_SECONDS = 604800;
+// 1 day
+const DEFAULT_AUTHENTICATED_EXPIRES_IN_SECONDS = 86400;
 
 export async function getProductFileRoutes(fastify: FastifyInstance) {
 
@@ -192,9 +197,17 @@ export async function getProductFileRoutes(fastify: FastifyInstance) {
             schema,
             preHandler: authenticate(fastify, { anonymous: true }),
             async handler(request, response) {
+                let expiresInSeconds: number | undefined = undefined;
+                if (getMaybePartner()) {
+                    expiresInSeconds = DEFAULT_PARTNER_EXPIRES_IN_SECONDS;
+                } else if (!isAnonymous()) {
+                    expiresInSeconds = DEFAULT_AUTHENTICATED_EXPIRES_IN_SECONDS;
+                }
                 const files = await getProductFiles(request.params.productId, {
                     public: isAnonymous(),
                     accept: "image",
+                    sizes: true,
+                    expiresInSeconds
                 });
                 response.send(files);
             },

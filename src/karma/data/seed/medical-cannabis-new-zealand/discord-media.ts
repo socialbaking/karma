@@ -21,13 +21,18 @@ import {
 } from "../../file/discord";
 import {createHash} from "crypto";
 import {DEFAULT_IMAGE_SIZE, getResolvedUrl, getSize, ResolveFileOptions} from "../../file/resolve-file";
-import {PutObjectCommand} from "@aws-sdk/client-s3";
+import {HeadObjectCommand, PutObjectCommand} from "@aws-sdk/client-s3";
 import {basename} from "discord.js";
+import {isNumberString} from "../../../calculations";
 
 const namespace = "cb541dc3-ffbd-4d9c-923a-d1f4af02fa89";
 
-const VERSION = +(DISCORD_MEDIA_VERSION || "17");
-const RESIZE_VERSION = 20;
+const VERSION = +(DISCORD_MEDIA_VERSION || "20");
+const RESIZE_VERSION = 23;
+
+const { IS_LOCAL, DISABLE_EXISTING_FILE } = process.env;
+
+const ENABLE_EXISTING_FILE = !DISABLE_EXISTING_FILE;
 
 const CACHE_KEY_PREFIX = `discord-media:${VERSION}`;
 
@@ -39,10 +44,6 @@ const CACHE_EXPIRES_IN_MS = 3 * DAY_MS;
 // We should try rolling backwards every week or so just to make sure we
 // Have the correctly pinned messages
 const CACHE_DIRECTION_EXPIRES_IN_MS = 7 * DAY_MS;
-
-const {
-    IS_LOCAL
-} = process.env
 
 // All bots can make up to 50 requests per second to our API.
 // If no authorization header is provided, then the limit is applied to the IP address.
@@ -72,15 +73,76 @@ const DISCORD_MEDIA_SIZES = [
 
 interface DiscordContext {
     requestsRemaining: number;
+    requestsUsed: number;
+    rateLimitUntil?: number;
+    rateLimitTimeout?: number;
+    onRateLimitResponse(response: Response): void;
 }
 
 export async function seedDiscordMedia() {
 
     if (!DISCORD_BOT_TOKEN) return;
 
-    const context: DiscordContext = {
-        requestsRemaining: DEFAULT_MAX_REQUESTS
+    let rateLimitedUntil: number | undefined = undefined;
+
+    function createContext(initialRequests = DEFAULT_MAX_REQUESTS) {
+        let requestsRemaining = initialRequests;
+        let scopeLimitedUntil: number | undefined = undefined;
+        const context: DiscordContext = {
+            get requestsUsed() {
+                return initialRequests - requestsRemaining;
+            },
+            get rateLimitUntil() {
+                return rateLimitedUntil ?? scopeLimitedUntil
+            },
+            get rateLimitTimeout() {
+                const until = context.rateLimitUntil;
+                const timeout = until - Date.now();
+                if (timeout <= 0) return undefined;
+                return timeout;
+            },
+            get requestsRemaining() {
+                const timeout = context.rateLimitTimeout;
+                if (timeout) {
+                    console.log("Request rate timeout", timeout);
+                    return 0;
+                }
+                return requestsRemaining;
+            },
+            set requestsRemaining(value: number) {
+                requestsRemaining = value;
+            },
+            onRateLimitResponse(response: Response) {
+                /*
+                'x-ratelimit-bucket' => {
+                  name: 'x-ratelimit-bucket',
+                  value: '1234567'
+                },
+                'x-ratelimit-limit' => { name: 'x-ratelimit-limit', value: '5' },
+                'x-ratelimit-remaining' => { name: 'x-ratelimit-remaining', value: '0' },
+                'x-ratelimit-reset' => { name: 'x-ratelimit-reset', value: '1686696069.471' },
+                'x-ratelimit-reset-after' => { name: 'x-ratelimit-reset-after', value: '3.661' },
+                 */
+                console.log("Rate limited by discord", requestsRemaining);
+                const rateLimitedUntilSeconds = response.headers.get("x-ratelimit-reset");
+                ok(isNumberString(rateLimitedUntilSeconds), "Expected ratelimit reset to be a number");
+                const currentRateLimitedUntil = (+rateLimitedUntilSeconds) * 1000;
+
+                const scope = response.headers.get("x-ratelimit-scope") ?? "user";
+                if (scope === "shared") {
+                    scopeLimitedUntil = currentRateLimitedUntil;
+                    console.log({ now: new Date().toISOString(), scopeLimitedUntil: new Date(scopeLimitedUntil).toISOString(), scopeLimitedFor: (scopeLimitedUntil - Date.now()) / 1000 });
+                } else {
+                    rateLimitedUntil = currentRateLimitedUntil;
+                    console.log({ now: new Date().toISOString(), currentRateLimitedUntil: new Date(currentRateLimitedUntil).toISOString(), currentRateLimitedFor: (currentRateLimitedUntil - Date.now()) / 1000 });
+                }
+
+            }
+        }
+        return context;
     }
+
+    const context: DiscordContext = createContext();
 
     let channels = await listProductChannels(context);
 
@@ -100,23 +162,55 @@ export async function seedDiscordMedia() {
     channels = channels.sort(
         (a, b) => sortOrder.get(a) < sortOrder.get(b) ?  -1 : 1
     );
-    for (const channel of channels) {
-        console.log(`Seeding files for Discord channel ${channel.name}`);
-        const initial = context.requestsRemaining;
-        const givenRemaining = Math.min(initial, DEFAULT_MAX_REQUESTS_PER_CHANNEL);
-        const nextContext = {
-            ...context,
-            requestsRemaining: givenRemaining
-        };
-        console.log(`Requests Remaining: ${context.requestsRemaining}`);
-        await downloadMediaFromChannel(nextContext, channel);
-        if (!isRequiredTimeRemaining(TIMEOUT_BUFFER_MS)) break;
-        if (context.requestsRemaining <= 0) break;
-        const used = givenRemaining - Math.max(0, nextContext.requestsRemaining);
-        context.requestsRemaining -= used;
-    }
+
+    let rateLimited: [ProductDiscordChannel, DiscordContext][] = []
+
+    rateLimitLoop: do {
+        let resolvedChannels = channels;
+        if (rateLimited.length) {
+            resolvedChannels = rateLimited
+                .sort((a, b) => {
+                    return (a[1].rateLimitTimeout ?? 0) < (b[1].rateLimitTimeout ?? 0) ? -1 : 1
+                })
+                .map((entry) => entry[0]);
+        }
+        const contexts = new Map(rateLimited);
+        rateLimited = [];
+        for (const channel of resolvedChannels) {
+            console.log(`Seeding files for Discord channel ${channel.name}`);
+            const initial = context.requestsRemaining;
+            const givenRemaining = Math.min(initial, DEFAULT_MAX_REQUESTS_PER_CHANNEL);
+            const nextContext = contexts.get(channel) ?? createContext(givenRemaining);
+
+            if (!await rateLimitTimeout(nextContext)) {
+                break rateLimitLoop;
+            }
+
+            if (!nextContext.requestsRemaining) {
+                continue;
+            }
+            console.log(`Requests Remaining: ${context.requestsRemaining}`);
+            await downloadMediaFromChannel(nextContext, channel);
+            if (!isRequiredTimeRemaining(TIMEOUT_BUFFER_MS)) break;
+            context.requestsRemaining -= nextContext.requestsUsed;
+            if (context.requestsRemaining <= 0) break;
+            if (context.rateLimitTimeout && nextContext.requestsUsed < givenRemaining) {
+                rateLimited.push([channel, nextContext]);
+            }
+        }
+    } while (rateLimited.length && isRequiredTimeRemaining(TIMEOUT_BUFFER_MS));
 
     console.log(`Requests Remaining: ${context.requestsRemaining}`);
+}
+
+async function rateLimitTimeout({ rateLimitTimeout: timeout }: DiscordContext) {
+    if (!timeout) return isRequiredTimeRemaining(TIMEOUT_BUFFER_MS);
+    if (!isRequiredTimeRemaining(timeout + TIMEOUT_BUFFER_MS)) {
+        return false;
+    }
+    console.log("Waiting for rate limit timeout", timeout);
+    await new Promise(resolve => setTimeout(resolve, timeout + 10));
+    return isRequiredTimeRemaining(TIMEOUT_BUFFER_MS);
 }
 
 async function downloadMediaFromChannel(context: DiscordContext, channel: ProductDiscordChannel) {
@@ -125,7 +219,7 @@ async function downloadMediaFromChannel(context: DiscordContext, channel: Produc
     const files = await listNamedFiles("product", channel.product.productId);
 
     if (files.length) {
-        const pending = files.filter(file => !file.synced && (file.externalUrl || file.remoteUrl));
+        const pending = files.filter(file => !file.syncedAt && (file.externalUrl || file.remoteUrl));
         if (pending.length) {
             console.log(`${pending.length} pending files for ${channel.name}`);
             anyProcessed = await saveFileData(context, pending);
@@ -191,7 +285,7 @@ async function downloadMediaFromChannel(context: DiscordContext, channel: Produc
     }
 
     let { finalSynced, finalFiles } = await listFiles();
-    const finalPending = finalFiles.filter(file => !file.synced && (file.remoteUrl || file.externalUrl));
+    const finalPending = finalFiles.filter(file => !file.syncedAt && (file.remoteUrl || file.externalUrl));
     console.log(`Final count, ${finalPending.length} pending files, ${finalSynced.length} synced files for ${channel.name}`);
 
     await watermarkFiles(finalSynced);
@@ -208,7 +302,7 @@ async function downloadMediaFromChannel(context: DiscordContext, channel: Produc
 
     async function listFiles() {
         const finalFiles = await listNamedFiles("product", channel.product.productId);
-        const finalSynced = finalFiles.filter(file => file.synced && (file.remoteUrl || file.externalUrl));
+        const finalSynced = finalFiles.filter(file => file.syncedAt && (file.remoteUrl || file.externalUrl));
         return { finalFiles, finalSynced }
     }
 
@@ -265,22 +359,86 @@ async function saveAttachments(context: DiscordContext, channel: ProductDiscordC
     );
 }
 
-async function saveToR2(file: Pick<FileData, "fileName" | "contentType">, blob: Blob): Promise<Partial<FileData>> {
+async function isExistingInR2(file: FileData) {
+    // Disable any functionality trying to use existing
+    if (!ENABLE_EXISTING_FILE) return false;
+    const client = await getR2();
+    const externalKey = `discord/${file.fileName}`;
+    const headCommand = new HeadObjectCommand({
+        Key: externalKey,
+        Bucket: R2_BUCKET,
+    });
+    try {
+        await client.send(headCommand);
+        return true;
+    } catch {
+        return false;
+    }
+}
+
+async function saveToR2(file: FileData, blob: Blob): Promise<Partial<FileData>> {
     const client = await getR2()
     const externalKey = `discord/${file.fileName}`;
+
+    const buffer = Buffer.from(await blob.arrayBuffer());
+    const hash256 = createHash("sha256");
+    hash256.update(buffer);
+    const hash5 = createHash("md5");
+    hash5.update(buffer);
+    const checksum = {
+        SHA256: hash256.digest().toString("base64"),
+        MD5: hash5.digest().toString("base64")
+    };
+
+    const url = new URL(
+        `/${externalKey}`,
+        R2_ENDPOINT
+    ).toString();
+
+    if (await isExistingInR2(file)) {
+        console.log(`Using existing uploaded file for ${file.fileName}`);
+        return {
+            synced: "r2",
+            syncedAt: file.syncedAt || new Date().toISOString(),
+            url,
+            // Allow checksum to be updated if it wasn't present!
+            checksum: {
+                ...checksum,
+                ...file.checksum
+            }
+        }
+    }
+
+    console.log(`Uploading file ${file.fileName} to R2`, checksum);
+
     const command = new PutObjectCommand({
         Key: externalKey,
         Bucket: R2_BUCKET,
-        Body: Buffer.from(await blob.arrayBuffer()),
+        Body: buffer,
         ContentType: file.contentType,
+        ContentMD5: checksum.MD5
     });
-    await client.send(command);
+
+    const result = await client.send(command);
     return {
         synced: "r2",
-        url: new URL(
-            `/${externalKey}`,
-            R2_ENDPOINT
-        ).toString()
+        syncedAt: new Date().toISOString(),
+        url,
+        checksum: {
+            ...checksum,
+            ...getChecksum(result)
+        }
+    };
+}
+
+function getChecksum(result: { ChecksumCRC32?: string, ChecksumCRC32C?: string, ChecksumSHA1?: string, ChecksumSHA256?: string }) {
+    if (!result.ChecksumSHA256) return undefined;
+    console.log(`Checksum:`, result.ChecksumSHA256);
+    return {
+        CRC32: result.ChecksumCRC32,
+        CRC32C: result.ChecksumCRC32C,
+        SHA1: result.ChecksumSHA1,
+        SHA256: result.ChecksumSHA256
     }
 }
 
@@ -308,7 +466,7 @@ async function saveFileData(context: DiscordContext, fileData: IdFileData[]): Pr
                     await blob.arrayBuffer()
                 )
             );
-            return { synced: "disk" }
+            return { synced: "disk", syncedAt: new Date().toISOString() }
         })
     }
 
@@ -333,7 +491,7 @@ async function saveFileData(context: DiscordContext, fileData: IdFileData[]): Pr
             ok(typeof productId === "string", "Expected file data to have productId");
             ok(typeof resolvedUrl === "string", "Expected file data to have externalUrl");
             const existing = await getNamedFile("product", productId, fileId);
-            if (existing?.synced) {
+            if (existing?.syncedAt) {
                 // Only use if version matches
                 // Allows re-fetching
                 if (existing.version === VERSION) {
@@ -358,9 +516,12 @@ async function saveFileData(context: DiscordContext, fileData: IdFileData[]): Pr
                 console.log(`saveAttachments status for ${data.fileName}:`, response.status);
                 if (response.ok) {
                     const blob = await response.blob();
+                    const baseUpdate = {
+                        ...((await fn(data, blob)) ?? undefined)
+                    }
                     update = {
-                        ...((await fn(data, blob)) ?? undefined),
-                        syncedAt: new Date().toISOString()
+                        ...baseUpdate,
+                        syncedAt: baseUpdate.syncedAt || new Date().toISOString()
                     };
                     anyUpdates = true;
                 }
@@ -456,10 +617,13 @@ async function *listMediaMessages(context: DiscordContext, channel: DiscordGuild
         console.log("listMediaMessages status:", response.status);
         if (response.status === 404) break;
         if (response.status === 429) {
-            context.requestsRemaining = 0;
+            context.onRateLimitResponse(response);
             break;
         }
-        ok(response.ok, `listMediaMessages returned ${response.status}`);
+        if (!response.ok) {
+            break;
+        }
+        // ok(response.ok, `listMediaMessages returned ${response.status}`);
         responseMessages = await response.json();
         responseMessages = responseMessages
             .map(message => ({
@@ -489,7 +653,7 @@ async function *listMediaMessages(context: DiscordContext, channel: DiscordGuild
         if (messages.length) {
             yield messages;
         }
-    } while (responseMessages.length >= MESSAGE_LIMIT_PER_REQUEST && (context.requestsRemaining > 0) && isRequiredTimeRemaining(TIMEOUT_BUFFER_MS));
+    } while (responseMessages.length >= MESSAGE_LIMIT_PER_REQUEST && await rateLimitTimeout(context) && (context.requestsRemaining > 0));
 
     if (mostRecentMessage) {
         await addExpiring({
@@ -647,7 +811,7 @@ async function watermarkFiles(files: File[]) {
     const pinned = files.filter(file => file.pinned && file.contentType.startsWith("image"));
     if (!pinned.length) return;
     const DEFAULT_SIZE = getSize();
-    const pending = pinned.filter(file => file.synced && !file.sizes?.filter(Boolean).find(size => (
+    const pending = pinned.filter(file => file.syncedAt && !file.sizes?.filter(Boolean).find(size => (
         size.width === DEFAULT_SIZE &&
         size.watermark &&
         size.version === RESIZE_VERSION
@@ -668,7 +832,7 @@ async function watermarkFiles(files: File[]) {
             console.log("Could not resize for", file.fileName)
             continue;
         }
-        console.log({ resized });
+        // console.log({ resized });
         const nextFile: File = {
             ...file,
             sizes: [
@@ -701,13 +865,14 @@ async function getReactionCount(context: DiscordContext, channelId: string, mess
     console.log(`getReactionCount status:`, response.status);
     if (response.status === 404) return undefined;
     if (response.status === 429) {
-        context.requestsRemaining = 0;
+        context.onRateLimitResponse(response);
         return undefined;
     }
     if (!response.ok) {
         console.log(await response.text());
+        return undefined;
     }
-    ok(response.ok, `listReactions returned ${response.status}`);
+    // ok(response.ok, `listReactions returned ${response.status}`);
     const reactions: unknown[] = await response.json();
     if (reactions.length) {
         console.log({ [emoji]: reactions.length });
@@ -728,7 +893,7 @@ async function fileReactions(context: DiscordContext, files: File[]) {
         if (!file.pinned) continue; // Only pinned files should get reaction counts checked
         if (!file.sourceId) continue;
         if (!context.requestsRemaining) break;
-        if (!isRequiredTimeRemaining(TIMEOUT_BUFFER_MS)) break;
+        if (!await rateLimitTimeout(context)) break;
         const remainingReactions = DISCORD_MEDIA_EMOJI_NAMES.filter(
             name => typeof file.reactionCounts?.[name] !== "number"
         );
@@ -763,7 +928,7 @@ async function fileReactions(context: DiscordContext, files: File[]) {
 async function resizeFiles(files: File[]) {
     const pinned = files.filter(file => file.pinned && file.contentType.startsWith("image"));
     for (let file of pinned) {
-        if (!isRequiredTimeRemaining(TIMEOUT_BUFFER_MS * 2)) break;
+        if (!isRequiredTimeRemaining(TIMEOUT_BUFFER_MS)) break;
         if (file.synced !== "r2") continue;
 
         // console.log({ before: file.sizes, version: RESIZE_VERSION });
@@ -782,7 +947,7 @@ async function resizeFiles(files: File[]) {
             ...watermarked
         ].filter(Boolean);
 
-        console.log({ updates });
+        // console.log({ updates });
 
         if (updates.length) {
             await setFile({
@@ -801,7 +966,7 @@ async function resizeFiles(files: File[]) {
             size => !file.sizes?.filter(Boolean).find(value => value.width === size && (watermark ? value.watermark : !value.watermark))
         );
         if (!sizes.length) return [];
-        console.log({ sizes, file: file.sizes, watermark });
+        // console.log({ sizes, file: file.sizes, watermark });
         const defaultSize = getSize();
         let url = file.url,
             fileName = file.fileName;
@@ -845,41 +1010,50 @@ async function resizeFile(file: File, options: ResolveFileOptions) {
     const withoutExtension = basename(file.fileName, extension)
     const withoutSize = withoutExtension.replace(/-\d+$/, "");
     const fileName = `${withoutSize}-${size}${extension}`;
-    console.log(`Fetching resized image for ${fileName} to size ${size} (public: ${options.public || false})`);
-    const returnedUrl = await getResolvedUrl(
-        {
-            ...file,
-            // Remove any available sizes, to ensure previous sized isn't used
-            sizes: undefined
-        },
-        options
-    );
-    const response = await fetch(returnedUrl, {
-        method: "GET",
-        headers: {
-            Accept: file.contentType
-        }
-    });
-    console.log(`resizeFile status for ${fileName}:`, response.status);
-    if (!response.ok) {
-        console.log(response.headers.get("Cf-Resized"));
-        console.log(response.headers);
-        return undefined;
-    }
     const fileData: FileData = {
         contentType: file.contentType,
         fileName
     };
-    const { synced, url } = await saveToR2(fileData, await response.blob());
+
+    let saved: Partial<FileData>;
+    // if (await isExistingInR2(fileData)) {
+    //     console.log(`Resized photo already exists for ${fileData.fileName}, using quick save function`);
+    //     saved = await saveToR2(fileData, new Blob([], { type: file.contentType }));
+    // } else {
+        console.log(`Fetching resized image for ${fileName} to size ${size} (public: ${options.public || false})`);
+        const returnedUrl = await getResolvedUrl(
+            {
+                ...file,
+                // Remove any available sizes, to ensure previous sized isn't used
+                sizes: undefined
+            },
+            options
+        );
+        const response = await fetch(returnedUrl, {
+            method: "GET",
+            headers: {
+                Accept: file.contentType
+            }
+        });
+        console.log(`resizeFile status for ${fileName}:`, response.status);
+        if (!response.ok) {
+            console.log(response.headers.get("Cf-Resized"));
+            console.log(response.headers);
+            return undefined;
+        }
+        saved = await saveToR2(fileData, await response.blob());
+    // }
+    const {synced, syncedAt, url, checksum} = saved;
     const nextFileSize: FileSize = {
         // Either width or height will match
         height: size,
         width: size,
         synced,
-        syncedAt: new Date().toISOString(),
+        syncedAt,
         url,
         version: RESIZE_VERSION,
-        fileName
+        fileName,
+        checksum
     };
     if (options.public) {
         nextFileSize.watermark = true;

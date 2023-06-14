@@ -9,6 +9,7 @@ import {ok} from "../../../is";
 import {getOrigin} from "../../listen/config";
 import {isNumberString} from "../../calculations";
 import {packageIdentifier} from "../../package";
+import {getExpiresAt} from "../storage";
 
 const {
     IMAGE_RESIZING_URL,
@@ -22,6 +23,8 @@ export const DEFAULT_IMAGE_SIZE = 1920;
 // From 1 to 100, default with Cloudflare is 85
 const DEFAULT_IMAGE_QUALITY = 100;
 
+const DEFAULT_EXPIRES_IN_SECONDS = 3600;
+
 const SIZE_QUALITY: Record<number, number> = {
     1920: 95,
     600: 85,
@@ -29,7 +32,6 @@ const SIZE_QUALITY: Record<number, number> = {
 }
 
 const BASE_SIZE = 600;
-
 
 const WATERMARK_CACHE_BUST = `4.${packageIdentifier}.${DISCORD_MEDIA_COMMUNITY_NAME}`;
 
@@ -51,23 +53,103 @@ export function getQuality(given?: number, size?: number): number {
     return DEFAULT_IMAGE_QUALITY;
 }
 
+export function getExpiresInSeconds(given?: number) {
+    if (given) return given;
+    return DEFAULT_EXPIRES_IN_SECONDS;
+}
+
 export interface ResolveFileOptions {
     public?: boolean
     size?: number;
+    sizes?: boolean;
     quality?: number;
+    expiresInSeconds?: number;
 }
 
 export async function getMaybeResolvedFile(file?: File, options?: ResolveFileOptions): Promise<ResolvedFile | undefined> {
     if (!file) return undefined;
     const { synced } = file;
     if (!synced) return undefined;
-    const url = await getResolvedUrl(file, options);
+    const expiresInSeconds = getExpiresInSeconds(options?.expiresInSeconds);
+    // Better to have an earlier expiresAt than later, so resolve it before
+    // resolving the url itself
+    const expiresAt = getExpiresAt(expiresInSeconds * 1000);
+
+    if (options?.sizes) {
+        ok(!options.size, "Unexpected size given along with sizes");
+        let targetSizes = (file.sizes ?? []).filter(file => file.synced === synced);
+        if (options.public) {
+            targetSizes = targetSizes.filter(size => size.watermark);
+        }
+        if (targetSizes.length) {
+            const signed = await Promise.all(
+                targetSizes.map(
+                    async targetSize => {
+                        const targetFile: File = {
+                            ...file,
+                            ...targetSize,
+                            sizes: [
+                                targetSize
+                            ]
+                        };
+                        const url = await getResolvedUrl(
+                            targetFile,
+                            {
+                                ...options,
+                                expiresInSeconds,
+                                size: targetSize.width,
+                                sizes: undefined,
+                                public: targetSize.watermark
+                            }
+                        );
+                        if (!url) return undefined;
+                        return {
+                            ...targetSize,
+                            signed: true,
+                            expiresAt,
+                            url,
+                            synced
+                        };
+                    }
+                )
+            );
+            const sorted = signed
+                .filter(Boolean)
+                .sort((a, b) => (a.width + a.height) > (b.width + b.height) ? -1 : 1)
+            if (sorted.length) {
+                const defaultSize = getSize();
+                const found = (
+                    // Prefer non watermark as default
+                    sorted.find(size => !size.watermark && size.width === defaultSize) ||
+                    sorted.find(size => size.width === defaultSize) ||
+                    sorted[0]
+                );
+                ok(found, "Expected size when length is over zero");
+                return {
+                    ...file,
+                    sizes: sorted,
+                    synced,
+                    ...found,
+                    signed: true,
+                    expiresAt
+                }
+            }
+        }
+        // If there are no target sizes, let the default resolution happen
+    }
+
+    const url = await getResolvedUrl(file, {
+        ...options,
+        sizes: undefined,
+        expiresInSeconds
+    });
     if (!url) return undefined;
     return {
         ...file,
         synced,
         url,
         signed: true,
+        expiresAt,
         sizes: undefined
     }
 }
@@ -107,13 +189,14 @@ export async function getResolvedUrl(file: File, options?: ResolveFileOptions) {
     const defaultSize = getSize()
     const watermarked = (
         file.sizes?.find(value => value.width === size && value.watermark) ??
-        file.sizes?.find(value => value.width === defaultSize && value.watermark)
+        file.sizes?.find(value => value.width === defaultSize && value.watermark) ??
+        file.sizes?.find(value => value.watermark)
     );
     const matching = (
         file.sizes?.find(value => value.width === size && !value.watermark) ??
         file.sizes?.find(value => value.width === defaultSize && !value.watermark)
     );
-    console.log({ watermarked, matching, size, defaultSize });
+    // console.log({ watermarked, matching, size, defaultSize });
     let input: string;
     if (options.public && watermarked) {
         const watermarkedUrl = await getR2URL(watermarked.url);
@@ -124,7 +207,7 @@ export async function getResolvedUrl(file: File, options?: ResolveFileOptions) {
     } else {
         if (matching) {
             const matchingUrl = await getR2URL(matching.url);
-            if ((matching.width === size || matching.height === size) && !watermarked) {
+            if ((matching.width === size || matching.height === size) && !options.public) {
                 return matchingUrl;
             }
             input = matchingUrl;
@@ -182,7 +265,7 @@ export async function getResolvedUrl(file: File, options?: ResolveFileOptions) {
             Key: key
         });
         // Specify a custom expiry for the presigned URL, in seconds
-        const expiresIn = 3600;
+        const expiresIn = getExpiresInSeconds(options.expiresInSeconds);
         return await getSignedUrl(client, command, { expiresIn });
     }
 

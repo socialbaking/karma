@@ -1,10 +1,15 @@
+import {Expiring} from "../expiring";
+
 export type FileUploadedSource = "discord";
 export type FileUploadedSynced = "r2" | "disk";
 export type FileType = "product";
 
-export interface FileImageSize {
+export interface FileImageSize extends Expiring {
   width: number;
   height: number;
+  signed?: boolean;
+  fileName?: string;
+  checksum?: Record<string, string>
 }
 
 export interface FileSize extends FileImageSize {
@@ -15,8 +20,6 @@ export interface FileSize extends FileImageSize {
   watermark?: boolean;
   copyright?: string;
   license?: string;
-  fileName?: string;
-  signed?: boolean;
 }
 
 export interface FileData extends Record<string, unknown>, Partial<FileImageSize> {
@@ -25,7 +28,6 @@ export interface FileData extends Record<string, unknown>, Partial<FileImageSize
   size?: number;
   path?: string;
   url?: string;
-  signed?: boolean;
   pinned?: boolean;
   uploadedAt?: string;
   uploadedByUsername?: string;

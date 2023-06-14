@@ -45,9 +45,12 @@ export type FileUploadedSource = "discord";
 export type FileUploadedSynced = "r2" | "disk";
 export type FileType = "product";
 
-export interface FileImageSize {
+export interface FileImageSize extends Expiring {
   width: number;
   height: number;
+  signed?: boolean;
+  fileName?: string;
+  checksum?: Record<string, string>
 }
 
 export interface FileSize extends FileImageSize {
@@ -58,7 +61,6 @@ export interface FileSize extends FileImageSize {
   watermark?: boolean;
   copyright?: string;
   license?: string;
-  fileName?: string;
 }
 
 export interface FileData extends Record<string, unknown>, Partial<FileImageSize> {
@@ -77,7 +79,9 @@ export interface FileData extends Record<string, unknown>, Partial<FileImageSize
   version?: number;
   type?: FileType | string;
   sizes?: FileSize[];
+  /** @deprecated */
   externalUrl?: string;
+  remoteUrl?: string;
   reactionCounts?: Record<string, number>;
   reactionCountsUpdatedAt?: string;
 }
