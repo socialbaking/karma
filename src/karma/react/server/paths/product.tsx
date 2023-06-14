@@ -31,7 +31,7 @@ export async function handler(request: FastifyRequest<Schema>): Promise<ProductI
         public: isAnonymous(),
         size: 600
     });
-    return { images100, images600 };
+    return { images100: images100.filter(file => file.pinned), images600: images600.filter(file => file.pinned) };
 }
 
 function ProductImages() {
