@@ -30,14 +30,15 @@ function ProductListItem(props: ProductProps) {
 
 export interface CopyrightInfoProps {
   product?: Product;
+  products?: Product[]
   margin?: boolean;
 }
 
-export function CopyrightInfo({ product, margin }: CopyrightInfoProps) {
+export function CopyrightInfo({ product, products: givenProducts, margin }: CopyrightInfoProps) {
   const allProducts = useSortedProducts(true);
   const products = useMemo(
-    () => (product ? [product] : allProducts),
-    [allProducts]
+    () => givenProducts ? givenProducts : (product ? [product] : allProducts),
+    [allProducts, givenProducts]
   );
   const copyright = useCopyrightInformation(products);
   const { isAnonymous } = useData();

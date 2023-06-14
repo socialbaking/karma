@@ -6,7 +6,7 @@ import {isAnonymous} from "../../../authentication";
 import {getImageResizingUrl} from "../../../data/file/resolve-file";
 import {CopyrightInfo} from "./products";
 
-interface ProductInfo {
+export interface ProductInfo {
     images100: File[]
     images600: File[]
 }
@@ -34,7 +34,7 @@ export async function handler(request: FastifyRequest<Schema>): Promise<ProductI
     return { images100: images100.filter(file => file.pinned), images600: images600.filter(file => file.pinned) };
 }
 
-function ProductImages() {
+export function ProductImages() {
     const { images100, images600 } = useInput<ProductInfo>()
     return (
         <div className="product-gallery">
@@ -88,22 +88,24 @@ function ProductImages() {
     padding-top: 200px;
 }
             `.trim()}} />
-            <ul className="product-gallery-navigation">
-                {images100.map(
-                    ({ url, uploadedByUsername, fileId }, index: number) => (
-                        <li key={index} className="product-gallery-navigation-item">
-                            <a href={`#image-${fileId}`}>
-                                <img src={url} alt={`View product image ${index + 1}`} />
-                            </a>
-                        </li>
-                    )
-                )}
-            </ul>
+            {images100.length ? (
+                <ul className="product-gallery-navigation">
+                    {images100.map(
+                        ({ url, uploadedByUsername, fileId }, index: number) => (
+                            <li key={index} className="product-gallery-navigation-item">
+                                <a href={`#image-${fileId}`}>
+                                    <img src={url} alt={`View product image ${index + 1}`} />
+                                </a>
+                            </li>
+                        )
+                    )}
+                </ul>
+            ) : undefined}
             <div className="product-gallery-view">
                 {images600.map(
                     ({ url, uploadedByUsername, fileId }, index: number) => (
                         <div key={index} className="product-gallery-item">
-                            <img id={`image-${fileId}`} src={url} alt={`Product image ${index + 1}${uploadedByUsername ? ` uploaded by ${uploadedByUsername}` : ""}`} />
+                            <img loading="lazy" id={`image-${fileId}`} src={url} alt={`Product image ${index + 1}${uploadedByUsername ? ` uploaded by ${uploadedByUsername}` : ""}`} />
                         </div>
                     )
                 )}
