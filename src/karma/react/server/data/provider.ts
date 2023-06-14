@@ -252,12 +252,12 @@ export function useSortedProducts(
     }
 
     function filtered() {
-      if (typeof searchValue !== "string") {
+      if (typeof searchValue !== "string" || isSearch === false) {
         return products;
       }
       return getMatchingProducts(products, organisations, categories, searchValue, direct);
     }
-  }, [products, organisations, categories, searchValue, direct]);
+  }, [products, organisations, categories, searchValue, isSearch, direct]);
 }
 
 export function useProductByName(productName?: string): Product | undefined {

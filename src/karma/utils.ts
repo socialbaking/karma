@@ -1,6 +1,8 @@
 import {Product, Organisation, Category} from "./client";
-import { ok } from "../is";
-import FuzzySearch from "fuzzy-search";
+import {isLike, ok} from "../is";
+import type FuzzySearchType from "fuzzy-search";
+
+const FuzzySearchModule: unknown = await import("fuzzy-search").catch(() => undefined);
 
 const NAME_SPLIT = " ";
 
@@ -24,13 +26,13 @@ const TYPE_REGEX = /(?:^|\s)[A-Z]{3}(?:$|\s)/
 
 const NUMBER_NUMBER_REGEX = /(?:^|\s)\d+\/\d+(?:$|\s)/
 
-export function getMatchingProducts(
-  products: Product[],
+export function getMatchingProducts<P extends Product>(
+  products: P[],
   organisations: Organisation[],
   categories: Category[],
   search: string,
   direct?: boolean
-): Product[] {
+): P[] {
   // console.log({ search });
   ok(typeof search === "string", "expected search to be a string");
   if (!search) return products;
@@ -251,13 +253,14 @@ export function getMatchingProducts(
     }
   }
 
-  const searcher = new FuzzySearch(products, ["productName"], {
+  if (!isLike<{ default: typeof FuzzySearchType }>(FuzzySearchModule)) return [];
+  const searcher = new FuzzySearchModule.default(products, ["productName"], {
     caseSensitive: false
   });
   return searcher.search(search);
 }
 
-function getMatchingType(products: Product[], search: string) {
+function getMatchingType<P extends Product>(products: P[], search: string) {
   const split = search.split(" ");
   const typeValueMatch = split.find((value) => TYPE_VALUE_REGEX.test(value));
   if (typeValueMatch) {

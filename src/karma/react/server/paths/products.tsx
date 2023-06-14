@@ -73,7 +73,9 @@ export function CopyrightInfo({ product, margin }: CopyrightInfoProps) {
 }
 
 export function Products() {
+  const allProducts = useSortedProducts(false);
   const products = useSortedProducts(true);
+  const includedProductIds = useMemo(() => products.map(product => product.productId), [products]);
   const metrics = useProductMetrics("month");
   const search = useQuerySearch();
   const { isAnonymous } = useData();
@@ -81,30 +83,30 @@ export function Products() {
     <>
       {isAnonymous ? <CopyrightInfo /> : undefined}
       <div className="bg-white shadow overflow-hidden sm:rounded-md">
-        <ul role="list" className="divide-y divide-gray-200">
-          {products.map((product, index) => (
+        <ul role="list" className="divide-y divide-gray-200" id="product-list">
+          {allProducts.map((product, index) => (
             <ProductListItem
               key={index}
               product={product}
+              isDefaultVisible={includedProductIds.includes(product.productId)}
               metrics={metrics[product.productId]}
             />
           ))}
         </ul>
       </div>
-      {search ? (
-        <div className="mx-4">
-          <br />
-          <br />
-          <a
+      <div className="mx-4" id="clear-search-container" hidden={!search}>
+        <br />
+        <br />
+        <a
+            id="clear-search"
             href="?"
             className="text-blue-600 hover:bg-white underline hover:underline-offset-2"
-          >
-            Clear search
-          </a>
-          <br />
-          <br />
-        </div>
-      ) : undefined}
+        >
+          Clear search
+        </a>
+        <br />
+        <br />
+      </div>
       <CopyrightInfo />
     </>
   );

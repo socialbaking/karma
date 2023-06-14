@@ -16,6 +16,7 @@ export interface ProductProps {
   metrics?: SingleProductMetrics;
   report?: boolean;
   category?: Category;
+  isDefaultVisible?: boolean
 }
 
 export interface ProductItemProps extends ProductProps {
@@ -102,6 +103,7 @@ export function ProductListItem({
   className,
   url,
   isAnonymous,
+  isDefaultVisible,
 }: ProductItemProps) {
   const { productId, sizes, ...attributes } = product;
   // const productUrl = `${url || "calculator"}?search=${encodeURIComponent(
@@ -149,7 +151,14 @@ export function ProductListItem({
   //   metrics
   // })
   return (
-    <li>
+    <li
+        data-product-id={productId}
+        data-product={product.productName}
+        data-category={category?.categoryName}
+        data-category-id={category?.categoryId}
+        data-category-generics={product.genericCategoryNames.join("|")}
+        hidden={!isDefaultVisible}
+    >
       <a
         href={productUrl}
         className={

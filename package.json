@@ -201,5 +201,16 @@
     "prettier": "prettier --write .",
     "wrangler": "wrangler dev",
     "wrangler:deploy": "wrangler deploy"
+  },
+  "importmap": {
+    "root": "esnext/.imports",
+    "imports": {
+      "react/jsx-runtime": "scripts/bridge/jsx-runtime.js",
+      "react": "node_modules/react/index.js",
+      "react-dom": "node_modules/react-dom/index.js",
+      "react-dom/client": "node_modules/react-dom/client.js",
+      "fuzzy-search": "node_modules/fuzzy-search/src/FuzzySearch.js",
+      "./is.js": "esnext/is.js"
+    }
   }
 }
