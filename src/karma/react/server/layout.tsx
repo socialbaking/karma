@@ -1,14 +1,7 @@
 import { PropsWithChildren, ReactElement } from "react";
-import {description, importmapPath, namespace, project} from "../../package";
+import {description, importmapJSON, namespace, project} from "../../package";
 import { getOrigin } from "../../listen/config";
-import { useData, useIsTrusted, useQuery, useQuerySearch } from "./data";
-import {
-  BASIC_CATEGORY_FLOWER,
-  CategoryIcon,
-} from "../client/components/icons";
-import {readFile} from "node:fs/promises";
-
-const importMapJSON = await readFile(importmapPath, "utf-8");
+import { useData, useIsTrusted, useQuerySearch } from "./data";
 
 export interface LayoutProps {
   title?: string;
@@ -250,7 +243,7 @@ export function BaseLayout({
         <meta name="description" content={description} />
         <meta name="author" content={namespace} />
         <link href="/server.css" rel="stylesheet" />
-        <script type="importmap" dangerouslySetInnerHTML={{ __html: importMapJSON }} />
+        <script type="importmap" dangerouslySetInnerHTML={{ __html: importmapJSON }} />
       </head>
       <body className="h-full">
         <div className="lg:pl-72 flex items-center gap-x-6 bg-gray-900 px-6 py-2.5 sm:px-3.5 sm:before:flex-1 sm:after:flex-1 justify-center">

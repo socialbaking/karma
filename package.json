@@ -203,7 +203,7 @@
     "wrangler:deploy": "wrangler deploy"
   },
   "importmap": {
-    "root": "esnext/.imports",
+    "root": "esnext/imports",
     "imports": {
       "react/jsx-runtime": "scripts/bridge/jsx-runtime.js",
       "react": "node_modules/react/index.js",
