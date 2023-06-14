@@ -7,8 +7,60 @@ import {
   timeBetweenCommitAndTestCompletion,
 } from "../../../package.readonly";
 import { homepage, packageIdentifier } from "../../../package";
+import {useIsAdmin, useIsTrusted} from "../data";
+import {readdirSync, statSync} from "fs";
+import {join} from "node:path";
+
+
+function isDirectory(path: string) {
+    try {
+        const stat = statSync(path);
+        return stat.isDirectory()
+    } catch {
+        return false;
+    }
+}
+
+interface DirectoryInfo {
+    path: string;
+    directories: DirectoryInfo[],
+    files: string[]
+}
+
+function readdirRecursive(path: string): DirectoryInfo {
+
+    const paths = readdirSync(path)
+        .filter(name => ![".git", "node_modules", ".env", ".cache", ".github", ".idea", "coverage"].includes(name))
+        .map(name => join(path, name));
+
+    const directories = paths.filter(isDirectory);
+    const files = paths.filter(path => !directories.includes(path));
+
+    const info = directories.map(readdirRecursive);
+
+    return {
+        path,
+        directories: info,
+        files
+    };
+}
+
+function Admin() {
+
+    const directories = readdirRecursive(process.cwd());
+
+    return <pre>
+        {JSON.stringify(
+            directories,
+            undefined,
+            "  "
+        )}
+    </pre>
+
+}
 
 export function Settings() {
+  const trusted = useIsTrusted()
   return (
     <>
       <p>You are running {packageIdentifier}</p>
@@ -55,6 +107,7 @@ export function Settings() {
         <br />
         Commit Hash: {commit}
       </p>
+        {trusted ? <Admin /> : undefined}
     </>
   );
 }
