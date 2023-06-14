@@ -1,5 +1,5 @@
 import { PropsWithChildren, ReactElement } from "react";
-import {description, importmapJSON, namespace, project} from "../../package";
+import {description, importmap, namespace, project} from "../../package";
 import { getOrigin } from "../../listen/config";
 import { useData, useIsTrusted, useQuerySearch } from "./data";
 
@@ -234,6 +234,27 @@ export function BaseLayout({
        console.error(error);
     }
     `;
+
+  const origin = getOrigin();
+  const importmapJSON = JSON.stringify({
+    ...importmap,
+    imports: Object.fromEntries(
+        Object.entries(importmap.imports)
+            .flatMap(entry => {
+              if (!(entry[0].startsWith(".") || entry[0].startsWith("/"))) {
+                return [entry]
+              }
+              return [
+                  entry,
+                  [
+                      new URL(entry[0], origin).toString(),
+                      entry[1]
+                  ]
+              ]
+            })
+    )
+  })
+
   return (
     <html lang="en" className="h-full bg-white">
       <head>

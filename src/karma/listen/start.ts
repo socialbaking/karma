@@ -1,4 +1,4 @@
-import fastify, {FastifyInstance} from "fastify";
+import fastify, {FastifyInstance, FastifyRequest} from "fastify";
 import { routes } from "./routes";
 import { setupSwagger } from "./swagger";
 import blippPlugin from "fastify-blipp";
@@ -113,29 +113,37 @@ export async function create() {
   register(blippPlugin);
   register(corsPlugin);
 
-  app.register(
+  await app.register(
     async (instance) => {
-      instance.register(etag);
+      await instance.register(etag);
       instance.addHook("onRequest", (request, response, done) => {
         response.header("Cache-Control", "max-age=1800"); // Give it something
         done();
       });
-      instance.register(files, {
+      await instance.register(files, {
         root: REACT_CLIENT_DIRECTORY,
         prefix: "/client",
       });
       const publicPath = PUBLIC_PATH || join(directory, "../../../public");
-      instance.register(files, {
+      await instance.register(files, {
         root: publicPath,
         decorateReply: false,
         prefix: "/public",
       });
-      instance.register(files, {
+
+
+      await instance.register(files, {
         // Relative to top level of this module
         // NOT relative to cwd
         root: importmapRoot,
         prefix: importmapRootName,
         decorateReply: false,
+        serveDotFiles: true,
+        dotfiles: "allow",
+        allowedPath: (pathName: string, root: string, request: FastifyRequest) => {
+          console.log("Allowed path", { pathName, root, importmapRoot, importmapRootName });
+          return true;
+        }
       });
     },
     { prefix: "/" }

@@ -67,7 +67,7 @@ async function createImports(importmap) {
 
     for (const [key, value] of Object.entries(importmap.imports)) {
         if (typeof value !== "string") continue;
-        const target = join(root, `${key}.js`)
+        const target = join(root, `${key.replace(/\.js$/, "")}.js`)
         await esbuild.build({
             entryPoints: [value],
             bundle: true,
