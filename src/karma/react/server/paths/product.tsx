@@ -98,15 +98,6 @@ function ProductImages() {
                         </li>
                     )
                 )}
-                {images100.map(
-                    ({ url, uploadedByUsername, fileId }, index: number) => (
-                        <li key={index} className="product-gallery-navigation-item">
-                            <a href={`#image-${fileId}`}>
-                                <img src={url} alt={`View product image ${index + 1}`} />
-                            </a>
-                        </li>
-                    )
-                )}
             </ul>
             <div className="product-gallery-view">
                 {images600.map(
