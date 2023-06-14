@@ -125,6 +125,10 @@ export async function create() {
         prefix: "/client",
         serveDotFiles: true,
         dotfiles: "allow",
+        allowedPath: (pathName: string, root: string, request: FastifyRequest) => {
+          console.log("Allowed path", { pathName, root, client: true });
+          return true;
+        }
       });
       const publicPath = PUBLIC_PATH || join(directory, "../../../public");
       await instance.register(files, {
@@ -133,6 +137,10 @@ export async function create() {
         prefix: "/public",
         serveDotFiles: true,
         dotfiles: "allow",
+        allowedPath: (pathName: string, root: string, request: FastifyRequest) => {
+          console.log("Allowed path", { pathName, root, public: true });
+          return true;
+        }
       });
 
 
