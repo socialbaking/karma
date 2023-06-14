@@ -27,31 +27,38 @@ interface DirectoryInfo {
     files: string[]
 }
 
-function readdirRecursive(path: string): DirectoryInfo {
+function readdirRecursive(path: string): DirectoryInfo | undefined {
+    try {
+        const paths = readdirSync(path)
+            .filter(name => ![".git", "node_modules", ".env", ".cache", ".github", ".idea", "coverage"].includes(name))
+            .map(name => join(path, name));
 
-    const paths = readdirSync(path)
-        .filter(name => ![".git", "node_modules", ".env", ".cache", ".github", ".idea", "coverage"].includes(name))
-        .map(name => join(path, name));
+        const directories = paths.filter(isDirectory);
+        const files = paths.filter(path => !directories.includes(path));
 
-    const directories = paths.filter(isDirectory);
-    const files = paths.filter(path => !directories.includes(path));
+        const info = directories.map(readdirRecursive).filter(Boolean);
 
-    const info = directories.map(readdirRecursive);
-
-    return {
-        path,
-        directories: info,
-        files
-    };
+        return {
+            path,
+            directories: info,
+            files
+        };
+    } catch {
+        return undefined;
+    }
 }
 
 function Admin() {
 
-    const directories = readdirRecursive(process.env.IS_LOCAL ? process.cwd() : "/");
-
     return <pre>
         {JSON.stringify(
-            directories,
+            readdirRecursive(process.env.IS_LOCAL ? process.cwd() : "/"),
+            undefined,
+            "  "
+        )}
+
+        {JSON.stringify(
+            readdirRecursive("node_modules/@socialbaking/karma"),
             undefined,
             "  "
         )}
