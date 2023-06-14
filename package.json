@@ -209,8 +209,7 @@
       "react": "node_modules/react/index.js",
       "react-dom": "node_modules/react-dom/index.js",
       "react-dom/client": "node_modules/react-dom/client.js",
-      "fuzzy-search": "node_modules/fuzzy-search/src/FuzzySearch.js",
-      "./is.js": "esnext/is.js"
+      "fuzzy-search": "node_modules/fuzzy-search/src/FuzzySearch.js"
     }
   }
 }

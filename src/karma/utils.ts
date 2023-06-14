@@ -1,6 +1,18 @@
-import {Product, Organisation, Category} from "./client";
-import {isLike, ok} from "../is";
+import type {Product, Organisation, Category} from "./client";
 import type FuzzySearchType from "fuzzy-search";
+
+// Including these functions in file to allow it to be a portable module by itself
+function isLike<T>(value: unknown): value is T {
+  return !!value;
+}
+
+function ok(value: unknown, message?: string): asserts value;
+function ok<T>(value: unknown, message?: string): asserts value is T;
+function ok(value: unknown, message?: string): asserts value {
+  if (!value) {
+    throw new Error(message ?? "Expected value");
+  }
+}
 
 const FuzzySearchModule: unknown = await import("fuzzy-search").catch(() => undefined);
 

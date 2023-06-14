@@ -59,7 +59,7 @@ async function createImports(importmap) {
 
     const entries = [];
 
-    const root = importmap.root || "esnext/.imports";
+    const root = importmap.root || "esnext/imports";
 
     await mkdir(root, {
         recursive: true

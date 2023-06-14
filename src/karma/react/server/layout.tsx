@@ -547,7 +547,7 @@ export function Layout(props: PropsWithChildren<LayoutProps>) {
                 id="search-form"
                 autoComplete="off"
               >
-                <input autoComplete="false" name="hidden" type="text" style={{ display: "none" }} />
+                <input autoComplete="false" name="_" type="text" style={{ display: "none" }} />
                 <label htmlFor="search-field" className="sr-only">
                   Search Products
                 </label>
@@ -571,6 +571,7 @@ export function Layout(props: PropsWithChildren<LayoutProps>) {
                   name="search"
                   defaultValue={search}
                 />
+                <input type="submit" value="Search" style={{ display: "none" }} />
               </form>
             </div>
           </div>
