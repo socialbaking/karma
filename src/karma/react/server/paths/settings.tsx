@@ -47,7 +47,7 @@ function readdirRecursive(path: string): DirectoryInfo {
 
 function Admin() {
 
-    const directories = readdirRecursive(process.cwd());
+    const directories = readdirRecursive(process.env.IS_LOCAL ? process.cwd() : "/");
 
     return <pre>
         {JSON.stringify(
