@@ -50,6 +50,8 @@ function ProductImages() {
     padding: 0;
     margin: 0;
     display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
 }
 .product-gallery-navigation .product-gallery-navigation-item {
     padding: 0;
@@ -59,6 +61,9 @@ function ProductImages() {
 .product-gallery-navigation .product-gallery-navigation-item a img {
     display: block;
     border: none;
+    object-fit: contain;
+    height: 100px;
+    width: 100px;
 }
 .product-gallery-navigation .product-gallery-navigation-item a {
     display: block;
@@ -70,15 +75,29 @@ function ProductImages() {
     min-height: 375px;
     overflow-x: hidden;
     float: left;
+    z-index: -10;
+    position: relative;
+    margin-top: -200px;
 }
 .product-gallery-view .product-gallery-item {
     min-width: 100%;
 }
 .product-gallery-view .product-gallery-item img {
     min-width: 100%;
+    object-fit: cover;
+    padding-top: 200px;
 }
             `.trim()}} />
             <ul className="product-gallery-navigation">
+                {images100.map(
+                    ({ url, uploadedByUsername, fileId }, index: number) => (
+                        <li key={index} className="product-gallery-navigation-item">
+                            <a href={`#image-${fileId}`}>
+                                <img src={url} alt={`View product image ${index + 1}`} />
+                            </a>
+                        </li>
+                    )
+                )}
                 {images100.map(
                     ({ url, uploadedByUsername, fileId }, index: number) => (
                         <li key={index} className="product-gallery-navigation-item">
