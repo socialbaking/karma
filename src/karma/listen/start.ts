@@ -123,12 +123,16 @@ export async function create() {
       await instance.register(files, {
         root: REACT_CLIENT_DIRECTORY,
         prefix: "/client",
+        serveDotFiles: true,
+        dotfiles: "allow",
       });
       const publicPath = PUBLIC_PATH || join(directory, "../../../public");
       await instance.register(files, {
         root: publicPath,
         decorateReply: false,
         prefix: "/public",
+        serveDotFiles: true,
+        dotfiles: "allow",
       });
 
 
