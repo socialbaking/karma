@@ -153,10 +153,6 @@ export function ProductListItem({
   return (
     <li
         data-product-id={productId}
-        data-product={product.productName}
-        data-category={category?.categoryName}
-        data-category-id={category?.categoryId}
-        data-category-generics={product.genericCategoryNames.join("|")}
         hidden={!isDefaultVisible}
     >
       <a

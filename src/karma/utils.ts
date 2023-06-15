@@ -266,7 +266,13 @@ export function getMatchingProducts<P extends Product>(
   }
 
   if (!isLike<{ default: typeof FuzzySearchType }>(FuzzySearchModule)) return [];
-  const searcher = new FuzzySearchModule.default(products, ["productName"], {
+  const keys: (keyof Product & string)[] = [
+    "productName",
+    "genericCategoryNames",
+    "genericAcronym",
+    "genericSearchTerm"
+  ]
+  const searcher = new FuzzySearchModule.default(products, keys, {
     caseSensitive: false
   });
   return searcher.search(search);

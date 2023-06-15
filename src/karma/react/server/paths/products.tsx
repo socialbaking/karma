@@ -1,8 +1,9 @@
 import {
+  useCategories,
   useCategory,
   useCopyrightInformation,
   useData,
-  useMetrics,
+  useMetrics, useOrganisations,
   useProductMetrics,
   useQuery,
   useQuerySearch,
@@ -80,9 +81,14 @@ export function Products() {
   const metrics = useProductMetrics("month");
   const search = useQuerySearch();
   const { isAnonymous } = useData();
+  const organisations = useOrganisations();
+  const categories = useCategories();
   return (
     <>
       {isAnonymous ? <CopyrightInfo /> : undefined}
+      <script type="application/json" id="organisations-json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organisations) }} />
+      <script type="application/json" id="categories-json" dangerouslySetInnerHTML={{ __html: JSON.stringify(categories) }} />
+      <script type="application/json" id="products-json" dangerouslySetInnerHTML={{ __html: JSON.stringify(allProducts) }} />
       <div className="bg-white shadow overflow-hidden sm:rounded-md">
         <ul role="list" className="divide-y divide-gray-200" id="product-list">
           {allProducts.map((product, index) => (

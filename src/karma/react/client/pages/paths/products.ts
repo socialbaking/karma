@@ -1,5 +1,5 @@
 import {ok} from "../../is";
-import {Product} from "../../../../client";
+import {Category, Organisation, Product} from "../../../../client";
 import {getMatchingProducts} from "../../utils";
 
 export async function products() {
@@ -15,18 +15,25 @@ export async function products() {
 
     form.autocomplete = "off";
 
-    const products = Array.from({ length: items.length }, (ignore, index) => items.item(index))
-        .map((item): Product & { element: HTMLElement } => ({
+    const organisationsJSONElement = document.getElementById("organisations-json");
+    const categoriesJSONElement = document.getElementById("categories-json");
+    const productsJSONElement = document.getElementById("products-json");
+
+    const organisations: Organisation[] = JSON.parse(organisationsJSONElement.innerHTML.trim());
+    const categories: Category[] = JSON.parse(categoriesJSONElement.innerHTML.trim());
+    const products: Product[] = JSON.parse(productsJSONElement.innerHTML.trim());
+
+    const productElements = Array.from({ length: items.length }, (ignore, index) => items.item(index))
+        .map((item): { productId: string, element: HTMLElement } => ({
             productId: item.getAttribute("data-product-id"),
-            productName: item.getAttribute("data-product"),
-            categoryId: item.getAttribute("data-category-id"),
-            genericCategoryNames: (item.getAttribute("data-category-generics") || "")
-                .split("|")
-                .filter(Boolean),
-            createdAt: "",
-            updatedAt: "",
             element: item
         }));
+
+    const productElementMap = new Map(
+        productElements.map(
+            ({ productId, element }) => [productId, element]
+        )
+    );
 
     field.addEventListener("change", () => {
         filterProductList(field.value);
@@ -49,15 +56,17 @@ export async function products() {
 
         const matches = !text.trim() ? products : getMatchingProducts(
             products,
-            [],
-            [],
+            organisations,
+            categories,
             text
         );
 
         console.log({ matches });
 
         for (const match of matches) {
-            match.element.hidden = false;
+            const element =  productElementMap.get(match.productId);
+            if (!element) continue;
+            element.hidden = false;
         }
 
         const hide = products.filter(
@@ -65,7 +74,9 @@ export async function products() {
         );
 
         for (const match of hide) {
-            match.element.hidden = true;
+            const element =  productElementMap.get(match.productId);
+            if (!element) continue;
+            element.hidden = true;
         }
     }
 
