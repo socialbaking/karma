@@ -60,6 +60,8 @@ async function createImports(importmap) {
     const entries = [];
 
     const root = importmap.root || "esnext/imports";
+    const buildRoot = "esnext";
+    const referencePath = root.replace(`${buildRoot}/`, "./");
 
     await mkdir(root, {
         recursive: true
@@ -84,6 +86,17 @@ async function createImports(importmap) {
         JSON.stringify({
             imports
         }, undefined, "  "),
+        "utf-8"
+    );
+
+    const files = Object.values(imports);
+    const referenceFile = files
+        .map((file, index) => `export * as Import${index} from "${file.replace(`/${buildRoot}`, ".")}";`)
+        .join("\n")
+
+    await writeFile(
+        `${buildRoot}/import-references.js`,
+        `${referenceFile}\n`,
         "utf-8"
     );
 }

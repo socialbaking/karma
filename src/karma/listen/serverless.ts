@@ -1,3 +1,7 @@
+// It appears vercel serverless requires strong references
+// for inclusion in the file system
+import "../../import-references";
+
 import * as dotenv from "dotenv";
 dotenv.config();
 
