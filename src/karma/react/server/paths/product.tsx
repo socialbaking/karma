@@ -104,7 +104,7 @@ export function ProductImages() {
                 {images600.map(
                     ({ url, uploadedByUsername, fileId }, index: number) => (
                         <div key={index} className="product-gallery-item">
-                            <img loading="lazy" id={`image-${fileId}`} src={url} alt={`Product image ${index + 1}${uploadedByUsername ? ` uploaded by ${uploadedByUsername}` : ""}`} />
+                            <img loading={index ? "lazy" : "eager"} id={`image-${fileId}`} src={url} alt={`Product image ${index + 1}${uploadedByUsername ? ` uploaded by ${uploadedByUsername}` : ""}`} />
                         </div>
                     )
                 )}

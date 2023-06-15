@@ -61,7 +61,7 @@ export function ImagesPage() {
                             }
                             return (
                                 <div className="image-container" id={image.fileId} key={index} data-product-id={image.productId}>
-                                    <img title={alt} alt={alt} src={image.url} />
+                                    <img loading={index ? "lazy" : "eager"} title={alt} alt={alt} src={image.url} />
                                 </div>
                             )
                         }
