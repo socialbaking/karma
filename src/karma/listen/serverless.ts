@@ -5,7 +5,7 @@ import "../../import-references";
 import * as dotenv from "dotenv";
 dotenv.config();
 
-import { create } from "./start";
+const { create } = await import("./start");
 
 const app = await create();
 
