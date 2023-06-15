@@ -11,16 +11,16 @@ import {File, FileData, FileImageSize, FileSize, getFile, getNamedFile, listName
 import {getTimeRemaining, isRequiredTimeRemaining, getSignal} from "../../../signal";
 import {addExpiring, getCached} from "../../cache";
 import {DAY_MS, getExpiresAt, MONTH_MS} from "../../storage";
-import {R2_ACCESS_KEY_SECRET, R2_ACCESS_KEY_ID, R2_ENDPOINT, R2_BUCKET, r2Config, getR2, isR2} from "../../file/r2";
+import {R2_ACCESS_KEY_SECRET, R2_ACCESS_KEY_ID, R2_ENDPOINT, R2_BUCKET, r2Config, getR2, isR2} from "../../file";
 import {
     DISCORD_MEDIA_OFFLINE_STORE,
     DISCORD_MEDIA_PARENT_CHANNEL_NAME,
     DISCORD_MEDIA_VERSION,
     DISCORD_MEDIA_PINNED_ONLY,
     DISCORD_MEDIA_EMOJI_NAME
-} from "../../file/discord";
+} from "../../file";
 import {createHash} from "crypto";
-import {DEFAULT_IMAGE_SIZE, getResolvedUrl, getSize, ResolveFileOptions} from "../../file/resolve-file";
+import {DEFAULT_IMAGE_SIZE, getResolvedUrl, getSize, ResolveFileOptions} from "../../file";
 import {HeadObjectCommand, PutObjectCommand} from "@aws-sdk/client-s3";
 import {basename} from "discord.js";
 import {isNumberString} from "../../../calculations";

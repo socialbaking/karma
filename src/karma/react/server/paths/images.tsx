@@ -3,7 +3,7 @@ import {FastifyRequest} from "fastify";
 import {useParams, useProduct, useInput, useProducts, useData} from "../data";
 import {ok} from "../../../../is";
 import {isAnonymous} from "../../../authentication";
-import {getImageResizingUrl, getSize} from "../../../data/file/resolve-file";
+import {getImageResizingUrl, getSize} from "../../../data/file";
 import {CopyrightInfo} from "./products";
 import {useMemo} from "react";
 
