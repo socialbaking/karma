@@ -1,16 +1,15 @@
-import { Data, DataProvider } from "./data/provider";
-import { paths } from "./paths";
+import { ReactData, DataProvider } from "./data";
 import { getOrigin } from "../../listen/config";
 import { AnonymousLayout, Layout, LayoutProps } from "./layout";
+import {DataProvider as BaseDataProvider, View} from "@opennetwork/logistics";
 
-export interface KarmaServerProps extends Data {
-  url: string;
+export interface KarmaServerProps extends ReactData {
+  view: View;
 }
 
 export default function KarmaServer(options: KarmaServerProps) {
   const { pathname } = new URL(options.url, getOrigin());
-
-  const Component = paths[pathname];
+  const { view: { Component } } = options;
 
   if (!Component) {
     return <div>Could not find {pathname}</div>;
@@ -29,5 +28,9 @@ export default function KarmaServer(options: KarmaServerProps) {
     }
   }
 
-  return <DataProvider value={options}>{children}</DataProvider>;
+  return (
+      <BaseDataProvider value={options}>
+        <DataProvider value={options}>{children}</DataProvider>
+      </BaseDataProvider>
+  );
 }

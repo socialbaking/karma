@@ -11,6 +11,7 @@ import {useIsAdmin, useIsTrusted} from "../data";
 import {readdirSync, statSync} from "fs";
 import {join} from "node:path";
 
+export const path = "/settings";
 
 function isDirectory(path: string) {
     try {
@@ -112,3 +113,5 @@ export function Settings() {
     </>
   );
 }
+
+export const Component = Settings;

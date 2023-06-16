@@ -13,7 +13,7 @@ import { organisationRoutes } from "./organisation";
 
 export async function routes(fastify: FastifyInstance) {
   async function apiRoutes(fastify: FastifyInstance) {
-    fastify.register(systemLogRoutes);
+    // fastify.register(systemLogRoutes);
     fastify.register(productRoutes);
     fastify.register(partnerRoutes);
     fastify.register(metricRoutes);
@@ -27,9 +27,9 @@ export async function routes(fastify: FastifyInstance) {
     prefix: "/api/version/1",
   });
 
-  fastify.register(authenticationRoutes, {
-    prefix: "/api",
-  });
+  // fastify.register(authenticationRoutes, {
+  //   prefix: "/api",
+  // });
 
   fastify.register(backgroundRoutes, {
     prefix: "/api",

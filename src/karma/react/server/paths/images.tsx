@@ -7,6 +7,8 @@ import {getImageResizingUrl, getSize} from "../../../data/file";
 import {CopyrightInfo} from "./products";
 import {useMemo} from "react";
 
+export const path = "/images";
+
 interface ProductInfo {
     images: File[];
 }
@@ -96,3 +98,5 @@ export function ImagesPage() {
         </div>
     )
 }
+
+export const Component = ImagesPage;

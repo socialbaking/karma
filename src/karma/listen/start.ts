@@ -24,7 +24,7 @@ import { errorHandler } from "../view/error";
 import etag from "@fastify/etag";
 import { parseStringFields } from "./body-parser";
 import {signalMiddleware} from "../signal";
-import Ajv from "ajv";
+import {routes as baseRoutes} from "@opennetwork/logistics";
 
 const { pathname } = new URL(import.meta.url);
 const directory = dirname(pathname);
@@ -163,7 +163,9 @@ export async function create() {
 
   await setupSwagger(app);
 
-  register(routes);
+  await register(routes);
+
+  await register(baseRoutes);
 
   return app;
 }

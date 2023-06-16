@@ -153,7 +153,7 @@ export function ProductListItem({
   return (
     <li
         data-product-id={productId}
-        hidden={!isDefaultVisible}
+        hidden={isDefaultVisible === false}
     >
       <a
         href={productUrl}

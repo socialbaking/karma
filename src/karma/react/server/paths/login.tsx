@@ -1,5 +1,8 @@
 import { useData } from "../data";
 
+export const path = "/login";
+export const anonymous = true;
+
 const FORM_CLASS = `
 mt-1
 block
@@ -47,3 +50,5 @@ export function Login() {
     </form>
   );
 }
+
+export const Component = Login;

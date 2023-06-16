@@ -8,6 +8,9 @@ import { background } from "../../../background";
 import { ok } from "../../../../is";
 import { isProductReport } from "../../../calculations";
 
+export const path = "/upload-report";
+export const trusted = true;
+
 export async function submit(request: FastifyRequest) {
   const report = await uploadReportHandler(request);
   if (isProductReport(report) || report.reports.find(isProductReport)) {
@@ -121,3 +124,5 @@ export function UploadReport() {
     </>
   );
 }
+
+export const Component = UploadReport;

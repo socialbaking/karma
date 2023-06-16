@@ -17,6 +17,10 @@ import { COPYRIGHT_PUBLIC_LABEL } from "../../../static";
 import { Product } from "../../../data";
 import { useMemo } from "react";
 
+export const path = "/products";
+export const anonymous = true;
+export const cached = true;
+
 function ProductListItem(props: ProductProps) {
   const category = useCategory(props.product.categoryId);
   const { isAnonymous } = useData();
@@ -118,3 +122,5 @@ export function Products() {
     </>
   );
 }
+
+export const Component = Products;

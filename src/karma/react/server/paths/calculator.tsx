@@ -23,6 +23,9 @@ import { background } from "../../../background";
 import { ProductListItem } from "../../client/components/product/list-item";
 import { getReportMetrics, ReportMetrics } from "../../../data";
 
+export const path = "/calculator";
+export const anonymous = true;
+
 export async function submit(request: FastifyRequest) {
   // 👀
   const report = await addReportFromRequest(request);
@@ -108,13 +111,15 @@ export function Calculator() {
   const submitted = useSubmitted();
   const result = useMaybeResult<{ report: Report; metrics?: ReportMetrics }>();
   const error = useError();
-  console.log(error);
   const productName = useQuerySearch();
   const submittedProduct = useProduct(body?.productId);
   const category = useCategory(submittedProduct?.categoryId);
   const metrics = useProductMetrics("month");
   const searchedProduct = useProductByName(productName);
   const searchedProductCategory = useCategory(searchedProduct?.categoryId);
+  console.log({
+    error, result, submitted, submittedProduct
+  });
   return (
     <form name="calculator" action="/calculator#action-section" method="post">
       {result ? (
@@ -148,6 +153,7 @@ export function Calculator() {
       {searchedProduct ? (
         <ul className="list-none">
           <ProductListItem
+            isDefaultVisible
             url="/products"
             product={searchedProduct}
             category={searchedProductCategory}
@@ -289,6 +295,7 @@ export function Calculator() {
                   ) : undefined}
                   <ul className="list-none">
                     <ProductListItem
+                      isDefaultVisible
                       url="/products"
                       report={!!result.metrics}
                       product={submittedProduct}
@@ -324,3 +331,5 @@ export function Calculator() {
     </form>
   );
 }
+
+export const Component = Calculator;

@@ -1,5 +1,5 @@
 import { ok } from "../../../is";
-import { AuthenticationRole, SystemRole } from "../authentication-role";
+import { AuthenticationRole, SystemRole } from "@opennetwork/logistics";
 
 export const namedRoles: Record<
   Exclude<AuthenticationRole, SystemRole>,
@@ -40,55 +40,9 @@ export const alternativeRoleNames: Partial<
   industry: ["Verified Industry"],
 };
 
-export const roles: AuthenticationRole[] = [
-  "admin",
-  "industry",
-  "member",
-  "moderator",
-  "owner",
-  "patient",
-  "pharmacy",
-  "developer",
-  "coordinator",
-  "booster",
-  "clinic",
-  "partner",
-];
-const stringRoles: string[] = roles;
-
-ok(
-  Object.keys(namedRoles).length === roles.length,
-  "Expected roles array to include all named roles"
-);
-
-export function isAuthenticationRole(key: string): key is AuthenticationRole {
-  return stringRoles.includes(key);
-}
-
-export function getAuthenticationRole(
-  name: string
-): AuthenticationRole | undefined {
-  const lowerName = name.toLowerCase();
-  if (isAuthenticationRole(lowerName)) return lowerName;
-  for (const key of roles) {
-    if (key === "system") continue;
-    if (name === key || lowerName === key) return key;
-    for (const value of [
-      namedRoles[key],
-      ...(alternativeRoleNames[key] ?? []),
-    ]) {
-      if (name === value) return key;
-      const lower = value.toLowerCase();
-      if (lowerName === lower) return key;
-    }
-  }
-  return undefined;
-}
-
-export function getAuthenticationRoles(names: string[]): AuthenticationRole[] {
-  const result = names
-    .filter(Boolean)
-    .map(getAuthenticationRole)
-    .filter(Boolean);
-  return [...new Set(result)];
-}
+export {
+  isAuthenticationRole,
+  getAuthenticationRole,
+  getAuthenticationRoles,
+  AuthenticationRole,
+} from "@opennetwork/logistics"

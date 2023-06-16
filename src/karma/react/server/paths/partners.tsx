@@ -1,5 +1,7 @@
 import { usePartners } from "../data/provider";
 
+export const path = "/partners";
+
 export function Partners() {
   const partners = usePartners();
   return (
@@ -12,3 +14,5 @@ export function Partners() {
     </div>
   );
 }
+
+export const Component = Partners;

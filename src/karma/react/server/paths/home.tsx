@@ -18,6 +18,9 @@ import {DISCORD_CLIENT_ID} from "../../../listen/auth/discord";
 import {REDDIT_CLIENT_ID} from "../../../listen/auth/reddit";
 import {AUTHSIGNAL_TENANT} from "../../../authentication/authsignal";
 
+export const path = "/home";
+export const anonymous = true;
+
 export function Home() {
   const { isAnonymous } = useData();
   const roles = useRoles();
@@ -134,3 +137,5 @@ export function Home() {
     </>
   );
 }
+
+export const Component = Home;

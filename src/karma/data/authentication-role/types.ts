@@ -1,6 +1,4 @@
-export type SystemRole = "system";
-
-export type AuthenticationRole =
+export type KarmaAuthenticationRole =
   | "moderator"
   | "admin"
   | "owner"
@@ -12,5 +10,14 @@ export type AuthenticationRole =
   | "booster"
   | "developer"
   | "coordinator"
-  | "partner"
-  | SystemRole;
+  | "partner";
+
+declare global {
+    interface AuthenticationRoles extends Record<KarmaAuthenticationRole, KarmaAuthenticationRole> {
+    }
+}
+
+// Used by client
+type AuthenticationRole =
+    | KarmaAuthenticationRole
+    | keyof AuthenticationRoles;

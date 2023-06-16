@@ -1,77 +1,34 @@
-import { FunctionComponent } from "react";
-import { Metrics } from "./metrics";
-import { Products } from "./products";
-import { Partners } from "./partners";
-import { Calculator, submit as calculatorSubmit } from "./calculator";
-import { Settings } from "./settings";
-import { Home } from "./home";
-import { Organisations } from "./organisations";
-import { Feedback, submit as feedbackSubmit } from "./feedback";
-import { Login } from "./login";
-import { Logout, handler as logoutHandler } from "./logout";
-import { Errors } from "./error";
-import { UploadReport, submit as uploadSubmit } from "./upload-report";
-import { ProductPage, handler as productHandler } from "./product";
-import { ImagesPage, handler as imagesHandler } from "./images";
+import * as MetricsView from "./metrics";
+import * as ProductsView from "./products";
+import * as PartnersView from "./partners";
+import * as CalculatorView from "./calculator";
+import * as SettingsView from "./settings";
+import * as HomeView from "./home";
+import * as HomeIndexView from "./home";
+import * as OrganisationsView from "./organisations";
+import * as FeedbackView from "./feedback";
+import * as LoginView from "./login";
+import * as LogoutView from "./logout";
+import * as ErrorsView from "./error";
+import * as UploadReportView from "./upload-report";
+import * as ProductView from "./product";
+import * as ImagesView from "./images";
+import {View} from "@opennetwork/logistics";
 
-export const paths: Record<string, FunctionComponent> = {
-  "/": Home,
-  "/home": Home,
-  "/metrics": Metrics,
-  "/products": Products,
-  "/product/:productId": ProductPage,
-  "/partners": Partners,
-  "/calculator": Calculator,
-  "/settings": Settings,
-  "/organisations": Organisations,
-  "/feedback": Feedback,
-  "/login": Login,
-  "/logout": Logout,
-  "/error": Errors,
-  "/upload-report": UploadReport,
-  "/images": ImagesPage
-};
-
-export const pathsAnonymous: Record<string, boolean> = {
-  "/home": true,
-  "/": true,
-  "/products": true,
-  "/feedback": true,
-  "/calculator": true,
-  "/login": true,
-  "/product/:productId": true,
-  "/images": false
-};
-
-export const pathsSubmit: Record<
-  string,
-  (...args: unknown[]) => Promise<unknown | void> | unknown | void
-> = {
-  "/calculator": calculatorSubmit,
-  "/feedback": feedbackSubmit,
-  "/upload-report": uploadSubmit,
-};
-
-export const pathsHandler: Record<
-  string,
-  (...args: unknown[]) => Promise<unknown | void> | unknown | void
-> = {
-  "/logout": logoutHandler,
-  "/product/:productId": productHandler,
-  "/images": imagesHandler
-};
-
-export const pathsCache: Record<string, boolean> = {
-  "/": false,
-  "/home": false,
-  "/metrics": true,
-  "/products": true,
-  "/partners": true,
-  "/calculator": false,
-  "/settings": false,
-  "/organisations": true,
-  "/feedback": false,
-  "/login": false,
-  "/logout": false,
-  "/error": false,
-};
+export const views: View[] = [
+    MetricsView,
+    ProductsView,
+    // PartnersView,
+    CalculatorView,
+    // SettingsView,
+    // HomeView,
+    // HomeIndexView,
+    // OrganisationsView,
+    FeedbackView,
+    // LoginView,
+    // LogoutView,
+    // ErrorsView,
+    ProductView,
+    UploadReportView,
+    ImagesView
+];

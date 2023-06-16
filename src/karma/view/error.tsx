@@ -4,6 +4,7 @@ import KarmaServer from "../react/server";
 import { getOrigin } from "../listen/config";
 import { getMaybeUser, getUser, isAnonymous } from "../authentication";
 import { isHTMLResponse } from "../listen/authentication";
+import {getView} from "./views";
 
 export function errorHandler(
   error: Error,
@@ -21,11 +22,15 @@ export function errorHandler(
 
   console.error(error);
 
+  const { DEFAULT_TIMEZONE = "Pacific/Auckland" } = process.env;
+  const origin = getOrigin()
+
   const html = renderToStaticMarkup(
     <KarmaServer
+      view={getView("/error")}
       isFragment={isFragment}
       isAnonymous={anonymous}
-      url="/error"
+      url={new URL(request.url, origin).toString()}
       error={error}
       products={[]}
       organisations={[]}
@@ -33,6 +38,8 @@ export function errorHandler(
       categories={[]}
       metrics={[]}
       user={user}
+      origin={origin}
+      timezone={DEFAULT_TIMEZONE}
       isAuthenticatedTrusted={!!process.env.AUTHENTICATED_IS_TRUSTED}
     />
   );

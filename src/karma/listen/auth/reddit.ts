@@ -3,7 +3,7 @@ import DiscordOAuth2, { PartialGuild } from "discord-oauth2";
 import { ok } from "../../../is";
 import { getOrigin } from "../config";
 import {
-  getAuthenticationStateByKey,
+  getAuthenticationState,
   addAuthenticationState,
   systemLogSchema,
   addCookieState,
@@ -113,7 +113,7 @@ export async function redditAuthenticationRoutes(fastify: FastifyInstance) {
       async handler(request, response) {
         const { code, state: stateKey } = request.query;
 
-        const state = await getAuthenticationStateByKey(stateKey);
+        const state = await getAuthenticationState(stateKey);
 
         if (!state?.externalScope) {
           const message = `Could not find stateKey in storage`;

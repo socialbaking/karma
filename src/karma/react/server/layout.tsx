@@ -1,5 +1,5 @@
 import { PropsWithChildren, ReactElement } from "react";
-import {description, importmap, namespace, project} from "../../package";
+import {description, importmap, namespace, project, name} from "../../package";
 import { getOrigin } from "../../listen/config";
 import { useData, useIsTrusted, useQuerySearch } from "./data";
 
@@ -280,7 +280,7 @@ export function BaseLayout({
         <title>{title || project}</title>
         <meta name="description" content={description} />
         <meta name="author" content={namespace} />
-        <link href="/server.css" rel="stylesheet" />
+        <link href={`/${name}/server.css`} rel="stylesheet" />
         <script type="importmap" dangerouslySetInnerHTML={{ __html: importmapJSON }} />
       </head>
       <body className="h-full">

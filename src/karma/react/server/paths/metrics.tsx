@@ -1,6 +1,9 @@
 import { useMetrics, useProducts } from "../data/provider";
 import { MetricsGraph } from "../../client/components/graph";
 
+export const path = "/metrics";
+export const anonymous = false;
+
 export function Metrics() {
   const metrics = useMetrics();
   const products = useProducts();
@@ -94,3 +97,5 @@ export function Metrics() {
     </div>
   );
 }
+
+export const Component = Metrics;

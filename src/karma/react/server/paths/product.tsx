@@ -5,6 +5,9 @@ import {ok} from "../../../../is";
 import {isAnonymous} from "../../../authentication";
 import {CopyrightInfo} from "./products";
 
+export const path = "/product/:productId";
+export const cached = true;
+
 export interface ProductInfo {
     images100: File[]
     images600: File[]
@@ -131,3 +134,5 @@ export function ProductPage() {
         </div>
     )
 }
+
+export const Component = ProductPage;

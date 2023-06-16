@@ -1,20 +1,9 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import {
-  commit,
-  commitAt,
-  commitAuthor,
-  packageIdentifier,
-  secondsBetweenCommitAndBuild,
-  secondsBetweenCommitAndTestCompletion,
-  timeBetweenCommitAndBuild,
-  timeBetweenCommitAndTestCompletion,
+  name
 } from "../package";
 import {
-  paths,
-  pathsAnonymous,
-  pathsCache,
-  pathsHandler,
-  pathsSubmit,
+  views,
 } from "../react/server/paths";
 import KarmaServer, { KarmaServerProps } from "../react/server";
 import { renderToStaticMarkup } from "react-dom/server";
@@ -37,37 +26,49 @@ import {
 } from "../authentication";
 import { ok } from "../../is";
 import { join, dirname } from "node:path";
-import { addCachedPage, getCached, getCachedPage } from "../data/cache";
+import { addCachedPage, getCached, getCachedPage } from "../data";
 import { getOrigin } from "../listen/config";
+import {getConfig, View} from "@opennetwork/logistics";
+import {getViews} from "./views";
 
 const { pathname } = new URL(import.meta.url);
 const DIRECTORY = dirname(pathname);
 export const REACT_CLIENT_DIRECTORY = join(DIRECTORY, "../react/client");
 
-export async function viewRoutes(fastify: FastifyInstance) {
-  const { ALLOW_ANONYMOUS_VIEWS, ENABLE_CACHE } = process.env;
 
-  fastify.get("/server.css", async (request, response) => {
+export async function styleRoutes(fastify: FastifyInstance) {
+  fastify.get(`/${name}/server.css`, async (request, response) => {
     response.header("Content-Type", "text/css");
     response.send(ServerCSS);
   });
+}
+
+export async function viewRoutes(fastify: FastifyInstance) {
+  const { ALLOW_ANONYMOUS_VIEWS, ENABLE_CACHE, DEFAULT_TIMEZONE = "Pacific/Auckland" } = process.env;
+
+  fastify.register(styleRoutes);
 
   function createPathHandler(
-    path: string,
-    options?: Partial<KarmaServerProps>,
-    isPathCached?: boolean
+      view: View,
+      options?: Partial<KarmaServerProps>,
+      isPathCached?: boolean,
+      baseResultGiven?: { value: unknown }
   ) {
-    const baseHandler = pathsHandler[path];
-    const submitHandler = pathsSubmit[path];
+    const baseHandler = view.handler;
+    const submitHandler = view.submit;
 
     return async function handler(
       request: FastifyRequest,
       response: FastifyReply
     ) {
       let baseResult: unknown = undefined;
-      if (baseHandler) {
-        baseResult = await baseHandler(request, response);
-        if (response.sent) return;
+      if (baseResultGiven) {
+        baseResult = baseResultGiven.value;
+      } else {
+        if (baseHandler) {
+          baseResult = await baseHandler(request, response);
+          if (response.sent) return;
+        }
       }
 
       const html = await getHTML();
@@ -115,6 +116,7 @@ export async function viewRoutes(fastify: FastifyInstance) {
         const { pathname } = new URL(request.url, getOrigin());
         const isFragment = pathname.endsWith("/fragment");
         const user = getMaybeUser();
+        const origin = getOrigin();
 
         // console.log({ anonymous, state, roles: state?.roles });
 
@@ -122,8 +124,11 @@ export async function viewRoutes(fastify: FastifyInstance) {
         let html = renderToStaticMarkup(
           <KarmaServer
             {...options}
+            view={view}
+            config={getConfig()}
             input={baseResult}
-            url={path}
+            url={new URL(request.url, origin).toString()}
+            origin={origin}
             isAnonymous={anonymous}
             isFragment={isFragment}
             partners={await listPartners({
@@ -144,6 +149,7 @@ export async function viewRoutes(fastify: FastifyInstance) {
             params={request.params}
             body={request.body}
             user={user}
+            timezone={DEFAULT_TIMEZONE}
             isAuthenticatedTrusted={!!process.env.AUTHENTICATED_IS_TRUSTED}
           />
         );
@@ -156,63 +162,78 @@ export async function viewRoutes(fastify: FastifyInstance) {
       }
     };
   }
-  function createPathSubmitHandler(path: string) {
-    const submit = pathsSubmit[path];
+  function createPathSubmitHandler(view: View) {
+    const { submit, handler: baseHandler, path } = view;
     ok(
-      typeof submit === "function",
-      `Expected pathSubmit.${path} to be a functon`
+        typeof submit === "function",
+        `Expected pathSubmit.${path} to be a function`
     );
 
     return async function handler(
-      request: FastifyRequest,
-      response: FastifyReply
+        request: FastifyRequest,
+        response: FastifyReply
     ) {
+      let baseResult;
+
+      if (baseHandler) {
+        baseResult = await baseHandler(request, response);
+        if (response.sent) return;
+      }
+
       let result, error;
       try {
-        result = await submit(request, response);
+        result = await submit(request, response, baseResult);
       } catch (caught) {
         error = caught;
       }
-      const view = createPathHandler(
-        path,
+      const pathHandler = createPathHandler(
+        view,
         {
           result,
           error,
           submitted: true,
         },
-        false
+        false,
+          { value: baseResult }
       );
-      await view(request, response);
+      await pathHandler(request, response);
     };
   }
 
-  Object.keys(paths).forEach((path) => {
-    const anonymous = pathsAnonymous[path] || !!ALLOW_ANONYMOUS_VIEWS;
-
-    const isPathCached = pathsCache[path] || false;
-
-    const handler = createPathHandler(path, {}, isPathCached);
-
-    // console.log({ path, anonymous, isPathCached });
-
+  function createView(view: View) {
+    const {
+      path,
+      anonymous,
+      cached: isPathCached = false,
+      submit
+    } = view;
+    const pathHandler = createPathHandler(view, {}, isPathCached);
     const preHandler = authenticate(fastify, {
-      anonymous: pathsAnonymous[path] || !!ALLOW_ANONYMOUS_VIEWS,
+      anonymous: anonymous || !!ALLOW_ANONYMOUS_VIEWS,
     });
+    const fragmentSuffix = `${path === "/" ? "" : "/"}fragment`;
 
-    fastify.get(`${path}/fragment`, {
+    fastify.get(`${path}${fragmentSuffix}`, {
       preHandler,
-      handler,
+      handler: pathHandler,
     });
     fastify.get(path, {
       preHandler,
-      handler,
+      handler: pathHandler,
     });
 
-    if (pathsSubmit[path]) {
+    if (submit) {
+      const submitHandler = createPathSubmitHandler(view);
       fastify.post(path, {
         preHandler,
-        handler: createPathSubmitHandler(path),
+        handler: submitHandler,
+      });
+      fastify.post(`${path}${fragmentSuffix}`, {
+        preHandler,
+        handler: submitHandler,
       });
     }
-  });
+  }
+
+  getViews().forEach(createView);
 }

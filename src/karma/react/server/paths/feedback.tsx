@@ -19,6 +19,9 @@ import { Octokit } from "@octokit/rest";
 import { getOrigin } from "../../../listen/config";
 import { isAnonymous } from "../../../authentication";
 
+export const path = "/feedback";
+export const anonymous = true;
+
 export interface FeedbackFormMetaData extends FormMetaData {
   type: "feedback";
   title: string;
@@ -269,3 +272,5 @@ export function Feedback() {
     </form>
   );
 }
+
+export const Component = Feedback;

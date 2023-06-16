@@ -20,32 +20,23 @@ import {
   TRUSTED_ROLE,
 } from "../../../static";
 import { SingleProductMetrics } from "../../client/data";
+import { ReactData as BaseReactData } from "@opennetwork/logistics";
 
-export interface Data {
-  body?: unknown;
-  result?: unknown;
-  error?: unknown;
-  query?: unknown;
+export interface ReactData extends BaseReactData {
   params?: unknown;
-  input?: unknown;
-  submitted?: true;
-  url: string;
-  isAnonymous: boolean;
-  isFragment: boolean;
   user?: User;
   products: Product[];
   categories: Category[];
   partners: Partner[];
   organisations: Organisation[];
   metrics: CountryProductMetrics[];
-  roles?: AuthenticationRole[];
   isAuthenticatedTrusted?: boolean;
 }
 
-export const DataContext = createContext<Data | undefined>(undefined);
+export const DataContext = createContext<ReactData | undefined>(undefined);
 export const DataProvider = DataContext.Provider;
 
-export function useData(): Data {
+export function useData(): ReactData {
   const context = useContext(DataContext);
   ok(context, "Expected DataProvider to be used");
   return context;
