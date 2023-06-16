@@ -1,4 +1,3 @@
-import { ok } from "../../../is";
 import { AuthenticationRole, SystemRole } from "@opennetwork/logistics";
 
 export const namedRoles: Record<
