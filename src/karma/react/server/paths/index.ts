@@ -4,7 +4,7 @@ import * as PartnersView from "./partners";
 import * as CalculatorView from "./calculator";
 import * as SettingsView from "./settings";
 import * as HomeView from "./home";
-import * as HomeIndexView from "./home";
+import * as HomeIndexView from "./home-index";
 import * as OrganisationsView from "./organisations";
 import * as FeedbackView from "./feedback";
 import * as LoginView from "./login";
@@ -20,9 +20,9 @@ export const views: View[] = [
     ProductsView,
     // PartnersView,
     CalculatorView,
-    // SettingsView,
-    // HomeView,
-    // HomeIndexView,
+    SettingsView,
+    HomeView,
+    HomeIndexView,
     // OrganisationsView,
     FeedbackView,
     // LoginView,

@@ -41,38 +41,12 @@ export function Home() {
           <br />
           <p>
             {
-              DISCORD_CLIENT_ID ? (
-                  <>
-                    <a
-                        href="/api/authentication/discord/redirect"
-                        className="text-blue-600 hover:bg-white underline hover:underline-offset-2"
-                    >
-                      Login with Discord
-                    </a>
-                    <br />
-                  </>
-              ) : undefined
-            }
-            {
-              REDDIT_CLIENT_ID ? (
-                  <>
-                    <a
-                        href="/api/authentication/reddit/redirect"
-                        className="text-blue-600 hover:bg-white underline hover:underline-offset-2"
-                    >
-                      Login with Reddit
-                    </a>
-                    <br />
-                  </>
-              ) : undefined
-            }
-            {
-              AUTHSIGNAL_TENANT ? (
+              (AUTHSIGNAL_TENANT || REDDIT_CLIENT_ID || DISCORD_CLIENT_ID) ? (
                   <a
                       href="/login"
                       className="text-blue-600 hover:bg-white underline hover:underline-offset-2"
                   >
-                    Login with Email / Magic Link / Authenticator
+                    Login
                   </a>
               ) : undefined
             }
