@@ -7,6 +7,7 @@ import {CopyrightInfo} from "./products";
 
 export const path = "/product/:productId";
 export const cached = true;
+export const anonymous = true;
 
 export interface ProductInfo {
     images100: File[]
