@@ -15,6 +15,8 @@ export async function products() {
 
     form.autocomplete = "off";
 
+    // console.log("Loading data at", new Date().toISOString());
+
     const organisationsJSONElement = document.getElementById("organisations-json");
     const categoriesJSONElement = document.getElementById("categories-json");
     const productsJSONElement = document.getElementById("products-json");
@@ -40,28 +42,99 @@ export async function products() {
     });
     field.addEventListener("keyup", () => {
         filterProductList(field.value);
-    })
+    });
 
-    function filterProductList(text: string) {
+    // console.log("Added event listener at", new Date().toISOString());
+
+    let urlReplacedThisMicrotask = false,
+        urlReplaceWaitingForTask = false,
+        urlReplacements: number[] = [];
+
+    function replaceUrl(): void {
+        const target = url.toString();
+        if (location.href === target) {
+            return;
+        }
 
         ok<HTMLInputElement>(field);
+        if (urlReplacedThisMicrotask) {
+            if (urlReplaceWaitingForTask) {
+                return;
+            }
+            urlReplaceWaitingForTask = true;
+            return queueMicrotask(() => {
+                urlReplaceWaitingForTask = false;
+                return replaceUrl();
+            })
+        }
+
+        const now = Date.now()
+        urlReplacements = urlReplacements.filter(
+            value => (now - value) < 15000
+        );
+
+        // console.log(urlReplacements.length, "url replacements in the last 15 seconds");
+
+        try {
+            // console.log("history.replaceState attempt", new Date().toISOString())
+            history.replaceState({
+                [field.name]: url.searchParams.get(field.name)
+            }, document.title, target);
+            urlReplacements.push(Date.now())
+            // console.log("history.replaceState at", new Date().toISOString())
+            urlReplacedThisMicrotask = true;
+            queueMicrotask(() => {
+                urlReplacedThisMicrotask = false;
+            });
+        } catch {
+            // Safari might throw when calling this
+            if (urlReplaceWaitingForTask) {
+                return;
+            }
+            urlReplaceWaitingForTask = true;
+
+            // It takes 15 seconds for Safari to allow history.replaceState
+            // use again after being rate limited
+
+            let timeout = 2500;
+            if (urlReplacements.length > 99) {
+                timeout = 7500;
+            } else if (urlReplacements.length > 5) {
+                timeout = 5000;
+            }
+            // console.log({ timeout });
+
+            setTimeout(() => {
+                urlReplaceWaitingForTask = false;
+                return replaceUrl()
+            }, timeout);
+        }
+    }
+
+
+    function filterProductList(text: string) {
+        ok<HTMLInputElement>(field);
+
+        if (url.searchParams.get(field.name) === text) {
+            return;
+        }
+
+        // console.log("Searching for", text, new Date().toISOString())
+
         if (text) {
             url.searchParams.set(field.name, text);
         } else {
             url.searchParams.delete(field.name);
         }
-        history.replaceState({
-            [field.name]: text
-        }, document.title, url.toString());
 
+        // console.log("Starting match at", new Date().toISOString())
         const matches = !text.trim() ? products : getMatchingProducts(
             products,
             organisations,
             categories,
             text
         );
-
-        console.log({ matches });
+        // console.log("Matched at", new Date().toISOString())
 
         for (const match of matches) {
             const element =  productElementMap.get(match.productId);
@@ -78,6 +151,8 @@ export async function products() {
             if (!element) continue;
             element.hidden = true;
         }
+
+        replaceUrl();
     }
 
 }

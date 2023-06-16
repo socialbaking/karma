@@ -208,6 +208,8 @@ export function getMatchingProducts<P extends Product>(
     }
   }
 
+  lower = search.toLowerCase();
+
   // console.log({ search, products })
 
   // By this point we have matched organisation, category, number/number, type, and terms
@@ -263,6 +265,24 @@ export function getMatchingProducts<P extends Product>(
     if (joinedMatching.length) {
       return joinedMatching;
     }
+  }
+
+  if (!search) {
+    return products;
+  }
+
+  const genericMatch = products.filter(
+      product => (
+          product.genericSearchTerm?.toLowerCase().includes(lower) ||
+          product.genericAcronym?.toLowerCase().includes(lower) ||
+          product.genericCategoryNames?.find(
+              name => name.toLowerCase().includes(lower)
+          )
+      )
+  );
+
+  if (genericMatch.length) {
+    return genericMatch;
   }
 
   if (!isLike<{ default: typeof FuzzySearchType }>(FuzzySearchModule)) return [];
