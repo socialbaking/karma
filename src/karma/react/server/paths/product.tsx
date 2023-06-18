@@ -1,9 +1,10 @@
 import {File, getProductFile, getProductFiles} from "../../../data";
 import {FastifyRequest} from "fastify";
-import {useParams, useProduct, useInput} from "../data";
+import {useParams, useProduct, useInput, useCategory, useProductMetrics, useData} from "../data";
 import {ok} from "../../../../is";
 import {isAnonymous} from "../../../authentication";
 import {CopyrightInfo} from "./products";
+import {ProductListItem} from "../../client/components/product/list-item";
 
 export const path = "/product/:productId";
 export const cached = true;
@@ -119,11 +120,23 @@ export function ProductImages() {
 export function ProductPage() {
     const { productId } = useParams<Params>();
     const product = useProduct(productId);
+    const category = useCategory(product.categoryId);
+    const metrics = useProductMetrics("month");
     ok(product, `Could not find product ${productId}`);
+    const { isAnonymous } = useData();
     return (
         <div>
             {isAnonymous ? <CopyrightInfo product={product} margin={false} /> : undefined}
-            <h1>{product.productName}</h1><br />
+            <ul className="list-none">
+                <ProductListItem
+                    isDefaultVisible
+                    url={false}
+                    product={product}
+                    category={category}
+                    metrics={metrics[product.productId]}
+                    overrideClassName="block hover:bg-gray-50 -mx-4 py-4 px-4"
+                />
+            </ul>
             <a
                 href={`/calculator?search=${encodeURIComponent(product.productName)}`}
                 className="text-blue-600 hover:bg-white underline hover:underline-offset-2"

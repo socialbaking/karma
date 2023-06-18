@@ -22,7 +22,7 @@ export interface ProductProps {
 export interface ProductItemProps extends ProductProps {
   className?: string;
   overrideClassName?: string;
-  url?: string; // search path for product
+  url?: false | string; // search path for product
   isAnonymous?: boolean
 }
 
@@ -155,16 +155,27 @@ export function ProductListItem({
         data-product-id={productId}
         hidden={isDefaultVisible === false}
     >
-      <a
-        href={productUrl}
-        className={
-          overrideClassName ??
-          `block hover:bg-gray-50 sm:px-4 py-4 sm:px-6 ${className || ""}`
-        }
-      >
+      {
+        url === false ?
+            <ProductContents /> :
+            <a
+                href={productUrl}
+                className={
+                    overrideClassName ??
+                    `block hover:bg-gray-50 sm:px-4 py-4 sm:px-6 ${className || ""}`
+                }
+            >
+              <ProductContents />
+            </a>
+      }
+    </li>
+  );
+
+  function ProductContents() {
+    return (
         <div className="flex justify-between flex-wrap flex-col sm:flex-row">
           <div
-            className={`text-sm font-medium text-indigo-600 flex flex-wrap mb-4 flex-col flex-1`}
+              className={`text-sm font-medium text-indigo-600 flex flex-wrap mb-4 flex-col flex-1`}
           >
             <div className="flex flex-wrap mr-1">{attributes?.productName}</div>
             <div className="flex flex-col">
@@ -176,99 +187,98 @@ export function ProductListItem({
               {/*  </Label>*/}
               {/*) : undefined}*/}
               {[...new Set(metrics.filter((value) => !value.proportional))]
-                .map((metric, index) => {
-                  const label = toMetricLabel(metric, !isReporting);
-                  const node = (
-                    <Label
-                      key={index}
-                      className={
-                        isReporting
-                          ? "mt-1 px-2 leading-5 text-green-800 bg-green-100"
-                          : "mt-1 text-gray-400"
-                      }
-                      title={toMetricLabel(metric, false)}
-                    >
-                      {label}
-                    </Label>
-                  );
-                  if (isReporting) return [label, node] as const;
-                  return [
-                    label,
-                    <div className="block" key={index}>
-                      {node}
-                    </div>,
-                  ] as const;
-                })
-                // Filter duplicate visual labels
-                .filter((entry, index, array) => {
-                  const [label] = entry;
-                  const before = array.slice(0, index);
-                  return !before.find((entry) => entry[0] === label);
-                })
-                .map((entry) => entry[1])}
+                  .map((metric, index) => {
+                    const label = toMetricLabel(metric, !isReporting);
+                    const node = (
+                        <Label
+                            key={index}
+                            className={
+                              isReporting
+                                  ? "mt-1 px-2 leading-5 text-green-800 bg-green-100"
+                                  : "mt-1 text-gray-400"
+                            }
+                            title={toMetricLabel(metric, false)}
+                        >
+                          {label}
+                        </Label>
+                    );
+                    if (isReporting) return [label, node] as const;
+                    return [
+                      label,
+                      <div className="block" key={index}>
+                        {node}
+                      </div>,
+                    ] as const;
+                  })
+                  // Filter duplicate visual labels
+                  .filter((entry, index, array) => {
+                    const [label] = entry;
+                    const before = array.slice(0, index);
+                    return !before.find((entry) => entry[0] === label);
+                  })
+                  .map((entry) => entry[1])}
               {product.generic ? (
-                <div className="block">
-                  <Label className="mt-1 text-gray-400">
-                    Generic {product.genericCategoryNames?.join(", ")}
-                  </Label>
-                </div>
+                  <div className="block">
+                    <Label className="mt-1 text-gray-400">
+                      Generic {product.genericCategoryNames?.join(", ")}
+                    </Label>
+                  </div>
               ) : product.branded ? (
-                <div className="block">
-                  <Label className="mt-1 text-gray-400">
-                    Branded {product.genericCategoryNames?.join(", ")}
-                  </Label>
-                </div>
+                  <div className="block">
+                    <Label className="mt-1 text-gray-400">
+                      Branded {product.genericCategoryNames?.join(", ")}
+                    </Label>
+                  </div>
               ) : product.genericCategoryNames?.length ? (
-                <div className="block">
-                  <Label className="mt-1 text-gray-400">
-                    {product.genericCategoryNames?.join(", ")}
-                  </Label>
-                </div>
+                  <div className="block">
+                    <Label className="mt-1 text-gray-400">
+                      {product.genericCategoryNames?.join(", ")}
+                    </Label>
+                  </div>
               ) : undefined}
             </div>
             {category ? (
-              <p className="flex items-center text-sm text-gray-500 mt-8">
-                <CategoryIcon categoryName={category.categoryName} />
-                {category.categoryName}
-              </p>
+                <p className="flex items-center text-sm text-gray-500 mt-8">
+                  <CategoryIcon categoryName={category.categoryName} />
+                  {category.categoryName}
+                </p>
             ) : undefined}
           </div>
           <div className="sm:ml-2 flex-1 flex flex-col-reverse sm:flex-col align-start justify-between mb-4">
             <div className="flex justify-start sm:justify-end flex-row pt-4 sm:pt-0">
               {ingredients.map((value, index) => (
-                <PercentageLabel key={index} {...value} className="ml-1" />
+                  <PercentageLabel key={index} {...value} className="ml-1" />
               ))}
             </div>
             {product.sizes?.length ? (
-              <div className="flex items-center text-sm text-gray-500 justify-start sm:justify-end flex-row sm:mt-2">
-                <PrescriptionBottleIcon
-                  className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
-                  aria-hidden="true"
-                />
-                <p>
-                  {(product.generic || isAnonymous) ? "Typically available" : "Available"} in{" "}
-                  {[...product.sizes]
-                    .sort((a, b) => {
-                      if (a.unit !== b.unit) {
-                        return a.unit < b.unit ? -1 : 1;
-                      }
-                      return a.value > b.value ? -1 : 1;
-                    })
-                    .map(({ value, unit }, index, array) => {
-                      const isLast = index && array.length === index + 1;
-                      return `${isLast ? "& " : ""}${value}${
-                        unit.length > 2 ? ` ${unit}` : unit
-                      }`;
-                    })
-                    .join(", ")}
-                </p>
-              </div>
+                <div className="flex items-center text-sm text-gray-500 justify-start sm:justify-end flex-row sm:mt-2">
+                  <PrescriptionBottleIcon
+                      className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
+                      aria-hidden="true"
+                  />
+                  <p>
+                    {(product.generic || isAnonymous) ? "Typically available" : "Available"} in{" "}
+                    {[...product.sizes]
+                        .sort((a, b) => {
+                          if (a.unit !== b.unit) {
+                            return a.unit < b.unit ? -1 : 1;
+                          }
+                          return a.value > b.value ? -1 : 1;
+                        })
+                        .map(({ value, unit }, index, array) => {
+                          const isLast = index && array.length === index + 1;
+                          return `${isLast ? "& " : ""}${value}${
+                              unit.length > 2 ? ` ${unit}` : unit
+                          }`;
+                        })
+                        .join(", ")}
+                  </p>
+                </div>
             ) : undefined}
           </div>
         </div>
-      </a>
-    </li>
-  );
+    )
+  }
 }
 
 export default React.memo(ProductListItem);

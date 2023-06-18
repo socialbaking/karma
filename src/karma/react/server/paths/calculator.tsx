@@ -154,7 +154,7 @@ export function Calculator() {
         <ul className="list-none">
           <ProductListItem
             isDefaultVisible
-            url="/products"
+            url={false}
             product={searchedProduct}
             category={searchedProductCategory}
             metrics={metrics[searchedProduct.productId]}
