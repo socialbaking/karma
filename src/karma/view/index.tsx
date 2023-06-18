@@ -8,6 +8,7 @@ import {
 import KarmaServer, { KarmaServerProps } from "../react/server";
 import { renderToStaticMarkup } from "react-dom/server";
 import {
+  CountryProductMetrics,
   listCategories,
   listMetrics,
   listOrganisations,
@@ -29,7 +30,8 @@ import { join, dirname } from "node:path";
 import { addCachedPage, getCached, getCachedPage } from "../data";
 import { getOrigin } from "../listen/config";
 import {getConfig, View} from "@opennetwork/logistics";
-import {getViews} from "./views";
+import {getView, getViews} from "./views";
+import {ReactData} from "../react/server/data";
 
 const { pathname } = new URL(import.meta.url);
 const DIRECTORY = dirname(pathname);
@@ -48,11 +50,57 @@ export async function viewRoutes(fastify: FastifyInstance) {
 
   fastify.register(styleRoutes);
 
+  async function getData(request: FastifyRequest): Promise<ReactData> {
+    const anonymous = isAnonymous();
+    const state = getMaybeAuthenticationState();
+    const { pathname } = new URL(request.url, getOrigin());
+    const isFragment = pathname.endsWith("/fragment");
+    const user = getMaybeUser();
+    const origin = getOrigin();
+    const partnersPromise = listPartners({
+      authorizedPartnerId: getMaybeAuthorizedForPartnerId(),
+    });
+    const organisationsPromise = listOrganisations({
+      authorizedOrganisationId: getMaybeAuthorizedForOrganisationId(),
+    });
+    const categoriesPromise = listCategories();
+    const productsPromise = listProducts({
+      // Making it obvious that if you are anonymous
+      // only public products will be visible
+      public: anonymous
+    });
+    let metricsPromise = Promise.resolve<CountryProductMetrics[]>([]);
+    if (!anonymous) {
+      metricsPromise = listMetrics();
+    }
+
+    return {
+      config: getConfig(),
+      url: new URL(request.url, origin).toString(),
+      origin,
+      isAnonymous: anonymous,
+      isFragment,
+      partners: await partnersPromise,
+      organisations: await organisationsPromise,
+      categories: await categoriesPromise,
+      metrics: await metricsPromise,
+      products: await productsPromise,
+      roles: state?.roles,
+      query: request.query,
+      params: request.params,
+      body: request.body,
+      user,
+      timezone: DEFAULT_TIMEZONE,
+      isAuthenticatedTrusted: !!process.env.AUTHENTICATED_IS_TRUSTED
+    };
+  }
+
   function createPathHandler(
       view: View,
       options?: Partial<KarmaServerProps>,
       isPathCached?: boolean,
-      baseResultGiven?: { value: unknown }
+      baseDataGiven?: ReactData,
+      baseResultGiven?: { value: unknown },
   ) {
     const baseHandler = view.handler;
     const submitHandler = view.submit;
@@ -61,12 +109,14 @@ export async function viewRoutes(fastify: FastifyInstance) {
       request: FastifyRequest,
       response: FastifyReply
     ) {
+      let data: ReactData | undefined = baseDataGiven;
       let baseResult: unknown = undefined;
       if (baseResultGiven) {
         baseResult = baseResultGiven.value;
       } else {
         if (baseHandler) {
-          baseResult = await baseHandler(request, response);
+          data = data ?? await getData(request);
+          baseResult = await baseHandler(request, response, data);
           if (response.sent) return;
         }
       }
@@ -111,50 +161,20 @@ export async function viewRoutes(fastify: FastifyInstance) {
       }
 
       async function getRenderedHTML() {
-        const anonymous = isAnonymous();
-        const state = getMaybeAuthenticationState();
-        const { pathname } = new URL(request.url, getOrigin());
-        const isFragment = pathname.endsWith("/fragment");
-        const user = getMaybeUser();
-        const origin = getOrigin();
-
         // console.log({ anonymous, state, roles: state?.roles });
+        data = data ?? await getData(request);
 
         // Can go right to static, should be no async loading within components
         let html = renderToStaticMarkup(
           <KarmaServer
             {...options}
+            {...data}
             view={view}
-            config={getConfig()}
             input={baseResult}
-            url={new URL(request.url, origin).toString()}
-            origin={origin}
-            isAnonymous={anonymous}
-            isFragment={isFragment}
-            partners={await listPartners({
-              authorizedPartnerId: getMaybeAuthorizedForPartnerId(),
-            })}
-            organisations={await listOrganisations({
-              authorizedOrganisationId: getMaybeAuthorizedForOrganisationId(),
-            })}
-            categories={await listCategories()}
-            metrics={anonymous ? [] : await listMetrics()}
-            products={await listProducts({
-              // Making it obvious that if you are anonymous
-              // only public products will be visible
-              public: anonymous
-            })}
-            roles={state?.roles}
-            query={request.query}
-            params={request.params}
-            body={request.body}
-            user={user}
-            timezone={DEFAULT_TIMEZONE}
-            isAuthenticatedTrusted={!!process.env.AUTHENTICATED_IS_TRUSTED}
           />
         );
 
-        if (!isFragment) {
+        if (!data.isFragment) {
           html = `<!doctype html>\n${html}`;
         }
 
@@ -173,16 +193,19 @@ export async function viewRoutes(fastify: FastifyInstance) {
         request: FastifyRequest,
         response: FastifyReply
     ) {
+      let data: ReactData | undefined = undefined;
       let baseResult;
 
       if (baseHandler) {
-        baseResult = await baseHandler(request, response);
+        data = await getData(request);
+        baseResult = await baseHandler(request, response, data);
         if (response.sent) return;
       }
 
       let result, error;
       try {
-        result = await submit(request, response, baseResult);
+        data = data ?? await getData(request);
+        result = await submit(request, response, baseResult, data);
       } catch (caught) {
         error = caught;
       }
@@ -194,6 +217,7 @@ export async function viewRoutes(fastify: FastifyInstance) {
           submitted: true,
         },
         false,
+          data,
           { value: baseResult }
       );
       await pathHandler(request, response);

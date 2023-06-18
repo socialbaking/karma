@@ -1,4 +1,5 @@
 import {
+  ReactData,
   useCategories,
   useCategory,
   useCopyrightInformation,
@@ -16,10 +17,42 @@ import { SvgTextIcon } from "../../client/components/icons";
 import { COPYRIGHT_PUBLIC_LABEL } from "../../../static";
 import { Product } from "../../../data";
 import { useMemo } from "react";
+import {FastifyReply, FastifyRequest} from "fastify";
+import {getMatchingProducts} from "../../../utils";
 
 export const path = "/products";
 export const anonymous = true;
-export const cached = true;
+
+type Querystring = {
+  productName?: string;
+  search?: string;
+}
+
+type Schema = {
+  Querystring: Querystring;
+}
+
+export async function handler(request: FastifyRequest<Schema>, response: FastifyReply, { products, categories, organisations }: ReactData) {
+  const search = getQuerySearch();
+  if (search) {
+    const matching = getMatchingProducts(
+        products,
+        organisations,
+        categories,
+        search
+    );
+    if (matching.length === 1) {
+      response.header("Location", `/product/${matching[0].productId}`);
+      response.status(302);
+      response.send();
+      return;
+    }
+  }
+
+  function getQuerySearch() {
+    return request.query.search || request.query.productName || "";
+  }
+}
 
 function ProductListItem(props: ProductProps) {
   const category = useCategory(props.product.categoryId);
