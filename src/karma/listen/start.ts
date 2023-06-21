@@ -113,54 +113,6 @@ export async function create() {
   register(blippPlugin);
   register(corsPlugin);
 
-  await app.register(
-    async (instance) => {
-      await instance.register(etag);
-      instance.addHook("onRequest", (request, response, done) => {
-        response.header("Cache-Control", "max-age=1800"); // Give it something
-        done();
-      });
-      await instance.register(files, {
-        root: REACT_CLIENT_DIRECTORY,
-        prefix: "/client",
-        serveDotFiles: true,
-        dotfiles: "allow",
-        allowedPath: (pathName: string, root: string, request: FastifyRequest) => {
-          console.log("Allowed path", { pathName, root, client: true });
-          return true;
-        }
-      });
-      const publicPath = PUBLIC_PATH || join(directory, "../../../public");
-      await instance.register(files, {
-        root: publicPath,
-        decorateReply: false,
-        prefix: "/public",
-        serveDotFiles: true,
-        dotfiles: "allow",
-        allowedPath: (pathName: string, root: string, request: FastifyRequest) => {
-          console.log("Allowed path", { pathName, root, public: true });
-          return true;
-        }
-      });
-
-
-      await instance.register(files, {
-        // Relative to top level of this module
-        // NOT relative to cwd
-        root: importmapRoot,
-        prefix: importmapRootName,
-        decorateReply: false,
-        serveDotFiles: true,
-        dotfiles: "allow",
-        allowedPath: (pathName: string, root: string, request: FastifyRequest) => {
-          console.log("Allowed path", { pathName, root, importmapRoot, importmapRootName });
-          return true;
-        }
-      });
-    },
-    { prefix: "/" }
-  );
-
   await setupSwagger(app);
 
   await register(routes);

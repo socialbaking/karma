@@ -52,6 +52,7 @@
   "author": "Fabian Cook <hello@fabiancook.dev>",
   "license": "MIT",
   "dependencies": {
+    "@authsignal/browser": "^0.1.7",
     "@authsignal/node": "^0.0.40",
     "@aws-sdk/client-s3": "^3.348.0",
     "@aws-sdk/s3-request-presigner": "^3.348.0",
@@ -73,10 +74,11 @@
     "@kvs/types": "^2.1.1",
     "@octokit/request": "6.2.4",
     "@octokit/rest": "^19.0.8",
-    "@opennetwork/logistics": "^1.0.0-alpha.24",
+    "@opennetwork/logistics": "^1.0.0-alpha.36",
     "@opentelemetry/api": "^1.4.1",
     "@opentelemetry/auto-instrumentations-node": "^0.36.6",
     "@opentelemetry/instrumentation-fastify": "^0.31.2",
+    "@simplewebauthn/browser": "^7.2.0",
     "@tailwindcss/forms": "^0.5.3",
     "@types/luxon": "^3.3.0",
     "@upstash/redis": "^1.20.4",
@@ -207,13 +209,16 @@
   },
   "importmap": {
     "root": "esnext/imports",
+    "prefix": ":name",
     "imports": {
       "react/jsx-runtime": "scripts/bridge/jsx-runtime.js",
       "react": "node_modules/react/index.js",
       "react-dom": "node_modules/react-dom/index.js",
       "react-dom/client": "node_modules/react-dom/client.js",
       "fuzzy-search": "node_modules/fuzzy-search/src/FuzzySearch.js",
-      "/is.js": "esnext/is.js"
+      "/is.js": "esnext/is.js",
+      "@simplewebauthn/browser": "node_modules/@simplewebauthn/browser/dist/bundle/index.js",
+      "@authsignal/browser": "node_modules/@authsignal/browser/dist/index.js"
     }
   }
 }

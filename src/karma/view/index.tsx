@@ -1,10 +1,4 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-import {
-  name
-} from "../package";
-import {
-  views,
-} from "../react/server/paths";
 import KarmaServer, { KarmaServerProps } from "../react/server";
 import { renderToStaticMarkup } from "react-dom/server";
 import {
@@ -22,21 +16,47 @@ import {
   getMaybeAuthorizedForOrganisationId,
   getMaybeAuthorizedForPartnerId,
   getMaybeUser,
-  getUser,
   isAnonymous,
 } from "../authentication";
 import { ok } from "../../is";
 import { join, dirname } from "node:path";
-import { addCachedPage, getCached, getCachedPage } from "../data";
+import { addCachedPage, getCachedPage } from "../data";
 import { getOrigin } from "../listen/config";
 import {getConfig, View} from "@opennetwork/logistics";
-import {getView, getViews} from "./views";
+import {getViews} from "./views";
 import {ReactData} from "../react/server/data";
+import {importmapPrefix, importmapRoot, importmapRootName, name, root} from "../package";
+import etag from "@fastify/etag";
+import files from "@fastify/static";
 
 const { pathname } = new URL(import.meta.url);
 const DIRECTORY = dirname(pathname);
 export const REACT_CLIENT_DIRECTORY = join(DIRECTORY, "../react/client");
 
+export async function fileRoutes(fastify: FastifyInstance) {
+  fastify.register(etag);
+  fastify.addHook("onRequest", (request, response, done) => {
+    response.header("Cache-Control", "max-age=1800"); // Give it something
+    done();
+  });
+  fastify.register(files, {
+    root: REACT_CLIENT_DIRECTORY,
+    prefix: `/${name}/client`,
+  });
+  const publicPath = join(root, "./public");
+  fastify.register(files, {
+    root: publicPath,
+    decorateReply: false,
+    prefix: `/${name}/public`,
+  });
+  fastify.register(files, {
+    // Relative to top level of this module
+    // NOT relative to cwd
+    root: importmapRoot,
+    prefix: `${importmapPrefix ? `/${importmapPrefix}/` : ""}${importmapRootName}`,
+    decorateReply: false,
+  });
+}
 
 export async function styleRoutes(fastify: FastifyInstance) {
   fastify.get(`/${name}/server.css`, async (request, response) => {
@@ -49,6 +69,7 @@ export async function viewRoutes(fastify: FastifyInstance) {
   const { ALLOW_ANONYMOUS_VIEWS, ENABLE_CACHE, DEFAULT_TIMEZONE = "Pacific/Auckland" } = process.env;
 
   fastify.register(styleRoutes);
+  fastify.register(fileRoutes);
 
   async function getData(request: FastifyRequest): Promise<ReactData> {
     const anonymous = isAnonymous();

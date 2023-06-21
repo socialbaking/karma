@@ -3,7 +3,7 @@ import {join} from "node:path";
 import * as esbuild from 'esbuild'
 
 const packageString = await readFile("package.json", "utf-8");
-const { importmap } = JSON.parse(packageString);
+const { importmap, name } = JSON.parse(packageString);
 
 function getESMExportOrDefault(packageJSON) {
     const mainExport = packageJSON.exports?.["."];
@@ -59,14 +59,15 @@ async function createImports(importmap) {
 
     const entries = [];
 
-    const root = importmap.root || "esnext/imports";
+    const root = (importmap.root || "esnext/imports").replace(":name", name);
+    const prefix = (importmap.prefix || ":name").replace(":name", name);
     const buildRoot = "esnext";
-    const referencePath = root.replace(`${buildRoot}/`, "./");
 
     await mkdir(root, {
         recursive: true
     })
 
+    const files = []
     for (const [key, value] of Object.entries(importmap.imports)) {
         if (typeof value !== "string") continue;
         const target = join(root, `${key.replace(/\.js$/, "")}.js`)
@@ -76,8 +77,10 @@ async function createImports(importmap) {
             format: "esm",
             outfile: target,
         })
+        const reference = `/${target.replace(/^\.\//, "")}`;
+        files.push(reference);
         // The path is expected to be served from top level
-        entries.push([key, `/${target.replace(/^\.\//, "")}`]);
+        entries.push([key, `${prefix ? `/${prefix}` : ""}${reference}`]);
     }
 
     const imports = Object.fromEntries(entries);
@@ -89,7 +92,6 @@ async function createImports(importmap) {
         "utf-8"
     );
 
-    const files = Object.values(imports);
     const referenceFile = files
         .map((file, index) => `export * as Import${index} from "${file.replace(`/${buildRoot}`, ".")}";`)
         .join("\n")

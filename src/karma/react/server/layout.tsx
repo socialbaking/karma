@@ -2,6 +2,7 @@ import { PropsWithChildren, ReactElement } from "react";
 import {description, importmap, namespace, project, name} from "../../package";
 import { getOrigin } from "../../listen/config";
 import { useData, useIsTrusted, useQuerySearch } from "./data";
+import { name as baseName } from "@opennetwork/logistics";
 
 export interface LayoutProps {
   title?: string;
@@ -194,21 +195,21 @@ function Logo() {
     <div className="flex flex-row align-start items-center">
       <img
         role="presentation"
-        src="/public/example-1.svg"
+        src={`/${name}/public/example-1.svg`}
         alt="Brand Image"
         className="h-8 w-auto fill-white"
         title="Social Baking Karma"
       />
       <img
         role="presentation"
-        src="/public/example-2.svg"
+        src={`/${name}/public/example-2.svg`}
         alt="Brand Image"
         className="h-8 mx-2 w-auto fill-white"
         title="Social Baking Karma"
       />
       <img
         role="presentation"
-        src="/public/example-3.svg"
+        src={`/${name}/public/example-3.svg`}
         alt="Brand Image"
         className="h-8 w-auto fill-white"
         title="Social Baking Karma"
@@ -244,9 +245,13 @@ export function BaseLayout({
   title,
 }: PropsWithChildren<LayoutProps>) {
   const script = `
-    const { client } = await import("/client/pages/index.js");
+    const { client: base } = await import("/${baseName}/client/pages/index.js");
+    const { client } = await import("/${name}/client/pages/index.js");
     try {
-        await client();
+        await Promise.all([
+          base(),
+          client()
+        ]);
     } catch (error) {
        console.error(error);
     }
