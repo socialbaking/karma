@@ -198,6 +198,7 @@
     "coverage": "export $(cat .env | xargs) && OTEL_SERVICE_NAME=karma-tests c8 node esnext/tests/index.js && yarn postbuild",
     "start": "node --enable-source-maps esnext/karma/listen/main.js",
     "start:nodemon": "nodemon --enable-source-maps esnext/karma/listen/main.js",
+    "inspect": "node --enable-source-maps --inspect-brk esnext/karma/listen/main.js",
     "quick": "yarn build && yarn start",
     "local": "yarn build && yarn seed && yarn start",
     "seed": "node --enable-source-maps esnext/karma/data/seed/main.js",

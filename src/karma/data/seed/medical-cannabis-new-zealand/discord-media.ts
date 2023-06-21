@@ -744,13 +744,25 @@ async function listProductChannels(context: DiscordContext): Promise<ProductDisc
     const products = await listProducts();
     const organisations = await listOrganisations();
     const categories = await listCategories();
+
+    console.log(channels.length);
+
+
     ok(DISCORD_MEDIA_PARENT_CHANNEL_NAME, "Expected DISCORD_MEDIA_PARENT_CHANNEL_NAME");
-    const parentName = DISCORD_MEDIA_PARENT_CHANNEL_NAME.toLowerCase();
-    const groupedChannels = channels
+    const parentName = decodeURIComponent(DISCORD_MEDIA_PARENT_CHANNEL_NAME).toLowerCase();
+    let groupedChannels = channels
         .filter(({ parent }) => {
             if (!parent) return false;
             return parent.name.toLowerCase() === parentName;
         });
+
+    if (!groupedChannels.length) {
+        groupedChannels = channels
+            .filter(({ parent }) => {
+                if (!parent) return false;
+                return parent.name.toLowerCase().includes(parentName);
+            });
+    }
 
     const matchingChannels = groupedChannels
         .map(channel => {
@@ -762,6 +774,14 @@ async function listProductChannels(context: DiscordContext): Promise<ProductDisc
             }
         })
         .filter(Boolean);
+
+    console.log({
+        parentName,
+        groupedChannels,
+        matchingChannels,
+        products
+    })
+
     const remainingProducts = products.filter(product => {
         const found = matchingChannels.find(channel => channel.product.productId === product.productId);
         return !found;

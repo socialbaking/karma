@@ -30,7 +30,6 @@ export {
     saveToR2,
     isExistingInR2,
     saveToDisk,
-    fileSchema,
     addFile,
     getResolvedFile,
     listNamedFiles,
@@ -50,3 +49,4 @@ export {
     DEFAULT_IMAGE_SIZE,
     getImageResizingUrl
 } from "@opennetwork/logistics";
+export * as fileSchema from "./schema";
