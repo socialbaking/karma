@@ -36,7 +36,7 @@ export async function setupSwagger(fastify: FastifyInstance) {
     },
   });
 
-  fastify.register(uiPlugin, {
+  await fastify.register(uiPlugin, {
     routePrefix: "/api/documentation",
     uiConfig: {
       docExpansion: "full",

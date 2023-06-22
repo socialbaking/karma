@@ -23,7 +23,7 @@ export async function listOfferRoutes(fastify: FastifyInstance) {
     ],
   };
 
-  fastify.get("/", {
+  await fastify.get("/", {
     schema,
     preHandler: authenticate(fastify),
     async handler(request: FastifyRequest, response) {

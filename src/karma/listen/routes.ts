@@ -12,27 +12,23 @@ import { offerRoutes } from "./offer";
 
 export async function routes(fastify: FastifyInstance) {
   async function apiRoutes(fastify: FastifyInstance) {
-    fastify.register(productRoutes);
-    fastify.register(partnerRoutes);
-    fastify.register(metricRoutes);
-    fastify.register(categoryRoutes);
-    fastify.register(reportRoutes);
-    fastify.register(calculationRoutes);
-    fastify.register(organisationRoutes);
-    fastify.register(offerRoutes);
+    await fastify.register(productRoutes);
+    await fastify.register(partnerRoutes);
+    await fastify.register(metricRoutes);
+    await fastify.register(categoryRoutes);
+    await fastify.register(reportRoutes);
+    await fastify.register(calculationRoutes);
+    await fastify.register(organisationRoutes);
+    await fastify.register(offerRoutes);
   }
 
-  fastify.register(apiRoutes, {
+  await fastify.register(apiRoutes, {
     prefix: "/api/version/1",
   });
 
-  // fastify.register(authenticationRoutes, {
-  //   prefix: "/api",
-  // });
-
-  fastify.register(backgroundRoutes, {
+  await fastify.register(backgroundRoutes, {
     prefix: "/api",
   });
 
-  fastify.register(viewRoutes);
+  await fastify.register(viewRoutes);
 }

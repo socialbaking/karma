@@ -6,13 +6,13 @@ import { uploadReportRoutes } from "./upload-report";
 
 export async function reportRoutes(fastify: FastifyInstance) {
   async function routes(fastify: FastifyInstance) {
-    fastify.register(listReportRoutes);
-    fastify.register(addReportRoutes);
-    fastify.register(getReportRoutes);
-    fastify.register(uploadReportRoutes);
+    await fastify.register(listReportRoutes);
+    await fastify.register(addReportRoutes);
+    await fastify.register(getReportRoutes);
+    await fastify.register(uploadReportRoutes);
   }
 
-  fastify.register(routes, {
+  await fastify.register(routes, {
     prefix: "/reports",
   });
 }

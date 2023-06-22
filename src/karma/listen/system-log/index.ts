@@ -3,10 +3,10 @@ import { listSystemLogsRoutes } from "./list-system-logs";
 
 export async function systemLogRoutes(fastify: FastifyInstance) {
   async function routes(fastify: FastifyInstance) {
-    fastify.register(listSystemLogsRoutes);
+    await fastify.register(listSystemLogsRoutes);
   }
 
-  fastify.register(routes, {
+  await fastify.register(routes, {
     prefix: "/system-logs",
   });
 }

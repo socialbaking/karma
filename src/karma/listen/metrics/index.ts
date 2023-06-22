@@ -8,15 +8,15 @@ import { addReportMetricsRoutes } from "./add-report-metrics";
 
 export async function metricRoutes(fastify: FastifyInstance) {
   async function routes(fastify: FastifyInstance) {
-    fastify.register(listMonthlyMetricsRoutes);
-    fastify.register(listDailyMetricsRoutes);
-    fastify.register(listReportMetricsRoutes);
-    fastify.register(listMetricsRoutes);
-    fastify.register(listProductMetricsRoutes);
-    fastify.register(addReportMetricsRoutes);
+    await fastify.register(listMonthlyMetricsRoutes);
+    await fastify.register(listDailyMetricsRoutes);
+    await fastify.register(listReportMetricsRoutes);
+    await fastify.register(listMetricsRoutes);
+    await fastify.register(listProductMetricsRoutes);
+    await fastify.register(addReportMetricsRoutes);
   }
 
-  fastify.register(routes, {
+  await fastify.register(routes, {
     prefix: "/metrics",
   });
 }

@@ -4,11 +4,11 @@ import { listCategoryRoutes } from "./list-categories";
 
 export async function categoryRoutes(fastify: FastifyInstance) {
   async function routes(fastify: FastifyInstance) {
-    fastify.register(addCategoryRoutes);
-    fastify.register(listCategoryRoutes);
+    await fastify.register(addCategoryRoutes);
+    await fastify.register(listCategoryRoutes);
   }
 
-  fastify.register(routes, {
+  await fastify.register(routes, {
     prefix: "/categories",
   });
 }

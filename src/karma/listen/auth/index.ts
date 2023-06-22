@@ -6,13 +6,13 @@ import { logoutRoutes } from "./logout";
 
 export async function authenticationRoutes(fastify: FastifyInstance) {
   async function routes(fastify: FastifyInstance) {
-    fastify.register(discordAuthenticationRoutes);
-    fastify.register(redditAuthenticationRoutes);
-    fastify.register(authsignalAuthenticationRoutes);
-    fastify.register(logoutRoutes);
+    await fastify.register(discordAuthenticationRoutes);
+    await fastify.register(redditAuthenticationRoutes);
+    await fastify.register(authsignalAuthenticationRoutes);
+    await fastify.register(logoutRoutes);
   }
 
-  fastify.register(routes, {
+  await fastify.register(routes, {
     prefix: "/authentication",
   });
 }

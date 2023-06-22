@@ -3,10 +3,10 @@ import {listOfferRoutes} from "./list-offers";
 
 export async function offerRoutes(fastify: FastifyInstance) {
   async function routes(fastify: FastifyInstance) {
-    fastify.register(listOfferRoutes);
+    await fastify.register(listOfferRoutes);
   }
 
-  fastify.register(routes, {
+  await fastify.register(routes, {
     prefix: "/offers",
   });
 }

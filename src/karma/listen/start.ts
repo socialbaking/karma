@@ -57,14 +57,14 @@ export async function create() {
 
   const register: (...args: unknown[]) => void = app.register.bind(fastify);
 
-  register(cookie, {
+  await register(cookie, {
     secret: COOKIE_SECRET,
     hook: "onRequest",
     parseOptions: {},
   });
 
-  register(multipart);
-  register(formbody, {
+  await register(multipart);
+  await register(formbody, {
     parser: parseStringFields,
   });
 
@@ -74,7 +74,7 @@ export async function create() {
   );
   const { name, version } = JSON.parse(packageJSON);
 
-  register(helmet, { contentSecurityPolicy: false });
+  await register(helmet, { contentSecurityPolicy: false });
 
   app.addHook("preValidation", async (request, response) => {
     if (request.headers.apikey && !request.headers.authorization) {
@@ -82,7 +82,7 @@ export async function create() {
     }
   });
 
-  register(fastifyRequestContext, {
+  await register(fastifyRequestContext, {
     hook: "preValidation",
     defaultStoreValues: {},
   });
@@ -102,16 +102,16 @@ export async function create() {
 
   signalMiddleware(app as FastifyInstance);
 
-  register(authPlugin);
-  register(bearerAuthPlugin, {
+  await register(authPlugin);
+  await register(bearerAuthPlugin, {
     keys: new Set<string>(),
     auth: bearerAuthentication,
     addHook: false,
   });
   app.setErrorHandler(errorHandler);
 
-  register(blippPlugin);
-  register(corsPlugin);
+  await register(blippPlugin);
+  await register(corsPlugin);
 
   await setupSwagger(app);
 

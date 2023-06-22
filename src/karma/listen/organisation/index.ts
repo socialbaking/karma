@@ -3,10 +3,10 @@ import { listOrganisationsRoutes } from "./list-organisations";
 
 export async function organisationRoutes(fastify: FastifyInstance) {
   async function routes(fastify: FastifyInstance) {
-    fastify.register(listOrganisationsRoutes);
+    await fastify.register(listOrganisationsRoutes);
   }
 
-  fastify.register(routes, {
+  await fastify.register(routes, {
     prefix: "/organisations",
   });
 }
