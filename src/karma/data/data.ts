@@ -14,3 +14,4 @@ export * from "./authentication-role";
 export * from "./cache";
 export * from "./user";
 export * from "./file";
+export * from "./offer";

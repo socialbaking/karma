@@ -175,6 +175,15 @@ export interface ResolvedFile extends File {
     synced: FileUploadedSynced;
 }
 
+import {
+  CalculationConsent,
+  CalculationConsentItem,
+  ReportDateData,
+  ReportRoleData,
+} from "../report";
+
+
+
 export interface ActiveIngredientMetrics extends Record<string, unknown> {
   type: string;
   unit: string;
@@ -233,6 +242,18 @@ export interface CountryProductMetrics extends MetricsData {
   duration: CountryProductMetricDuration;
   reportingDateKey: keyof ReportDateData;
 }
+
+export {
+    Offer,
+    OfferData,
+    OfferItem,
+    OfferItemType,
+    OfferPrice,
+    OfferStatus,
+    InventoryOffer,
+    OrderOfferItem,
+    ProductOfferItem,
+} from "@opennetwork/logistics";
 
 export interface OrganisationBaseData extends Record<string, unknown> {
   countryCode?: string; // "NZ"

@@ -58,6 +58,7 @@ export function getMatchingProducts<P extends Product>(
     // console.log("Exact match", exactMatch);
     return exactMatch;
   }
+  // console.log("Not exact match", search);
 
   let lower = search.toLowerCase();
 

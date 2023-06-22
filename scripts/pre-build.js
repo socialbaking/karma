@@ -1,5 +1,5 @@
 import { readFile, readdir, stat, writeFile } from "node:fs/promises";
-import { join } from "node:path";
+import {extname, join} from "node:path";
 import {
   replaceBetween,
   VARIABLES_REPLACE_AFTER_TEST_COMMENT,
@@ -9,6 +9,8 @@ const PATH = "./src/karma/data";
 const CLIENT_INTERFACE_GENERATED_PATH =
   "./src/karma/client/interface.readonly.ts";
 const CLIENT_INTERFACE_PATH = "./src/karma/client/client.interface.ts";
+const COMMON_PATH = "src/karma";
+const CLIENT_COMMON_RELATIVE = "../";
 
 const PACKAGE_GENERATED_PATH = "./src/karma/package.readonly.ts";
 
@@ -22,55 +24,79 @@ const IGNORE_TYPES = [
   "user",
 ];
 
-const paths = await readdir(PATH);
+const paths = await readdir(PATH)
 
-// console.log({ paths });
+const typePaths = (
+    await Promise.all(
+        paths
+            .filter(name => !IGNORE_TYPES.includes(name))
+            .map(
+                async (name) => {
+                    const path = join(PATH, name);
+                    const pathStat = await stat(path).catch(() => undefined);
+                    if (!pathStat) return "";
+                    if (!pathStat.isDirectory()) return "";
+
+                    const typesPath = join(path, "types.ts");
+                    const typesStat = await stat(typesPath).catch(() => undefined);
+                    if (!typesStat) return "";
+                    if (!typesStat.isFile()) return "";
+
+                    return typesPath;
+                }
+            )
+    )
+)
+    .filter(Boolean);
+
 
 const types = (
-  await Promise.all(
-    paths
-      .filter((name) => !IGNORE_TYPES.includes(name))
-      .map(async (name) => {
-        const path = join(PATH, name);
-        const pathStat = await stat(path).catch(() => undefined);
-        if (!pathStat) return "";
-        if (!pathStat.isDirectory()) return "";
-
-        const typesPath = join(path, "types.ts");
-        const typesStat = await stat(typesPath).catch(() => undefined);
-        if (!typesStat) return "";
-        if (!typesStat.isFile()) return "";
-
-        const typesFile = await readFile(typesPath, "utf-8");
-
-        // Assume all imports are to other types that will be contained in this file
-        // If not the build will fail :)
-        return typesFile.replace(
-          /(import|export)\s+{[^}]+}\s+from[^\n]+/gs,
-          ""
-        );
-      })
-  )
+    await Promise.all(
+        typePaths
+            .map(
+                async (typesPath) => {
+                    const typesFile = await readFile(typesPath, "utf-8");
+                    // Assume all imports are to other types that will be contained in this file
+                    // If not the build will fail :)
+                    return typesFile
+                        .replace(/(import|export).+from.+/mg, "")
+                }
+            )
+    )
 )
-  .filter(Boolean)
-  .map((value) => value.trim())
-  .join("\n\n");
+    .filter(Boolean)
+    .map(value => value.trim())
+    .join("\n\n")
 
 // console.log(types);
 
-await writeFile(CLIENT_INTERFACE_GENERATED_PATH, types, "utf-8");
+const typesFile = typePaths
+    .map(
+        typePath => {
+            const path = typePath
+                .replace(`./${COMMON_PATH}/`, CLIENT_COMMON_RELATIVE)
+                .replace(`${COMMON_PATH}/`, CLIENT_COMMON_RELATIVE);
+            const extension = extname(path);
+            return `export * from "${path.replace(extension, "")}"`;
+        }
+    )
+    .join("\n");
+
+await writeFile(
+    CLIENT_INTERFACE_GENERATED_PATH,
+    `// These references are auto generated, do not edit manually\n\n${typesFile}\n`,
+    "utf-8"
+);
 
 let client = await readFile(CLIENT_INTERFACE_PATH, "utf-8");
 
 client = client
-  .split(CLIENT_START_LINE)
-  .at(1)
-  .replace(/^\/\/.+/gm, "")
-  .replace(/^import\s*.+/gm, "");
+    .split(CLIENT_START_LINE)
+    .at(1)
+    .replace(/^\/\/.+/mg, "")
+    .replace(/^import\s*.+/mg, "")
 
-const interfaceContents = [client, types]
-  .map((value) => value.trim())
-  .join("\n\n");
+const interfaceContents = [client, types].map(value => value.trim()).join("\n\n");
 
 await replaceBetween(
   "README.md",
