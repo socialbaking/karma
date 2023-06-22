@@ -18,7 +18,7 @@ import {
   getMaybeUser,
   isAnonymous,
 } from "../authentication";
-import { ok } from "../../is";
+import {isLike, ok} from "../../is";
 import { join, dirname } from "node:path";
 import { addCachedPage, getCachedPage } from "../data";
 import { getOrigin } from "../listen/config";
@@ -189,8 +189,12 @@ export async function viewRoutes(fastify: FastifyInstance) {
         // Can go right to static, should be no async loading within components
         let html = renderToStaticMarkup(
           <KarmaServer
-            {...options}
+            {...(isLike<Partial<ReactData>>(baseResult) ? baseResult : {})}
             {...data}
+            {...options}
+            query={request.query}
+            params={request.params}
+            body={request.body}
             view={view}
             input={baseResult}
           />

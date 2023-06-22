@@ -118,7 +118,7 @@ export function Calculator() {
   const searchedProduct = useProductByName(productName);
   const searchedProductCategory = useCategory(searchedProduct?.categoryId);
   console.log({
-    error, result, submitted, submittedProduct
+    error, result, submitted, submittedProduct, body
   });
   return (
     <form name="calculator" action="/calculator#action-section" method="post">
