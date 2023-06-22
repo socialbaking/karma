@@ -9,7 +9,7 @@ import {
 import { ReportReference, ReportReferenceData } from "./reference";
 import { getExpiresAt } from "../storage";
 import { getReportDates } from "../../calculations";
-import { getAuthenticationRoles } from "../../authentication";
+import {getAuthenticationRoles, getMaybePartner, getMaybeUser} from "../../authentication";
 
 export async function setReport(data: ReportData & Partial<Report>): Promise<Report> {
     const store = getReportStore();
@@ -25,6 +25,10 @@ export async function setReport(data: ReportData & Partial<Report>): Promise<Rep
         reportedAt: createdAt,
         expiresAt: getExpiresAt(REPORT_EXPIRES_IN_MS, data.expiresAt),
     };
+    if (!report.anonymous) {
+        report.createdByUserId = getMaybeUser()?.userId;
+        report.createdByPartnerId = getMaybePartner()?.partnerId;
+    }
     await store.set(reportId, report);
     // Reset reference when report set
     await setReportReference({
