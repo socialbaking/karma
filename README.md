@@ -194,6 +194,7 @@ export interface ActiveIngredientMetrics extends Record<string, unknown> {
   mean?: boolean;
   size?: ProductSizeData;
   prefix?: string;
+  calculation?: "minimum" | "maximum" | "mean" | string;
 }
 
 export interface ProductMetricData extends Record<string, unknown> {

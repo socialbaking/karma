@@ -16,9 +16,10 @@ import {
 import { ok } from "../../../is";
 import { DateTime } from "luxon";
 import { toHumanNumberString } from "../to-human-number-string";
-import { mean } from "simple-statistics";
+import { mean, min, max } from "simple-statistics";
 import { MetricsData } from "../../data";
 import { v4 } from "uuid";
+import outliers from "outliers";
 
 export const title = "Daily Average";
 export const description = "Calculates the average values for a day";
@@ -135,28 +136,69 @@ export function processReportsForUnit<M extends MetricsData>(
             .map((value) => value.value)
             .filter(isNumberString)
             .map((value) => +value);
+
+          const outlierValues = outliers(numericValues);
+          let withoutOutliers = numericValues;
+          if (outlierValues.length) {
+            console.log({ outlierValues });
+            withoutOutliers = numericValues.filter(value => !outlierValues.includes(value))
+          }
+
           const prefixes = values.map((value) => value.prefix).filter(Boolean);
-          const { length } = numericValues;
-          if (!length) return;
-          return {
-            ...values.at(0),
-            type,
-            unit,
-            value: toHumanNumberString(mean(numericValues)),
-            // If its one value it is not a mean, it is a real value
-            // This lets us filter it correctly and not give real values without mixing it
-            // with at least one other value
-            mean: length > 1 ? true : undefined,
-            prefix: prefixes[0],
-          };
+          const { length } = withoutOutliers;
+          if (!length) return [];
+          return [
+            {
+              ...values.at(0),
+              type,
+              unit,
+              value: toHumanNumberString(min(numericValues)),
+              calculation: "minimum",
+              prefix: prefixes[0],
+              outliers: outlierValues
+            },
+            {
+              ...values.at(0),
+              type,
+              unit,
+              value: toHumanNumberString(max(numericValues)),
+              calculation: "maximum",
+              prefix: prefixes[0],
+              outliers: outlierValues
+            },
+            {
+              ...values.at(0),
+              type,
+              unit,
+              value: toHumanNumberString(mean(withoutOutliers)),
+              calculation: "mean",
+              // If its one value it is not a mean, it is a real value
+              // This lets us filter it correctly and not give real values without mixing it
+              // with at least one other value
+              mean: length > 1 ? true : undefined,
+              prefix: prefixes[0]
+            },
+            {
+              ...values.at(0),
+              type,
+              unit,
+              value: toHumanNumberString(mean(numericValues)),
+              calculation: "meanWithOutliers",
+              // If its one value it is not a mean, it is a real value
+              // This lets us filter it correctly and not give real values without mixing it
+              // with at least one other value
+              mean: length > 1 ? true : undefined,
+              prefix: prefixes[0]
+            }
+          ];
         }
 
         const unitValues = typeValues.filter((value) => value.unit === unit);
 
         // We don't want to mix these two types of values
         return [
-          withValues(unitValues.filter((value) => value.proportional)),
-          withValues(unitValues.filter((value) => !value.proportional)),
+          ...withValues(unitValues.filter((value) => value.proportional)),
+          ...withValues(unitValues.filter((value) => !value.proportional)),
         ].filter(Boolean);
       });
     });

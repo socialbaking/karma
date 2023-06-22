@@ -18,6 +18,9 @@ export async function listSpeculativeOffers(options: ListSpeculativeOffersOption
     function getProductOffers(product: Product): Offer[] {
 
         function getProduct(metrics: CountryProductMetrics) {
+            if (product.countryCode && product.countryCode !== metrics.countryCode) {
+                return undefined;
+            }
             return metrics.products.find(metricProduct => metricProduct.productId === product.productId);
         }
         const matching = metrics.find(getProduct);
@@ -39,7 +42,8 @@ export async function listSpeculativeOffers(options: ListSpeculativeOffersOption
             value.size.unit === size.unit &&
             value.size.value === size.value &&
             value.type === unit &&
-            value.unit === `${matching.currencySymbol}/${unit}`
+            value.unit === `${matching.currencySymbol}/${unit}` &&
+            value.calculation === "mean"
         ));
 
         if (!metric) return [];

@@ -4102,6 +4102,11 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-18.16.9.tgz#e79416d778a8714597342bb87efb5a6e914f7a73"
   integrity sha512-IeB32oIV4oGArLrd7znD2rkHQ6EDCM+2Sr76dJnrHwv9OHBTTM6nuDLK9bmikXzPa0ZlWMWtRGo/Uw4mrzQedA==
 
+"@types/outliers@^0.0.0":
+  version "0.0.0"
+  resolved "https://registry.yarnpkg.com/@types/outliers/-/outliers-0.0.0.tgz#65007bc21f59e13532f39ac546de301be5a76980"
+  integrity sha512-K2yj0hy+5xrodRDwZ2dPKcisD5s2nQHnZyBBzPhj0RRTSW/3LDd4Y5z57XALB+mLc6Bq153FO3mlajEIWPG3Bw==
+
 "@types/pg-pool@2.0.3":
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/@types/pg-pool/-/pg-pool-2.0.3.tgz#3eb8df2933f617f219a53091ad4080c94ba1c959"
@@ -8211,6 +8216,11 @@ os-tmpdir@~1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/os-tmpdir/-/os-tmpdir-1.0.2.tgz#bbe67406c79aa85c5cfec766fe5734555dfa1274"
   integrity sha512-D2FR03Vir7FIu45XBY20mTb+/ZSWB00sjU9jdQXt83gDrI4Ztz5Fs7/yy74g2N5SVQY4xY1qDr4rNddwYRVX0g==
+
+outliers@^0.0.3:
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/outliers/-/outliers-0.0.3.tgz#4d8329bf25340495b628d3997016525d097dd5b8"
+  integrity sha512-llzMndHLe3bT5myeO5qiySIusEN+zd+Eq1YLXWbe2/FC2l26AmWPRw0ji7heI0azubWB6NEM87xU24y/CL99Iw==
 
 p-finally@^1.0.0:
   version "1.0.0"

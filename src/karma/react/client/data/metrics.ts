@@ -13,10 +13,11 @@ export type SingleProductMetrics = {
 
 function isMetricMatch(
   value: ActiveIngredientMetrics,
-  { numeric, type, unit }: Partial<MetricOptions>
+  { numeric, type, unit, calculation }: Partial<MetricOptions>
 ) {
   if (numeric && !isNumberString(value.value)) return false;
   if (type && value.type !== type) return false;
+  if (calculation && value.type !== calculation) return false;
   if (!unit) return true;
   return value.unit === unit;
 }
@@ -39,6 +40,7 @@ export interface MetricOptions {
   unit: string;
   type?: string;
   numeric?: boolean;
+  calculation?: ActiveIngredientMetrics["calculation"]
 }
 
 export function useMetric(
@@ -51,10 +53,10 @@ export function useMetric(
 
 export function useMetricMatch(
   match?: ActiveIngredientMetrics[],
-  { numeric, type, unit }: Partial<MetricOptions> = {}
+  { numeric, type, unit, calculation }: Partial<MetricOptions> = {}
 ) {
   return useMemo(() => {
-    const options = { numeric, type, unit };
+    const options = { numeric, type, unit, calculation };
     return match?.find((value) => isMetricMatch(value, options));
-  }, [match, numeric, type, unit]);
+  }, [match, numeric, type, unit, calculation]);
 }

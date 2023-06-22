@@ -123,14 +123,17 @@ export function ProductListItem({
   const baseUnitMetrics = useMetrics(allMetrics, {
     unit: `$/${unit}`,
     numeric: true,
+    calculation: "mean"
   }).filter((value) => !value.proportional);
   const baseSizeMetrics = useMetrics(allMetrics, {
     unit: `$/${sizeUnit}`,
     numeric: true,
+    calculation: "mean"
   }).filter((value) => !value.proportional);
   const baseIngredientMetrics = useMetrics(allMetrics, {
     unit: `$/${ingredientUnit}`,
     numeric: true,
+    calculation: "mean"
   }).filter((value) => !value.proportional);
   const numericUnitMetric = useMetricMatch(baseUnitMetrics);
   const numericSizeMetric = useMetricMatch(baseSizeMetrics);
