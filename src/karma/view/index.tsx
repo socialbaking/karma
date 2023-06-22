@@ -49,6 +49,13 @@ export async function fileRoutes(fastify: FastifyInstance) {
     decorateReply: false,
     prefix: `/${name}/public`,
   });
+  try {
+    fastify.register(files, {
+      root: publicPath,
+      decorateReply: false,
+      prefix: "/public",
+    });
+  } catch {}
   fastify.register(files, {
     // Relative to top level of this module
     // NOT relative to cwd
