@@ -52,13 +52,7 @@ function readdirRecursive(path: string): DirectoryInfo | undefined {
 
 function Admin() {
 
-    // return <pre>
-    //     {JSON.stringify(
-    //         readdirRecursive("node_modules/@socialbaking/karma") ?? readdirRecursive(process.env.IS_LOCAL ? process.cwd() : "/var"),
-    //         undefined,
-    //         "  "
-    //     )}
-    // </pre>
+
 
     return (
         <>
@@ -71,6 +65,24 @@ function Admin() {
             >
                 Create Role Invite
             </a>
+            <br />
+            <hr />
+            <br />
+            <pre>
+                {JSON.stringify(
+                    readdirRecursive("node_modules/@socialbaking/karma") ?? readdirRecursive(process.env.IS_LOCAL ? process.cwd() : "/var"),
+                    undefined,
+                    "  "
+                )}
+            </pre>
+            <br />
+            <pre>
+                {JSON.stringify(
+                    readdirRecursive("node_modules/@opennetwork/logistics") ?? undefined,
+                    undefined,
+                    "  "
+                )}
+            </pre>
         </>
     )
 

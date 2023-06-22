@@ -34,29 +34,23 @@ const DIRECTORY = dirname(pathname);
 export const REACT_CLIENT_DIRECTORY = join(DIRECTORY, "../react/client");
 
 export async function fileRoutes(fastify: FastifyInstance) {
-  fastify.register(etag);
-  fastify.addHook("onRequest", (request, response, done) => {
+  await fastify.register(etag);
+  await fastify.addHook("onRequest", (request, response, done) => {
     response.header("Cache-Control", "max-age=1800"); // Give it something
     done();
   });
-  fastify.register(files, {
+  await fastify.register(files, {
     root: REACT_CLIENT_DIRECTORY,
     prefix: `/${name}/client`,
+    decorateReply: !fastify.hasReplyDecorator("sendFile"),
   });
   const publicPath = join(root, "./public");
-  fastify.register(files, {
+  await fastify.register(files, {
     root: publicPath,
     decorateReply: false,
     prefix: `/${name}/public`,
   });
-  try {
-    fastify.register(files, {
-      root: publicPath,
-      decorateReply: false,
-      prefix: "/public",
-    });
-  } catch {}
-  fastify.register(files, {
+  await fastify.register(files, {
     // Relative to top level of this module
     // NOT relative to cwd
     root: importmapRoot,
@@ -75,8 +69,8 @@ export async function styleRoutes(fastify: FastifyInstance) {
 export async function viewRoutes(fastify: FastifyInstance) {
   const { ALLOW_ANONYMOUS_VIEWS, ENABLE_CACHE, DEFAULT_TIMEZONE = "Pacific/Auckland" } = process.env;
 
-  fastify.register(styleRoutes);
-  fastify.register(fileRoutes);
+  await fastify.register(styleRoutes);
+  await fastify.register(fileRoutes);
 
   async function getData(request: FastifyRequest): Promise<ReactData> {
     const anonymous = isAnonymous();
