@@ -221,5 +221,11 @@
       "@simplewebauthn/browser": "node_modules/@simplewebauthn/browser/dist/bundle/index.js",
       "@authsignal/browser": "node_modules/@authsignal/browser/dist/index.js"
     }
-  }
+  },
+  "staticReferences": [
+    "./public",
+    "./esnext/karma/react/client/pages/index.js",
+    "./esnext/karma/react/client/is.js",
+    "./esnext/karma/react/client/utils.js"
+  ]
 }

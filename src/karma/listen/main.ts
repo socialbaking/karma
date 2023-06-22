@@ -1,4 +1,4 @@
-import "../../import-references";
+import "../../references";
 
 import * as dotenv from "dotenv";
 

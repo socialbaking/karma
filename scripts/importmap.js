@@ -92,9 +92,18 @@ async function createImports(importmap) {
         "utf-8"
     );
 
-    const referenceFile = files
-        .map((file, index) => `export * as Import${index} from "${file.replace(`/${buildRoot}`, ".")}";`)
-        .join("\n")
+    const importReferences = files
+        .map((file, index) => `await import("${file.replace(`/${buildRoot}`, ".")}");`)
+        .join("\n");
+
+    const referenceFile = `
+    export async function importReferences() { 
+    try {
+    ${importReferences}
+    } catch {
+    
+    }
+    }`.trim();
 
     await writeFile(
         `${buildRoot}/import-references.js`,
