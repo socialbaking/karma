@@ -16,7 +16,7 @@ import {
 import { ok } from "../../../is";
 import { DateTime } from "luxon";
 import { toHumanNumberString } from "../to-human-number-string";
-import { mean, min, max, out } from "simple-statistics";
+import { mean, min, max } from "simple-statistics";
 import { MetricsData } from "../../data";
 import { v4 } from "uuid";
 import outliers from "outliers";
