@@ -154,8 +154,7 @@ export function processReportsForUnit<M extends MetricsData>(
               unit,
               value: toHumanNumberString(min(numericValues)),
               calculation: "minimum",
-              prefix: prefixes[0],
-              outliers: outlierValues
+              prefix: prefixes[0]
             },
             {
               ...values.at(0),
@@ -163,8 +162,7 @@ export function processReportsForUnit<M extends MetricsData>(
               unit,
               value: toHumanNumberString(max(numericValues)),
               calculation: "maximum",
-              prefix: prefixes[0],
-              outliers: outlierValues
+              prefix: prefixes[0]
             },
             {
               ...values.at(0),

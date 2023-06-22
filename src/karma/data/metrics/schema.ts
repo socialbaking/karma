@@ -29,6 +29,10 @@ export const activeIngredientMetrics = {
       type: "string",
       nullable: true,
     },
+    calculation: {
+      type: "string",
+      nullable: true,
+    },
   },
   required: ["type", "unit", "value"],
 } as const;
