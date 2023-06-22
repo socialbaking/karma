@@ -23,7 +23,11 @@ export async function listSpeculativeOffers(options: ListSpeculativeOffersOption
             }
             return metrics.products.find(metricProduct => metricProduct.productId === product.productId);
         }
-        const matching = metrics.find(getProduct);
+        const sortedMatching = metrics
+            .filter(getProduct)
+            .sort((a, b) => a[a.reportingDateKey] > b[b.reportingDateKey] ? -1 : 1)
+
+        const matching = sortedMatching[0];
 
         if (!matching) return [];
         const productMetric = getProduct(matching);
