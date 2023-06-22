@@ -1,5 +1,5 @@
 import {listProducts, Product} from "../product";
-import {listMonthlyMetrics} from "../metrics";
+import {CountryProductMetrics, listMonthlyMetrics} from "../metrics";
 import {Offer} from "@opennetwork/logistics";
 import {v5} from "uuid";
 import {isNumberString} from "../../calculations";
@@ -16,12 +16,14 @@ export async function listSpeculativeOffers(options: ListSpeculativeOffersOption
     return products.flatMap<Offer>(getProductOffers);
 
     function getProductOffers(product: Product): Offer[] {
-        const matching = metrics.find(metrics => (
-            metrics.products.length === 1 &&
-            metrics.products.find(metricProduct => metricProduct.productId === product.productId)
-        ));
+
+        function getProduct(metrics: CountryProductMetrics) {
+            return metrics.products.find(metricProduct => metricProduct.productId === product.productId);
+        }
+        const matching = metrics.find(getProduct);
 
         if (!matching) return [];
+        const productMetric = getProduct(matching);
 
         const size = (
             product.sizes?.find(size => isNumberString(size.value)) ??
@@ -32,7 +34,7 @@ export async function listSpeculativeOffers(options: ListSpeculativeOffersOption
 
         const unit = size.unit;
 
-        const metric = matching.products[0].activeIngredients.find(value => (
+        const metric = productMetric.activeIngredients.find(value => (
             value.size &&
             value.size.unit === size.unit &&
             value.size.value === size.value &&
