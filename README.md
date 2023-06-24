@@ -448,6 +448,7 @@ export interface ReportData
   note?: string;
   parentReportId?: string;
   createdByUserId?: string;
+  createdByPartnerId?: string;
   anonymous?: boolean;
 }
 

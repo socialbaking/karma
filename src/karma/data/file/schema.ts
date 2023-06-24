@@ -10,6 +10,11 @@ export const file = {
         productId: {
             type: "string",
             nullable: true
+        },
+        reactionCounts: {
+            type: "object",
+            properties: {},
+            additionalProperties: true
         }
     }
 }
