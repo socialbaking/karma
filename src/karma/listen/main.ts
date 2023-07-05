@@ -1,5 +1,3 @@
-import "../../references";
-
 import * as dotenv from "dotenv";
 
 dotenv.config();
@@ -7,5 +5,8 @@ dotenv.config();
 await import("../../tracing");
 
 const { start } = await import("./start");
+const { configure } = await import("../config");
 
-await start();
+await import("../../references");
+
+await configure(start);

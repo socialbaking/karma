@@ -1,12 +1,11 @@
 import { withConfig } from "@opennetwork/logistics";
 import {views} from "../react/server/paths";
 import {alternativeRoleNames, namedRoles} from "../data";
-import {Config} from "@opennetwork/logistics";
-// import type {PaymentForm} from "@opennetwork/logistics/esnext/react/server/paths/order/types";
+// import type {PaymentForm} from "@opennetwork/logistics";
 // import {v4} from "uuid";
 // import {getOrigin} from "../listen/config";
 // import {ok} from "../../is";
-//
+
 // function getPaymentCallbackUrls() {
 //     return {};
 // }
@@ -16,6 +15,12 @@ export function configure<R>(fn: () => R): R {
         views,
         namedRoles,
         alternativeRoleNames,
+
+        /**
+         * EXAMPLE ONLY
+         *
+         * KARMA DOES NOT CURRENTLY TAKE PAYMENTS, THIS IS SHOWING USE OF @OPENNETWORK/LOGISTICS
+         */
         // async getPaymentForm({ order, total, offers }): Promise<PaymentForm> {
         //
         //     const merchantReference = v4();

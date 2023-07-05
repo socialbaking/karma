@@ -7,7 +7,7 @@ import {
     timeBetweenCommitAndTestCompletion,
 } from "../../../package.readonly";
 import { homepage, packageIdentifier } from "../../../package";
-import { packageIdentifier as basePackageIdentifier } from "@opennetwork/logistics";
+import {getConfig, packageIdentifier as basePackageIdentifier} from "@opennetwork/logistics";
 import {useIsAdmin, useIsTrusted} from "../data";
 import {readdirSync, statSync} from "fs";
 import {join} from "node:path";
@@ -79,6 +79,22 @@ function Admin() {
             <pre>
                 {JSON.stringify(
                     readdirRecursive("node_modules/@opennetwork/logistics") ?? undefined,
+                    undefined,
+                    "  "
+                )}
+            </pre>
+            <br />
+            <pre>
+                {JSON.stringify(
+                    Object.fromEntries(
+                        Object.entries(getConfig())
+                            .map(entry => {
+                                if (typeof entry[1] === "function") {
+                                    return [entry[0], "typeof function"]
+                                }
+                                return entry;
+                            })
+                    ),
                     undefined,
                     "  "
                 )}
