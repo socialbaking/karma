@@ -74,7 +74,7 @@
     "@kvs/types": "^2.1.1",
     "@octokit/request": "6.2.4",
     "@octokit/rest": "^19.0.8",
-    "@opennetwork/logistics": "^1.0.0-alpha.59",
+    "@opennetwork/logistics": "^1.0.0-alpha.60",
     "@opentelemetry/api": "^1.4.1",
     "@opentelemetry/auto-instrumentations-node": "^0.36.6",
     "@opentelemetry/instrumentation-fastify": "^0.31.2",
