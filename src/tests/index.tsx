@@ -16,6 +16,8 @@ try {
     await startRedisMemory();
   }
 
+  type T = Awaited<Promise<string>>
+
   await autoSeed();
 
 
