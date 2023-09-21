@@ -300,15 +300,15 @@ export interface Partner extends PartnerData {
   approvedByUserId?: string;
 }
 
-export interface Temperature {
+export interface ProductTemperature {
   value: string;
-  unit: string;
+  unit?: string;
 }
 
-export interface IngredientInfo {
+export interface ProductIngredient {
   name: string;
   active?: boolean;
-  boil?: Temperature;
+  boil?: ProductTemperature;
 }
 
 export interface ProductSizeData extends Record<string, unknown> {
@@ -358,7 +358,7 @@ export interface ProductData extends Record<string, unknown> {
   info?: ProductInfo[];
   files?: ProductFile[];
   obsoleteAt?: string;
-  ingredients?: IngredientInfo[];
+  ingredients?: ProductIngredient[];
 }
 
 export interface ProductActiveIngredient {

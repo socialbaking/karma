@@ -137,6 +137,24 @@ export function ProductPage() {
                     overrideClassName="block hover:bg-gray-50 -mx-4 py-4 px-4"
                 />
             </ul>
+            {
+                product.ingredients ? (
+                    <ul>
+                        {
+                            product.ingredients.map(
+                                (ingredient, index) => (
+                                    <li key={index}>
+                                        {ingredient.name} | {ingredient.boil?.value} {ingredient.boil?.unit}
+                                    </li>
+                                )
+                            )
+                        }
+                    </ul>
+                ) : undefined
+            }
+            <br /><br />
+            <hr />
+            <br /><br />
             <a
                 href={`/calculator?search=${encodeURIComponent(product.productName)}`}
                 className="text-blue-600 hover:bg-white underline hover:underline-offset-2"
