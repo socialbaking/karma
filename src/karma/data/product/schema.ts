@@ -1,3 +1,35 @@
+export const productTemperatureData = {
+  type: "object",
+  properties: {
+    value: {
+      type: "string",
+    },
+    unit: {
+      type: "string",
+      nullable: true
+    },
+  },
+  required: ["value"],
+};
+
+export const productIngredientData = {
+  type: "object",
+  properties: {
+    name: {
+      type: "string",
+    },
+    boil: {
+      ...productTemperatureData,
+      nullable: true
+    },
+    active: {
+      type: "boolean",
+      nullable: true
+    }
+  },
+  required: ["name"],
+};
+
 export const productSizeData = {
   type: "object",
   properties: {
@@ -80,6 +112,11 @@ export const productData = {
         type: "string",
       },
       nullable: true,
+    },
+    ingredients: {
+      type: "array",
+      items: productIngredientData,
+      nullable: true
     },
     categoryId: {
       type: "string",

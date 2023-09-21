@@ -1,5 +1,16 @@
 import {FileData} from "../file";
 
+export interface ProductTemperature {
+  value: string;
+  unit?: string;
+}
+
+export interface ProductIngredient {
+  name: string;
+  active?: boolean;
+  boil?: ProductTemperature;
+}
+
 export interface ProductSizeData extends Record<string, unknown> {
   value: string;
   unit: string;
@@ -47,6 +58,7 @@ export interface ProductData extends Record<string, unknown> {
   info?: ProductInfo[];
   files?: ProductFile[];
   obsoleteAt?: string;
+  ingredients?: ProductIngredient[];
 }
 
 export interface ProductActiveIngredient {

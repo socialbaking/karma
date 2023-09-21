@@ -13,7 +13,7 @@ export const trusted = true;
 
 export async function submit(request: FastifyRequest) {
   const report = await uploadReportHandler(request);
-  if (isProductReport(report) || report.reports.find(isProductReport)) {
+  if (isProductReport(report) || report?.reports.find(isProductReport)) {
     await background();
   }
   return {
@@ -55,6 +55,7 @@ export function UploadReport() {
   const submitted = useSubmitted();
   const result = useMaybeResult<{ report: Report; metrics?: ReportMetrics }>();
   const error = useError();
+  console.error(error);
   return (
     <>
       <form
@@ -87,7 +88,7 @@ export function UploadReport() {
             <hr className="my-8" />
           </>
         ) : undefined}
-        {submitted && result ? (
+        {submitted && result.report ? (
           <>
             <hr className="my-8" />
             <div className="pointer-events-auto flex items-center justify-between gap-x-6 bg-green-200 px-6 py-2.5 sm:rounded-xl sm:py-3 sm:pl-4 sm:pr-3.5">
@@ -106,7 +107,7 @@ export function UploadReport() {
                     </tr>
                     </thead>
                     <tbody>
-                    {result.report.reports.map(
+                    {result.report?.reports.map(
                         (report, index) => (
                             <tr key={index} className={report.productName ? "bg-lime-200" : "bg-red-400"}>
                               <td>{report.productText}</td>
@@ -119,7 +120,18 @@ export function UploadReport() {
               ) : undefined
             }
           </>
-        ) : undefined}
+        ) : (
+            submitted && !error ? (
+                <>
+                  <hr className="my-8" />
+                  <div className="pointer-events-auto flex items-center justify-between gap-x-6 bg-green-200 px-6 py-2.5 sm:rounded-xl sm:py-3 sm:pl-4 sm:pr-3.5">
+                    <p className="text-sm leading-6">
+                      Uploaded!
+                    </p>
+                  </div>
+                </>
+            ) : undefined
+        )}
       </section>
     </>
   );

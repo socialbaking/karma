@@ -82,6 +82,7 @@ interface DiscordContext {
 export async function seedDiscordMedia() {
 
     if (!DISCORD_BOT_TOKEN) return;
+    if (process.env.NO_DISCORD_MEDIA_SEED) return;
 
     let rateLimitedUntil: number | undefined = undefined;
 

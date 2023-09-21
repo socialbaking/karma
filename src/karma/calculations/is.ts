@@ -3,15 +3,16 @@ import {PollReportData, PollReportOptionData, ProductReportData} from "../client
 import {isLike} from "../../is";
 
 export function isProductReport(
-  report: Report
+  report?: Report
 ): report is Report & ProductReportData & { type: "purchase" | "product" } {
   return !!isProductReportData(report);
 }
 
 export function isProductReportData(
-  report: ReportData
+  report?: ReportData
 ): report is ReportData & ProductReportData & { type: "purchase" | "product" } {
   return !!(
+    report &&
     (report.type === "product" || report.type === "purchase") &&
     isNumberString(report.productTotalCost) &&
     isNumberString(report.productItemCost) &&

@@ -38,6 +38,10 @@ try {
       await import("./search");
       span.end();
     });
+    await tracer.startActiveSpan("offers-tests", async (span) => {
+      await import("./offers");
+      span.end();
+    });
     span.end();
   });
 

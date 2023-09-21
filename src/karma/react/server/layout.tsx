@@ -118,7 +118,7 @@ const items: UserMenuItem[] = [
   },
   {
     path: "/upload-report",
-    name: "Upload CSV",
+    name: "Upload",
     icon: (
       <svg
         xmlns="http://www.w3.org/2000/svg"

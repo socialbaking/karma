@@ -1,5 +1,5 @@
-import {listProducts, Product} from "../product";
-import {CountryProductMetrics, listMonthlyMetrics} from "../metrics";
+import {listProducts, Product, ProductSizeData} from "../product";
+import {ActiveIngredientMetrics, CountryProductMetrics, listMonthlyMetrics, ProductMetricData} from "../metrics";
 import {Offer} from "@opennetwork/logistics";
 import {v5} from "uuid";
 import {isNumberString} from "../../calculations";
@@ -8,15 +8,38 @@ export interface ListSpeculativeOffersOptions {
     public?: boolean;
 }
 
-export async function listSpeculativeOffers(options: ListSpeculativeOffersOptions = {}) {
-    const products = await listProducts(options);
+export async function listSpeculativeOffers(options: ListSpeculativeOffersOptions = {}): Promise<Offer[]> {
+    const [products, generics] = await Promise.all([
+        listProducts(options),
+        listProducts({
+            generic: true
+        })
+    ]);
 
     const metrics = await listMonthlyMetrics();
 
-    return products.flatMap<Offer>(getProductOffers);
+    interface ProductMetricInfo {
+        product: Product;
+        metric?: ActiveIngredientMetrics;
+        size: ProductSizeData;
+        productMetric: ProductMetricData;
+        unit: string;
+        matching?: CountryProductMetrics;
+    }
+    const info: ProductMetricInfo[] = products.flatMap<ProductMetricInfo>(getProductMetric);
 
-    function getProductOffers(product: Product): Offer[] {
+    const productOffers = info.flatMap(getProductOffers);
 
+    const units = [...new Set(info.map(({ metric }) => metric.unit))];
+    console.log({
+        units,
+    })
+
+    const genericOffers = generics.flatMap(getGenericProductOffer);
+
+    return productOffers.concat(genericOffers);
+
+    function getProductMetric(product: Product): ProductMetricInfo[] {
         function getProduct(metrics: CountryProductMetrics) {
             if (product.countryCode && product.countryCode !== metrics.countryCode) {
                 return undefined;
@@ -50,6 +73,19 @@ export async function listSpeculativeOffers(options: ListSpeculativeOffersOption
             value.calculation === "mean"
         ));
 
+        const info: ProductMetricInfo = {
+            metric,
+            matching,
+            unit,
+            productMetric,
+            size,
+            product,
+        };
+
+        return [info];
+    }
+
+    function getProductOffers({ metric, matching, size, product }: ProductMetricInfo): Offer[] {
         if (!metric) return [];
 
         const countryCode = product.countryCode || matching.countryCode || "NZ";
@@ -65,7 +101,7 @@ export async function listSpeculativeOffers(options: ListSpeculativeOffersOption
                 {
                     type: "product",
                     productId: product.productId,
-                    quantity: 1
+                    quantity: 1,
                 }
             ],
             currency: currency ?? "",
@@ -79,5 +115,14 @@ export async function listSpeculativeOffers(options: ListSpeculativeOffersOption
         return [
             offer
         ];
+    }
+
+    function getGenericProductOffer(product: Product): Offer[] {
+
+
+
+
+
+        return [];
     }
 }

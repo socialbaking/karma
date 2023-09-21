@@ -6,26 +6,42 @@ import {
   ReportData,
   splitValueUnitPrefix,
   Report,
-  listProducts, listOrganisations, listCategories,
+  listProducts, listOrganisations, listCategories, ProductData, ProductIngredient, CalculationConsentItem, setProduct,
 } from "../../data";
-import { ok } from "../../../is";
+import {isLike, ok} from "../../../is";
 import { reportDataReportKeys } from "../../data/report/schema";
 import { calculations, hasConsent } from "../../calculations";
 import { MultipartValue } from "@fastify/multipart";
 import { parseStringFields } from "../body-parser";
 import { getReportDataFromRequestBody } from "./add-report";
 import { authenticate } from "../authentication";
+import { Readable } from "node:stream";
+import {getMatchingProducts} from "../../utils";
 
 const { UPLOAD_LIMIT: givenLimit } = process.env;
 
 const UPLOAD_LIMIT = givenLimit ? +givenLimit : 4.5 * 1024 * 1024;
 
+async function fromReadable(readable: Readable) {
+  const chunks = [];
+  for await (const chunk of readable) {
+    chunks.push(chunk);
+  }
+  return Buffer.concat(chunks);
+}
+
+async function fromReadableJSON(readable: Readable) {
+  const buffer = await fromReadable(readable);
+  return JSON.parse(buffer.toString("utf-8"));
+}
+
+type ReportDataRecord = Record<keyof ReportData, string>;
+
 export async function uploadReportHandler(
   request: FastifyRequest
-): Promise<Report> {
+): Promise<Report | undefined> {
   ok(request.isMultipart(), "Expected multi part form upload");
 
-  type ReportDataRecord = Record<keyof ReportData, string>;
 
   const fields: MultipartValue[] = [];
 
@@ -55,6 +71,9 @@ export async function uploadReportHandler(
       ok(!fileParsed, "Expected one file");
       if (part.filename.endsWith(".json")) {
         // TODO
+        const json = await fromReadableJSON(part.file);
+        ok(Array.isArray(json), "Expected JSON array file");
+        records.push(...json);
       } else {
         await pipeline(part.file, parser);
       }
@@ -65,28 +84,90 @@ export async function uploadReportHandler(
     fields.map((field) => [field.fieldname, String(field.value)])
   );
   const fieldsProcessed = parseStringFields(fieldsParams.toString());
-  ok<ReportData>(fieldsProcessed);
+  ok<Record<string, string>>(fieldsProcessed);
 
-  ok(records.length, "Expected at least one CSV row");
+  ok(records.length, "Expected at least one row");
 
+  console.log(records[0], records.find(isProductIngredientInfo));
+
+  if (records.find(isProductIngredientInfo)) {
+    await uploadIngredientInfo(records);
+    return undefined;
+  } else {
+    // addReport shouldn't be throwing
+    // where the above getReportDataFromRequestBody does throw
+    // this allows us to be sure we aren't uploading half the report file
+    return await uploadDefaultReportRecords(records, fieldsProcessed);
+  }
+}
+
+export async function uploadReportRoutes(fastify: FastifyInstance) {
+  fastify.post("/upload", {
+    preHandler: authenticate(fastify),
+    async handler(request, response) {
+      const report = await uploadReportHandler(request);
+      response.status(201);
+      response.send(report);
+    },
+  });
+}
+
+function isProductIngredientInfo(info: unknown): info is ProductData & { ingredients: ProductIngredient[] } {
+  return !!(
+      isLike<ProductData>(info) &&
+      typeof info.productName === "string" &&
+      Array.isArray(info.ingredients) &&
+      info.ingredients.every(ingredient => ingredient.name)
+  );
+}
+
+async function uploadIngredientInfo(records: unknown[]): Promise<void> {
+  const filtered = records.filter(isProductIngredientInfo);
+  ok(filtered.length === records.length, `${records.length - filtered.length} items are not product ingredient lists`);
+
+  const products = await listProducts();
+  const organisations = await listOrganisations();
+  const categories = await listCategories();
+
+  for (const { productName, ingredients } of filtered) {
+    const [match] = getMatchingProducts(
+        products,
+        organisations,
+        categories,
+        productName,
+        true
+    );
+
+    if (match) {
+       await setProduct({
+         ...match,
+         ingredients
+       });
+    }
+  }
+}
+
+async function uploadDefaultReportRecords(records: ReportDataRecord[], fields: Record<string, string>) {
   ok(
-    getReportDataRowEntries(records[0]).length,
-    `Expected columns to match: ${reportDataReportKeys.join(",")}`
+      getReportDataRowEntries(records[0]).length,
+      `Expected columns to match: ${reportDataReportKeys.join(",")}`
   );
 
   const data: ReportDataRecord[] = records
-    .map((record) => {
-      const entries = getReportDataRowEntries(record);
-      if (!entries.length) return undefined;
-      return getReportDataRow(entries);
-    })
-    .filter(Boolean);
+      .map((record) => {
+        const entries = getReportDataRowEntries(record);
+        if (!entries.length) return undefined;
+        return getReportDataRow(entries);
+      })
+      .filter(Boolean);
 
-  const { calculationConsent } = fieldsProcessed;
+  const { calculationConsent } = fields;
+
+  ok<CalculationConsentItem[]>(calculationConsent);
 
   ok(
-    hasConsent(calculationConsent, calculations.metrics.costPerUnit),
-    `Expected consent for ${calculations.metrics.costPerUnit.title} calculations for CSV report upload`
+      hasConsent(calculationConsent, calculations.metrics.costPerUnit),
+      `Expected consent for ${calculations.metrics.costPerUnit.title} calculations for CSV report upload`
   );
 
   const baseData: ReportData = {
@@ -106,20 +187,20 @@ export async function uploadReportHandler(
 
   for (const row of data) {
     ok(
-      !row.countryCode || row.countryCode === baseData.countryCode,
-      "Expected all rows to have the same countryCode, or only the first row to contain a countryCode"
+        !row.countryCode || row.countryCode === baseData.countryCode,
+        "Expected all rows to have the same countryCode, or only the first row to contain a countryCode"
     );
     ok(
-      !row.currencySymbol || row.currencySymbol === baseData.currencySymbol,
-      "Expected all rows to have the same currencySymbol, or only the first row to contain a currencySymbol"
+        !row.currencySymbol || row.currencySymbol === baseData.currencySymbol,
+        "Expected all rows to have the same currencySymbol, or only the first row to contain a currencySymbol"
     );
     ok(
-      !row.timezone || row.timezone === baseData.timezone,
-      "Expected all rows to have the same timezone, or only the first row to contain a timezone"
+        !row.timezone || row.timezone === baseData.timezone,
+        "Expected all rows to have the same timezone, or only the first row to contain a timezone"
     );
     ok(
-      !row.type || row.type === baseData.type,
-      "Expected all rows to have the same type, or only the first row to contain a type"
+        !row.type || row.type === baseData.type,
+        "Expected all rows to have the same type, or only the first row to contain a type"
     );
 
     const {
@@ -172,26 +253,15 @@ export async function uploadReportHandler(
 
   function getReportDataRowEntries(data: Record<string, string>) {
     return reportDataReportKeys
-      .filter((key) => typeof data[key] === "string" && data[key].length)
-      .map((key) => [key, data[key]] as const);
+        .filter((key) => typeof data[key] === "string" && data[key].length)
+        .map((key) => [key, data[key]] as const);
   }
 
   function getReportDataRow(
-    entries: ReturnType<typeof getReportDataRowEntries>
+      entries: ReturnType<typeof getReportDataRowEntries>
   ): ReportDataRecord {
     const result = Object.fromEntries(entries);
     ok<ReportDataRecord>(result);
     return result;
   }
-}
-
-export async function uploadReportRoutes(fastify: FastifyInstance) {
-  fastify.post("/upload", {
-    preHandler: authenticate(fastify),
-    async handler(request, response) {
-      const report = await uploadReportHandler(request);
-      response.status(201);
-      response.send(report);
-    },
-  });
 }
