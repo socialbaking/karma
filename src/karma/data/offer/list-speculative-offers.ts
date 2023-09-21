@@ -30,14 +30,16 @@ export async function listSpeculativeOffers(options: ListSpeculativeOffersOption
 
     const productOffers = info.flatMap(getProductOffers);
 
-    const units = [...new Set(info.map(({ metric }) => metric.unit))];
-    console.log({
-        units,
-    })
+    return productOffers;
 
-    const genericOffers = generics.flatMap(getGenericProductOffer);
-
-    return productOffers.concat(genericOffers);
+    // const units = [...new Set(info.map(({ metric }) => metric.unit))];
+    // console.log({
+    //     units,
+    // })
+    //
+    // const genericOffers = generics.flatMap(getGenericProductOffer);
+    //
+    // return productOffers.concat(genericOffers);
 
     function getProductMetric(product: Product): ProductMetricInfo[] {
         function getProduct(metrics: CountryProductMetrics) {
