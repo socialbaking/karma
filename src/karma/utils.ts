@@ -142,6 +142,7 @@ export function getMatchingProducts<P extends Product>(
         .split("/")
         .map((value, index) => `${value}${split[index]}`)
     const replace = splitReplace.join(" ");
+    // console.log({ organisation, category, search, numberNumber, replace });
     search = search.replace(numberNumber, replace);
     if (organisation && category) {
       const matching = getMatchingProducts(products, organisations, categories, search);
@@ -210,6 +211,7 @@ export function getMatchingProducts<P extends Product>(
   }
 
   lower = search.toLowerCase();
+  // console.log({ lower });
 
   // console.log({ search, products })
 
@@ -248,6 +250,20 @@ export function getMatchingProducts<P extends Product>(
         products = matching;
       }
     }
+  }
+
+  const ingredientMatch = products.filter(
+      product => (
+          product.ingredients?.find(
+              ingredient => ingredient.name.toLowerCase().includes(lower)
+          )
+      )
+  );
+
+  // console.log({ lower, ingredientMatch })
+
+  if (ingredientMatch.length) {
+    return ingredientMatch;
   }
 
   const lowerSplitMatching = products.filter((product) => {
