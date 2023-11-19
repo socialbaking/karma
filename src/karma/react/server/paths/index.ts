@@ -13,6 +13,7 @@ import * as ErrorsView from "./error";
 import * as UploadReportView from "./upload-report";
 import * as ProductView from "./product";
 import * as ImagesView from "./images";
+import * as ReviewView from "./review";
 import {View} from "@opennetwork/logistics";
 
 export const views: View[] = [
@@ -30,5 +31,6 @@ export const views: View[] = [
     // ErrorsView,
     ProductView,
     UploadReportView,
-    ImagesView
+    ImagesView,
+    ReviewView
 ];

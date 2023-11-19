@@ -43,7 +43,12 @@ export interface DeprecatedReportData {
 
 type StringNumber = `${number}` | number | string;
 
-export interface ProductReportData extends DeprecatedReportData {
+export interface ProductReviewReportData {
+  comment?: string;
+  rating?: string | `${number}` | number;
+  vibes?: string;
+}
+export interface ProductReportData extends DeprecatedReportData, ProductReviewReportData {
   productId?: string;
   productName?: string; // Actual productName, not free text
   productText?: string; // User free text of the product
