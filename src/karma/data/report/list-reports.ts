@@ -9,9 +9,18 @@ export interface ListReportsInput {
 export async function listReports({
   authorizedUserId,
 }: ListReportsInput = {}): Promise<Report[]> {
+  if (!authorizedUserId) {
+    return []; // Shortcut it
+  }
   const store = getReportStore();
   const reports = await store.values();
   return reports
-    .filter((partner) => partner.createdByUserId === authorizedUserId)
+    .filter((partner) => {
+      if (!partner.createdByUserId) {
+        // Be explicit
+        return false;
+      }
+      return partner.createdByUserId === authorizedUserId
+    })
     .map(patchOldReport);
 }

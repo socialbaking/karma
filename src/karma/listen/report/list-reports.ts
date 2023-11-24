@@ -1,6 +1,7 @@
 import { FastifyInstance, FastifyRequest } from "fastify";
 import { listReports, reportSchema } from "../../data";
 import { authenticate } from "../authentication";
+import {getUser} from "../../authentication";
 
 export async function listReportRoutes(fastify: FastifyInstance) {
   const response = {
@@ -26,7 +27,9 @@ export async function listReportRoutes(fastify: FastifyInstance) {
     schema,
     preHandler: authenticate(fastify),
     async handler(request: FastifyRequest, response) {
-      response.send(await listReports());
+      response.send(await listReports({
+        authorizedUserId: getUser().userId
+      }));
     },
   });
 }
