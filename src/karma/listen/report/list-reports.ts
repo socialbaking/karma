@@ -1,7 +1,7 @@
 import { FastifyInstance, FastifyRequest } from "fastify";
 import { listReports, reportSchema } from "../../data";
 import { authenticate } from "../authentication";
-import {getUser} from "../../authentication";
+import {getMaybePartner, getMaybeUser, getUser} from "../../authentication";
 
 export async function listReportRoutes(fastify: FastifyInstance) {
   const response = {
@@ -28,7 +28,8 @@ export async function listReportRoutes(fastify: FastifyInstance) {
     preHandler: authenticate(fastify),
     async handler(request: FastifyRequest, response) {
       response.send(await listReports({
-        authorizedUserId: getUser().userId
+        authorizedUserId: getMaybeUser()?.userId,
+        authorizedPartnerId: getMaybePartner()?.partnerId
       }));
     },
   });
