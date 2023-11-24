@@ -245,6 +245,14 @@ const organisationData: (OrganisationData & { partner?: boolean })[] = [
     countryCode: "NZ",
     associatedBrandingTerms: [],
   },
+  {
+    organisationName: "Eqalis Pharmaceuticals",
+    website: "https://eqalis.co.nz/",
+    approvedAt: "2023-10-31T11:00:00.000Z",
+    approved: true,
+    countryCode: "NZ",
+    associatedBrandingTerms: ["Eqalis"],
+  }
 ];
 
 const partners = organisationData
