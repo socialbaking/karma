@@ -17,6 +17,7 @@ import { getReportDataFromRequestBody } from "./add-report";
 import { authenticate } from "../authentication";
 import { Readable } from "node:stream";
 import {getMatchingProducts} from "../../utils";
+import xlsx from "xlsx";
 
 const { UPLOAD_LIMIT: givenLimit } = process.env;
 
@@ -35,7 +36,154 @@ async function fromReadableJSON(readable: Readable) {
   return JSON.parse(buffer.toString("utf-8"));
 }
 
+type RowRecord = Record<string, string>;
+
 type ReportDataRecord = Record<keyof ReportData, string>;
+
+function parseProductRows(rows: RowRecord[] = []) {
+  const pricePerUnitIndex = rows.findIndex(isPricePerUnitRow);
+  const totalUnitPrices = rows.slice(0, pricePerUnitIndex - 1);
+  return totalUnitPrices.filter(getRowProductName);
+
+  function isPricePerUnitRow(row: RowRecord) {
+    const name = getRowProductName(row);
+    return (
+        name === "Product (price per gram)" ||
+        name === "Product (full spectrum) price per mg" ||
+        name === "Product (Isolate or synthetic) price per mg" ||
+        name === "Product price (balanced) per mg" ||
+        name === "Product price (high THC) per mg" ||
+        name === "Product price per mg" ||
+        name === "Price per mg"
+    );
+  }
+}
+
+function getRowProductName(row: RowRecord) {
+  return (
+      row["Product Name"] ??
+      row["Product (Full spectrum)"] ??
+      row["Product (Isolate or synthetic)"] ??
+      row["Product (Flower)"] ??
+      row["Product (Isolate or synthetic)"] ??
+      row["Product"] ??
+      row["Device"]
+  );
+}
+
+function parseProductWorkSheet(sheet: xlsx.WorkSheet) {
+  const json = xlsx.utils.sheet_to_json<RowRecord>(sheet, {
+    defval: "",
+    blankrows: true
+  });
+  return parseProductRows(json);
+}
+
+function flattenProducts(sheet: RowRecord[]): ReportDataRecord[] {
+  return sheet.flatMap(
+      (row): ReportDataRecord[] => {
+
+        return Object.entries(row)
+            .filter(([key]) => !(key.includes("%") || key === "Size" || key === "Total mg" || key === "Total g" || key === "mg/ml" || getRowProductName(row).includes("updated or checked")))
+            .filter(([, value]) => typeof value === "number")
+            .map(([key, value]): ReportDataRecord => {
+              let singleLine = key
+                  .replace(/\s+/g, " ")
+                  // Special characters for references etc
+                  .replace(/[‡*]+/g, "")
+                  .trim()
+
+              function formatNumber(value: number | string) {
+                return String(Math.round(Number(value) * 100) / 100)
+              }
+
+              let size = `${row["Size"]}g`,
+                  items = "1",
+                  totalCost = formatNumber(row[key]),
+                  itemCost = totalCost,
+                  deliveryCost = "",
+                  feeCost = "";
+
+              const itemsMatch = singleLine.match(/x(\d+)/);
+              if (itemsMatch) {
+                items = itemsMatch[1];
+                singleLine = singleLine.replace(itemsMatch[0], "").trim();
+              }
+
+              const sizeMatch = singleLine.match(/(\d+)g/);
+              if (sizeMatch) {
+                size = sizeMatch[1];
+                singleLine = singleLine.replace(sizeMatch[0], "").trim()
+              }
+
+              if (items !== "1") {
+                totalCost = formatNumber(Number(row[key]) * Number(items))
+              }
+
+              return {
+                type: "product",
+                countryCode: "NZ",
+                currencySymbol: "$",
+                timezone: "Pacific/Auckland",
+                note: "",
+                productText: [
+                  row["Brand"],
+                  getRowProductName(row)
+                ]
+                    .filter(Boolean)
+                    .join(" "),
+                // TODO replace size if in key
+                productSize: size,
+                productTotalCost: totalCost,
+                productItemCost: itemCost,
+                productItems: items,
+                productDeliveryCost: deliveryCost,
+                productFeeCost: feeCost,
+                productOrganisationText: singleLine
+              }
+            })
+
+      }
+  )
+}
+
+async function parseXLSXFile(file: Readable) {
+  const records: RowRecord[] = [];
+
+  const workbook = xlsx.read(await fromReadable(file));
+
+  const flower = workbook.Sheets["Flower"]
+  const oilCBD = workbook.Sheets["CBD Oil (FS)"];
+  const oilCBDIsolate = workbook.Sheets["CBD Oil (Iso)"];
+  const oilCBDTHC = workbook.Sheets["CBD:THC Oil"];
+  const oilTHC = workbook.Sheets["THC Oil"];
+  // const edibles = workbook.Sheets["Edibles"];
+  // const vapes = workbook.Sheets["Vapes"];
+
+  if (flower) {
+    const products = parseProductWorkSheet(flower);
+    const branded = products.filter(row => row["Brand"]);
+    records.push(...flattenProducts(branded))
+  }
+
+  if (oilCBD) {
+    records.push(...flattenProducts(parseProductWorkSheet(oilCBD)));
+  }
+
+  if (oilCBDIsolate) {
+    records.push(...flattenProducts(parseProductWorkSheet(oilCBDIsolate)));
+  }
+
+  if (oilCBDTHC) {
+    records.push(...flattenProducts(parseProductWorkSheet(oilCBDTHC)));
+  }
+
+  if (oilTHC) {
+    records.push(...flattenProducts(parseProductWorkSheet(oilTHC)));
+  }
+
+  return records;
+}
 
 export async function uploadReportHandler(
   request: FastifyRequest
@@ -74,6 +222,8 @@ export async function uploadReportHandler(
         const json = await fromReadableJSON(part.file);
         ok(Array.isArray(json), "Expected JSON array file");
         records.push(...json);
+      } else if (part.filename.endsWith(".xlsx")) {
+        records.push(...await parseXLSXFile(part.file));
       } else {
         await pipeline(part.file, parser);
       }

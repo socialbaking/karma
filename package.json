@@ -147,6 +147,7 @@
     "@types/rimraf": "^3.0.2",
     "@types/uuid": "^8.3.3",
     "@types/whatwg-url": "^8.2.1",
+    "@types/xlsx": "^0.0.36",
     "@types/xmldom": "^0.1.31",
     "@vercel/node": "^2.13.0",
     "@virtualstate/dom": "^2.46.0",
@@ -178,11 +179,11 @@
     "typescript": "^5.0.4",
     "urlpattern-polyfill": "^1.0.0-rc2",
     "v8-to-istanbul": "^8.1.0",
-    "why-is-node-still-running": "^1.0.0",
-    "wrangler": "^3.0.0"
+    "why-is-node-still-running": "^1.0.0"
   },
   "optionalDependencies": {
-    "redis-memory-server": "^0.6.0"
+    "redis-memory-server": "^0.6.0",
+    "wrangler": "^3.0.0"
   },
   "scripts": {
     "test:all": "yarn test:node",

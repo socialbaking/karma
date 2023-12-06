@@ -88,7 +88,7 @@ export function UploadReport() {
             <hr className="my-8" />
           </>
         ) : undefined}
-        {submitted && result.report ? (
+        {submitted && result?.report ? (
           <>
             <hr className="my-8" />
             <div className="pointer-events-auto flex items-center justify-between gap-x-6 bg-green-200 px-6 py-2.5 sm:rounded-xl sm:py-3 sm:pl-4 sm:pr-3.5">
