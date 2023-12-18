@@ -209,7 +209,7 @@ export async function redditAuthenticationRoutes(fastify: FastifyInstance) {
               },
             }
           );
-          ok(response, "getSubscriptions response not ok");
+          ok(response.ok, "getSubscriptions response not ok");
           return response.json();
         }
 
@@ -271,7 +271,7 @@ export async function redditAuthenticationRoutes(fastify: FastifyInstance) {
               "User-Agent": USER_AGENT,
             },
           });
-          ok(response, "getSidebar response not ok");
+          ok(response.ok, "getSidebar response not ok");
           const {
             data: { children },
           } = await response.json();
@@ -286,7 +286,7 @@ export async function redditAuthenticationRoutes(fastify: FastifyInstance) {
               "User-Agent": USER_AGENT,
             },
           });
-          ok(response, "getMe response not ok");
+          ok(response.ok, "getMe response not ok");
           return response.json();
         }
 
@@ -306,7 +306,7 @@ export async function redditAuthenticationRoutes(fastify: FastifyInstance) {
               },
             }
           );
-          ok(response, "getAccessToken response not ok");
+          ok(response.ok, "getAccessToken response not ok");
           return response.json();
         }
       },

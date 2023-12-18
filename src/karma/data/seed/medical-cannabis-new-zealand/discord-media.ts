@@ -84,6 +84,8 @@ export async function seedDiscordMedia() {
     if (!DISCORD_BOT_TOKEN) return;
     if (process.env.NO_DISCORD_MEDIA_SEED) return;
 
+    console.log("seed discord media");
+
     let rateLimitedUntil: number | undefined = undefined;
 
     function createContext(initialRequests = DEFAULT_MAX_REQUESTS) {

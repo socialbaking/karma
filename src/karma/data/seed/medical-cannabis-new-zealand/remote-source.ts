@@ -39,6 +39,7 @@ import {
   NZULM_TERMS,
 } from "../../../utils";
 import {seedDiscordMedia} from "./discord-media";
+import {seedRedditContent} from "./reddit-content";
 
 
 // All these products are sourced from public knowledge
@@ -68,8 +69,10 @@ export async function seed() {
 
   await seedFromHealthNZ();
 
-  console.log("seed discord media");
   await seedDiscordMedia();
+
+  await seedRedditContent();
+
 }
 
 export async function seedFromHealthNZ() {
