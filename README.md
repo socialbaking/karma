@@ -23,6 +23,7 @@ export interface ClientOptions {
   version?: number;
   prefix?: string;
   url?: string | URL;
+  fetch?: typeof fetch
 }
 
 export interface Client {
