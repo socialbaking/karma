@@ -26,6 +26,7 @@ export class Client implements ClientInterface {
   readonly partnerId: string | undefined;
   readonly version: number;
   readonly prefix: string;
+  readonly fetch: typeof fetch;
 
   constructor({
     url,
@@ -33,7 +34,9 @@ export class Client implements ClientInterface {
     partnerId,
     version,
     prefix,
+    fetch: optionsFetch
   }: ClientOptions = {}) {
+    this.fetch = optionsFetch ?? fetch;
     this.baseUrl = url ?? "https://karma.patient.nz";
     version = version ?? 1;
     this.version = version;
@@ -54,7 +57,7 @@ export class Client implements ClientInterface {
 
   async addPartner(partner: PartnerData): Promise<Partner> {
     const { baseUrl, headers, prefix } = this;
-    const response = await fetch(new URL(`${prefix}/partners`, baseUrl), {
+    const response = await this.fetch(new URL(`${prefix}/partners`, baseUrl), {
       method: "POST",
       body: JSON.stringify(partner),
       headers,
@@ -65,7 +68,7 @@ export class Client implements ClientInterface {
 
   async addCategory(category: CategoryData): Promise<Category> {
     const { baseUrl, headers, prefix } = this;
-    const response = await fetch(new URL(`${prefix}/categories`, baseUrl), {
+    const response = await this.fetch(new URL(`${prefix}/categories`, baseUrl), {
       method: "POST",
       body: JSON.stringify(category),
       headers,
@@ -76,7 +79,7 @@ export class Client implements ClientInterface {
 
   async listOrganisations(): Promise<Organisation[]> {
     const { baseUrl, headers, prefix } = this;
-    const response = await fetch(new URL(`${prefix}/organisations`, baseUrl), {
+    const response = await this.fetch(new URL(`${prefix}/organisations`, baseUrl), {
       method: "GET",
       headers,
     });
@@ -86,7 +89,7 @@ export class Client implements ClientInterface {
 
   async listPartners(): Promise<Partner[]> {
     const { baseUrl, headers, prefix } = this;
-    const response = await fetch(new URL(`${prefix}/partners`, baseUrl), {
+    const response = await this.fetch(new URL(`${prefix}/partners`, baseUrl), {
       method: "GET",
       headers,
     });
@@ -100,7 +103,7 @@ export class Client implements ClientInterface {
     if (partnerId) {
       url.searchParams.set("partnerId", partnerId);
     }
-    const response = await fetch(url, {
+    const response = await this.fetch(url, {
       method: "GET",
       headers,
     });
@@ -110,7 +113,7 @@ export class Client implements ClientInterface {
 
   async addProduct(product: ProductData): Promise<Product> {
     const { baseUrl, headers, prefix } = this;
-    const response = await fetch(new URL(`${prefix}/products`, baseUrl), {
+    const response = await this.fetch(new URL(`${prefix}/products`, baseUrl), {
       method: "POST",
       body: JSON.stringify(product),
       headers,
@@ -121,7 +124,7 @@ export class Client implements ClientInterface {
 
   async addReport(report: ReportData): Promise<Report> {
     const { baseUrl, headers, prefix } = this;
-    const response = await fetch(new URL(`${prefix}/reports`, baseUrl), {
+    const response = await this.fetch(new URL(`${prefix}/reports`, baseUrl), {
       method: "POST",
       body: JSON.stringify(report),
       headers,
@@ -136,7 +139,7 @@ export class Client implements ClientInterface {
     const { baseUrl, headers } = this;
     const url = new URL("/api/background", baseUrl);
     url.search = new URLSearchParams(query).toString();
-    const response = await fetch(url, {
+    const response = await this.fetch(url, {
       method: "GET",
       headers,
     });
@@ -146,7 +149,7 @@ export class Client implements ClientInterface {
 
   async listCategories(): Promise<Category[]> {
     const { baseUrl, headers, prefix } = this;
-    const response = await fetch(new URL(`${prefix}/categories`, baseUrl), {
+    const response = await this.fetch(new URL(`${prefix}/categories`, baseUrl), {
       method: "GET",
       headers,
     });
@@ -156,7 +159,7 @@ export class Client implements ClientInterface {
 
   async listProducts(): Promise<Product[]> {
     const { baseUrl, headers, prefix } = this;
-    const response = await fetch(new URL(`${prefix}/products`, baseUrl), {
+    const response = await this.fetch(new URL(`${prefix}/products`, baseUrl), {
       method: "GET",
       headers,
     });
@@ -166,7 +169,7 @@ export class Client implements ClientInterface {
 
   async listReports(): Promise<Report[]> {
     const { baseUrl, headers, prefix } = this;
-    const response = await fetch(new URL(`${prefix}/reports`, baseUrl), {
+    const response = await this.fetch(new URL(`${prefix}/reports`, baseUrl), {
       method: "GET",
       headers,
     });
@@ -176,7 +179,7 @@ export class Client implements ClientInterface {
 
   async getProduct(productId: string): Promise<Product | undefined> {
     const { baseUrl, headers, prefix } = this;
-    const response = await fetch(
+    const response = await this.fetch(
       new URL(`${prefix}/products/${productId}`, baseUrl),
       {
         method: "GET",
@@ -190,7 +193,7 @@ export class Client implements ClientInterface {
 
   async getReport(reportId: string): Promise<Report | undefined> {
     const { baseUrl, headers, prefix } = this;
-    const response = await fetch(
+    const response = await this.fetch(
       new URL(`${prefix}/reports/${reportId}`, baseUrl),
       {
         method: "GET",
@@ -204,7 +207,7 @@ export class Client implements ClientInterface {
 
   async addReportMetrics(data: ReportMetricsData): Promise<ReportMetrics> {
     const { baseUrl, headers, prefix } = this;
-    const response = await fetch(
+    const response = await this.fetch(
       new URL(`${prefix}/metrics/reports`, baseUrl),
       {
         method: "POST",
@@ -218,7 +221,7 @@ export class Client implements ClientInterface {
 
   async listDailyMetrics(): Promise<CountryProductMetrics[]> {
     const { baseUrl, headers, prefix } = this;
-    const response = await fetch(new URL(`${prefix}/metrics/days`, baseUrl), {
+    const response = await this.fetch(new URL(`${prefix}/metrics/days`, baseUrl), {
       method: "GET",
       headers,
     });
@@ -228,7 +231,7 @@ export class Client implements ClientInterface {
 
   async listMetrics(): Promise<CountryProductMetrics[]> {
     const { baseUrl, headers, prefix } = this;
-    const response = await fetch(new URL(`${prefix}/metrics`, baseUrl), {
+    const response = await this.fetch(new URL(`${prefix}/metrics`, baseUrl), {
       method: "GET",
       headers,
     });
@@ -238,7 +241,7 @@ export class Client implements ClientInterface {
 
   async listMonthlyMetrics(): Promise<CountryProductMetrics[]> {
     const { baseUrl, headers, prefix } = this;
-    const response = await fetch(new URL(`${prefix}/metrics/months`, baseUrl), {
+    const response = await this.fetch(new URL(`${prefix}/metrics/months`, baseUrl), {
       method: "GET",
       headers,
     });
@@ -248,7 +251,7 @@ export class Client implements ClientInterface {
 
   async listReportMetrics(): Promise<ReportMetrics[]> {
     const { baseUrl, headers, prefix } = this;
-    const response = await fetch(
+    const response = await this.fetch(
       new URL(`${prefix}/metrics/reports`, baseUrl),
       {
         method: "GET",
@@ -263,7 +266,7 @@ export class Client implements ClientInterface {
     productId: string
   ): Promise<CountryProductMetrics[]> {
     const { baseUrl, headers, prefix } = this;
-    const response = await fetch(
+    const response = await this.fetch(
       new URL(`${prefix}/metrics/products/${productId}`, baseUrl),
       {
         method: "GET",
@@ -276,7 +279,7 @@ export class Client implements ClientInterface {
 
   async listCalculationKeys(): Promise<string[]> {
     const { baseUrl, headers, prefix } = this;
-    const response = await fetch(
+    const response = await this.fetch(
       new URL(`${prefix}/calculations/keys`, baseUrl),
       {
         method: "GET",
@@ -289,7 +292,7 @@ export class Client implements ClientInterface {
 
   async listCalculations(): Promise<CalculationSource[]> {
     const { baseUrl, headers, prefix } = this;
-    const response = await fetch(new URL(`${prefix}/calculations`, baseUrl), {
+    const response = await this.fetch(new URL(`${prefix}/calculations`, baseUrl), {
       method: "GET",
       headers,
     });
