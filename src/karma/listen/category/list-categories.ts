@@ -24,7 +24,6 @@ export async function listCategoryRoutes(fastify: FastifyInstance) {
 
   fastify.get("/", {
     schema,
-    preHandler: authenticate(fastify),
     async handler(request: FastifyRequest, response) {
       response.send(await listCategories());
     },
